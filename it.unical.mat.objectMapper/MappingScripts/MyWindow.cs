@@ -3,24 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.UI;
 using System.Threading;
 using Assets.Scripts.MappingScripts;
 
 public class MyWindow : EditorWindow
 {
-    ReflectionExecutor re;
-    Serializator serializator;
-    bool groupEnabled;
-    List<string> availableGameObjects;
+    GameObjectsTracker tracker;
     int chosenGOIndex = 0;
     string chosenGO;
-    Dictionary<object, bool> objectsToggled;
-    Dictionary<object, object> objectsOwners;
-    Dictionary<object,Dictionary< string,object>> objectDerivedFromFields;
-    Dictionary<object, Dictionary<string,FieldOrProperty>> objectsProperties;
-    Dictionary<GameObject, List<Component>> gOComponents;
-    bool showProperties=false;
+    bool showProperties = false;
     Vector2 scroll;
 
 
@@ -32,24 +23,23 @@ public class MyWindow : EditorWindow
 
     private void Awake()
     {
-        re = (ReflectionExecutor)GameObject.FindObjectOfType(typeof(ReflectionExecutor));
-        chosenGOIndex = EditorGUILayout.Popup(chosenGOIndex, availableGameObjects.ToArray());
-        chosenGO = availableGameObjects[chosenGOIndex];
-        serializator = new Serializator(this);
+        tracker = new GameObjectsTracker();
+        chosenGOIndex = EditorGUILayout.Popup(chosenGOIndex, tracker.AvailableGameObjects.ToArray());
+        chosenGO = tracker.AvailableGameObjects[chosenGOIndex];      
         
     }
 
     void OnGUI()
     {
-        
-        availableGameObjects = re.GetGameObjects();
-        availableGameObjects.Sort();
+
+        tracker.updateGameObjects();
+        tracker.AvailableGameObjects.Sort();
         chosenGO = EditorGUILayout.TextField("Choosen object", chosenGO);
         GUILayout.Label("Base Settings", EditorStyles.boldLabel);
         GUILayout.BeginHorizontal();
         GUILayout.Label("Choose a game object to map", EditorStyles.label);
-        chosenGOIndex = EditorGUILayout.Popup(chosenGOIndex, availableGameObjects.ToArray());
-        chosenGO = availableGameObjects[chosenGOIndex];
+        chosenGOIndex = EditorGUILayout.Popup(chosenGOIndex, tracker.AvailableGameObjects.ToArray());
+        chosenGO = tracker.AvailableGameObjects[chosenGOIndex];
         GUILayout.EndHorizontal();
         showProperties = EditorGUILayout.BeginToggleGroup("Show properties", showProperties);
         EditorGUI.indentLevel++;
@@ -65,7 +55,7 @@ public class MyWindow : EditorWindow
         bool done = GUILayout.Button("Done");
         if (done)
         {
-            serializator.serialize(re.GetGameObjectWithName(chosenGO));
+            tracker.serialize(chosenGO);
         }
     }
 
@@ -76,22 +66,22 @@ public class MyWindow : EditorWindow
         {
             using (var scrollView = new EditorGUILayout.ScrollViewScope(scroll))
             {
-                GameObject gO = re.GetGameObjectWithName(chosenGO);
-                foreach(FieldOrProperty obj in objectsProperties[gO].Values)
+                GameObject gO = tracker.GetGameObject(chosenGO);
+                foreach(FieldOrProperty obj in tracker.ObjectsProperties[gO].Values)
                 {
-                    EditorGUI.BeginDisabledGroup(objectDerivedFromFields[gO][obj.Name()] == null);
-                    if (re.IsBaseType(obj))
+                    EditorGUI.BeginDisabledGroup(tracker.ObjectDerivedFromFields[gO][obj.Name()] == null);
+                    if (tracker.IsBaseType(obj))
                         {
-                            objectsToggled[obj] = EditorGUILayout.ToggleLeft(obj.Name(), objectsToggled[obj]);
+                        tracker.ObjectsToggled[obj] = EditorGUILayout.ToggleLeft(obj.Name(), tracker.ObjectsToggled[obj]);
                         }
                         else
                         {
-                        
-                            objectsToggled[obj] = EditorGUILayout.BeginToggleGroup(obj.Name(), objectsToggled[obj]);
-                            if (objectsToggled[obj])
+
+                        tracker.ObjectsToggled[obj] = EditorGUILayout.BeginToggleGroup(obj.Name(), tracker.ObjectsToggled[obj]);
+                            if (tracker.ObjectsToggled[obj])
                             {
                                 EditorGUI.indentLevel++;
-                                addSubProperties(objectDerivedFromFields[gO][obj.Name()], gO);
+                                addSubProperties(tracker.ObjectDerivedFromFields[gO][obj.Name()], gO);
                                 EditorGUI.indentLevel--;
                             }
                             EditorGUILayout.EndToggleGroup();
@@ -100,11 +90,11 @@ public class MyWindow : EditorWindow
                 }
                      
                 
-                foreach(Component c in gOComponents[gO])
+                foreach(Component c in tracker.GOComponents[gO])
                 {
                     //Debug.Log(c);
-                    objectsToggled[c] = EditorGUILayout.BeginToggleGroup(c.GetType().ToString(), objectsToggled[c]);
-                    if (objectsToggled[c])
+                    tracker.ObjectsToggled[c] = EditorGUILayout.BeginToggleGroup(c.GetType().ToString(), tracker.ObjectsToggled[c]);
+                    if (tracker.ObjectsToggled[c])
                     {                        
                         EditorGUI.indentLevel++;
                         addSubProperties(c,gO);
@@ -122,10 +112,10 @@ public class MyWindow : EditorWindow
     private void addSubProperties(object obj, object objOwner)
     {
         
-        if(objectsOwners.ContainsKey(obj) && !objectsOwners[obj].Equals(objOwner)|| obj.Equals(re.GetGameObjectWithName(chosenGO)))
+        if(tracker.ObjectsOwners.ContainsKey(obj) && !tracker.ObjectsOwners[obj].Equals(objOwner)|| obj.Equals(tracker.GetGameObject(chosenGO)))
         {
             EditorGUI.BeginDisabledGroup(true);
-            if (obj.Equals(re.GetGameObjectWithName(chosenGO)))
+            if (obj.Equals(tracker.GetGameObject(chosenGO)))
             {
                 EditorGUILayout.ToggleLeft("This is "+chosenGO+" object", true);
             }
@@ -137,28 +127,28 @@ public class MyWindow : EditorWindow
 
             return;
         }
-        if (!objectsToggled.ContainsKey(obj))
+        if (!tracker.ObjectsToggled.ContainsKey(obj))
         {
-            objectsToggled.Add(obj, false);
+            tracker.ObjectsToggled.Add(obj, false);
         }
-        if (!objectsProperties.ContainsKey(obj))
+        if (!tracker.ObjectsProperties.ContainsKey(obj))
         {
             updateDataStructures(obj);
         }
-        foreach (FieldOrProperty f in objectsProperties[obj].Values)
+        foreach (FieldOrProperty f in tracker.ObjectsProperties[obj].Values)
         {
-            EditorGUI.BeginDisabledGroup(objectDerivedFromFields[obj][f.Name()] == null);
-            if (re.IsBaseType(f))
+            EditorGUI.BeginDisabledGroup(tracker.ObjectDerivedFromFields[obj][f.Name()] == null);
+            if (tracker.IsBaseType(f))
             {
-                objectsToggled[f] = EditorGUILayout.ToggleLeft(f.Name(), objectsToggled[f]);
+                tracker.ObjectsToggled[f] = EditorGUILayout.ToggleLeft(f.Name(), tracker.ObjectsToggled[f]);
             }
             else
             {
-                objectsToggled[f] = EditorGUILayout.BeginToggleGroup(f.Name(), objectsToggled[f]);
-                if (objectsToggled[f])
+                tracker.ObjectsToggled[f] = EditorGUILayout.BeginToggleGroup(f.Name(), tracker.ObjectsToggled[f]);
+                if (tracker.ObjectsToggled[f])
                 {
                     EditorGUI.indentLevel++;
-                    addSubProperties(objectDerivedFromFields[obj][f.Name()],obj);
+                    addSubProperties(tracker.ObjectDerivedFromFields[obj][f.Name()],obj);
                     EditorGUI.indentLevel--;
                 }
                 EditorGUILayout.EndToggleGroup();
@@ -169,9 +159,9 @@ public class MyWindow : EditorWindow
 
     private void updateDataStructures(object obj)
     {
-        List<FieldOrProperty> p = re.GetFieldsAndProperties(obj);
-        objectsProperties.Add(obj, new Dictionary<string, FieldOrProperty>());
-        objectDerivedFromFields.Add(obj, new Dictionary<string, object>());
+        List<FieldOrProperty> p = tracker.GetFieldsAndProperties(obj);
+        tracker.ObjectsProperties.Add(obj, new Dictionary<string, FieldOrProperty>());
+        tracker.ObjectDerivedFromFields.Add(obj, new Dictionary<string, object>());
         foreach (FieldOrProperty ob in p)
         {
             object objValueForOb;
@@ -184,21 +174,21 @@ public class MyWindow : EditorWindow
                 //Debug.Log("cannot get value for property " + ob.Name());
                 objValueForOb = null;
             }
-            objectsProperties[obj].Add(ob.Name(), ob);
-            objectsToggled.Add(ob, false);
-            objectDerivedFromFields[obj].Add(ob.Name(), objValueForOb);
-            if (objValueForOb != null && !objectsOwners.ContainsKey(objValueForOb))
+            tracker.ObjectsProperties[obj].Add(ob.Name(), ob);
+            tracker.ObjectsToggled.Add(ob, false);
+            tracker.ObjectDerivedFromFields[obj].Add(ob.Name(), objValueForOb);
+            if (objValueForOb != null && !tracker.ObjectsOwners.ContainsKey(objValueForOb))
             {
-                objectsOwners.Add(objValueForOb, obj);
+                tracker.ObjectsOwners.Add(objValueForOb, obj);
             }
 
         }
         if (obj.GetType() == typeof(GameObject))
         {
-            gOComponents[(GameObject)obj] = re.GetComponents((GameObject)obj);
-            foreach (Component c in gOComponents[(GameObject)obj])
+            tracker.GOComponents[(GameObject)obj] = tracker.GetComponents((GameObject)obj);
+            foreach (Component c in tracker.GOComponents[(GameObject)obj])
             {
-                objectsToggled.Add(c, false);
+                tracker.ObjectsToggled.Add(c, false);
             }
         }
     }
@@ -208,15 +198,15 @@ public class MyWindow : EditorWindow
 
         scroll = new Vector2(0, 0);
         //Debug.Log(chosenGO);
-        GameObject gO = re.GetGameObjectWithName(chosenGO);
-        objectsProperties = new Dictionary<object, Dictionary<string,FieldOrProperty>>();
-        gOComponents = new Dictionary<GameObject, List<Component>>();
-        objectsOwners = new Dictionary<object, object>();
-        objectsToggled = new Dictionary<object, bool>();
-        List<FieldOrProperty> p = re.GetFieldsAndProperties(gO); ;
-        objectsProperties[gO] = new Dictionary<string, FieldOrProperty>();
-        objectDerivedFromFields = new Dictionary<object, Dictionary<string, object>>();
-        objectDerivedFromFields.Add(gO, new Dictionary<string, object>());
+        GameObject gO = tracker.GetGameObject(chosenGO);
+        tracker.ObjectsProperties = new Dictionary<object, Dictionary<string,FieldOrProperty>>();
+        tracker.GOComponents = new Dictionary<GameObject, List<Component>>();
+        tracker.ObjectsOwners = new Dictionary<object, object>();
+        tracker.ObjectsToggled = new Dictionary<object, bool>();
+        List<FieldOrProperty> p = tracker.GetFieldsAndProperties(gO); ;
+        tracker.ObjectsProperties[gO] = new Dictionary<string, FieldOrProperty>();
+        tracker.ObjectDerivedFromFields = new Dictionary<object, Dictionary<string, object>>();
+        tracker.ObjectDerivedFromFields.Add(gO, new Dictionary<string, object>());
         foreach (FieldOrProperty obj in p)
         {
             object gOValueForObj;
@@ -228,29 +218,29 @@ public class MyWindow : EditorWindow
             {
                 gOValueForObj = null;
             }
-            objectsProperties[gO].Add(obj.Name(), obj);
-            if (gOValueForObj != null && !re.IsBaseType(obj))
+            tracker.ObjectsProperties[gO].Add(obj.Name(), obj);
+            if (gOValueForObj != null && !tracker.IsBaseType(obj))
             {
-                objectsOwners.Add(gOValueForObj, gO);
+                tracker.ObjectsOwners.Add(gOValueForObj, gO);
             }
-            
-            objectDerivedFromFields[gO].Add(obj.Name(), gOValueForObj);
-            if (!objectsToggled.ContainsKey(obj))
+
+            tracker.ObjectDerivedFromFields[gO].Add(obj.Name(), gOValueForObj);
+            if (!tracker.ObjectsToggled.ContainsKey(obj))
             {
-                objectsToggled.Add(obj, false);               
+                tracker.ObjectsToggled.Add(obj, false);               
             }
         }
-        gOComponents[gO] = re.GetComponents(gO);
-        foreach (Component c in gOComponents[gO])
+        tracker.GOComponents[gO] = tracker.GetComponents(gO);
+        foreach (Component c in tracker.GOComponents[gO])
         {
-            objectsToggled.Add(c, false);
+            tracker.ObjectsToggled.Add(c, false);
         }
 
     }
 
     void OnInspectorUpdate()
     {
-        if (showProperties && (objectsProperties == null || !objectsProperties.ContainsKey(re.GetGameObjectWithName(chosenGO))))
+        if (showProperties && (tracker.ObjectsProperties == null || !tracker.ObjectsProperties.ContainsKey(tracker.GetGameObject(chosenGO))))
         {
             updateDataStructures();
         }

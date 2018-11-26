@@ -7,16 +7,16 @@ using UnityEngine;
 
 namespace Assets.Scripts.MappingScripts
 {
-    class Serializator
+    public  class Serializator
     {
         ObjectIDGenerator iDGenerator;
-        MyWindow myWindow;
+        GameObjectsTracker tracker;
 
 
-        public Serializator(MyWindow window)
+        public Serializator(GameObjectsTracker tr)
         {
             iDGenerator = new ObjectIDGenerator();
-            myWindow = window;
+            tracker = tr;
         }
 
         internal void serialize(GameObject gO)
