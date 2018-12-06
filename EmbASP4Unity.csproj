@@ -5,9 +5,10 @@
     <ProjectGuid>{4AA77F3E-F274-4520-B54F-0D98DF5DA92A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <NoStandardLibraries>false</NoStandardLibraries>
-    <AssemblyName>ClassLibrary</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <AssemblyName>EmbASP4Unity</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -61,7 +62,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include=".gitignore" />
     <Content Include=".git\ms-persist.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -108,27 +108,18 @@
     <None Include=".git\packed-refs" />
     <None Include=".git\refs\heads\master" />
     <None Include=".git\refs\remotes\origin\master" />
-    <None Include=".project" />
     <None Include=".vs\EmbASP4Unity\v15\.suo" />
     <None Include=".vs\slnx.sqlite" />
     <None Include=".vs\VSWorkspaceState.json" />
-    <None Include="it.unical.mat.objectMapper\MappingScripts\Fact.cs.meta" />
-    <None Include="it.unical.mat.objectMapper\MappingScripts\FieldOrProperty.cs.meta" />
-    <None Include="it.unical.mat.objectMapper\MappingScripts\MyWindow.cs.meta" />
-    <None Include="it.unical.mat.objectMapper\MappingScripts\ReflectionExecutor.cs.meta" />
-    <None Include="it.unical.mat.objectMapper\MappingScripts\Serializator.cs.meta" />
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="it.unical.mat.objectMapper\MappingScripts\Fact.cs" />
-    <Compile Include="it.unical.mat.objectMapper\MappingScripts\FieldOrProperty.cs" />
-    <Compile Include="it.unical.mat.objectMapper\MappingScripts\GameObjectsTracker.cs" />
-    <Compile Include="it.unical.mat.objectMapper\MappingScripts\MyWindow.cs" />
-    <Compile Include="it.unical.mat.objectMapper\MappingScripts\ReflectionExecutor.cs" />
-    <Compile Include="it.unical.mat.objectMapper\MappingScripts\Serializator.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\MappingScripts\Fact.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\MappingScripts\FieldOrProperty.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\MappingScripts\GameObjectsTracker.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\MappingScripts\MyWindow.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\MappingScripts\ReflectionExecutor.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\MappingScripts\SensorConfiguration.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\MappingScripts\SensorsManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".git\objects\info\" />

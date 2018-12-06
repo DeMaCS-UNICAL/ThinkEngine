@@ -9,17 +9,6 @@ using System.IO;
 [ExecuteInEditMode]
 public class ReflectionExecutor : MonoBehaviour
 {
-    void Awake()
-    {
-
-        Debug.Log("Editor causes this Awake");
-
-        string mydocpath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-        using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "WriteLines.txt")))
-        {
-            test(outputFile);
-        }
-    }
 
     public List<string> GetGameObjects()
     {
@@ -38,7 +27,7 @@ public class ReflectionExecutor : MonoBehaviour
         string mydocpath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "WriteLines.txt")))
         {
-            test(outputFile);
+            //test(outputFile);
         }
         
     }
