@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 
-[ExecuteInEditMode]
-public class ReflectionExecutor : MonoBehaviour
+
+public class ReflectionExecutor : ScriptableObject
 {
 
     public List<string> GetGameObjects()
@@ -16,7 +16,9 @@ public class ReflectionExecutor : MonoBehaviour
         List<string> objectsNames = new List<string>();
         foreach(object o in go)
         {
+          
             objectsNames.Add(((GameObject)o).name);
+            
         }
         return objectsNames;
     }
@@ -69,15 +71,41 @@ public class ReflectionExecutor : MonoBehaviour
 
     public bool IsBaseType(FieldOrProperty obj)
     {
-        List<Type> signedInteger = new List<Type> { typeof(sbyte), typeof(short), typeof(int), typeof(long) };
-        List<Type> unsignedInteger = new List<Type> { typeof(byte), typeof(ushort), typeof(uint), typeof(ulong) };
-        List<Type> floatingPoint = new List<Type> { typeof(double), typeof(float) };
+        List<Type> signedInteger = SignedIntegerTypes();
+        List<Type> unsignedInteger = UnsignedIntegerTypes();
+        List<Type> floatingPoint = FloatingPointTypes();
         //Debug.Log(" level " + level);
         Type objType = obj.Type();
-
+        uint u = 1;
+        byte b = 1;
+        ulong l = 1;
+        ushort s = 1;
+        l = s;
         //Debug.Log(obj.GetProperties()[0].PropertyType+" with name "+ obj.GetProperties()[0].Name);
+        bool isBase = signedInteger.Contains(objType) || unsignedInteger.Contains(objType) || floatingPoint.Contains(objType);
+        isBase |= objType == typeof(char) || objType == typeof(bool) || objType == typeof(Enum) || objType == typeof(string);
+        return  isBase ;
+    }
 
-       return signedInteger.Contains(objType) || unsignedInteger.Contains(objType) || floatingPoint.Contains(objType) || objType == typeof(char) || objType == typeof(bool) || objType == typeof(Enum) || objType == typeof(string);
+    public int isArrayOfRank(FieldOrProperty obj)
+    {
+        Type objType = obj.Type();
+        return objType.IsArray? objType.GetArrayRank():-1;
+    }
+
+    public static List<Type> FloatingPointTypes()
+    {
+        return new List<Type> { typeof(double), typeof(float) };
+    }
+
+    public static List<Type> UnsignedIntegerTypes()
+    {
+        return new List<Type> { typeof(byte), typeof(ushort), typeof(uint), typeof(ulong) };
+    }
+
+    public static List<Type> SignedIntegerTypes()
+    {
+        return new List<Type> { typeof(sbyte), typeof(short), typeof(int), typeof(long) };
     }
 
     public void printBaseType(Type obj, int level, List<object> met)
@@ -147,6 +175,17 @@ public class ReflectionExecutor : MonoBehaviour
         }
     }
 
+    internal bool isMappable(FieldOrProperty obj)
+    {
+        return IsBaseType(obj) || isMatrix(obj);
+    }
+
+    private bool isMatrix(FieldOrProperty obj)
+    {
+       
+        return isArrayOfRank(obj)==2;
+    }
+
     public void describeObject(object obj, int level, List<object> met, StreamWriter o)
     {
         Type objType = obj.GetType();
@@ -161,7 +200,7 @@ public class ReflectionExecutor : MonoBehaviour
          }
          */
         // Debug.Log(objType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Length);
-        MemberInfo[] fields = objType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+        MemberInfo[] fields = objType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
         MemberInfo[] properties = objType.GetProperties();
         var members = fields.Union(properties);
         foreach (MemberInfo child in members)
@@ -266,11 +305,21 @@ public class ReflectionExecutor : MonoBehaviour
         }
     }
 
+    internal Type TypeOf(FieldOrProperty f)
+    {
+        return f.Type();
+    }
+
     public List<FieldOrProperty> GetFieldsAndProperties(object go)
     {
         List<FieldOrProperty> propertiesList = new List<FieldOrProperty>();
-        MemberInfo[] fields = go.GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-        MemberInfo[] properties = go.GetType().GetProperties();
+        Type t =go.GetType();
+        if(go is Type)
+        {
+            t = (Type)go;
+        }
+        MemberInfo[] fields = t.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+        MemberInfo[] properties = t.GetProperties();
         var members = fields.Union(properties);
         foreach (MemberInfo child in members)
         {
