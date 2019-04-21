@@ -1,10 +1,9 @@
-﻿using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts.Mappers;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
-namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
+namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
 {
-    internal class ASPFloatingPointMapper : ScriptableObject, IMapper
+    internal class ASPCharMapper : ScriptableObject, IMapper
     {
         public string Map(object o)
         {

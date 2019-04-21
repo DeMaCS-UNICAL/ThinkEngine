@@ -34,4 +34,16 @@ public class FieldOrProperty
     {
         return f == null ? p.GetValue(ob, null) : f.GetValue(ob);
     }
+
+    public void SetValue(object obj, object value)
+    {
+        if (f != null)
+        {
+            f.SetValue(obj, value);
+        }
+        else
+        {
+            p.SetValue(obj, value,null);
+        }
+    }
 }

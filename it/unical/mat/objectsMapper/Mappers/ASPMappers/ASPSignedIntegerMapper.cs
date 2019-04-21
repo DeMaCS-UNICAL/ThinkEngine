@@ -1,8 +1,7 @@
-﻿using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts.Mappers;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
-namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
+namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
 {
     internal class ASPSignedIntegerMapper : ScriptableObject, IMapper
     {

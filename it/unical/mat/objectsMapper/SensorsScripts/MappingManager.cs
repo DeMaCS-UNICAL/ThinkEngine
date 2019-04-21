@@ -1,9 +1,10 @@
-﻿using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts.Mappers;
+﻿using EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts;
+using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
+namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
 {
     
     public class MappingManager : ScriptableObject
@@ -16,7 +17,9 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         }
 
         public void OnEnable() { 
-            mappers.Add(typeof(SimpleSensor), ScriptableObject.CreateInstance<ASPSensorMapper>());
+            mappers.Add(typeof(SimpleSensor), ScriptableObject.CreateInstance<ASPSimpleSensorMapper>());
+            mappers.Add(typeof(AdvancedSensor), ScriptableObject.CreateInstance<ASPAdvancedSensorMapper>());
+            mappers.Add(typeof(SimpleActuator), ScriptableObject.CreateInstance<ASPActuatorMapper>());
             mappers.Add(typeof(bool), ScriptableObject.CreateInstance<ASPBoolMapper>());
             foreach (Type t in ReflectionExecutor.SignedIntegerTypes())
             {
@@ -38,8 +41,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 
         public IMapper getMapper(Type t)
         {
-            
-            return mappers[t];
+            if (mappers.ContainsKey(t))
+            {
+                return mappers[t];
+            }
+            return null;
         }
     }
 }

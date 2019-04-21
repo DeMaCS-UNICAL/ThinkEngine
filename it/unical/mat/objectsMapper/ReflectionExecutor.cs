@@ -9,6 +9,7 @@ using System.IO;
 
 public class ReflectionExecutor : ScriptableObject
 {
+    public const BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
 
     public List<string> GetGameObjects()
     {
@@ -318,7 +319,7 @@ public class ReflectionExecutor : ScriptableObject
         {
             t = (Type)go;
         }
-        MemberInfo[] fields = t.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+        MemberInfo[] fields = t.GetFields(BindingAttr);
         MemberInfo[] properties = t.GetProperties();
         var members = fields.Union(properties);
         foreach (MemberInfo child in members)

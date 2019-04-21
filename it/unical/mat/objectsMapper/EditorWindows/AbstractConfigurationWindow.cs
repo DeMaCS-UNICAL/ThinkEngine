@@ -77,11 +77,34 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 if (save)
                 {
                     Debug.Log("saving fdgdfgdfgdfgdf");
+                    checkToggled();
                     updateConfiguredObject();
                 }
             }
 
         }
+
+        private void checkToggled()
+        {
+            
+
+            List<object> allObjects = new List<object>();
+            allObjects.AddRange(tracker.ObjectsToggled.Keys);
+            foreach (object obj in allObjects)
+            {
+                if (tracker.ObjectsToggled[obj])
+                {
+                    toggleAncestors(obj);
+                }
+            }
+        }
+
+        private void toggleAncestors(object obj)
+        {
+            //IMPLEMENT
+        }
+    
+
         protected void updateConfiguredObject(AbstractConfiguration conf)
         {
             if (manager.configuredGameObject().Contains(chosenGO))
@@ -211,14 +234,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                     {
                         bool disabled = tracker.ObjectDerivedFromFields[gO][obj.Name()] == null;
                         EditorGUI.BeginDisabledGroup(disabled);
-                        if (tracker.IsMappable(obj))
+                        if (isMappable(obj))
                         {
                             EditorGUILayout.BeginHorizontal();
                             tracker.ObjectsToggled[obj] = EditorGUILayout.ToggleLeft(obj.Name(), tracker.ObjectsToggled[obj]);
-                            if (tracker.IsMappable(obj))
-                            {
-                                addCustomFields(obj);
-                            }
+                            addCustomFields(obj);
+
                             if (tracker.ObjectsToggled[obj] && !tracker.IsBaseType(obj))
                             {
                                 bool configure = GUILayout.Button("Configure Object");
@@ -230,8 +251,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                                     if (!tracker.basicTypeCollectionsConfigurations.ContainsKey(obj))
                                     {
                                         tracker.basicTypeCollectionsConfigurations.Add(obj, new SimpleGameObjectsTracker(objectToConfigure.Type()));
-                                        tracker.basicTypeCollectionsConfigurations[obj].getBasicProperties();
                                     }
+                                    tracker.basicTypeCollectionsConfigurations[obj].getBasicProperties();
                                     drawObjectProperties();
                                 }
                             }
@@ -271,7 +292,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             }
         }
 
-       
+        protected virtual bool isMappable(FieldOrProperty obj)
+        {
+            return tracker.IsMappable(obj);
+        }
+
         public void addPropertyName(object obj)
         {
             if (!tracker.propertiesName.ContainsKey(obj))
@@ -370,14 +395,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             {
                 bool disabled = tracker.ObjectDerivedFromFields[obj][f.Name()] == null;
                 EditorGUI.BeginDisabledGroup(disabled);
-                if (tracker.IsMappable(f))
+                if (isMappable(f))
                 {
                     EditorGUILayout.BeginHorizontal();
                     tracker.ObjectsToggled[f] = EditorGUILayout.ToggleLeft(f.Name(), tracker.ObjectsToggled[f]);
-                    if (tracker.IsMappable(f))
-                    {
-                        addCustomFields(f);
-                    }
+                    addCustomFields(f);
                     if (tracker.ObjectsToggled[f] && !tracker.IsBaseType(f))
                     {
                         bool configure = GUILayout.Button("Configure Object");
@@ -389,8 +411,9 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                             if (!tracker.basicTypeCollectionsConfigurations.ContainsKey(f))
                             {
                                 tracker.basicTypeCollectionsConfigurations.Add(f, new SimpleGameObjectsTracker(objectToConfigure.Type()));
-                                tracker.basicTypeCollectionsConfigurations[f].getBasicProperties();
+                                
                             }
+                            tracker.basicTypeCollectionsConfigurations[f].getBasicProperties();
                             drawObjectProperties();
                         }
                     }
@@ -414,11 +437,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         {
             GUILayout.Label("Configure "+objectToConfigure.Type().GetElementType()+" object for "+objectToConfigure.Name()+" property ", EditorStyles.boldLabel);
             SimpleGameObjectsTracker st = tracker.basicTypeCollectionsConfigurations[objectToConfigure];
+            
             List<string> propertiesNames = new List<string>();
+            Debug.Log(st.propertiesToggled);
             foreach (string s in st.propertiesToggled.Keys)
             {
                 propertiesNames.Add(s); 
             }
+            
             using (var h = new EditorGUILayout.VerticalScope())
             {
                 using (var scrollView = new EditorGUILayout.ScrollViewScope(helpScroll))

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
+namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
 {
     
     public interface  IMapper

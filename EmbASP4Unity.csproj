@@ -114,21 +114,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorConfiguration.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\SimpleActuator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\AbstractConfigurationWindow.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\ActuatorConfigurationWindow.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorsManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\AbstractConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\IManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\AdvancedSensor.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Mappers\ASPMappers\ASPBoolMapper.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Mappers\ASPMappers\ASPCharMapper.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Mappers\ASPMappers\ASPEnumMapper.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\FieldOrProperty.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Mappers\ASPMappers\ASPFloatingPointMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPActuatorMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPBoolMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPCharMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPEnumMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\FieldOrProperty.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPFloatingPointMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\GameObjectsTracker.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Mappers\ASPMappers\ASPMapperHelper.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Mappers\ASPMappers\ASPSensorMapper.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Mappers\IMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPMapperHelper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPAdvanceSensorMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPSimpleSensorMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Mappers\IMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\MappingManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\SensorConfigurationWindow.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Operation.cs" />
@@ -136,9 +139,9 @@
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SimpleSensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SensorConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SensorsManager.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Mappers\ASPMappers\ASPSignedIntegerMapper.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Mappers\ASPMappers\ASPStringMapper.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Mappers\ASPMappers\ASPUnsignedIntegerMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPSignedIntegerMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPStringMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPUnsignedIntegerMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\StringPair.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\StringStringPair.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SimpleGameObjectsTracker.cs" />

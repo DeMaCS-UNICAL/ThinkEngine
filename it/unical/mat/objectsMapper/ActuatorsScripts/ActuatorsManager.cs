@@ -11,13 +11,15 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
     public class ActuatorsManager : ScriptableObject,IManager
     {
         [SerializeField]
-        private List<AbstractConfiguration> brainsConfs;
+        private List<AbstractConfiguration> actuatorsConfs;
+        [SerializeField]
+        private List<ActuatorConfiguration> confsToSerialize;
         [SerializeField]
         private List<string> ConfiguredGameObject;
 
         public ref List<AbstractConfiguration> confs()
         {
-            return ref brainsConfs;
+            return ref actuatorsConfs;
         }
 
         public ref List<string> configuredGameObject()
@@ -28,9 +30,9 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
         void OnEnable()
         {
 
-            if (brainsConfs == null)
+            if (actuatorsConfs == null)
             {
-                brainsConfs = new List<AbstractConfiguration>();
+                actuatorsConfs = new List<AbstractConfiguration>();
             }
             if (ConfiguredGameObject == null)
             {
@@ -40,12 +42,23 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
 
         public void OnBeforeSerialize()
         {
-            throw new NotImplementedException();
+            confsToSerialize = new List<ActuatorConfiguration>();
+            foreach (AbstractConfiguration conf in actuatorsConfs)
+            {
+                //Debug.Log("before serialization " + ((SensorConfiguration)conf).operationPerProperty.Count);
+                confsToSerialize.Add((ActuatorConfiguration)conf);
+            }
         }
 
         public void OnAfterDeserialize()
         {
-            throw new NotImplementedException();
+            actuatorsConfs = new List<AbstractConfiguration>();
+            foreach (ActuatorConfiguration conf in confsToSerialize)
+            {
+
+                actuatorsConfs.Add(conf);
+
+            }
         }
     }
 }

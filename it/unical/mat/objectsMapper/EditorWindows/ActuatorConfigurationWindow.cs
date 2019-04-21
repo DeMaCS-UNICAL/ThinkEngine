@@ -93,4 +93,8 @@ public class ActuatorConfigurationWindow : AbstractConfigurationWindow
             
         }
     }
+    protected override bool isMappable(FieldOrProperty obj)
+    {
+        return tracker.IsBaseType(obj);
+    }
 }

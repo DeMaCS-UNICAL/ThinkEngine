@@ -44,8 +44,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
             List<Component> comp = tr.GOComponents[gO];
             foreach (string s in gOProperties.Keys)
             {
+                
                 if (tr.ObjectsToggled[gOProperties[s]])
                 {
+                    Debug.Log("property " + s + " toggled");
                     if (tracker.IsMappable(gOProperties[s]))
                     {
                         //Debug.Log("adding " + gOProperties[s].Name());
@@ -60,12 +62,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
                             specificConfiguration(gOProperties[s], s);
                         }
                     }
-                    
-                }
-                else if (tracker.ObjectDerivedFromFields.ContainsKey(gO) && !tracker.IsBaseType(gOProperties[s]))
-                {
-                    // Debug.Log("recursing on " + gOProperties[s].Name());
-                    recursevelyAdd(gO, gOProperties[s], "");
+                    else if (tracker.ObjectDerivedFromFields.ContainsKey(gO))
+                    {
+                        // Debug.Log("recursing on " + gOProperties[s].Name());
+                        recursevelyAdd(gO, gOProperties[s], "");
+                    }
                 }
             }
             foreach (Component c in comp)
@@ -160,14 +161,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
                                 advancedConf.Add(tracker.basicTypeCollectionsConfigurations[derivedObjProperties[s]]);
                             }
                         }
-                        
-                    }
-                    else if (tracker.ObjectDerivedFromFields.ContainsKey(derivedObj) && !tracker.IsBaseType(derivedObjProperties[s]))
-                    {
-                        //Debug.Log("recursin on " + parent + fieldOrProperty.Name() + "^" + derivedObjProperties[s].Name());
 
-                        recursevelyAdd(derivedObj, derivedObjProperties[s], parent + fieldOrProperty.Name() + "^");
+                        else if (tracker.ObjectDerivedFromFields.ContainsKey(derivedObj) && !tracker.IsBaseType(derivedObjProperties[s]))
+                        {
+                            //Debug.Log("recursin on " + parent + fieldOrProperty.Name() + "^" + derivedObjProperties[s].Name());
 
+                            recursevelyAdd(derivedObj, derivedObjProperties[s], parent + fieldOrProperty.Name() + "^");
+
+                        }
                     }
                 }
             }

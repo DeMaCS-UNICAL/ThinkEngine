@@ -31,13 +31,9 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             sensConfs = new List<AbstractConfiguration>();
             foreach (SensorConfiguration conf in confsToSerialize)
             {
-               // Debug.Log("after serialization SensorConfiguration" + conf.operationPerProperty.Count);
+               
                 sensConfs.Add(conf);
-               /* Debug.Log("after serialization AbstractConfiguration" + ((SensorConfiguration)sensConfs[sensConfs.Count-1]).operationPerProperty.Count);
-               / foreach(StringIntPair pair in conf.operationPerProperty)
-                {
-                    Debug.Log(pair.Key + " " + pair.Value);
-                }*/
+               
             }
         }
 

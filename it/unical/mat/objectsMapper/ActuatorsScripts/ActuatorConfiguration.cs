@@ -14,12 +14,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
     {
         internal override void cleanSpecificDataStructure()
         {
-            throw new NotImplementedException();
+            
         }
 
         internal override void specificConfiguration(FieldOrProperty fieldOrProperty, string s)
         {
-            throw new NotImplementedException();
+            
         }
     }
 }

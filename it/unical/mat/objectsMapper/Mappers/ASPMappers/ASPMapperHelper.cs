@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts.Mappers
+namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
 {
     public class ASPMapperHelper : ScriptableObject
     {
