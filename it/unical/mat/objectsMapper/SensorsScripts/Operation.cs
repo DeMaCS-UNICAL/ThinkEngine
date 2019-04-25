@@ -15,7 +15,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         private static object returnValue;
         private static string valueToTrack;
         public enum boolOperations { Newest, Oldest,Specific_Value,Conjunction,Disjunction };
-        public enum stringOperations { Newest, Oldest, Specific_Value, Mode};
+        public enum stringOperations { Newest, Oldest, Specific_Value };//, Mode};
         public enum numericOperations { Newest, Oldest,  Specific_Value, Max,Min,Avg};
         public enum matrixOperations {All}
         public static readonly int SPECIFIC = (int)boolOperations.Specific_Value;
@@ -44,13 +44,24 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             actionPerOperation.Add(typeof(boolOperations), new Dictionary<int, Action>());
             actionPerOperation.Add(typeof(numericOperations), new Dictionary<int, Action>());
             actionPerOperation.Add(typeof(matrixOperations), new Dictionary<int, Action>());
-            actionPerOperation[typeof(numericOperations)].Add(0, oldest);
-            actionPerOperation[typeof(numericOperations)].Add(1, newest);
+            actionPerOperation[typeof(numericOperations)].Add(0, newest);
+            actionPerOperation[typeof(numericOperations)].Add(1, oldest);
             actionPerOperation[typeof(numericOperations)].Add(2, specificValue);
             actionPerOperation[typeof(numericOperations)].Add(3, max);
             actionPerOperation[typeof(numericOperations)].Add(4, min);
             actionPerOperation[typeof(numericOperations)].Add(5, avg);
             actionPerOperation[typeof(matrixOperations)].Add(0, allMatrix);
+            actionPerOperation[typeof(boolOperations)].Add(0, newest);
+            actionPerOperation[typeof(boolOperations)].Add(1, oldest);
+            actionPerOperation[typeof(boolOperations)].Add(2, specificValue);
+            actionPerOperation[typeof(boolOperations)].Add(3, conjunction);
+            actionPerOperation[typeof(boolOperations)].Add(4, disjunction);
+            actionPerOperation[typeof(stringOperations)].Add(0, newest);
+            actionPerOperation[typeof(stringOperations)].Add(1, oldest);
+            actionPerOperation[typeof(stringOperations)].Add(2, specificValue);
+
+
+
         }
 
         internal static Type getOperationsPerType(Type type)
@@ -66,7 +77,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         internal static object compute(int op, object value)
         {
             values = (IList)value;
-            Type typeForOperation = values.GetType().GetGenericArguments()[0]; ;
+            Type typeForOperation = values.GetType().GetGenericArguments()[0];
             Type enumType = typeof(object);
             if (operationsPerType.ContainsKey(typeForOperation))
             {

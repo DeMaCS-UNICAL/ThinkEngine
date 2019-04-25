@@ -45,8 +45,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             confsToSerialize = new List<ActuatorConfiguration>();
             foreach (AbstractConfiguration conf in actuatorsConfs)
             {
-                //Debug.Log("before serialization " + ((SensorConfiguration)conf).operationPerProperty.Count);
-                confsToSerialize.Add((ActuatorConfiguration)conf);
+                //Debug.Log("before serialization " + ((ActuatorConfiguration)conf));
+                ActuatorConfiguration actuatorConf = (ActuatorConfiguration)conf;
+                confsToSerialize.Add(actuatorConf);
+                
             }
         }
 

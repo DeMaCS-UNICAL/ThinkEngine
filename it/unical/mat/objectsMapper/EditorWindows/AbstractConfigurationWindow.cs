@@ -76,8 +76,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 }
                 if (save)
                 {
-                    Debug.Log("saving fdgdfgdfgdfgdf");
-                    checkToggled();
+                    //Debug.Log("saving fdgdfgdfgdfgdf");
+                   // checkToggled();
                     updateConfiguredObject();
                 }
             }
@@ -126,15 +126,15 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             }
             try
             {
-                Debug.Log("before adding"+manager.confs().Count);
+                //Debug.Log("before adding"+manager.confs().Count);
                 manager.confs().Add(tracker.saveConfiguration(conf,chosenGO));
-                Debug.Log("after adding" + manager.confs().Count);
+                //Debug.Log("after adding" + manager.confs().Count);
 
             }
             catch (Exception e)
             {
-                Debug.Log("error while adding");
-                Debug.Log(e.StackTrace);
+                //Debug.Log("error while adding");
+                //Debug.Log(e.StackTrace);
             }
         }
        
@@ -281,7 +281,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                         if (tracker.ObjectsToggled[c])
                         {
                             EditorGUI.indentLevel++;
-                            addSubProperties(c, c.name, gO);
+                            addSubProperties(c, c.GetType().ToString(), gO);
                             EditorGUI.indentLevel--;
                         }
                     }
@@ -439,7 +439,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             SimpleGameObjectsTracker st = tracker.basicTypeCollectionsConfigurations[objectToConfigure];
             
             List<string> propertiesNames = new List<string>();
-            Debug.Log(st.propertiesToggled);
+            //Debug.Log(st.propertiesToggled);
             foreach (string s in st.propertiesToggled.Keys)
             {
                 propertiesNames.Add(s); 

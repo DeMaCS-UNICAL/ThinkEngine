@@ -1,15 +1,26 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 
 namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
 {
-    internal class ASPSignedIntegerMapper : ScriptableObject, IMapper
+    internal class ASPSignedIntegerMapper: IMapper
     {
+        public static ASPSignedIntegerMapper instance;
         public string Map(object o)
         {
             DictionaryEntry entry = (DictionaryEntry)o;
             string value =  "(" + entry.Value + ")";
-            return ScriptableObject.CreateInstance<ASPMapperHelper>().buildMapping((string)entry.Key, '^', value);
+            return ASPMapperHelper.getInstance().buildMapping((string)entry.Key, '^', value);
+        }
+
+        internal static IMapper getInstance()
+        {
+            if (instance == null)
+            {
+                instance = new ASPSignedIntegerMapper();
+            }
+            return instance;
         }
     }
 }

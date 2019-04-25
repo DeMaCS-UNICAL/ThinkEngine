@@ -18,9 +18,9 @@ public class ActuatorConfigurationWindow : AbstractConfigurationWindow
     [MenuItem("Window/Actuator Configuration Window")]
     public static void Init()
     {
-        Debug.Log("going to show");
+        //Debug.Log("going to show");
         EditorWindow.GetWindow(typeof(ActuatorConfigurationWindow));
-        Debug.Log("showed");
+        //Debug.Log("showed");
     }
 
 
@@ -55,11 +55,11 @@ public class ActuatorConfigurationWindow : AbstractConfigurationWindow
 
     protected override void updateConfiguredObject()
     {
-        updateConfiguredObject(new ActuatorConfiguration());
+        updateConfiguredObject(ActuatorConfiguration.CreateInstance<ActuatorConfiguration>());
     }
 
 
-    void OnDestroy()
+    void OnDisable()
     {
         if (AssetDatabase.LoadAssetAtPath("Assets/Resources/ActuatorsManager.asset", typeof(ActuatorsManager)) == null)
         {
@@ -69,6 +69,19 @@ public class ActuatorConfigurationWindow : AbstractConfigurationWindow
         {
             EditorUtility.SetDirty((ActuatorsManager)manager);
             AssetDatabase.SaveAssets();
+        }
+        foreach (AbstractConfiguration conf in ((ActuatorsManager)manager).confs())
+        {
+            ActuatorConfiguration actuatorConf = (ActuatorConfiguration)conf;
+            if (AssetDatabase.LoadAssetAtPath("Assets/Resources/Actuators/" + actuatorConf.configurationName + ".asset", typeof(ActuatorConfiguration)) == null)
+            {
+                AssetDatabase.CreateAsset(actuatorConf, "Assets/Resources/Actuators/" + actuatorConf.configurationName + ".asset");
+            }
+            else
+            {
+                EditorUtility.SetDirty(actuatorConf);
+                AssetDatabase.SaveAssets();
+            }
         }
     }
 

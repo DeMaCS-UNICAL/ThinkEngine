@@ -10,26 +10,41 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
 {
     public class ASPActuatorMapper : ScriptableObject, IMapper
     {
+        public static ASPActuatorMapper instance;
         public string Map(object o)
         {
             SimpleActuator actuator = (SimpleActuator)o;
             string actuatorMapping = "";
-            foreach(IDictionary dic in actuator.dictionaryPerType.Values)
+            foreach(IDictionary dic in actuator.dictionaryPerType.Values.Distinct())
             {
                 foreach(DictionaryEntry entry in dic)
                 {
-                    actuatorMapping += "setOnActuator("+actuator.actuatorName + "(";
-                    string[] propertyPath = ((string)entry.Key).Split('^');
-                    string suffix = "))";
+                    actuatorMapping += "setOnActuator("+actuator.actuatorName + "("+actuator.gOName+"(";
+                    string keyWithoutDotsAndSpaces = ((string)entry.Key).Replace(".", "");
+                    keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace(" ", "");
+                    if (!actuator.unityASPVariationNames.ContainsKey(keyWithoutDotsAndSpaces)) {
+                        actuator.unityASPVariationNames.Add(keyWithoutDotsAndSpaces, (string)entry.Key);
+                    }
+                    string[] propertyPath = keyWithoutDotsAndSpaces.Split('^');
+                    string suffix = ")))";
                     foreach(string s in propertyPath)
                     {
                         actuatorMapping += s+"(";
                         suffix += ")";
                     }
-                    actuatorMapping += "X" + suffix+":-"+"\n";
+                    actuatorMapping += "X" + suffix+":-"+ Environment.NewLine;
                 }
             }
             return actuatorMapping;
+        }
+
+        internal static IMapper getInstance()
+        {
+            if (instance == null)
+            {
+                instance = new ASPActuatorMapper();
+            }
+            return instance;
         }
     }
 }

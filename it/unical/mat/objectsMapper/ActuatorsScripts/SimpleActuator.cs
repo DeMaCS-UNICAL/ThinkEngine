@@ -1,4 +1,5 @@
 ﻿using EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts;
+using EmbASP4Unity.it.unical.mat.objectsMapper.Mappers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
         public string gOName;
         public string actuatorName;
         public Dictionary<Type, IDictionary> dictionaryPerType;
+        public Dictionary<string, string> unityASPVariationNames;
         public Dictionary<string, long> signedIntegerProperties;
         public Dictionary<string, ulong> unsignedIntegerProperties;
         public Dictionary<string, double> floatingPointProperties;
@@ -36,7 +38,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             properties.AddRange(propertiesToTrack);
             ReflectionExecutor re = ScriptableObject.CreateInstance<ReflectionExecutor>();
             cleanDataStructures();
-            
+            populateDataStructures();
 
         }
 
@@ -47,14 +49,148 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             properties = new List<string>();
             ReflectionExecutor re = ScriptableObject.CreateInstance<ReflectionExecutor>();
             gO = re.GetGameObjectWithName(s.gOName);
+           // Debug.Log(s.gOName);
+           // Debug.Log(gO);
             gOName = s.gOName;
             cleanDataStructures();
             properties.AddRange(s.properties);
-                        
+            populateDataStructures();
+
+        }
+
+        private void populateDataStructures()
+        {
+            Type gOType = gO.GetType();
+            
+            foreach (string st in properties)
+            {
+
+                if (!st.Contains("^"))
+                {
+
+                    setDefaultValue(st,st,gOType, gO);
+                }
+                else
+                {
+                    populateComposedProperty(st, st, gOType, gO);
+                }
+
+            }
+        }
+
+        private void populateComposedProperty(string entire_name, string st, Type objType, object obj)
+        {
+            string parentName = st.Substring(0, st.IndexOf("^"));
+            string child = st.Substring(st.IndexOf("^") + 1, st.Length - st.IndexOf("^") - 1);
+            MemberInfo[] members = objType.GetMember(parentName, BindingAttr);
+            if (members.Length == 0)
+            {
+                populateComponent(entire_name, st, objType, obj);
+                return;
+            }
+            FieldOrProperty parentProperty = new FieldOrProperty(objType.GetMember(parentName)[0]);
+            object parent = parentProperty.GetValue(obj);
+            Type parentType = parent.GetType();
+            if (!child.Contains("^"))
+            {
+                setDefaultValue(entire_name, child, parentType, parent);
+            }
+            else
+            {
+                populateComposedProperty(entire_name, child, parentType, parent);
+            }
+        }
+
+        internal void parse(string test)
+        {
+            //Debug.Log("parsing " + actuatorName);
+            string[] values = test.Split(' ');
+            MappingManager mapper = MappingManager.getInstance();
+            IMapper actuatorMapper = mapper.getMapper(typeof(SimpleActuator));
+            string[] mappedProperties = actuatorMapper.Map(this).Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            foreach(string literal in values)
+            {
+                //Debug.Log("literal "+literal);
+                foreach(string mapped in mappedProperties)
+                {
+                    //Debug.Log("mapped " + mapped);
+                    string withoutVariable = mapped.Substring(0,mapped.LastIndexOf('('));
+                    if (literal.StartsWith(withoutVariable))
+                    {
+                        string clean = literal.Substring(("setOnActuator(" + actuatorName + "(" + gOName + "(").Length);
+                        clean = clean.Replace('(', '^');
+                        clean = clean.Remove(clean.IndexOf(')'));
+                        string val = clean.Substring(clean.LastIndexOf('^')+1);
+                        clean = clean.Remove(clean.LastIndexOf('^'));
+                        //Debug.Log(clean+" has value "+val);
+                        string property = unityASPVariationNames[clean];
+                        foreach(Type t in dictionaryPerType.Keys)
+                        {
+                            IDictionary dic = dictionaryPerType[t];
+                            if (dic.Contains(property))
+                            {
+                                dic[property] = Convert.ChangeType(val, dic.GetType().GetGenericArguments()[1]);
+                            }
+                            
+                        }
+                        break;
+                    }
+
+                }
+            }
+        }
+
+        private void populateComponent(string entire_name, string st, Type objType, object obj)
+        {
+            string parentName = st.Substring(0, st.IndexOf("^"));
+            string child = st.Substring(st.IndexOf("^") + 1, st.Length - st.IndexOf("^") - 1);
+            if (objType == typeof(GameObject))
+            {
+                Component c = ((GameObject)gO).GetComponent(parentName);
+                if (c != null)
+                {
+                    if (!child.Contains("^"))
+                    {
+                        setDefaultValue(entire_name, child, c.GetType(), c);
+
+                    }
+                    else
+                    {
+                        populateComposedProperty(entire_name, child, c.GetType(), c);
+                    }
+                }
+            }
+        }
+
+        private void setDefaultValue(string entire_name, string st, Type objType, object obj)
+        {
+            MemberInfo[] members = objType.GetMember(st, BindingAttr);
+            if (members.Length == 0)
+            {
+                return;
+            }
+            FieldOrProperty property = new FieldOrProperty(members[0]);
+            //Debug.Log("property " + property.Name() + " " + property.Type());
+            if (dictionaryPerType.ContainsKey(property.Type()))
+            {
+                IDictionary dic = dictionaryPerType[property.Type()];
+                Type propertyInDictionaryType = dic.GetType().GetGenericArguments()[1];
+                if (!dic.Contains(entire_name))
+                {
+                    //Debug.Log("Adding " + entire_name);
+                    dic.Add(entire_name, Convert.ChangeType("0", propertyInDictionaryType));
+                }
+                else
+                {
+                    dic[entire_name] = Convert.ChangeType("0", propertyInDictionaryType);
+                }
+
+            }
         }
 
         public void cleanDataStructures()
         {
+            unityASPVariationNames = new Dictionary<string, string>();
             floatingPointProperties = new Dictionary<string, double>();
             unsignedIntegerProperties = new Dictionary<string, ulong>();
             signedIntegerProperties = new Dictionary<string, long>();
@@ -155,7 +291,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             string parentName = st.Substring(0, st.IndexOf("^"));
             string child = st.Substring(st.IndexOf("^") + 1, st.Length - st.IndexOf("^") - 1);
             MemberInfo[] members = objType.GetMember(parentName, BindingAttr);
-           Debug.Log("members with name " + parentName + " " + members.Length);
+          // Debug.Log("members with name " + parentName + " " + members.Length);
             if (members.Length == 0)
             {
                 updateComponent(entire_name, st, objType,obj);

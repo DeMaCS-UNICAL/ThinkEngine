@@ -10,7 +10,7 @@ using System.Collections;
 namespace EmbASP4Unity.it.unical.mat.objectsMapper
 {
     [Serializable]
-    public abstract class AbstractConfiguration
+    public abstract class AbstractConfiguration :ScriptableObject
     {
         protected GameObjectsTracker tracker;
         protected GameObject gO;
@@ -47,7 +47,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
                 
                 if (tr.ObjectsToggled[gOProperties[s]])
                 {
-                    Debug.Log("property " + s + " toggled");
+                    //Debug.Log("property " + s + " toggled");
                     if (tracker.IsMappable(gOProperties[s]))
                     {
                         //Debug.Log("adding " + gOProperties[s].Name());
@@ -64,7 +64,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
                     }
                     else if (tracker.ObjectDerivedFromFields.ContainsKey(gO))
                     {
-                        // Debug.Log("recursing on " + gOProperties[s].Name());
+                        //Debug.Log("recursing on " + gOProperties[s].Name());
                         recursevelyAdd(gO, gOProperties[s], "");
                     }
                 }
@@ -82,7 +82,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
                         {
                             if (tracker.IsMappable(componentProperties[s]))
                             {
-                                string adding = c.GetType().ToString() + "^" + s;
+                                string adding = c.GetType() + "^" + s;
                                 // Debug.Log("adding " + c.GetType().ToString() + "^" + s);
                                 properties.Add(adding);
                                 if (tracker.IsBaseType(componentProperties[s]))
@@ -103,13 +103,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
                                     advancedConf.Add(tracker.basicTypeCollectionsConfigurations[componentProperties[s]]);
                                 }
                             }
-                            
+                            else if (tracker.ObjectDerivedFromFields.ContainsKey(c))// && !tracker.IsBaseType(componentProperties[s]))
+                            {
+                                //Debug.Log("recursing on " + c.name);
+                                recursevelyAdd(c, componentProperties[s], c.GetType() + "^");
+                            }
+
                         }
-                        else if (tracker.ObjectDerivedFromFields.ContainsKey(c))// && !tracker.IsBaseType(componentProperties[s]))
-                        {
-                            //Debug.Log("recursing on " + c.name);
-                            recursevelyAdd(c, componentProperties[s], c.GetType().ToString() + "^");
-                        }
+                        
                     }
                 }
             }
@@ -117,7 +118,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
             {
                 throw new Exception("No properties selected, invalid configuration to save.");
             }
-            Debug.Log("success");
+            //Debug.Log("success");
         }
 
         
@@ -127,6 +128,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
             object derivedObj = tracker.ObjectDerivedFromFields[obj][fieldOrProperty.Name()];
             if (derivedObj == null || (tracker.ObjectsOwners.ContainsKey(derivedObj) && !tracker.ObjectsOwners[derivedObj].Key.Equals(obj)) || !tracker.ObjectsOwners[derivedObj].Value.Equals(fieldOrProperty.Name()) || derivedObj.Equals(tracker.GO))
             {
+                Debug.Log(fieldOrProperty.Name()+" returning ");
                 return;
             }
             if (tracker.ObjectsProperties.ContainsKey(derivedObj))
@@ -137,7 +139,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
 
                     if (tracker.ObjectsToggled[derivedObjProperties[s]])
                     {
-
+                        //Debug.Log(s + " is toggled");
                         if (tracker.IsMappable(derivedObjProperties[s]))
                         {
                             //Debug.Log(derivedObjProperties[s].Name() + " toggled");
@@ -149,7 +151,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
                                 specificConfiguration(derivedObjProperties[s], adding);
                             }
                             int startFrom = 0;
-                            while (startFrom < adding.Length && adding.IndexOf("^", startFrom) != -1)
+                            while (startFrom < adding.Length && adding.IndexOf("^", startFrom) != adding.LastIndexOf("^"))
                             {
                                 int currentIndex = adding.IndexOf("^", startFrom);
                                 properties.Add(adding.Substring(0, currentIndex));

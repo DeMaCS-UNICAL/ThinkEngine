@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EmbASP4Unity.it.unical.mat.objectsMapper.Mappers;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,26 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 {
     public class SimpleSensor
     {
+        public readonly object toLock = new object();
+        public bool dataAvailable;/* {
+            get {
+                lock (toLock)
+                {
+                    return dataAvailable;
+                }
+            }
+            set {
+                lock (toLock)
+                {
+                    Debug.Log("locking");
+                    dataAvailable = value;
+                }
+            }
+        }*/
         public object gO;
         public string gOName;
         public string sensorName;
+        public Dictionary<string, string> unityASPVariationNames;
         public Dictionary<Type, IDictionary> dictionaryPerType;
         public Dictionary<string, List<long>> signedIntegerProperties;
         public Dictionary<string, List<ulong>> unsignedIntegerProperties;
@@ -36,12 +54,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             cleanDataStructures();
             properties = new List<string>();
             properties.AddRange(propertiesToTrack);
-            mappingManager = ScriptableObject.CreateInstance<MappingManager>();
+            mappingManager = MappingManager.getInstance();
             ReflectionExecutor re = ScriptableObject.CreateInstance<ReflectionExecutor>();
             cleanDataStructures();
             foreach(string st in properties)
             {
-                Debug.Log(st);
+                //Debug.Log(st);
                 operationPerProperty.Add(st, 0);
             }
             UpdateProperties();
@@ -53,7 +71,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             
             sensorName = s.configurationName;
             properties = new List<string>();
-            mappingManager = ScriptableObject.CreateInstance<MappingManager>();
+            mappingManager = MappingManager.getInstance();
             ReflectionExecutor re = ScriptableObject.CreateInstance<ReflectionExecutor>();
             gO = re.GetGameObjectWithName(s.gOName);
             gOName = s.gOName;
@@ -62,12 +80,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             foreach (StringIntPair p in s.operationPerProperty)
             {
                 operationPerProperty.Add(p.Key, p.Value);
-                //Debug.Log(p.Key + " " + p.Value);
+                Debug.Log(p.Key + " " + p.Value);
                 if (p.Value == Operation.SPECIFIC)
                 {
                     foreach (StringStringPair pair2 in s.specificValuePerProperty)
                     {
-                        Debug.Log(pair2.Key + " " + pair2.Value);
+                        //Debug.Log(pair2.Key + " " + pair2.Value);
                         if (pair2.Key.Equals(p.Key))
                         {
                             specificValuePerProperty.Add(p.Key, pair2.Value);
@@ -75,7 +93,6 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                         }
                     }
                 }
-                break;
             }
             //UpdateProperties();
             
@@ -84,6 +101,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 
         public void cleanDataStructures()
         {
+            unityASPVariationNames = new Dictionary<string, string>();
             operationPerProperty = new Dictionary<string, int>();
             specificValuePerProperty = new Dictionary<string, string>();
             floatingPointProperties = new Dictionary<string, List<double>>();
@@ -114,20 +132,22 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 
         public void UpdateProperties()
         {
-            Type gOType = gO.GetType();
-            foreach (string st in properties)
+            lock (toLock)
             {
-                
-                if (!st.Contains("^"))
+                Type gOType = gO.GetType();
+                foreach (string st in properties)
                 {
-                    
-                        updateSimpleProperty(st,st,gOType,gO);
-                }
-                else
-                {
-                    updateComposedProperty(st,st, gOType,gO);
-                }
+                    if (!st.Contains("^"))
+                    {
 
+                        updateSimpleProperty(st, st, gOType, gO);
+                    }
+                    else
+                    {
+                        updateComposedProperty(st, st, gOType, gO);
+                    }
+                }
+                dataAvailable = true;
             }
         }
 
@@ -135,16 +155,17 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         {
             string parentName = st.Substring(0, st.IndexOf("^"));
             string child = st.Substring(st.IndexOf("^") + 1, st.Length - st.IndexOf("^") - 1);
-            Debug.Log("component " + entire_name + " parent " + parentName + " child " + child);
+            //Debug.Log("component " + entire_name + " parent " + parentName + " child " + child);
             if (gOType== typeof(GameObject))
             {
                 Component c = ((GameObject)gO).GetComponent(parentName);
                 if (c != null)
                 {
-                    Debug.Log(c);
+                    
+                    //Debug.Log(c);
                     if (!child.Contains("^"))
                     {
-                        Debug.Log(c.GetType());
+                        //Debug.Log(c.GetType());
                         updateSimpleProperty(entire_name, child, c.GetType(), c);
 
                     }
@@ -159,13 +180,13 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         private void updateSimpleProperty(string entire_name,string st, Type gOType, object obj)
         {
             MemberInfo[] members = gOType.GetMember(st,BindingAttr);
-            Debug.Log("update "+entire_name+" members length"+ members.Length+" st "+st+" type "+gOType);
+            //Debug.Log("update "+entire_name+" members length"+ members.Length+" st "+st+" type "+gOType);
             if (members.Length == 0)
             {
                 return;
             }
             FieldOrProperty property = new FieldOrProperty(members[0]);
-            Debug.Log(property.Type()+" contained: "+ dictionaryPerType.ContainsKey(property.Type()));
+            //Debug.Log(property.Type()+" contained: "+ dictionaryPerType.ContainsKey(property.Type()));
             if (dictionaryPerType.ContainsKey(property.Type()))
             {
                 Type listType = dictionaryPerType[property.Type()].GetType().GetGenericArguments()[1];
@@ -176,12 +197,16 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                 }
                 ((IList)dictionaryPerType[property.Type()][entire_name]).Add(Convert.ChangeType(property.GetValue(obj), argType));
                 int listCount = ((IList)dictionaryPerType[property.Type()][entire_name]).Count;
-                Debug.Log("added " + entire_name);  
+                if (listCount > 500)
+                {
+                    ((IList)dictionaryPerType[property.Type()][entire_name]).RemoveAt(0);
+                }
+                //Debug.Log("added " + entire_name);  
                    
             }
             else
             {
-                Debug.Log("advanced update for " + entire_name);
+                //Debug.Log("advanced update for " + entire_name);
                 advancedUpdate(property,entire_name,obj);
             }
 
@@ -200,13 +225,13 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             string parentName = st.Substring(0, st.IndexOf("^"));
             string child = st.Substring(st.IndexOf("^") + 1, st.Length - st.IndexOf("^") - 1);
             MemberInfo[] members = objType.GetMember(parentName, BindingAttr);
-           Debug.Log("members with name " + parentName + " " + members.Length);
+            //Debug.Log("members with name " + parentName + " " + members.Length);
             if (members.Length == 0)
             {
                 updateComponent(entire_name, st, objType,obj);
                 return;
             }
-            FieldOrProperty parentProperty = new FieldOrProperty(objType.GetMember(parentName)[0]);
+            FieldOrProperty parentProperty = new FieldOrProperty(members[0]);
             //Debug.Log(parentProperty.Name());
             object parent = parentProperty.GetValue(obj);
             Type parentType = parent.GetType();

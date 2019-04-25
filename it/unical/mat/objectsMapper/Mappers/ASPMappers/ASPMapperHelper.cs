@@ -6,8 +6,18 @@ using UnityEngine;
 
 namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
 {
-    public class ASPMapperHelper : ScriptableObject
+    public class ASPMapperHelper
     {
+        public static ASPMapperHelper instance;
+
+        public static ASPMapperHelper getInstance()
+        {
+            if (instance == null)
+            {
+                instance = new ASPMapperHelper();
+            }
+            return instance;
+        }
         public string buildMapping(string name, char c, string value)
         {
             string mapping = name.Replace('^', '(');

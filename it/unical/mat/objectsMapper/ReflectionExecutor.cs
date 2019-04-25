@@ -26,7 +26,7 @@ public class ReflectionExecutor : ScriptableObject
 
     void Update()
     {
-        Debug.Log("Editor causes this Update");
+        //Debug.Log("Editor causes this Update");
         string mydocpath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         using (StreamWriter outputFile = new StreamWriter(Path.Combine(mydocpath, "WriteLines.txt")))
         {
@@ -34,7 +34,7 @@ public class ReflectionExecutor : ScriptableObject
         }
         
     }
-    public void test(StreamWriter o)
+   /* public void test(StreamWriter o)
     {
         object[] go = GameObject.FindObjectsOfType(typeof(GameObject));
 
@@ -44,13 +44,13 @@ public class ReflectionExecutor : ScriptableObject
         {
             if (((GameObject)obj).name.Equals("test"))
             {
-                /* Debug.Log(((MonoBehaviour)go[0]).name + " has " + ((MonoBehaviour)go[0]).GetType().GetProperties().Length + " properties");
+                 Debug.Log(((MonoBehaviour)go[0]).name + " has " + ((MonoBehaviour)go[0]).GetType().GetProperties().Length + " properties");
                  Debug.Log(((MonoBehaviour)go[0]).name + " has type: " + go[0].GetType());
 
                  // printBaseType(go[0].GetType(), 0, metTypes);
                  string description = describeObject(((MonoBehaviour)obj), 0, metTypes);
 
-                 Debug.Log(description);*/
+                 Debug.Log(description);
 
                 //MonoBehaviour ob = ((GameObject)obj).GetComponent<TestingReflection>();
                 o.WriteLine("DESCRIBING OBJECT " + ((GameObject)obj).name+" that is a "+obj.GetType());
@@ -68,7 +68,7 @@ public class ReflectionExecutor : ScriptableObject
         }
        
         
-    }
+    }*/
 
     public bool IsBaseType(FieldOrProperty obj)
     {
@@ -109,7 +109,7 @@ public class ReflectionExecutor : ScriptableObject
         return new List<Type> { typeof(sbyte), typeof(short), typeof(int), typeof(long) };
     }
 
-    public void printBaseType(Type obj, int level, List<object> met)
+    /*public void printBaseType(Type obj, int level, List<object> met)
     {
         List<Type> signedInteger = new List<Type> { typeof(sbyte), typeof(short), typeof(int), typeof(long) };
         List<Type> unsignedInteger = new List<Type> { typeof(byte), typeof(ushort), typeof(uint), typeof(ulong) };
@@ -161,7 +161,7 @@ public class ReflectionExecutor : ScriptableObject
                     Debug.Log("Skipping Type " + child.PropertyType);
                 }
             }
-            /* foreach (FieldInfo child in obj.GetFields())
+             foreach (FieldInfo child in obj.GetFields())
              {
                  Debug.Log("child type " + child.GetType());
                  if (!met.Contains(child.GetType()))
@@ -172,9 +172,9 @@ public class ReflectionExecutor : ScriptableObject
                  {
                      Debug.Log("Skipping Type " + child.GetType());
                  }
-             }*/
+             }
         }
-    }
+    }*/
 
     internal bool isMappable(FieldOrProperty obj)
     {
@@ -187,26 +187,26 @@ public class ReflectionExecutor : ScriptableObject
         return isArrayOfRank(obj)==2;
     }
 
-    public void describeObject(object obj, int level, List<object> met, StreamWriter o)
+    /*public void describeObject(object obj, int level, List<object> met, StreamWriter o)
     {
         Type objType = obj.GetType();
         //Debug.Log( objType + "has following fields: \n");
         o.WriteLine(objType + " has following fields:");
         met.Add(obj);
         // Debug.Log(objType.GetProperties().Length);
-        /* foreach (PropertyInfo child in objType.GetProperties())
+         foreach (PropertyInfo child in objType.GetProperties())
          {
 
              describing += child.PropertyType + " named " + child.Name + "\n";
          }
-         */
+         
         // Debug.Log(objType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Length);
         MemberInfo[] fields = objType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
         MemberInfo[] properties = objType.GetProperties();
         var members = fields.Union(properties);
         foreach (MemberInfo child in members)
         {
-          /*  if (child.MemberType == MemberTypes.Field)
+            if (child.MemberType == MemberTypes.Field)
             {
 
                 if (met.Contains(((FieldInfo)child).GetValue(obj)))
@@ -218,15 +218,15 @@ public class ReflectionExecutor : ScriptableObject
             else if (met.Contains(((PropertyInfo)child).GetValue(obj,null)))
             {
                 continue;
-            }*/
+            }
 
             describeField(new FieldOrProperty(child), obj, level + 1, met, o);
         }
         
 
-    }
+    }*/
 
-    public void describeField(FieldOrProperty m, object ob, int level, List<object> met, StreamWriter o)
+   /* public void describeField(FieldOrProperty m, object ob, int level, List<object> met, StreamWriter o)
     {
         
         List<Type> signedInteger = new List<Type> { typeof(sbyte), typeof(short), typeof(int), typeof(long) };
@@ -285,9 +285,9 @@ public class ReflectionExecutor : ScriptableObject
         {
             o.WriteLine(m.Name() + " is " + objType);
         }
-    }
+    }*/
 
-    public void describeGeneric(FieldOrProperty m, object ob, int level, StreamWriter o)
+   /* public void describeGeneric(FieldOrProperty m, object ob, int level, StreamWriter o)
     {
         //Debug.Log(m.Name()+" "+m.Type());
         if (m.Type().GetGenericTypeDefinition() == typeof(List<>))
@@ -304,7 +304,7 @@ public class ReflectionExecutor : ScriptableObject
             //Debug.Log("a dictionary of " + m.GetValue(ob).GetType().GetGenericArguments()[0]+","+ m.GetValue(ob).GetType().GetGenericArguments()[1] + " named " + m.Name() + "\n");
             o.WriteLine("a dictionary of " + m.GetValue(ob).GetType().GetGenericArguments()[0] + "," + m.GetValue(ob).GetType().GetGenericArguments()[1] + " named " + m.Name());
         }
-    }
+    }*/
 
     internal Type TypeOf(FieldOrProperty f)
     {

@@ -13,6 +13,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 
         public AdvancedSensor(SensorConfiguration conf) :base(conf)
         {
+            
             advancedConf = new Dictionary<string, SimpleGameObjectsTracker>();
             foreach(SimpleGameObjectsTracker st in conf.advancedConf)
             {
@@ -25,7 +26,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         {
             if(property.Type().IsArray && property.Type().GetArrayRank() == 2)
             {
-                Debug.Log(entire_name + " is a matrix");
+                //Debug.Log(entire_name + " is a matrix");
                 Array matrix = property.GetValue(parent) as Array;
                 int r = matrix.GetLength(0);
                 int c = matrix.GetLength(1);
@@ -40,7 +41,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                 {
                     for(int j=0; j < c; j++)
                     {
-                        Debug.Log(matrix.GetValue(i, j).GetType());
+                        //Debug.Log(matrix.GetValue(i, j).GetType());
                         current[i,j] = new SimpleSensor(elementConf, matrix.GetValue(i,j));
                     }
                 }
