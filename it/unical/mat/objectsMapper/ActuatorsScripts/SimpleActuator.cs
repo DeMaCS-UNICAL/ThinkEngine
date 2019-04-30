@@ -1,5 +1,6 @@
 ﻿using EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts;
 using EmbASP4Unity.it.unical.mat.objectsMapper.Mappers;
+using EmbASP4Unity.it.unical.mat.embasp.languages.asp;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -53,7 +54,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
            // Debug.Log(gO);
             gOName = s.gOName;
             cleanDataStructures();
-            properties.AddRange(s.properties);
+            foreach(string st in s.properties)
+            {
+                if (!properties.Contains(st))
+                {
+                    properties.Add(st);
+                }
+            }
+            
             populateDataStructures();
 
         }
@@ -101,14 +109,13 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             }
         }
 
-        internal void parse(string test)
+        internal void parse(AnswerSet set)
         {
             //Debug.Log("parsing " + actuatorName);
-            string[] values = test.Split(' ');
             MappingManager mapper = MappingManager.getInstance();
             IMapper actuatorMapper = mapper.getMapper(typeof(SimpleActuator));
             string[] mappedProperties = actuatorMapper.Map(this).Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            foreach(string literal in values)
+            foreach(string literal in set.GetAnswerSet())
             {
                 //Debug.Log("literal "+literal);
                 foreach(string mapped in mappedProperties)
@@ -126,10 +133,13 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
                         string property = unityASPVariationNames[clean];
                         foreach(Type t in dictionaryPerType.Keys)
                         {
+
+                            //Debug.Log(t + " " + property);
                             IDictionary dic = dictionaryPerType[t];
                             if (dic.Contains(property))
                             {
                                 dic[property] = Convert.ChangeType(val, dic.GetType().GetGenericArguments()[1]);
+                                //Debug.Log(property + " " + dic[property]);
                             }
                             
                         }
@@ -222,7 +232,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             Type gOType = gO.GetType();
             foreach (string st in properties)
             {
-                
+                Debug.Log(st);
                 if (!st.Contains("^"))
                 {
                     
@@ -264,7 +274,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
         private void updateSimpleProperty(string entire_name,string st, Type gOType, object obj)
         {
             MemberInfo[] members = gOType.GetMember(st,BindingAttr);
-            //Debug.Log("update "+entire_name+" members length"+ members.Length+" st "+st+" type "+gOType);
+            Debug.Log("update "+entire_name+" members length"+ members.Length+" st "+st+" type "+gOType);
             if (members.Length == 0)
             {
                 return;
@@ -275,7 +285,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             {
                 Type propertyInDictionaryType = dictionaryPerType[property.Type()].GetType().GetGenericArguments()[1];
                 property.SetValue(obj, Convert.ChangeType(dictionaryPerType[property.Type()][entire_name],property.Type()));
-                  
+                Debug.Log("sat value " + property.GetValue(obj));
             }
 
             //Debug.Log("added " + st + "with value " + ((IList)dictionaryPerType[property.Type()][st])[((IList)dictionaryPerType[property.Type()][st]).Count - 1]);

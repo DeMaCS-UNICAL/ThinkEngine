@@ -1,10 +1,10 @@
 ﻿using EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts;
 using EmbASP4Unity.it.unical.mat.objectsMapper.Mappers;
 using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts;
-/*using it.unical.mat.embasp.@base;
-using it.unical.mat.embasp.languages.asp;
-using it.unical.mat.embasp.platforms.desktop;
-using it.unical.mat.embasp.specializations.dlv.desktop;*/
+using EmbASP4Unity.it.unical.mat.embasp.@base;
+using EmbASP4Unity.it.unical.mat.embasp.languages.asp;
+using EmbASP4Unity.it.unical.mat.embasp.platforms.desktop;
+using EmbASP4Unity.it.unical.mat.embasp.specializations.dlv.desktop;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,6 +21,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         string factsPath;
         MappingManager mapper;
         public bool reason;
+        
 
         public EmbASPManager(Brain b)
         {
@@ -34,10 +35,9 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
             reason = true;
             IMapper sensorMapper = mapper.getMapper(typeof(AdvancedSensor));
             //Debug.Log("mapper " + sensorMapper);
-            Debug.Log(Path.GetTempPath());
             while (reason)
             {
-                Thread.Sleep(5000);
+                //Thread.Sleep(1000);
                 //Debug.Log("executing thread");
                 lock (brain.toLock)
                 {
@@ -56,6 +56,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                                 }
                                 string toAppend = sensorMapper.Map(sensor);
                                 //Debug.Log(toAppend);
+                                //Debug.Log(toAppend);
                                 fs.Write(toAppend);
 
                             }
@@ -66,31 +67,34 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                     }
                     catch (Exception e)
                     {
-                        Debug.Log(e.Message);
+                        Debug.LogError(e.Message);
+                        Debug.LogError(e.StackTrace);
                     }
 
                 }
-                string test = "setOnActuator(Player(AI(AssetsScriptsAIPlayer(numOfMove(2)))))" +
-                    " setOnActuator(Player(AI(AssetsScriptsAIPlayer(typeOfLateralMove(left)))))" +
-                    " setOnActuator(Player(AI(AssetsScriptsAIPlayer(numOfLateralMove(1)))))" +
-                    " setOnActuator(Player(AI(AssetsScriptsAIPlayer(numOfRotation(1)))))";
-
-                lock (brain.toLock)
-                {
-                    foreach(SimpleActuator actuator in brain.getActuators())
-                    {
-                        actuator.parse(test);
-                    }
-                    brain.setActuatorsReady(true);
-                }
-                /* Handler handler = new DesktopHandler(new DLVDesktopService(@".\lib\dlv.exe"));
+                //Debug.Log(Path.GetFullPath(@".\lib\dlv.exe"));
+                 Handler handler = new DesktopHandler(new DLVDesktopService(@".\lib\dlv.exe"));
                  InputProgram encoding = new ASPInputProgram();
-                 encoding.AddFilesPath(brain.ASPFilePath);
+                 encoding.AddFilesPath(Path.GetFullPath(brain.ASPFilePath));
                  InputProgram facts = new ASPInputProgram();
                  facts.AddFilesPath(factsPath);
                  handler.AddProgram(encoding);
                  handler.AddProgram(facts);
-                 Output o = handler.StartSync();*/
+                handler.AddOption(new OptionDescriptor("-filter=setOnActuator"));
+                Output o = handler.StartSync();
+                //Debug.Log(o.ErrorsString+" "+o.OutputString);
+                 AnswerSets answers = (AnswerSets)o;
+               // Debug.Log("debugging answer set");
+                Debug.Log("there are "+answers.Answersets.Count);
+                // Debug.Log("error: " + answers.ErrorsString);
+                lock (brain.toLock)
+                {
+                    foreach (SimpleActuator actuator in brain.getActuators())
+                    {
+                        actuator.parse(answers.Answersets[0]);
+                    }
+                    brain.setActuatorsReady(true);
+                }
                 //File.Delete(factsPath);
             }
         }

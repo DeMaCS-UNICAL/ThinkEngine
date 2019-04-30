@@ -80,7 +80,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             foreach (StringIntPair p in s.operationPerProperty)
             {
                 operationPerProperty.Add(p.Key, p.Value);
-                Debug.Log(p.Key + " " + p.Value);
+                //Debug.Log(p.Key + " " + p.Value);
                 if (p.Value == Operation.SPECIFIC)
                 {
                     foreach (StringStringPair pair2 in s.specificValuePerProperty)

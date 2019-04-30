@@ -20,6 +20,16 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
         }
         public string buildMapping(string name, char c, string value)
         {
+            //Debug.Log(name);
+            name = char.ToLower(name[0]) + name.Substring(1);
+            for (int i = 1; i < name.Length; i++)
+            {
+                //Debug.Log(name);
+                if (name[i] == '^')
+                {
+                    name = name.Substring(0,i+1)+ char.ToLower(name[i + 1]) + name.Substring(i+2);
+                }
+            }
             string mapping = name.Replace('^', '(');
             int size = mapping.Length;
             mapping += value;

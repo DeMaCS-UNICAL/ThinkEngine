@@ -26,20 +26,22 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         private static new System.Timers.Timer timer;
 
         public string ASPFilePath;
-        public double brainUpdateFrequencyMs;
+        public float brainUpdateFrequency;
         private bool updateSensors;
         private bool actuatorsReady;
+        public float startIn;
 
         void Reset() {
             
-            ASPFilePath = "Assets/Resources/" + gameObject.name + ".asp";
-            brainUpdateFrequencyMs = 500;
+            
+            ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
+            brainUpdateFrequency = 500;
         }
 
         
 
         void OnValidate() {
-            ASPFilePath = "Assets/Resources/" + gameObject.name + ".asp";
+            ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
         }
 
         internal void generateFile()
@@ -87,7 +89,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
             foreach (ActuatorConfiguration conf in actuatorsConfigurations)
             {
                 actuators.Add(new SimpleActuator(conf));
-                Debug.Log(conf.configurationName+" added");
+                //Debug.Log(conf.configurationName+" added");
             }
 
 
@@ -96,13 +98,9 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 embasp.Run();
             });
             executionThread.Start();
-            timer = new System.Timers.Timer();
-            timer.Interval = brainUpdateFrequencyMs;
-            timer.Elapsed += enableUpdateSensors;
-            timer.AutoReset = true;
-            timer.Enabled = true;
+            InvokeRepeating("UpdateSensors", startIn, brainUpdateFrequency);
         }
-
+        
         public void setActuatorsReady(bool v)
         {
             actuatorsReady = v;
@@ -137,13 +135,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         
 
 
-       void FixedUpdate()
+       void UpdateSensors()
        {
-            if (updateSensors)
-            {
+            
                 lock (toLock)
                 {
-                    // Debug.Log("updating sensors");
+                    //Debug.Log("updating sensors");
 
                     foreach (AdvancedSensor sensor in sensors)
                     {
@@ -151,24 +148,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                         //Debug.Log(sensor.sensorName + " updated");
                     }
                     Monitor.Pulse(toLock);
-                    updateSensors = false;
                 }
-            }
-           //lock (toLock)
-           //{
-            /*   Debug.Log("updating sensors");
-
-               foreach (AdvancedSensor sensor in sensors)
-               {
-                   sensor.UpdateProperties();
-               }
-               //Monitor.Pulse(toLock);
-          // }
-           /*if (count==0)
-           {
-               executionThread.Start();
-               count++;
-           }*/
+          
 
         }
     }

@@ -26,20 +26,33 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                 {
                     if (s.matrixProperties.ContainsKey(matrixPath))
                     {
+                        string keyWithoutDotsAndSpaces = matrixPath.Replace(".", "");
+                        keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace(" ", "");
+                        keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace("_", "");
+                        
                         SimpleSensor[,] matrix = s.matrixProperties[matrixPath];
                         int r = matrix.GetLength(0), c = matrix.GetLength(1);
-                        string prefix = s.sensorName + "(";
-                        string suffix = ").";
+                        string sensorNameNotCapital = char.ToLower(s.sensorName[0]) + s.sensorName.Substring(1);
+                        //Debug.Log("goname " + s.gOName);
+                        string goNameNotCapital = "";
+                        if (s.gOName.Length > 0)
+                        {
+                            goNameNotCapital = char.ToLower(s.gOName[0]) + s.gOName.Substring(1);
+                        }
+                        string prefix = sensorNameNotCapital + "("+goNameNotCapital+"(";
+                        string suffix = ")).";
                         int start = 0;
-                        int indexOfCap = matrixPath.IndexOf('^', start);
+                        int indexOfCap = keyWithoutDotsAndSpaces.IndexOf('^', start);
                         while (indexOfCap != -1)
                         {
-                            prefix += matrixPath.Substring(start, indexOfCap - start) + "(";
+                            string toConcatL = keyWithoutDotsAndSpaces.Substring(start, indexOfCap - start);
+                            prefix += char.ToLower(toConcatL[0])+toConcatL.Substring(1) + "(";
                             suffix = ")" + suffix;
                             start = indexOfCap + 1;
-                            indexOfCap = matrixPath.IndexOf('^', start);
+                            indexOfCap = keyWithoutDotsAndSpaces.IndexOf('^', start);
                         }
-                        prefix += matrixPath.Substring(start, matrixPath.Length - start) + "(";
+                        string toConcat = keyWithoutDotsAndSpaces.Substring(start, keyWithoutDotsAndSpaces.Length - start);
+                        prefix += char.ToLower(toConcat[0]) + toConcat.Substring(1) + "(";
                         suffix = ")" + suffix;
                         for (int i = 0; i < r; i++)
                         {
@@ -62,6 +75,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                 s.matrixProperties = new Dictionary<string, SimpleSensor[,]>();
                 s.dataAvailable = false;
             }
+            //Debug.Log("mapping " + sensorMapping);
             return sensorMapping;
         }
 

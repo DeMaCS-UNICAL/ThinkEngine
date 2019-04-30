@@ -1,4 +1,4 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -6,7 +6,7 @@
     <OutputType>Library</OutputType>
     <NoStandardLibraries>false</NoStandardLibraries>
     <AssemblyName>EmbASP4Unity</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -20,6 +20,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +30,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <RootNamespace>EmbASP4Unity</RootNamespace>
@@ -40,8 +42,8 @@
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EmbASP3.5">
-      <HintPath>..\Pac-Man\Assets\EmbASP3.5.dll</HintPath>
+    <Reference Include="EmbASP3_5">
+      <HintPath>..\Dottorato\Ianni\EmbASP4Unity\EmbASP3.5\bin\Debug\EmbASP3_5.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -116,6 +118,44 @@
     <None Include=".vs\VSWorkspaceState.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="it\unical\mat\embasp\base\Callback.cs" />
+    <Compile Include="it\unical\mat\embasp\base\Handler.cs" />
+    <Compile Include="it\unical\mat\embasp\base\InputProgram.cs" />
+    <Compile Include="it\unical\mat\embasp\base\OptionDescriptor.cs" />
+    <Compile Include="it\unical\mat\embasp\base\Output.cs" />
+    <Compile Include="it\unical\mat\embasp\base\Service.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\asp\AnswerSet.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\asp\AnswerSets.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\asp\ASPFilterOption.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\asp\ASPInputProgram.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\asp\ASPMapper.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\asp\IllegalTermException.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\asp\PredicateNotValidException.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\asp\SymbolicConstant.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\Id.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\IllegalAnnotationException.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\Mapper.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\ObjectNotValidException.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\Param.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\pddl\Action.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\pddl\PDDLException.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\pddl\PDDLInputProgram.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\pddl\PDDLMapper.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\pddl\PDDLProgramType.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\pddl\Plan.cs" />
+    <Compile Include="it\unical\mat\embasp\platforms\desktop\DesktopHandler.cs" />
+    <Compile Include="it\unical\mat\embasp\platforms\desktop\DesktopService.cs" />
+    <Compile Include="it\unical\mat\embasp\specializations\clingo\ClingoAnswerSets.cs" />
+    <Compile Include="it\unical\mat\embasp\specializations\clingo\desktop\ClingoDesktopService.cs" />
+    <Compile Include="it\unical\mat\embasp\specializations\dlv2\desktop\DLV2DesktopService.cs" />
+    <Compile Include="it\unical\mat\embasp\specializations\dlv2\DLV2AnswerSets.cs" />
+    <Compile Include="it\unical\mat\embasp\specializations\dlv\desktop\DLVDesktopService.cs" />
+    <Compile Include="it\unical\mat\embasp\specializations\dlv\DLVAnswerSets.cs" />
+    <Compile Include="it\unical\mat\embasp\specializations\dlv\DLVFilterOption.cs" />
+    <Compile Include="it\unical\mat\embasp\specializations\solver_planning_domains\desktop\SPDDesktopService.cs" />
+    <Compile Include="it\unical\mat\embasp\specializations\solver_planning_domains\SPDPlan.cs" />
+    <Compile Include="it\unical\mat\embasp\specializations\solver_planning_domains\SPDUtility.cs" />
+    <Compile Include="it\unical\mat\embasp\unity\AIManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\SimpleActuator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Brain.cs" />

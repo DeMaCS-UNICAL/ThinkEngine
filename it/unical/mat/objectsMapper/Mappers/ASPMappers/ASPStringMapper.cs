@@ -10,7 +10,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
         public string Map(object o)
         {
             DictionaryEntry entry = (DictionaryEntry)o;
-            string value = "(" + entry.Value + ")";
+            string value = "(\"" + entry.Value + "\")";
             return ASPMapperHelper.getInstance().buildMapping((string)entry.Key, '^', value);
         }
 

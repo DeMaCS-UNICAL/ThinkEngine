@@ -34,6 +34,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                         //Debug.Log(entry.Key);
                         string keyWithoutDotsAndSpaces = ((string)entry.Key).Replace(".", "");
                         keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace(" ", "");
+                        keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace("_", "");
                         if (!s.unityASPVariationNames.ContainsKey(keyWithoutDotsAndSpaces))
                         {
                             s.unityASPVariationNames.Add(keyWithoutDotsAndSpaces, (string)entry.Key);
@@ -41,15 +42,22 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                         Type mapperType = entry.Value.GetType().GetGenericArguments()[0];//entry is a List<SOMETHING>
                         DictionaryEntry toMap = new DictionaryEntry();
                         toMap.Key = keyWithoutDotsAndSpaces;
-                        if (s.operationPerProperty.ContainsKey((string)toMap.Key))
+                        string sensorNameNotCapital = char.ToLower(s.sensorName[0]) + s.sensorName.Substring(1);
+                        //Debug.Log("goname " + s.gOName);
+                        string goNameNotCapital = "";
+                        if (s.gOName.Length > 0)
                         {
-                            sensorMapping += s.sensorName + "(";
+                            goNameNotCapital = char.ToLower(s.gOName[0]) + s.gOName.Substring(1);
+                        }
+                        if (s.operationPerProperty.ContainsKey((string)entry.Key))
+                        {
+                            sensorMapping += sensorNameNotCapital + "(";
                             if (!s.gOName.Equals(""))
                             {
-                                sensorMapping += s.gOName + "(";
+                                sensorMapping += goNameNotCapital + "(";
                             }
                             //Debug.Log(sensorMapping + " " + entry.Value + " " + s.operationPerProperty[(string)toMap.Key]);
-                            toMap.Value = Operation.compute(s.operationPerProperty[(string)toMap.Key], entry.Value);
+                            toMap.Value = Operation.compute(s.operationPerProperty[(string)entry.Key], entry.Value);
                             //Debug.Log("toMap: " + toMap.Key + " " + toMap.Value);
                             sensorMapping += manager.getMapper(mapperType).Map(toMap) + ")";
                             if (!s.gOName.Equals(""))

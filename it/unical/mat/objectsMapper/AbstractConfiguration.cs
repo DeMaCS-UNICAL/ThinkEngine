@@ -128,7 +128,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
             object derivedObj = tracker.ObjectDerivedFromFields[obj][fieldOrProperty.Name()];
             if (derivedObj == null || (tracker.ObjectsOwners.ContainsKey(derivedObj) && !tracker.ObjectsOwners[derivedObj].Key.Equals(obj)) || !tracker.ObjectsOwners[derivedObj].Value.Equals(fieldOrProperty.Name()) || derivedObj.Equals(tracker.GO))
             {
-                Debug.Log(fieldOrProperty.Name()+" returning ");
+               // Debug.Log(fieldOrProperty.Name()+" returning ");
                 return;
             }
             if (tracker.ObjectsProperties.ContainsKey(derivedObj))

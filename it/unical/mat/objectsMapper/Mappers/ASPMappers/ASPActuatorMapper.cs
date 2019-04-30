@@ -19,13 +19,24 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
             {
                 foreach(DictionaryEntry entry in dic)
                 {
-                    actuatorMapping += "setOnActuator("+actuator.actuatorName + "("+actuator.gOName+"(";
-                    string keyWithoutDotsAndSpaces = ((string)entry.Key).Replace(".", "");
-                    keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace(" ", "");
-                    if (!actuator.unityASPVariationNames.ContainsKey(keyWithoutDotsAndSpaces)) {
-                        actuator.unityASPVariationNames.Add(keyWithoutDotsAndSpaces, (string)entry.Key);
+                    string actuatorNameNotCapital = char.ToLower(actuator.actuatorName[0]) + actuator.actuatorName.Substring(1);
+                    string goNameNotCapital = char.ToLower(actuator.gOName[0]) + actuator.gOName.Substring(1);
+                    actuatorMapping += "setOnActuator("+ actuatorNameNotCapital + "("+ goNameNotCapital + "(";
+                    string rightFormat = ((string)entry.Key).Replace(".", "");
+                    rightFormat = rightFormat.Replace(" ", "");
+                    rightFormat = char.ToLower(rightFormat[0]) + rightFormat.Substring(1);
+                    for(int i = 1; i < rightFormat.Length; i++)
+                    {
+                        if (rightFormat[i] == '^')
+                        {
+                            rightFormat = rightFormat.Substring(0, i + 1) + char.ToLower(rightFormat[i + 1]) +
+                                rightFormat.Substring(i + 2);
+                        }
                     }
-                    string[] propertyPath = keyWithoutDotsAndSpaces.Split('^');
+                    if (!actuator.unityASPVariationNames.ContainsKey(rightFormat)) {
+                        actuator.unityASPVariationNames.Add(rightFormat, (string)entry.Key);
+                    }
+                    string[] propertyPath = rightFormat.Split('^');
                     string suffix = ")))";
                     foreach(string s in propertyPath)
                     {
