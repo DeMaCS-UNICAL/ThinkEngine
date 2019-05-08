@@ -53,7 +53,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             sensorName = obj.GetType().ToString();
             cleanDataStructures();
             properties = new List<string>();
-            properties.AddRange(propertiesToTrack);
+            properties.AddRange(propertiesToTrack.Distinct());
             mappingManager = MappingManager.getInstance();
             ReflectionExecutor re = ScriptableObject.CreateInstance<ReflectionExecutor>();
             cleanDataStructures();
@@ -76,7 +76,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             gO = re.GetGameObjectWithName(s.gOName);
             gOName = s.gOName;
             cleanDataStructures();
-            properties.AddRange(s.properties);
+            properties.AddRange(s.properties.Distinct());
             foreach (StringIntPair p in s.operationPerProperty)
             {
                 operationPerProperty.Add(p.Key, p.Value);

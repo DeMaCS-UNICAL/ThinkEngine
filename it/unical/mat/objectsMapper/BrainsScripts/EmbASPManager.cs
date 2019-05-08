@@ -85,7 +85,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 //Debug.Log(o.ErrorsString+" "+o.OutputString);
                  AnswerSets answers = (AnswerSets)o;
                // Debug.Log("debugging answer set");
-                Debug.Log("there are "+answers.Answersets.Count);
+                //Debug.Log("there are "+answers.Answersets.Count);
                 // Debug.Log("error: " + answers.ErrorsString);
                 lock (brain.toLock)
                 {

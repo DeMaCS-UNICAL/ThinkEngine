@@ -232,7 +232,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             Type gOType = gO.GetType();
             foreach (string st in properties)
             {
-                Debug.Log(st);
+                //Debug.Log(st);
                 if (!st.Contains("^"))
                 {
                     
@@ -274,7 +274,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
         private void updateSimpleProperty(string entire_name,string st, Type gOType, object obj)
         {
             MemberInfo[] members = gOType.GetMember(st,BindingAttr);
-            Debug.Log("update "+entire_name+" members length"+ members.Length+" st "+st+" type "+gOType);
+            //Debug.Log("update "+entire_name+" members length"+ members.Length+" st "+st+" type "+gOType);
             if (members.Length == 0)
             {
                 return;
@@ -285,7 +285,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             {
                 Type propertyInDictionaryType = dictionaryPerType[property.Type()].GetType().GetGenericArguments()[1];
                 property.SetValue(obj, Convert.ChangeType(dictionaryPerType[property.Type()][entire_name],property.Type()));
-                Debug.Log("sat value " + property.GetValue(obj));
+                //Debug.Log("sat value " + property.GetValue(obj));
             }
 
             //Debug.Log("added " + st + "with value " + ((IList)dictionaryPerType[property.Type()][st])[((IList)dictionaryPerType[property.Type()][st]).Count - 1]);
