@@ -41,6 +41,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 //Debug.Log("executing thread");
                 lock (brain.toLock)
                 {
+                    Monitor.Wait(brain.toLock);
                     try
                     {
                         factsPath = Path.GetTempFileName();
@@ -49,11 +50,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                             //Debug.Log("creating file");
                             foreach (AdvancedSensor sensor in brain.getSensors())
                             {
+                                /*
                                 //Debug.Log("sensor " + sensor.sensorName);
                                 if (!sensor.dataAvailable)
                                 {
+                                    //Debug.Log("waiting sensors");
                                     Monitor.Wait(brain.toLock);
                                 }
+                                */
                                 string toAppend = sensorMapper.Map(sensor);
                                 //Debug.Log(toAppend);
                                 //Debug.Log(toAppend);
@@ -91,6 +95,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 {
                     foreach (SimpleActuator actuator in brain.getActuators())
                     {
+                        //Debug.Log("parsing " + actuator.actuatorName);
+                        //Debug.Log(answers.Answersets[0].GetAnswerSet()[0]);
                         actuator.parse(answers.Answersets[0]);
                     }
                     brain.setActuatorsReady(true);

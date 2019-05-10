@@ -20,6 +20,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                 advancedConf.Add(st.propertyName, st);
             }
             matrixProperties = new Dictionary<string, SimpleSensor[,]>();
+            
         }
 
         protected override void advancedUpdate(FieldOrProperty property, string entire_name, object parent)
@@ -42,7 +43,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                     for(int j=0; j < c; j++)
                     {
                         //Debug.Log(matrix.GetValue(i, j).GetType());
-                        current[i,j] = new SimpleSensor(elementConf, matrix.GetValue(i,j));
+                        current[i,j] = new SimpleSensor(elementConf,advancedConf[entire_name].name, matrix.GetValue(i,j));
                     }
                 }
                     

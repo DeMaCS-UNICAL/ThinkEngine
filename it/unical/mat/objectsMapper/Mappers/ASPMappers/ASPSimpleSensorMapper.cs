@@ -77,6 +77,39 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
             return sensorMapping;
         }
 
-        
+        public string getASPRepresentation(SimpleSensor s)
+        {
+            String sensorMapping = "";
+            foreach (string p in s.properties.Distinct())
+            {
+                if (s.operationPerProperty.ContainsKey(p))
+                {
+                    sensorMapping += "%";
+                    string keyWithoutDotsAndSpaces = p.Replace(".", "");
+                    keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace(" ", "");
+                    keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace("_", "");
+                    string sensorNameNotCapital = char.ToLower(s.sensorName[0]) + s.sensorName.Substring(1);
+                    //Debug.Log("goname " + s.gOName);
+                    string goNameNotCapital = "";
+                    if (s.gOName.Length > 0)
+                    {
+                        goNameNotCapital = char.ToLower(s.gOName[0]) + s.gOName.Substring(1);
+                    }
+                
+                    sensorMapping += sensorNameNotCapital + "(";
+                    if (!s.gOName.Equals(""))
+                    {
+                        sensorMapping += goNameNotCapital + "(";
+                    }
+                    sensorMapping += ASPMapperHelper.getInstance().buildMapping(keyWithoutDotsAndSpaces, '^', "(X)") + ")";
+                    if (!s.gOName.Equals(""))
+                    {
+                        sensorMapping += ").";
+                    }
+                    sensorMapping += Environment.NewLine;
+                }
+            }
+            return sensorMapping;
+        }
     }
 }

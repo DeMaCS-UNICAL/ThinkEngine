@@ -46,11 +46,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         public const BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
 
 
-        public SimpleSensor(List<string> propertiesToTrack, object obj)//ONLY FOR BASIC TYPE PROPERTIES IN OBJ
+        public SimpleSensor(List<string> propertiesToTrack,string name, object obj)//ONLY FOR BASIC TYPE PROPERTIES IN OBJ
         {
             gO = obj;
             gOName = "";
-            sensorName = obj.GetType().ToString();
+            sensorName = name;
             cleanDataStructures();
             properties = new List<string>();
             properties.AddRange(propertiesToTrack.Distinct());
@@ -250,10 +250,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         }
 
        
-        public string getASPRepresentation()
-        {
-            return mappingManager.mappers[this.GetType()].Map(this);
-        }
+       
      }
     }
 

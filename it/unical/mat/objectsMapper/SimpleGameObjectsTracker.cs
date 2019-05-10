@@ -11,6 +11,7 @@ public class SimpleGameObjectsTracker
     public List<string> toSave;
     [SerializeField]
     public string propertyName;
+    public string name;
 
     public SimpleGameObjectsTracker(Type type)
     {
@@ -44,6 +45,7 @@ public class SimpleGameObjectsTracker
 
     public void save()
     {
+        name = objType.ToString();
         foreach(string s in propertiesToggled.Keys)
         {
             if (propertiesToggled[s] && !toSave.Contains(s))

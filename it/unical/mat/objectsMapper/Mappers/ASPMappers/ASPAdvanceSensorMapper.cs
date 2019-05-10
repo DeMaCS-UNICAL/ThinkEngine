@@ -87,5 +87,43 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
             }
             return instance;
         }
+        public string getASPRepresentation(AdvancedSensor s)
+        {
+            MappingManager manager = MappingManager.getInstance();
+            string rep = ((ASPSimpleSensorMapper)manager.getMapper(typeof(SimpleSensor))).getASPRepresentation(s);
+            foreach (string p in s.advancedConf.Keys.Distinct())
+            {
+                List<string> elementConf = s.advancedConf[p].toSave;
+                string keyWithoutDotsAndSpaces = p.Replace(".", "");
+                keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace(" ", "");
+                keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace("_", "");
+                string sensorNameNotCapital = char.ToLower(s.sensorName[0]) + s.sensorName.Substring(1);
+                //Debug.Log("goname " + s.gOName);
+                string goNameNotCapital = "";
+                if (s.gOName.Length > 0)
+                {
+                    goNameNotCapital = char.ToLower(s.gOName[0]) + s.gOName.Substring(1);
+                }
+
+                foreach (string p2 in elementConf) {
+                    rep += "%" + sensorNameNotCapital + "(";
+                    if (!s.gOName.Equals(""))
+                    {
+                        rep += goNameNotCapital + "(";
+                    }
+                    string elemType = s.advancedConf[p].name;
+                    elemType = Char.ToLower(elemType[0])+elemType.Substring(1);
+                    string partial = elemType+"("+ ASPMapperHelper.getInstance().buildMapping(p2, '^', "(V)")+")";
+                    rep += ASPMapperHelper.getInstance().buildMapping(keyWithoutDotsAndSpaces, '^', "(X,Y,"+partial+")") + ")";//TODO: improve whene map other types
+                    if (!s.gOName.Equals(""))
+                    {
+                        rep += ").";
+                    }
+                    rep += Environment.NewLine;
+                }
+            }
+            return rep;
+        }
     }
+    
 }
