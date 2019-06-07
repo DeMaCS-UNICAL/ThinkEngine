@@ -14,7 +14,7 @@ using System.Collections;
 
 namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 {
-    [ExecuteInEditMode]
+    [ExecuteInEditMode,Serializable]
     public class Brain :MonoBehaviour
     {
         public readonly object toLock = new object();
@@ -28,21 +28,30 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         int count = 0;
         private static new System.Timers.Timer timer;
         private bool sensorsUpdated;
-
-        public string ASPFilePath;
-       
+        private object triggerClass;
+        public string triggerClassPath;
+        public string ASPFilePath;       
         private bool updateSensors;
         private bool actuatorsReady;
-        public bool executeRepeatedly;
+
+        public bool updateSensorsRepeatedly;
         public float startIn;
         public float brainUpdateFrequency;
-        public bool executeOnTrigger;
-        public string triggerClassPath;
-        public string triggerMethod="";
+
+        public bool updateSensorsOnTrigger;
+        public string sensorsTriggerMethod="";
         private MethodInfo sensorsUpdateMethod;
-        private MethodInfo reasonerMethod;
-        private object triggerClass;
-        public string executeReasonerOn;
+
+        public bool updateSensorsOnCollision;
+        public List<string> sensorsCollidersGONames;
+
+        public bool executeReasonerOnTrigger;
+        public string reasonerTriggerMethod = "";
+        public MethodInfo reasonerMethod;
+
+        public bool executeReasonerOnCollision;
+        public List<string> reasonerCollidersGONames;
+        public bool executeReasonerAsSoonAsPossible;
 
         void Awake()
         {
@@ -68,7 +77,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         
 
         void Reset() {
-            executeRepeatedly = true;
+            updateSensorsRepeatedly = true;
             triggerClassPath = @".\Assets\Game\Scripts\Trigger.cs";
             ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
             brainUpdateFrequency = 500;
@@ -134,6 +143,79 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
             triggerClass = ScriptableObject.CreateInstance("Trigger");
             MethodInfo[] methods = triggerClass.GetType().GetMethods();
             //Debug.Log("creating sensors");
+            SensorsAndActuatorCreation();
+            ReasonOn(methods);
+            UpdateSensorsOn(methods);
+
+            //Debug.Log("trigger method is "+triggerMethod);
+            
+            executionThread = new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+                embasp.Run();
+            });
+            //executionThread.Start();
+
+        }
+
+        private void UpdateSensorsOn(MethodInfo[] methods)
+        {
+            if (updateSensorsRepeatedly)
+            {
+                InvokeRepeating("UpdateSensors", startIn, brainUpdateFrequency);
+            }
+            else if (updateSensorsOnTrigger)
+            {
+                foreach (MethodInfo mI in methods)
+                {
+                    if (mI.Name.Equals(sensorsTriggerMethod))
+                    {
+                        //Debug.Log(mI.Name);
+                        sensorsUpdateMethod = mI;
+                        StartCoroutine("UpdateSensorsOnTrigger");
+                    }
+                }
+            }else if (updateSensorsOnCollision)
+            {
+                foreach (string coll in sensorsCollidersGONames)
+                {
+                    GameObject temp = GameObject.Find(coll);
+                    SensorsTrigger trigger = temp.AddComponent<SensorsTrigger>();
+                    trigger.brain = this;
+                }
+            }
+        }
+
+        private void ReasonOn(MethodInfo[] methods)
+        {
+            if( executeReasonerAsSoonAsPossible)
+            {
+                StartCoroutine("pulseOnSensorsReady");
+            }
+            else if(executeReasonerOnTrigger)
+            {
+                foreach (MethodInfo mI in methods)
+                {
+                    if (mI.Name.Equals(sensorsTriggerMethod))
+                    {
+                        //Debug.Log(mI.Name);
+                        reasonerMethod = mI;
+                        StartCoroutine("pulseOn");
+                    }
+                }
+            }else if (executeReasonerOnCollision)
+            {
+                foreach(string coll in reasonerCollidersGONames)
+                {
+                    GameObject temp = GameObject.Find(coll);
+                    ReasonerTrigger trigger = temp.AddComponent<ReasonerTrigger>();
+                    trigger.brain = this;
+                }
+            }
+        }
+
+        private void SensorsAndActuatorCreation()
+        {
             foreach (SensorConfiguration conf in sensorsConfigurations)
             {
                 sensors.Add(new AdvancedSensor(conf));
@@ -144,46 +226,6 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 actuators.Add(new SimpleActuator(conf));
                 //Debug.Log(conf.configurationName+" added");
             }
-            
-            if(executeReasonerOn.Equals("When Sensors are ready"))
-            {
-                StartCoroutine("pulseOnSensorsReady");
-            }
-            else
-            {
-                foreach (MethodInfo mI in methods)
-                {
-                    if (mI.Name.Equals(triggerMethod))
-                    {
-                        //Debug.Log(mI.Name);
-                        reasonerMethod = mI;
-                        StartCoroutine("pulseOn");
-                    }
-                }
-            }
-
-            //Debug.Log("trigger method is "+triggerMethod);
-            if (executeRepeatedly)
-            {
-                InvokeRepeating("UpdateSensors", startIn, brainUpdateFrequency);
-            }
-            else if (!triggerMethod.Equals(""))
-            {
-                foreach (MethodInfo mI in methods)
-                {
-                    if (mI.Name.Equals(triggerMethod))
-                    {
-                        //Debug.Log(mI.Name);
-                        sensorsUpdateMethod = mI;
-                        StartCoroutine("UpdateSensorsOnTrigger");
-                    }
-                }
-            }
-            executionThread = new Thread(() => {
-                Thread.CurrentThread.IsBackground = true;
-                embasp.Run();
-            });
-            executionThread.Start();
         }
 
         private IEnumerator pulseOn()
