@@ -14,11 +14,15 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
     {
         List<string> methodsToShow = new List<string>();
         List<string> methodsToShowForReasoner = new List<string>();
-        int sensorsUpdateIndex = 0;
-        int reasoningExecutionUpdateIndex = 0;
+        public int sensorsUpdateIndex = 0;
+        public int reasoningExecutionIndex = 0;
+        public int applyActuatorsIndex;
+        private List<string> methodsToShowForActuators=new List<string>();
+        private Brain myScript;
+
         void OnEnable()
         {
-            
+            myScript = target as Brain;
             var triggerClass = ScriptableObject.CreateInstance("Trigger");
             MethodInfo[] methods = triggerClass.GetType().GetMethods();
             
@@ -32,14 +36,42 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             }
             methodsToShowForReasoner.Add("When Sensors are ready");
             methodsToShowForReasoner.AddRange(methodsToShow);
+            methodsToShowForActuators.Add("Always");
+            methodsToShowForActuators.Add("Never");
+            methodsToShowForActuators.AddRange(methodsToShow);
+            for(int i=0; i < methodsToShow.Count; i++)
+            {
+                if (myScript.updateSensorsOn.Equals(methodsToShow[i]))
+                {
+                    reasoningExecutionIndex = i;
+                    break;
+                }
+            }
+            for (int i = 0; i < methodsToShowForReasoner.Count; i++)
+            {
+                if (myScript.executeReasonerOn.Equals(methodsToShowForReasoner[i]))
+                {
+                    sensorsUpdateIndex = i;
+                    break;
+                }
+            }
+            for (int i = 0; i < methodsToShowForActuators.Count; i++)
+            {
+                if (myScript.applyActuatorsCondition.Equals(methodsToShowForActuators[i]))
+                {
+                    applyActuatorsIndex = i;
+                    break;
+                }
+            }
         }
         public override void OnInspectorGUI()
         {
             // base.OnInspectorGUI();
-            Brain myScript = target as Brain;
+           
             List<string> excludedProperties = new List<string>();
-            excludedProperties.Add("triggerMethod");
+            excludedProperties.Add("updateSensorsOn");
             excludedProperties.Add("executeReasonerOn");
+            excludedProperties.Add("applyActuatorsCondition");
             if (!myScript.executeRepeatedly)
             {
                 excludedProperties.Add("brainUpdateFrequency");
@@ -51,7 +83,6 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             }
             SerializedObject serialized = new SerializedObject(myScript);
             DrawPropertiesExcluding(serialized, excludedProperties.ToArray());
-            serialized.ApplyModifiedProperties();
             if(myScript.executeOnTrigger && myScript.executeRepeatedly)
             {
                 if (excludedProperties.Contains("triggerClassPath"))
@@ -69,19 +100,26 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 EditorGUILayout.LabelField("Choose a method to use as trigger for Sensors Update");
                 sensorsUpdateIndex = EditorGUILayout.Popup(sensorsUpdateIndex, methodsToShow.ToArray());
                 EditorGUILayout.EndHorizontal();
-                myScript.triggerMethod = methodsToShow[sensorsUpdateIndex];
+                myScript.updateSensorsOn = methodsToShow[sensorsUpdateIndex];
             }
             else
             {
-                myScript.triggerMethod = "";
+                myScript.updateSensorsOn = "";
             }
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Choose when to run the reasoner");
-            reasoningExecutionUpdateIndex = EditorGUILayout.Popup(reasoningExecutionUpdateIndex, methodsToShowForReasoner.ToArray());
+            reasoningExecutionIndex = EditorGUILayout.Popup(reasoningExecutionIndex, methodsToShowForReasoner.ToArray());
             EditorGUILayout.EndHorizontal();
-            myScript.executeReasonerOn = methodsToShowForReasoner[reasoningExecutionUpdateIndex];
+            myScript.executeReasonerOn = methodsToShowForReasoner[reasoningExecutionIndex];
 
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Choose when to apply Actuators actions");
+            applyActuatorsIndex = EditorGUILayout.Popup(applyActuatorsIndex, methodsToShowForActuators.ToArray());
+            EditorGUILayout.EndHorizontal();
+            myScript.applyActuatorsCondition = methodsToShowForActuators[applyActuatorsIndex];
+
+            serialized.ApplyModifiedProperties();//CHECK SERIALIZATION
 
             Brain current = (Brain)target;
             if(GUILayout.Button("Generate ASP file", GUILayout.Width(300)))

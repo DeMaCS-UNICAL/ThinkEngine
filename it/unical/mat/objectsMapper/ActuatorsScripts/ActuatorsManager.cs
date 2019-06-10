@@ -1,4 +1,7 @@
-﻿using System;
+﻿using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
+using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,10 +19,59 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
         private List<ActuatorConfiguration> confsToSerialize;
         [SerializeField]
         private List<string> ConfiguredGameObject;
+        [NonSerialized]
+        public Dictionary<Brain,List<SimpleActuator>> instantiatedActuators;
+        public static ActuatorsManager instance;
+        [NonSerialized]
+        public bool applyCoroutinStarted=false;
 
         public ref List<AbstractConfiguration> confs()
         {
             return ref actuatorsConfs;
+        }
+
+        public static ActuatorsManager GetInstance()
+        {
+            if (instance == null)
+            {
+                instance = new ActuatorsManager();
+            }
+            return instance;
+        }
+        public void registerActuators(Brain b, List<SimpleActuator> instantiated)
+        {
+            if (instantiatedActuators == null)
+            {
+                instantiatedActuators = new Dictionary<Brain, List<SimpleActuator>>();
+            }
+            if (!instantiatedActuators.ContainsKey(b))
+            {
+                instantiatedActuators.Add(b, instantiated);
+            }
+            else
+            {
+                instantiatedActuators[b]= instantiated;
+            }
+        }
+
+        public IEnumerator applyActuators()
+        {
+            while (true)
+            {
+                foreach (Brain brain in instantiatedActuators.Keys)
+                {
+                    if (brain.areActuatorsReady() && brain.actuatorsUpdateCondition())
+                    {
+                        foreach (SimpleActuator act in instantiatedActuators[brain])
+                        {
+                            act.UpdateProperties();
+                        }
+                        brain.setActuatorsReady(false);
+                    }
+                }
+                yield return null;
+            }
+            
         }
 
         public ref List<string> configuredGameObject()
@@ -38,6 +90,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             {
                 ConfiguredGameObject = new List<string>();
             }
+            
+            
         }
 
         public void OnBeforeSerialize()
@@ -54,6 +108,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
 
         public void OnAfterDeserialize()
         {
+            instance = this;
             actuatorsConfs = new List<AbstractConfiguration>();
             foreach (ActuatorConfiguration conf in confsToSerialize)
             {

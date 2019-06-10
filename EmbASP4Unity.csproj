@@ -159,7 +159,7 @@
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\SimpleActuator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Brain.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\EmbASPManager.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\SolverExecutor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\AbstractConfigurationWindow.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\ActuatorConfigurationWindow.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorsManager.cs" />

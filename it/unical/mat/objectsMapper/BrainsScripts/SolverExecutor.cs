@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 {
-    public class EmbASPManager
+    public class SolverExectuor
     {
         public Brain brain;
         string factsPath;
@@ -23,7 +23,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         public bool reason;
         
 
-        public EmbASPManager(Brain b)
+        public SolverExectuor(Brain b)
         {
             brain = b;
             factsPath = "Assets/Resources/" + brain.gameObject.name + "Facts.asp";

@@ -28,7 +28,7 @@ public class SensorConfigurationWindow : AbstractConfigurationWindow
         if (AssetDatabase.LoadAssetAtPath("Assets/Resources/SensorsManager.asset", typeof(SensorsManager)) == null)
         {
             //Debug.Log("manager not found");
-            manager = CreateInstance<SensorsManager>();
+            manager = SensorsManager.GetInstance();
         }
         else
         {

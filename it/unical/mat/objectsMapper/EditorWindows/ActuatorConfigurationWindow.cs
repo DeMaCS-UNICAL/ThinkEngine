@@ -28,7 +28,7 @@ public class ActuatorConfigurationWindow : AbstractConfigurationWindow
     {
         if (AssetDatabase.LoadAssetAtPath("Assets/Resources/ActuatorsManager.asset", typeof(ActuatorsManager)) == null)
         {
-            manager = CreateInstance<ActuatorsManager>();
+            manager = ActuatorsManager.GetInstance();
         }
         else
         {
