@@ -88,18 +88,21 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 Output o = handler.StartSync();
                 //Debug.Log(o.ErrorsString+" "+o.OutputString);
                  AnswerSets answers = (AnswerSets)o;
-               // Debug.Log("debugging answer set");
+                // Debug.Log("debugging answer set");
                 //Debug.Log("there are "+answers.Answersets.Count);
                 // Debug.Log("error: " + answers.ErrorsString);
-                lock (brain.toLock)
+                if (answers.Answersets.Count > 0)
                 {
-                    foreach (SimpleActuator actuator in brain.getActuators())
+                    lock (brain.toLock)
                     {
-                        //Debug.Log("parsing " + actuator.actuatorName);
-                        //Debug.Log(answers.Answersets[0].GetAnswerSet()[0]);
-                        actuator.parse(answers.Answersets[0]);
+                        foreach (SimpleActuator actuator in brain.getActuators())
+                        {
+                            //Debug.Log("parsing " + actuator.actuatorName);
+                            //Debug.Log(answers.Answersets[0].GetAnswerSet()[0]);
+                            actuator.parse(answers.Answersets[0]);
+                        }
+                        brain.setActuatorsReady(true);
                     }
-                    brain.setActuatorsReady(true);
                 }
                 //File.Delete(factsPath);
             }
