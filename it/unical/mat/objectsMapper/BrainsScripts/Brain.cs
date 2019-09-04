@@ -52,9 +52,18 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         public bool executeReasonerOnCollision;
         public List<string> reasonerCollidersGONames;
         public bool executeReasonerAsSoonAsPossible;
+        internal object extraFacts;
 
         void Awake()
         {
+            if (reasonerCollidersGONames == null)
+            {
+                reasonerCollidersGONames = new List<string>();
+            }
+            if (sensorsCollidersGONames == null)
+            {
+                sensorsCollidersGONames = new List<string>();
+            }
             if (Application.isEditor && !File.Exists(triggerClassPath)) {
                 using (FileStream fs = File.Create(triggerClassPath))
                 {
@@ -154,7 +163,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 Thread.CurrentThread.IsBackground = true;
                 embasp.Run();
             });
-            //executionThread.Start();
+            executionThread.Start();
 
         }
 
@@ -287,7 +296,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         
 
 
-       void UpdateSensors()
+       public void UpdateSensors()
        {
             
                 lock (toLock)

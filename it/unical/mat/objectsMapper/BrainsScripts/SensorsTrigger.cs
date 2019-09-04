@@ -14,11 +14,13 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         void OnTriggerEnter2D(Collider2D col)
         {
 
-            Debug.Log("collisione with " + col.gameObject.name+" sensors");
+            Debug.Log("2d collision with " + col.gameObject.name+" sensors");
+            brain.UpdateSensors();
+            brain.extraFacts = "triggeringCollision(\"" + gameObject.name + "\",\"" + col.gameObject.name + "\").";
         }
         void OnTriggerEnter(Collider col)
         {
-            Debug.Log("collisione with " + col.gameObject.name + " sensors");
+            Debug.Log("collision with " + col.gameObject.name + " sensors");
         }
     }
 }

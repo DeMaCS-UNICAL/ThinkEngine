@@ -41,6 +41,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 //Debug.Log("executing thread");
                 lock (brain.toLock)
                 {
+                    
                     Monitor.Wait(brain.toLock);
                     try
                     {
@@ -65,6 +66,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 
                             }
                             //Debug.Lof(fs.)
+                            if (!brain.extraFacts.Equals(""))
+                            {
+                                fs.Write(brain.extraFacts);
+                            }
                             fs.Close();
                             //Debug.Log("closing stream");
                         }

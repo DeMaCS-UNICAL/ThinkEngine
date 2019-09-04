@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -15,6 +16,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         {
 
             Debug.Log("collisione with " + col.gameObject.name+" reasoner");
+            
+            lock (brain.toLock)
+            {
+                Monitor.Pulse(brain.toLock);
+            }
         }
         void OnTriggerEnter(Collider col)
         {

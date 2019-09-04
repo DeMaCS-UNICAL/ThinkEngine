@@ -123,6 +123,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         public override void OnInspectorGUI()
         {
             // base.OnInspectorGUI();
+            
             Brain myScript = target as Brain;
             List<string> excludedProperties = new List<string>();
             excludedProperties.Add("sensorsTriggerMethod");
@@ -132,8 +133,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             excludedProperties.Add("updateSensorsOnCollision");
             excludedProperties.Add("executeReasonerOnTrigger");
             excludedProperties.Add("executeReasonerOnCollision");
-            excludedProperties.Add("sensorsCollidersGONames");
-            excludedProperties.Add("reasonerCollidersGONames");
+            //excludedProperties.Add("sensorsCollidersGONames");
+            //excludedProperties.Add("reasonerCollidersGONames");
             excludedProperties.Add("executeReasonerAsSoonAsPossible");
 
             if (!myScript.updateSensorsRepeatedly)
@@ -148,7 +149,6 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             
             SerializedObject serialized = new SerializedObject(myScript);
             DrawPropertiesExcluding(serialized, excludedProperties.ToArray());
-            serialized.ApplyModifiedProperties();
             if (GUILayout.Button("Generate ASP file", GUILayout.Width(300)))
             {
                 myScript.generateFile();
@@ -209,7 +209,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                     myScript.executeReasonerOnCollision = true;
                     break;
             }
-
+            
             if (reasonerExecutionType == 1)
             {
                 reasonerTrigger(myScript);
@@ -219,8 +219,9 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 reasonerColliders(myScript);
             }
 
-            
 
+    
+            serialized.ApplyModifiedProperties();
         }
 
         private void reasonerColliders(Brain myScript)
@@ -231,9 +232,16 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 foreach (string gO in collidersGO)
                 {
                     reasonerColliderToggle[gO] = EditorGUILayout.ToggleLeft(gO, reasonerColliderToggle[gO]);
-                    if (reasonerColliderToggle[gO])
+                    if (reasonerColliderToggle[gO] && !myScript.reasonerCollidersGONames.Contains(gO))
                     {
                         myScript.reasonerCollidersGONames.Add(gO);
+                    }
+                    else
+                    {
+                        if (!reasonerColliderToggle[gO] && myScript.reasonerCollidersGONames.Contains(gO))
+                        {
+                            myScript.reasonerCollidersGONames.Remove(gO);
+                        }
                     }
                 }
             }
@@ -247,9 +255,16 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 foreach (string gO in collidersGO)
                 {
                     sensorsColliderToggle[gO] = EditorGUILayout.ToggleLeft(gO, sensorsColliderToggle[gO]);
-                    if (sensorsColliderToggle[gO])
+                    if (sensorsColliderToggle[gO] && !myScript.sensorsCollidersGONames.Contains(gO))
                     {
                         myScript.sensorsCollidersGONames.Add(gO);
+                    }
+                    else
+                    {
+                        if (!sensorsColliderToggle[gO] && myScript.sensorsCollidersGONames.Contains(gO))
+                        {
+                            myScript.sensorsCollidersGONames.Remove(gO);
+                        }
                     }
                 }
             }
