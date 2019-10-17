@@ -7,6 +7,7 @@ using System.Threading;
 using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts;
 using EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows;
 using EmbASP4Unity.it.unical.mat.objectsMapper;
+using System.IO;
 
 [Serializable]
 public class SensorConfigurationWindow : AbstractConfigurationWindow
@@ -67,6 +68,10 @@ public class SensorConfigurationWindow : AbstractConfigurationWindow
 
     void OnDisable()
     {
+        if (!Directory.Exists("Assets/Resources/Sensors"))
+        {
+            Directory.CreateDirectory("Assets/Resources/Sensors");
+        }
         if (AssetDatabase.LoadAssetAtPath("Assets/Resources/SensorsManager.asset", typeof(SensorsManager)) == null)
         {
             AssetDatabase.CreateAsset((SensorsManager)manager, "Assets/Resources/SensorsManager.asset");

@@ -64,6 +64,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
                     {
                         foreach (SimpleActuator act in instantiatedActuators[brain])
                         {
+                            Performance.updatingActuators = true;
                             act.UpdateProperties();
                         }
                         brain.setActuatorsReady(false);

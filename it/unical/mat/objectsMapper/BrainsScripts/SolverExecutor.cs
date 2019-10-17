@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
@@ -21,7 +22,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         string factsPath;
         MappingManager mapper;
         public bool reason;
-        
+        Stopwatch stopwatch = new Stopwatch();
+        int factsSteps = 0;
+        double factsAvgTime = 0;
+        int asSteps = 0;
+        double asAvgTime = 0;
+
 
         public SolverExectuor(Brain b)
         {
@@ -32,6 +38,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         
         public void Run()
         {
+            
             reason = true;
             IMapper sensorMapper = mapper.getMapper(typeof(AdvancedSensor));
             //Debug.Log("mapper " + sensorMapper);
@@ -44,6 +51,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                     Monitor.Wait(brain.toLock);
                     try
                     {
+                        stopwatch.Start();
                         factsPath = Path.GetTempFileName();
                         using (StreamWriter fs = new StreamWriter(factsPath, true))
                         {
@@ -68,11 +76,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                             fs.Close();
                             //Debug.Log("closing stream");
                         }
+                        stopwatch.Stop();
+                        factsSteps++;
+                        factsAvgTime += stopwatch.ElapsedMilliseconds;
                     }
                     catch (Exception e)
                     {
-                        Debug.LogError(e.Message);
-                        Debug.LogError(e.StackTrace);
+                        UnityEngine.Debug.LogError(e.Message);
+                        UnityEngine.Debug.LogError(e.StackTrace);
                     }
 
                 }
@@ -85,9 +96,13 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                  handler.AddProgram(encoding);
                  handler.AddProgram(facts);
                 handler.AddOption(new OptionDescriptor("-filter=setOnActuator"));
+                stopwatch.Start();
                 Output o = handler.StartSync();
                 //Debug.Log(o.ErrorsString+" "+o.OutputString);
                  AnswerSets answers = (AnswerSets)o;
+                stopwatch.Stop();
+                asSteps++;
+                asAvgTime += stopwatch.ElapsedMilliseconds;
                 // Debug.Log("debugging answer set");
                 //Debug.Log("there are "+answers.Answersets.Count);
                 // Debug.Log("error: " + answers.ErrorsString);
@@ -106,6 +121,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 }
                 //File.Delete(factsPath);
             }
+            
+        }
+        public void finalize()
+        {
+            Performance.writeOnFile("facts",factsAvgTime/factsSteps);
+            Performance.writeOnFile("answer set",asAvgTime/asSteps);
         }
     }
 }

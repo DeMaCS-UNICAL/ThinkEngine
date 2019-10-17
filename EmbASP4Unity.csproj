@@ -191,6 +191,7 @@
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\StringPair.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\StringStringPair.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SimpleGameObjectsTracker.cs" />
+    <Compile Include="it\unical\mat\Performance.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".git\objects\info\" />

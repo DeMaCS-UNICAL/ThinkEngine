@@ -20,8 +20,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         public readonly object toLock = new object();
         public List<SensorConfiguration> sensorsConfigurations;
         public List<ActuatorConfiguration> actuatorsConfigurations;
-        private List<AdvancedSensor> sensors;
-        private List<SimpleActuator> actuators;
+        //private List<AdvancedSensor> sensors;
+        //private List<SimpleActuator> actuators;
         private MappingManager mapper;
         private Thread executionThread;
         private SolverExectuor embasp;
@@ -30,7 +30,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         private bool sensorsUpdated;
 
         public string ASPFilePath;
-       
+        public bool enableBrain;
         private bool updateSensors;
         private bool actuatorsReady;
         public bool executeRepeatedly;
@@ -46,9 +46,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         public string applyActuatorsCondition;
         private MethodInfo applyActuatorsMethod;
         private SensorsManager sensorManager;
+        private ActuatorsManager actuatorsManager;
 
         void Awake()
         {
+            actuatorsManager = ActuatorsManager.GetInstance();
+            sensorManager = SensorsManager.GetInstance();
             if (Application.isEditor && !File.Exists(triggerClassPath)) {
                 using (FileStream fs = File.Create(triggerClassPath))
                 {
@@ -61,7 +64,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                     fs.Write(info, 0, info.Length);
                 }
             }
-            else if(Application.isPlaying)
+            else if(Application.isPlaying && enableBrain)
             {
                 initBrain();
             }
@@ -96,8 +99,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 
         internal void generateFile()
         {
-            actuators = new List<SimpleActuator>();
-            sensors = new List<AdvancedSensor>();
+            List<SimpleActuator>  actuators = actuatorsManager.instantiatedActuators[this];
+            List<AdvancedSensor>  sensors = sensorManager.instantiatedSensors[this];
             mapper = MappingManager.getInstance();
             foreach (ActuatorConfiguration conf in actuatorsConfigurations)
             {
@@ -136,13 +139,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 
         internal IEnumerable<AdvancedSensor> getSensors()
         {
-            return sensors;
+            return sensorManager.instantiatedSensors[this];
         }
 
         void initBrain()
         {
-            sensors = new List<AdvancedSensor>();
-            actuators = new List<SimpleActuator>();
+
+            List<AdvancedSensor>  sensors = new List<AdvancedSensor>();
+            List<SimpleActuator>  actuators = new List<SimpleActuator>();
             embasp = new SolverExectuor(this);
             triggerClass = ScriptableObject.CreateInstance("Trigger");
             MethodInfo[] methods = triggerClass.GetType().GetMethods();
@@ -152,14 +156,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 sensors.Add(new AdvancedSensor(conf));
                 //Debug.Log(conf.configurationName+" added");
             }
-            sensorManager = SensorsManager.GetInstance();
+            
             sensorManager.registerSensors(this, sensors);
             foreach (ActuatorConfiguration conf in actuatorsConfigurations)
             {
                 actuators.Add(new SimpleActuator(conf));
                 //Debug.Log(conf.configurationName+" added");
             }
-            ActuatorsManager actuatorsManager = ActuatorsManager.GetInstance();
+            
             actuatorsManager.registerActuators(this, actuators);
             if (!actuatorsManager.applyCoroutinStarted)
             {
@@ -252,7 +256,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 
         public IEnumerable<SimpleActuator> getActuators()
         {
-            return actuators;
+            return actuatorsManager.instantiatedActuators[this];
         }
 
         private void enableUpdateSensors(object sender, ElapsedEventArgs e)
@@ -268,6 +272,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
             }
             if (embasp != null) {
                 embasp.reason = false;
+                Debug.Log("finalize");
+                embasp.finalize();
             }
         }
 

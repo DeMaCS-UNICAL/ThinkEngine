@@ -68,7 +68,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         }
         public void updateSensors(Brain brain)
         {
-            
+            Performance.updatingSensors = true;
             foreach (AdvancedSensor sens in instantiatedSensors[brain])
             {
                 sens.UpdateProperties();

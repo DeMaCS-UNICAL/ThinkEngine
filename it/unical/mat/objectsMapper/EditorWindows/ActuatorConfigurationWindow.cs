@@ -8,6 +8,7 @@ using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts;
 using EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows;
 using EmbASP4Unity.it.unical.mat.objectsMapper;
 using EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts;
+using System.IO;
 
 [Serializable]
 public class ActuatorConfigurationWindow : AbstractConfigurationWindow
@@ -26,6 +27,9 @@ public class ActuatorConfigurationWindow : AbstractConfigurationWindow
 
     void OnEnable()
     {
+        if (!Directory.Exists("Assets/Resources")){
+            Directory.CreateDirectory("Assets/Resources");
+        }
         if (AssetDatabase.LoadAssetAtPath("Assets/Resources/ActuatorsManager.asset", typeof(ActuatorsManager)) == null)
         {
             manager = ActuatorsManager.GetInstance();
@@ -61,6 +65,11 @@ public class ActuatorConfigurationWindow : AbstractConfigurationWindow
 
     void OnDisable()
     {
+        if (!Directory.Exists("Assets/Resources/Actuators"))
+        {
+            Directory.CreateDirectory("Assets/Resources/Actuators");
+        }
+        
         if (AssetDatabase.LoadAssetAtPath("Assets/Resources/ActuatorsManager.asset", typeof(ActuatorsManager)) == null)
         {
             AssetDatabase.CreateAsset((ActuatorsManager)manager, "Assets/Resources/ActuatorsManager.asset");
