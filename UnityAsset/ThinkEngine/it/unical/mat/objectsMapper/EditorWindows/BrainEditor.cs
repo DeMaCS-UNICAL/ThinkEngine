@@ -12,6 +12,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
     [CustomEditor(typeof(Brain))]
     public class BrainEditor:Editor
     {
+        List<string> excludedProperties=new List<string>();
         List<string> methodsToShow = new List<string>();
         List<string> methodsToShowForReasoner = new List<string>();
         public int sensorsUpdateIndex = 0;
@@ -67,8 +68,29 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         public override void OnInspectorGUI()
         {
             // base.OnInspectorGUI();
-           
-            List<string> excludedProperties = new List<string>();
+            if (myScript.executeOnTrigger && myScript.executeRepeatedly)
+            {
+                if (excludedProperties.Contains("triggerClassPath"))
+                {
+                    myScript.executeRepeatedly = false;
+                }
+                else
+                {
+                    myScript.executeOnTrigger = false;
+                }
+            }
+            if (!(myScript.executeOnTrigger || myScript.executeRepeatedly))
+            {
+                if (excludedProperties.Contains("triggerClassPath"))
+                {
+                    myScript.executeOnTrigger = true;
+                }
+                else
+                {
+                    myScript.executeRepeatedly = true;
+                }
+            }
+            excludedProperties = new List<string>();
             excludedProperties.Add("updateSensorsOn");
             excludedProperties.Add("executeReasonerOn");
             excludedProperties.Add("applyActuatorsCondition");
@@ -83,17 +105,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             }
             SerializedObject serialized = new SerializedObject(myScript);
             DrawPropertiesExcluding(serialized, excludedProperties.ToArray());
-            if(myScript.executeOnTrigger && myScript.executeRepeatedly)
-            {
-                if (excludedProperties.Contains("triggerClassPath"))
-                {
-                    myScript.executeRepeatedly = false;
-                }
-                else
-                {
-                    myScript.executeOnTrigger = false;
-                }
-            }
+            
             if (myScript.executeOnTrigger)
             {
                 EditorGUILayout.BeginHorizontal();

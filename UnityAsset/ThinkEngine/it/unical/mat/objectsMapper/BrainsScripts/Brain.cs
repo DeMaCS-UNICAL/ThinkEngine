@@ -53,6 +53,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         void Awake()
         {
             triggerClassPath = @".\Assets\Scripts\Trigger.cs";
+            if (ASPFilePath.Equals(null))
+            {
+                ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
+            }
             actuatorsManager = ActuatorsManager.GetInstance();
             sensorManager = SensorsManager.GetInstance();
             if (Application.isEditor && !File.Exists(triggerClassPath)) {
@@ -89,7 +93,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         void Reset() {
             executeRepeatedly = true;
             triggerClassPath = @".\Assets\Scripts\Trigger.cs";
-            ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
+            //ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
             ASPFileTemplatePath = @".\Assets\Resources\" + gameObject.name + "_template.asp";
             brainUpdateFrequency = 500;
         }
@@ -98,7 +102,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 
         void OnValidate() {
             triggerClassPath = @".\Assets\Scripts\Trigger.cs";
-            ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
+            //ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
             ASPFileTemplatePath = @".\Assets\Resources\" + gameObject.name + "_template.asp";
         }
 

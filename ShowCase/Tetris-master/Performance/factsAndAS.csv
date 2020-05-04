@@ -32,3 +32,5 @@ facts 1,003.73ms
 answer set 1,165.91ms 
 facts 3,829.02ms 
 answer set 3,985.07ms 
+facts 629.86ms 
+answer set 795.43ms 
