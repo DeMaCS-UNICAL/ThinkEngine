@@ -1,0 +1,6 @@
+- Copy the EmbASP4Unity.dll file from bin\Debug to *UnityGameProject*\Assets\Plugins
+- Download the proper version of DLV and copy it to *UnityGameProject*\lib
+- The Sensor/Actuator configuration windows are available in the Unity menu "Window"
+- Add a script component to a GO choosing as script the "Brain" (you can find it after choosing EmbASP4Unity.it.unical.mat.objectMapper)
+
+For further clarification, send an email to angilica[at]mat.unical.it
