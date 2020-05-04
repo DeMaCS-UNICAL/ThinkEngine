@@ -19,6 +19,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
         private List<ActuatorConfiguration> confsToSerialize;
         [SerializeField]
         private List<string> ConfiguredGameObject;
+        [SerializeField]
+        private List<string> ConfigurationsNames;
         [NonSerialized]
         public Dictionary<Brain,List<SimpleActuator>> instantiatedActuators;
         public static ActuatorsManager instance;
@@ -29,7 +31,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
         {
             return ref actuatorsConfs;
         }
-
+        public ref List<string> usedNames()
+        {
+            return ref ConfigurationsNames;
+        }
         public static ActuatorsManager GetInstance()
         {
             if (instance == null)
@@ -67,8 +72,9 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
                             Performance.updatingActuators = true;
                             act.UpdateProperties();
                         }
-                        brain.setActuatorsReady(false);
+                        
                     }
+                    brain.setActuatorsReady(false);
                 }
                 yield return null;
             }
@@ -90,6 +96,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             if (ConfiguredGameObject == null)
             {
                 ConfiguredGameObject = new List<string>();
+            }
+            if(ConfigurationsNames == null)
+            {
+                ConfigurationsNames = new List<string>();
             }
             
             
@@ -118,5 +128,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
 
             }
         }
+
+        
     }
 }

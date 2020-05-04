@@ -9,6 +9,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
     public interface IManager: ISerializationCallbackReceiver
     {
         ref List<string> configuredGameObject();
+        ref List<string> usedNames();
         ref List<AbstractConfiguration> confs();
     }
 }

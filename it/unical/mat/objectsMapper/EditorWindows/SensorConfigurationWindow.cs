@@ -28,13 +28,13 @@ public class SensorConfigurationWindow : AbstractConfigurationWindow
     {
         if (AssetDatabase.LoadAssetAtPath("Assets/Resources/SensorsManager.asset", typeof(SensorsManager)) == null)
         {
-            //Debug.Log("manager not found");
+           // Debug.Log("manager not found");
             manager = SensorsManager.GetInstance();
         }
         else
         {
             manager = (SensorsManager)AssetDatabase.LoadAssetAtPath("Assets/Resources/SensorsManager.asset", typeof(SensorsManager));
-            //Debug.Log("manager found");
+          //  Debug.Log("manager found");
         }
         tracker = new GameObjectsTracker();
     }
@@ -66,7 +66,7 @@ public class SensorConfigurationWindow : AbstractConfigurationWindow
     }
     
 
-    void OnDisable()
+    /*void OnDisable()
     {
         if (!Directory.Exists("Assets/Resources/Sensors"))
         {
@@ -94,11 +94,37 @@ public class SensorConfigurationWindow : AbstractConfigurationWindow
                 AssetDatabase.SaveAssets();
             }
         }
-    }
+    }*/
 
     protected override string onSaving()
     {
-        throw new NotImplementedException();
+        if (!Directory.Exists("Assets/Resources/Sensors"))
+        {
+            Directory.CreateDirectory("Assets/Resources/Sensors");
+        }
+        if (AssetDatabase.LoadAssetAtPath("Assets/Resources/SensorsManager.asset", typeof(SensorsManager)) == null)
+        {
+            AssetDatabase.CreateAsset((SensorsManager)manager, "Assets/Resources/SensorsManager.asset");
+        }
+        else
+        {
+            EditorUtility.SetDirty((SensorsManager)manager);
+            AssetDatabase.SaveAssets();
+        }
+        foreach (AbstractConfiguration conf in ((SensorsManager)manager).confs())
+        {
+            SensorConfiguration sensorConf = (SensorConfiguration)conf;
+            if (AssetDatabase.LoadAssetAtPath("Assets/Resources/Sensors/" + sensorConf.configurationName + ".asset", typeof(SensorConfiguration)) == null)
+            {
+                AssetDatabase.CreateAsset(sensorConf, "Assets/Resources/Sensors/" + sensorConf.configurationName + ".asset");
+            }
+            else
+            {
+                EditorUtility.SetDirty(sensorConf);
+                AssetDatabase.SaveAssets();
+            }
+        }
+        return "";
     }
 
    

@@ -17,6 +17,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         private List<SensorConfiguration> confsToSerialize;
         [SerializeField]
         private List<string> ConfiguredGameObject;
+        [SerializeField]
+        private List<string> ConfigurationsNames;
         [NonSerialized]
         public Dictionary<Brain, List<AdvancedSensor>> instantiatedSensors;
         public static SensorsManager instance;
@@ -24,6 +26,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         public ref List<string> configuredGameObject()
         {
             return ref ConfiguredGameObject;
+        }
+        public ref List<string> usedNames()
+        {
+            return ref ConfigurationsNames;
         }
         public ref List<AbstractConfiguration> confs()
         {
@@ -72,8 +78,17 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             foreach (AdvancedSensor sens in instantiatedSensors[brain])
             {
                 sens.UpdateProperties();
+                /*if (sens.matrixProperties.Count() > 0)
+                {
+                    Debug.Log(sens.matrixProperties.Count() + " " + sens.matrixProperties.First().Key + " " + sens.matrixProperties.First().Value);
+                }
+                if (sens.listProperties.Count > 0)
+                {
+                    Debug.Log(sens.listProperties.Count() + " " + sens.listProperties.First().Key + " " + sens.listProperties.First().Value);
+                }*/
+
             }
-                
+
         }
         public void OnBeforeSerialize()
         {
@@ -97,6 +112,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             if (ConfiguredGameObject == null)
             {
                 ConfiguredGameObject = new List<string>();
+            }
+            if (ConfigurationsNames == null)
+            {
+                ConfigurationsNames = new List<string>();
             }
         }
     }

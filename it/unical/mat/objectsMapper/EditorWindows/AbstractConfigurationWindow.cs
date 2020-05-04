@@ -32,7 +32,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
         public void draw(string type)
         {
-            
+            //Debug.Log("manager "+manager);
             chosenGO = EditorGUILayout.TextField("Chosen object", chosenGO);
             GUILayout.Label("Base Settings", EditorStyles.boldLabel);
             GUILayout.BeginHorizontal();
@@ -57,7 +57,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
                 EditorGUI.indentLevel--;
                 string buttonContent;
-                if (manager.configuredGameObject().Contains(chosenGO))
+                if (manager.usedNames().Contains(chosenGO))
                 {
                     buttonContent = "Override Configuration";
                 }
@@ -79,6 +79,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                     //Debug.Log("saving fdgdfgdfgdfgdf");
                    // checkToggled();
                     updateConfiguredObject();
+                    onSaving();
                 }
             }
 
@@ -107,12 +108,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
         protected void updateConfiguredObject(AbstractConfiguration conf)
         {
-            if (manager.configuredGameObject().Contains(chosenGO))
+            if (manager.usedNames().Contains(tracker.configurationName))
             {
                 
                 foreach (AbstractConfiguration s in manager.confs())
                 {
-                    if (s.gOName.Equals(chosenGO))
+                    if (s.configurationName.Equals(tracker.configurationName))
                     {
                         conf = s;
                         break;
@@ -250,6 +251,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                                     helpScroll = new Vector2(0, 0);
                                     if (!tracker.basicTypeCollectionsConfigurations.ContainsKey(obj))
                                     {
+                                        //Debug.Log("adding simple tracker for " + objectToConfigure.Name() + " that is a " + objectToConfigure.Type());
                                         tracker.basicTypeCollectionsConfigurations.Add(obj, new SimpleGameObjectsTracker(objectToConfigure.Type()));
                                     }
                                     tracker.basicTypeCollectionsConfigurations[obj].getBasicProperties();
@@ -410,6 +412,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                             helpScroll = new Vector2(0, 0);
                             if (!tracker.basicTypeCollectionsConfigurations.ContainsKey(f))
                             {
+                                //Debug.Log("adding simple tracker for " + objectToConfigure.Name() + " that is a " + objectToConfigure.Type());
+
                                 tracker.basicTypeCollectionsConfigurations.Add(f, new SimpleGameObjectsTracker(objectToConfigure.Type()));
                                 
                             }
@@ -435,9 +439,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
         protected void drawObjectProperties()
         {
-            GUILayout.Label("Configure "+objectToConfigure.Type().GetElementType()+" object for "+objectToConfigure.Name()+" property ", EditorStyles.boldLabel);
             SimpleGameObjectsTracker st = tracker.basicTypeCollectionsConfigurations[objectToConfigure];
-            
+            GUILayout.Label("Configure "+st.objType+" object for "+objectToConfigure.Name()+" property ", EditorStyles.boldLabel);
             List<string> propertiesNames = new List<string>();
             //Debug.Log(st.propertiesToggled);
             foreach (string s in st.propertiesToggled.Keys)

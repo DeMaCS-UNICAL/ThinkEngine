@@ -93,6 +93,23 @@ public class ReflectionExecutor : ScriptableObject
         Type objType = obj.Type();
         return objType.IsArray? objType.GetArrayRank():-1;
     }
+    public Type isList(FieldOrProperty obj)
+    {
+        Type objType = obj.Type();
+        return isListOfType(objType);
+    }
+    public Type isListOfType(Type type)
+    {
+        if (type.IsGenericType && type.GetGenericTypeDefinition()==typeof(List<>))
+        {
+            Type[] listArguments = type.GetGenericArguments();
+            if (listArguments.Length == 1 && !listArguments[0].IsGenericType)
+            {
+                return listArguments[0];
+            }
+        }
+        return null;
+    }
 
     public static List<Type> FloatingPointTypes()
     {
@@ -178,7 +195,7 @@ public class ReflectionExecutor : ScriptableObject
 
     internal bool isMappable(FieldOrProperty obj)
     {
-        return IsBaseType(obj) || isMatrix(obj);
+        return IsBaseType(obj) || isMatrix(obj) || isList(obj)!=null;
     }
 
     private bool isMatrix(FieldOrProperty obj)
@@ -186,6 +203,7 @@ public class ReflectionExecutor : ScriptableObject
        
         return isArrayOfRank(obj)==2;
     }
+ 
 
     /*public void describeObject(object obj, int level, List<object> met, StreamWriter o)
     {
@@ -226,85 +244,85 @@ public class ReflectionExecutor : ScriptableObject
 
     }*/
 
-   /* public void describeField(FieldOrProperty m, object ob, int level, List<object> met, StreamWriter o)
-    {
-        
-        List<Type> signedInteger = new List<Type> { typeof(sbyte), typeof(short), typeof(int), typeof(long) };
-        List<Type> unsignedInteger = new List<Type> { typeof(byte), typeof(ushort), typeof(uint), typeof(ulong) };
-        List<Type> floatingPoint = new List<Type> { typeof(double), typeof(float) };
-        //Debug.Log(" level " + level);
-        Type objType = m.Type();
-        
-        //Debug.Log(obj.GetProperties()[0].PropertyType+" with name "+ obj.GetProperties()[0].Name);
-        met.Add(objType);
-        if (level > 5)
-        {
-            // Debug.Log("too many levels");
-            o.WriteLine("too many levels");
+    /* public void describeField(FieldOrProperty m, object ob, int level, List<object> met, StreamWriter o)
+     {
 
-        }
-        else if (signedInteger.Contains(objType))
-        {
-            //Debug.Log(m.Name + " is a signed integer");
-            o.WriteLine(m.Name() + " is a signed integer with value "+m.GetValue(ob));
-        }
-        else if (unsignedInteger.Contains(objType))
-        {
-            // Debug.Log(m.Name + " is an unsigned integer");
-            o.WriteLine(m.Name() + " is a unsigned integer with value " + m.GetValue(ob));
-        }
-        else if (floatingPoint.Contains(objType))
-        {
-            //Debug.Log(m.Name + " is a floating point number");
-            o.WriteLine(m.Name() + " is a floating point number with value " + m.GetValue(ob));
-        }
-        else if (objType == typeof(char))
-        {
-            //Debug.Log(m.Name + " is a char");
-            o.WriteLine(m.Name() + " is a char with value " + m.GetValue(ob));
-        }
-        else if (objType == typeof(bool))
-        {
-            //Debug.Log(m.Name + " is a bool");
-            o.WriteLine(m.Name() + " is a bool with value " + m.GetValue(ob));
-        }
-        else if (objType == typeof(Enum))
-        {
-            //Debug.Log(m.Name + " is an Enum");
-            o.WriteLine(m.Name() + " is an Enum with value " + m.GetValue(ob));
-        }else if(objType == typeof(string))
-        {
-            o.WriteLine(m.Name() + " is a string with value" + m.GetValue(ob));
-        }
-        else if (objType.IsGenericType)
-        {
-            describeGeneric(m, ob, level,o);
+         List<Type> signedInteger = new List<Type> { typeof(sbyte), typeof(short), typeof(int), typeof(long) };
+         List<Type> unsignedInteger = new List<Type> { typeof(byte), typeof(ushort), typeof(uint), typeof(ulong) };
+         List<Type> floatingPoint = new List<Type> { typeof(double), typeof(float) };
+         //Debug.Log(" level " + level);
+         Type objType = m.Type();
 
-        }
-        else
-        {
-            o.WriteLine(m.Name() + " is " + objType);
-        }
-    }*/
+         //Debug.Log(obj.GetProperties()[0].PropertyType+" with name "+ obj.GetProperties()[0].Name);
+         met.Add(objType);
+         if (level > 5)
+         {
+             // Debug.Log("too many levels");
+             o.WriteLine("too many levels");
 
-   /* public void describeGeneric(FieldOrProperty m, object ob, int level, StreamWriter o)
-    {
-        //Debug.Log(m.Name()+" "+m.Type());
-        if (m.Type().GetGenericTypeDefinition() == typeof(List<>))
-        {
-            //Debug.Log("a list of " + m.GetValue(ob).GetType().GetGenericArguments()[0] + " named " + m.Name() + "\n");
-            o.WriteLine("a list of " + m.GetValue(ob).GetType().GetGenericArguments()[0] + " named " + m.Name());
-        }else if (m.Type().GetGenericTypeDefinition() == typeof(HashSet<>))
-        {
-            // Debug.Log("an hashset of " + m.GetValue(ob).GetType().GetGenericArguments()[0] + " named " + m.Name() + "\n");
-            o.WriteLine("an hashset of " + m.GetValue(ob).GetType().GetGenericArguments()[0] + " named " + m.Name());
-        }
-        else if (m.Type().GetGenericTypeDefinition() == typeof(Dictionary<,>))
-        {
-            //Debug.Log("a dictionary of " + m.GetValue(ob).GetType().GetGenericArguments()[0]+","+ m.GetValue(ob).GetType().GetGenericArguments()[1] + " named " + m.Name() + "\n");
-            o.WriteLine("a dictionary of " + m.GetValue(ob).GetType().GetGenericArguments()[0] + "," + m.GetValue(ob).GetType().GetGenericArguments()[1] + " named " + m.Name());
-        }
-    }*/
+         }
+         else if (signedInteger.Contains(objType))
+         {
+             //Debug.Log(m.Name + " is a signed integer");
+             o.WriteLine(m.Name() + " is a signed integer with value "+m.GetValue(ob));
+         }
+         else if (unsignedInteger.Contains(objType))
+         {
+             // Debug.Log(m.Name + " is an unsigned integer");
+             o.WriteLine(m.Name() + " is a unsigned integer with value " + m.GetValue(ob));
+         }
+         else if (floatingPoint.Contains(objType))
+         {
+             //Debug.Log(m.Name + " is a floating point number");
+             o.WriteLine(m.Name() + " is a floating point number with value " + m.GetValue(ob));
+         }
+         else if (objType == typeof(char))
+         {
+             //Debug.Log(m.Name + " is a char");
+             o.WriteLine(m.Name() + " is a char with value " + m.GetValue(ob));
+         }
+         else if (objType == typeof(bool))
+         {
+             //Debug.Log(m.Name + " is a bool");
+             o.WriteLine(m.Name() + " is a bool with value " + m.GetValue(ob));
+         }
+         else if (objType == typeof(Enum))
+         {
+             //Debug.Log(m.Name + " is an Enum");
+             o.WriteLine(m.Name() + " is an Enum with value " + m.GetValue(ob));
+         }else if(objType == typeof(string))
+         {
+             o.WriteLine(m.Name() + " is a string with value" + m.GetValue(ob));
+         }
+         else if (objType.IsGenericType)
+         {
+             describeGeneric(m, ob, level,o);
+
+         }
+         else
+         {
+             o.WriteLine(m.Name() + " is " + objType);
+         }
+     }*/
+
+    /* public void describeGeneric(FieldOrProperty m, object ob, int level, StreamWriter o)
+     {
+         //Debug.Log(m.Name()+" "+m.Type());
+         if (m.Type().GetGenericTypeDefinition() == typeof(List<>))
+         {
+             //Debug.Log("a list of " + m.GetValue(ob).GetType().GetGenericArguments()[0] + " named " + m.Name() + "\n");
+             o.WriteLine("a list of " + m.GetValue(ob).GetType().GetGenericArguments()[0] + " named " + m.Name());
+         }else if (m.Type().GetGenericTypeDefinition() == typeof(HashSet<>))
+         {
+             // Debug.Log("an hashset of " + m.GetValue(ob).GetType().GetGenericArguments()[0] + " named " + m.Name() + "\n");
+             o.WriteLine("an hashset of " + m.GetValue(ob).GetType().GetGenericArguments()[0] + " named " + m.Name());
+         }
+         else if (m.Type().GetGenericTypeDefinition() == typeof(Dictionary<,>))
+         {
+             //Debug.Log("a dictionary of " + m.GetValue(ob).GetType().GetGenericArguments()[0]+","+ m.GetValue(ob).GetType().GetGenericArguments()[1] + " named " + m.Name() + "\n");
+             o.WriteLine("a dictionary of " + m.GetValue(ob).GetType().GetGenericArguments()[0] + "," + m.GetValue(ob).GetType().GetGenericArguments()[1] + " named " + m.Name());
+         }
+     }*/
 
     internal Type TypeOf(FieldOrProperty f)
     {

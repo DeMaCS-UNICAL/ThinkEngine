@@ -63,7 +63,7 @@ public class ActuatorConfigurationWindow : AbstractConfigurationWindow
     }
 
 
-    void OnDisable()
+    /*void OnDisable()
     {
         if (!Directory.Exists("Assets/Resources/Actuators"))
         {
@@ -92,10 +92,37 @@ public class ActuatorConfigurationWindow : AbstractConfigurationWindow
                 AssetDatabase.SaveAssets();
             }
         }
-    }
+    }*/
 
     protected override string onSaving()
     {
+        if (!Directory.Exists("Assets/Resources/Actuators"))
+        {
+            Directory.CreateDirectory("Assets/Resources/Actuators");
+        }
+
+        if (AssetDatabase.LoadAssetAtPath("Assets/Resources/ActuatorsManager.asset", typeof(ActuatorsManager)) == null)
+        {
+            AssetDatabase.CreateAsset((ActuatorsManager)manager, "Assets/Resources/ActuatorsManager.asset");
+        }
+        else
+        {
+            EditorUtility.SetDirty((ActuatorsManager)manager);
+            AssetDatabase.SaveAssets();
+        }
+        foreach (AbstractConfiguration conf in ((ActuatorsManager)manager).confs())
+        {
+            ActuatorConfiguration actuatorConf = (ActuatorConfiguration)conf;
+            if (AssetDatabase.LoadAssetAtPath("Assets/Resources/Actuators/" + actuatorConf.configurationName + ".asset", typeof(ActuatorConfiguration)) == null)
+            {
+                AssetDatabase.CreateAsset(actuatorConf, "Assets/Resources/Actuators/" + actuatorConf.configurationName + ".asset");
+            }
+            else
+            {
+                EditorUtility.SetDirty(actuatorConf);
+                AssetDatabase.SaveAssets();
+            }
+        }
         /* ConfigurationPopup popup = new ConfigurationPopup();
          Vector2 pos = new Vector2((this.position.xMax + this.position.xMin) / 2, (this.position.yMax + this.position.yMin) / 2);
          Vector2 dim = new Vector2(100, 100);

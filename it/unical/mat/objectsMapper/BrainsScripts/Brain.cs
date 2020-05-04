@@ -27,9 +27,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         private SolverExectuor embasp;
         int count = 0;
         private static new System.Timers.Timer timer;
-        private bool sensorsUpdated;
-
+        public bool sensorsUpdated;
+        [NonSerialized]
+        public bool solverWaiting;
         public string ASPFilePath;
+        public string ASPFileTemplatePath;
         public bool enableBrain;
         private bool updateSensors;
         private bool actuatorsReady;
@@ -50,6 +52,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 
         void Awake()
         {
+            triggerClassPath = @".\Assets\Scripts\Trigger.cs";
             actuatorsManager = ActuatorsManager.GetInstance();
             sensorManager = SensorsManager.GetInstance();
             if (Application.isEditor && !File.Exists(triggerClassPath)) {
@@ -85,34 +88,38 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 
         void Reset() {
             executeRepeatedly = true;
-            triggerClassPath = @".\Assets\Game\Scripts\Trigger.cs";
+            triggerClassPath = @".\Assets\Scripts\Trigger.cs";
             ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
+            ASPFileTemplatePath = @".\Assets\Resources\" + gameObject.name + "_template.asp";
             brainUpdateFrequency = 500;
         }
 
         
 
         void OnValidate() {
-            triggerClassPath = @".\Assets\Game\Scripts\Trigger.cs";
+            triggerClassPath = @".\Assets\Scripts\Trigger.cs";
             ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
+            ASPFileTemplatePath = @".\Assets\Resources\" + gameObject.name + "_template.asp";
         }
 
         internal void generateFile()
         {
-            List<SimpleActuator>  actuators = actuatorsManager.instantiatedActuators[this];
-            List<AdvancedSensor>  sensors = sensorManager.instantiatedSensors[this];
-            mapper = MappingManager.getInstance();
-            foreach (ActuatorConfiguration conf in actuatorsConfigurations)
-            {
-                actuators.Add(new SimpleActuator(conf));
-            }
+            List<AdvancedSensor> sensors = new List<AdvancedSensor>();
+            List<SimpleActuator> actuators = new List<SimpleActuator>();
             foreach (SensorConfiguration conf in sensorsConfigurations)
             {
                 sensors.Add(new AdvancedSensor(conf));
+                //Debug.Log(conf.configurationName+" added");
             }
+            foreach (ActuatorConfiguration conf in actuatorsConfigurations)
+            {
+                actuators.Add(new SimpleActuator(conf));
+                //Debug.Log(conf.configurationName+" added");
+            }
+            mapper = MappingManager.getInstance();
             IMapper actuatorMapper = mapper.getMapper(typeof(SimpleActuator));
             ASPAdvancedSensorMapper sensorMapper = (ASPAdvancedSensorMapper)mapper.getMapper(typeof(AdvancedSensor));
-            using (FileStream fs = File.Create(ASPFilePath))
+            using (FileStream fs = File.Create(ASPFileTemplatePath))
             {
                 foreach (SimpleActuator act in actuators)
                 {
@@ -127,7 +134,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
             }
         }
 
-        internal bool sensorsReady()
+        public bool sensorsReady()
         {
             if (sensorsUpdated)
             {
@@ -226,6 +233,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 yield return new WaitUntil(() => (bool)reasonerMethod.Invoke(triggerClass, null));
                 lock (toLock)
                 {
+                    solverWaiting = false;
                     Monitor.Pulse(toLock);
                 }
             }
@@ -234,11 +242,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         {
             while (true)
             {
-                Debug.Log("waiting sensors");
+                //Debug.Log("waiting sensors");
                 yield return new WaitUntil(() => sensorsReady());
-                Debug.Log("pulsing");
+                //Debug.Log("pulsing");
                 lock (toLock)
                 {
+                    solverWaiting = false;
                     Monitor.Pulse(toLock);
                 }
             }
@@ -272,7 +281,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
             }
             if (embasp != null) {
                 embasp.reason = false;
-                Debug.Log("finalize");
+                //Debug.Log("finalize");
                 embasp.finalize();
             }
         }
@@ -285,6 +294,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
             
             lock (toLock)
             {
+                //Debug.Log("updating sensors");
                 sensorManager.updateSensors(this);
                 sensorsUpdated = true;
             }

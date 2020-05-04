@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 {
@@ -48,19 +49,23 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 //Debug.Log("executing thread");
                 lock (brain.toLock)
                 {
+                    brain.solverWaiting = true;
                     Monitor.Wait(brain.toLock);
                     try
                     {
                         stopwatch.Start();
                         factsPath = Path.GetTempFileName();
+                        
+
                         using (StreamWriter fs = new StreamWriter(factsPath, true))
                         {
-                            //Debug.Log("creating file");
+                            //UnityEngine.Debug.Log("creating file "+ factsPath);
                             foreach (AdvancedSensor sensor in brain.getSensors())
                             {
-                                /*
+
+                                
                                 //Debug.Log("sensor " + sensor.sensorName);
-                                if (!sensor.dataAvailable)
+                                /*if (!sensor.dataAvailable)
                                 {
                                     //Debug.Log("waiting sensors");
                                     Monitor.Wait(brain.toLock);
@@ -103,12 +108,18 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 stopwatch.Stop();
                 asSteps++;
                 asAvgTime += stopwatch.ElapsedMilliseconds;
-                // Debug.Log("debugging answer set");
+                 //Debug.Log("debugging answer set");
                 //Debug.Log("there are "+answers.Answersets.Count);
-                // Debug.Log("error: " + answers.ErrorsString);
+                 //Debug.Log("error: " + answers.ErrorsString);
                 if (answers.Answersets.Count > 0)
                 {
-                    lock (brain.toLock)
+                    string asPath = Path.GetTempFileName();
+                    using (StreamWriter fs = new StreamWriter(asPath, true))
+                    {
+                        fs.Write(o.OutputString);
+                        fs.Close();
+                    }
+                        lock (brain.toLock)
                     {
                         foreach (SimpleActuator actuator in brain.getActuators())
                         {

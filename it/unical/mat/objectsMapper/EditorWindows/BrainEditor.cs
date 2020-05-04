@@ -122,11 +122,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             serialized.ApplyModifiedProperties();//CHECK SERIALIZATION
 
             Brain current = (Brain)target;
-            if(GUILayout.Button("Generate ASP file", GUILayout.Width(300)))
+            if(GUILayout.Button("Generate ASP file template", GUILayout.Width(300)))
             {
                 current.generateFile();
             }
-            
+            EditorGUILayout.LabelField("Warning! Generating a new file will delete the previouse template.");
+
         }
     }
 }

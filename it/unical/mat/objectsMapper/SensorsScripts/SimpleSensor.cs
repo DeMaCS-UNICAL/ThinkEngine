@@ -56,14 +56,19 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             properties.AddRange(propertiesToTrack.Distinct());
             mappingManager = MappingManager.getInstance();
             ReflectionExecutor re = ScriptableObject.CreateInstance<ReflectionExecutor>();
+            init();
+
+        }
+
+        public void init()
+        {
             cleanDataStructures();
-            foreach(string st in properties)
+            foreach (string st in properties)
             {
                 //Debug.Log(st);
                 operationPerProperty.Add(st, 0);
             }
             UpdateProperties();
-
         }
 
         public SimpleSensor(SensorConfiguration s)
