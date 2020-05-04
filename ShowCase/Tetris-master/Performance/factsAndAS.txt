@@ -1,0 +1,21 @@
+facts 537.17
+anser set 628.60
+facts 548.86ms 
+answer set 623.00ms 
+facts 609.00ms 
+answer set 785.86ms 
+facts 16.00ms 
+answer set 181.00ms 
+facts 310.60ms 
+answer set 444.20ms 
+facts 228.00ms 
+answer set 421.00ms 
+facts 426.20ms 
+answer set 607.80ms 
+facts 342.25ms 
+answer set 544.75ms 
+facts 493.60ms 
+answer set 596.25ms 
+facts 435.80ms 
+answer set 522.00ms 
+
