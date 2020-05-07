@@ -42,7 +42,7 @@ public class SimpleGameObjectsTracker
     public void getBasicProperties()
     {
         Type local = Type.GetType(objType);
-        //Debug.Log("obtained type from " + objType + " is " + local);
+        Debug.Log("obtained type from " + objType + " is " + local);
         ReflectionExecutor re = ScriptableObject.CreateInstance<ReflectionExecutor>();
         List<FieldOrProperty> all = re.GetFieldsAndProperties(local);
         propertiesToggled = new Dictionary<string, bool>();

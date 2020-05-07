@@ -27,6 +27,18 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
         [NonSerialized]
         public bool applyCoroutinStarted=false;
 
+        public AbstractConfiguration findConfiguration(string s)
+        {
+            foreach (ActuatorConfiguration c in actuatorsConfs)
+            {
+                if (c.name.Equals(s))
+                {
+                    return c;
+                }
+            }
+            return new ActuatorConfiguration(s);
+        }
+
         public ref List<AbstractConfiguration> confs()
         {
             return ref actuatorsConfs;

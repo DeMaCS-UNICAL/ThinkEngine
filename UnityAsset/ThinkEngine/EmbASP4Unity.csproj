@@ -160,11 +160,14 @@
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\SimpleActuator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Brain.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\SolverExecutor.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\AbstractConfigurator.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\EditorWindows\AbstractConfiguratorEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\AbstractConfigurationWindow.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\ActuatorConfigurationWindow.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorsManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\AbstractConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\BrainEditor.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\EditorWindows\SensorConfiguratorEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\IManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\AdvancedSensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPActuatorMapper.cs" />
@@ -182,6 +185,7 @@
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\SensorConfigurationWindow.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Operation.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ReflectionExecutor.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SensorConfigurator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SimpleSensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SensorConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SensorsManager.cs" />

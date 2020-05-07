@@ -11,7 +11,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
     [Serializable]
     public class SensorsManager : ScriptableObject, IManager
     {
-        
+
         private List<AbstractConfiguration> sensConfs;
         [SerializeField]
         private List<SensorConfiguration> confsToSerialize;
@@ -22,6 +22,17 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         [NonSerialized]
         public Dictionary<Brain, List<AdvancedSensor>> instantiatedSensors;
         public static SensorsManager instance;
+
+        public AbstractConfiguration findConfiguration(string s){
+            foreach(SensorConfiguration c in sensConfs)
+            {
+                if (c.name.Equals(s))
+                {
+                    return c;
+                }
+            }
+            return new SensorConfiguration(s);
+        }
 
         public ref List<string> configuredGameObject()
         {

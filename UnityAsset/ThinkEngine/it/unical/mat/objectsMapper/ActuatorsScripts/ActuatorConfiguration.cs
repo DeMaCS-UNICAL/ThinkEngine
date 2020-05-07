@@ -12,6 +12,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
     [Serializable]
     public class ActuatorConfiguration : AbstractConfiguration
     {
+        
+        public ActuatorConfiguration(string s)
+        {
+            this.name = s;
+        }
+
         internal override void cleanSpecificDataStructure()
         {
             

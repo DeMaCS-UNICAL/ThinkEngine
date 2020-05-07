@@ -122,7 +122,7 @@ public class GameObjectsTracker
                             foreach (SimpleGameObjectsTracker st in s.advancedConf) {
                                 if (st.propertyName.Equals(obj.Name()))
                                 {
-                                    st.objType = obj.Type().GetElementType().ToString();
+                                   // st.objType = obj.Type().GetElementType().ToString();
                                     basicTypeCollectionsConfigurations.Add(obj, st);
                                     //Debug.Log("Adding st for " + obj.Name() + " whit type " + st.objType);
                                     break;
@@ -247,7 +247,7 @@ public class GameObjectsTracker
                         {
                             if (st.propertyName.Equals(parent + "^" + ob.Name()))
                             {
-                                st.objType = ob.Type().GetElementType().ToString();
+                                //st.objType = ob.Type().GetElementType().ToString();
                                 //Debug.Log("Adding st for " + ob.Name() + " whit type " + st.objType);
                                 basicTypeCollectionsConfigurations.Add(ob, st);
                                 break;

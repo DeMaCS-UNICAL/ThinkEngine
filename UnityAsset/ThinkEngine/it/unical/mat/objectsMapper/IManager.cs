@@ -11,6 +11,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
         ref List<string> configuredGameObject();
         ref List<string> usedNames();
         ref List<AbstractConfiguration> confs();
+        AbstractConfiguration findConfiguration(string v);
     }
 }
 

@@ -17,6 +17,13 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         [SerializeField]
         internal List<StringStringPair> specificValuePerProperty;
 
+        public SensorConfiguration(string s)
+        {
+            this.name = s;
+            operationPerProperty = new List<StringIntPair>();
+            specificValuePerProperty = new List<StringStringPair>();
+        }
+
         internal SensorConfiguration()
         {
             operationPerProperty = new List<StringIntPair>();

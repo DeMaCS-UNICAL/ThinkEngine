@@ -13,7 +13,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
     public abstract class AbstractConfiguration :ScriptableObject
     {
         protected GameObjectsTracker tracker;
-        protected GameObject gO;
+        public GameObject gO;
         [SerializeField]
         public string gOName;
         [SerializeField]
