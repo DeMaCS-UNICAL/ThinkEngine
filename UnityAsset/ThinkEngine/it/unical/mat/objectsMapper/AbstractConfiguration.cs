@@ -6,14 +6,13 @@ using System.Text;
 using System.Runtime.Serialization;
 using UnityEngine;
 using UnityEditor;
-using System.Collections;
 namespace EmbASP4Unity.it.unical.mat.objectsMapper
 {
     [Serializable]
     public abstract class AbstractConfiguration :ScriptableObject
     {
         protected GameObjectsTracker tracker;
-        public GameObject gO;
+        private GameObject gO;
         [SerializeField]
         public string gOName;
         [SerializeField]

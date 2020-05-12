@@ -13,20 +13,22 @@ using System.IO;
 public class SensorConfiguratorEditor : AbstractConfiguratorEditor
 {
 
-    void OnEnable()
+    public override void OnInspectorGUI()
     {
-        base.OnEnable();
-        typeOfConfigurator = "Sensor";
-        if (AssetDatabase.LoadAssetAtPath("Assets/Resources/SensorsManager.asset", typeof(SensorsManager)) == null)
+        if (!objectMode)
         {
-           // Debug.Log("manager not found");
-            manager = SensorsManager.GetInstance();
+            base.OnInspectorGUI();
         }
         else
         {
-            manager = (SensorsManager)AssetDatabase.LoadAssetAtPath("Assets/Resources/SensorsManager.asset", typeof(SensorsManager));
-          //  Debug.Log("manager found");
+            drawObjectProperties();
         }
+    }
+
+    void OnEnable()
+    {
+        base.OnEnable();
+        typeOfConfigurator = "Sensor";        
     }
     
     protected override void updateConfiguredObject()
@@ -66,36 +68,7 @@ public class SensorConfiguratorEditor : AbstractConfiguratorEditor
         }
     }*/
 
-    protected override string onSaving()
-    {
-        if (!Directory.Exists("Assets/Resources/Sensors"))
-        {
-            Directory.CreateDirectory("Assets/Resources/Sensors");
-        }
-        if (AssetDatabase.LoadAssetAtPath("Assets/Resources/SensorsManager.asset", typeof(SensorsManager)) == null)
-        {
-            AssetDatabase.CreateAsset((SensorsManager)manager, "Assets/Resources/SensorsManager.asset");
-        }
-        else
-        {
-            EditorUtility.SetDirty((SensorsManager)manager);
-            AssetDatabase.SaveAssets();
-        }
-        foreach (AbstractConfiguration conf in ((SensorsManager)manager).confs())
-        {
-            SensorConfiguration sensorConf = (SensorConfiguration)conf;
-            if (AssetDatabase.LoadAssetAtPath("Assets/Resources/Sensors/" + sensorConf.configurationName + ".asset", typeof(SensorConfiguration)) == null)
-            {
-                AssetDatabase.CreateAsset(sensorConf, "Assets/Resources/Sensors/" + sensorConf.configurationName + ".asset");
-            }
-            else
-            {
-                EditorUtility.SetDirty(sensorConf);
-                AssetDatabase.SaveAssets();
-            }
-        }
-        return "";
-    }
+   
 
    
     internal override void addCustomFields(FieldOrProperty obj)

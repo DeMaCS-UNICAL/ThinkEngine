@@ -1,6 +1,7 @@
 ﻿using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEditor;
@@ -16,9 +17,9 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         [SerializeField]
         private List<SensorConfiguration> confsToSerialize;
         [SerializeField]
-        private List<string> ConfiguredGameObject;
+        private List<string> configuredGameObject;
         [SerializeField]
-        private List<string> ConfigurationsNames;
+        private List<string> configurationsNames;
         [NonSerialized]
         public Dictionary<Brain, List<AdvancedSensor>> instantiatedSensors;
         public static SensorsManager instance;
@@ -26,25 +27,25 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         public AbstractConfiguration findConfiguration(string s){
             foreach(SensorConfiguration c in sensConfs)
             {
-                if (c.name.Equals(s))
+                if (c.configurationName.Equals(s))
                 {
                     return c;
                 }
             }
-            return new SensorConfiguration(s);
+            return null;
         }
 
-        public ref List<string> configuredGameObject()
+        public List<string> getConfiguredGameObject()
         {
-            return ref ConfiguredGameObject;
+            return configuredGameObject;
         }
-        public ref List<string> usedNames()
+        public List<string> getUsedNames()
         {
-            return ref ConfigurationsNames;
+            return configurationsNames;
         }
-        public ref List<AbstractConfiguration> confs()
+        public List<AbstractConfiguration> getConfigurations()
         {
-            return ref sensConfs;
+            return sensConfs;
         }
 
         public void OnAfterDeserialize()
@@ -61,10 +62,24 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 
         internal static SensorsManager GetInstance()
         {
+           // Debug.Log("instance " + instance);
             if (instance == null)
             {
-                instance = new SensorsManager();
+                if (!Directory.Exists("Assets/Resources"))
+                {
+                    Directory.CreateDirectory("Assets/Resources");
+                }
+                if (AssetDatabase.LoadAssetAtPath("Assets/Resources/SensorsManager.asset", typeof(SensorsManager)) == null)
+                {
+                    instance = new SensorsManager();
+                }
+                else
+                {
+                    instance = (SensorsManager)AssetDatabase.LoadAssetAtPath("Assets/Resources/SensorsManager.asset", typeof(SensorsManager));
+                }
             }
+            //Debug.Log("instance after " + instance);
+            //Debug.Log("confs: " + instance.sensConfs.Count);
             return instance;
         }
 
@@ -120,13 +135,66 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             {
                 sensConfs = new List<AbstractConfiguration>();
             }
-            if (ConfiguredGameObject == null)
+            if (configuredGameObject == null)
             {
-                ConfiguredGameObject = new List<string>();
+                configuredGameObject = new List<string>();
             }
-            if (ConfigurationsNames == null)
+            if (configurationsNames == null)
             {
-                ConfigurationsNames = new List<string>();
+                configurationsNames = new List<string>();
+            }
+        }
+
+        public void delete(string v)
+        {
+            int i = 0;
+            for (; i < sensConfs.Count; i++)
+            {
+                if (sensConfs[i].configurationName.Equals(v))
+                {
+                    break;
+                }
+            }
+            if (i < sensConfs.Count)
+            {
+                deleteGO(sensConfs[i]);
+                sensConfs.RemoveAt(i);
+            }
+            configurationsNames.Remove(v);
+        }
+
+        private void deleteGO(AbstractConfiguration abstractConfiguration)
+        {
+            foreach(SensorConfiguration c in sensConfs)
+            {
+                if (!c.configurationName.Equals(abstractConfiguration.configurationName))
+                {
+                    if (c.gOName.Equals(abstractConfiguration.gOName))
+                    {
+                        return;
+                    }
+                }
+            }
+            configuredGameObject.Remove(abstractConfiguration.gOName);
+        }
+
+        public AbstractConfiguration newConfiguration(string n,string go)
+        {
+            return new SensorConfiguration(n,go);
+        }
+
+        public void addConfiguration(AbstractConfiguration abstractConfiguration)
+        {
+            //Debug.Log("checking if to delete " + abstractConfiguration.name);
+            delete(abstractConfiguration.configurationName);
+            sensConfs.Add(abstractConfiguration);
+            if (!configurationsNames.Contains(abstractConfiguration.configurationName))
+            {
+                configurationsNames.Add(abstractConfiguration.configurationName);
+            }
+            if (!configuredGameObject.Contains(abstractConfiguration.gOName))
+            {
+                configuredGameObject.Add(abstractConfiguration.gOName);
             }
         }
     }

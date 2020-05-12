@@ -12,7 +12,6 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
     public abstract class AbstractConfiguratorEditor : Editor
     {
         protected GameObjectsTracker tracker;
-        protected IManager manager;
         
         [SerializeField]
         protected string chosenGO;
@@ -31,6 +30,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
         protected Vector2 mainScroll;
         protected Vector2 helpScroll;
+        protected Vector2 configurationScroll;
         protected string chosenName;
         protected List<string> gOToShow;
         protected bool objectMode;
@@ -54,6 +54,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             {
                 tracker.updateDataStructures(null, configuration);
             }
+            if(objectMode && objectToConfigure is null)
+            {
+                objectMode = false;
+            }
         }
         
         override public void OnInspectorGUI()
@@ -74,7 +78,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             if (chosingNewConfigurationName)
             {
                 choseNewConfigurationName();
-                if (configuringConfiguration)
+                if (configuringConfiguration && !(configuration is null))
                 {
                     tracker.updateDataStructures(null, configuration);
                 }
@@ -99,18 +103,33 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
             EditorGUI.indentLevel--;
             string buttonContent;
-            if (manager.usedNames().Contains(chosenGO))
+            bool disabled=false;
+            if (configurator.configurationNames().Contains(tracker.configurationName))
             {
                 buttonContent = "Override Configuration";
+            }
+            else if (configurator.generalUsedNames().Contains(tracker.configurationName))
+            {
+                buttonContent = "Name used for another game object sensor";
+                disabled = true;
             }
             else
             {
                 buttonContent = "Save Configuration";
             }
-            tracker.configurationName = EditorGUILayout.TextField(typeOfConfigurator + " name: ", tracker.configurationName);
+            EditorGUIUtility.labelWidth=100;
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            GUILayout.BeginVertical();
+            tracker.configurationName = EditorGUILayout.TextField(typeOfConfigurator + " name: ", tracker.configurationName,GUILayout.MinWidth(200));
             EditorGUILayout.BeginHorizontal();
+            GUI.enabled = !disabled;
             bool save = GUILayout.Button(buttonContent);
+            GUI.enabled = true;
             bool cancel = GUILayout.Button("Cancel");
+            EditorGUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+            GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
             if (cancel)
             {
@@ -122,7 +141,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 //Debug.Log("saving fdgdfgdfgdfgdf");
                 // checkToggled();
                 updateConfiguredObject();
-                onSaving();
+                configurator.onSaving();
             }
             
         }
@@ -134,20 +153,32 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             chosenName = GUILayout.TextField(chosenName);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Ok"))
+            GUILayout.FlexibleSpace();
+            if (!configurator.generalUsedNames().Contains(chosenName))
             {
-                if (!manager.usedNames().Contains(chosenName))
+                if (GUILayout.Button("Ok"))
                 {
-                    configuration = configurator.newConfiguration(chosenName);
+                    //configuration = configurator.newConfiguration(chosenName,chosenGO);
+                    configuration = null;
                     chosingNewConfigurationName = false;
                     configuringConfiguration = true;
+                    tracker.updateDataStructures(chosenGO, null);
+                    tracker.configurationName = chosenName;
                 }
+            }
+            else
+            {
+                GUI.enabled = false;
+                GUILayout.Button("Name already used.");
+                GUI.enabled = true;
             }
             if (GUILayout.Button("Back"))
             {
                 chosingNewConfigurationName = false;
                 showingConfigurations = true;
             }
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
 
         }
 
@@ -174,27 +205,18 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
         protected void updateConfiguredObject(AbstractConfiguration conf)
         {
-            if (manager.usedNames().Contains(tracker.configurationName))
+            if (configurator.generalUsedNames().Contains(tracker.configurationName))
             {
-
-                foreach (AbstractConfiguration s in manager.confs())
-                {
-                    if (s.configurationName.Equals(tracker.configurationName))
-                    {
-                        conf = s;
-                        break;
-                    }
-                }
-                manager.confs().Remove(conf);
+                configurator.deleteConfiguration(tracker.configurationName);
             }
-            else
+            /*else
             {
-                manager.configuredGameObject().Add(chosenGO);
-            }
+                configurator.addConfiguredGameObject(chosenGO);
+            }*/
             try
             {
                 //Debug.Log("before adding"+manager.confs().Count);
-                manager.confs().Add(tracker.saveConfiguration(conf, chosenGO));
+                configurator.addConfiguration(tracker.saveConfiguration(conf, chosenGO));
                 //Debug.Log("after adding" + manager.confs().Count);
 
             }
@@ -216,107 +238,122 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         }
         protected void showConfigurations()
         {
-            if (manager.configuredGameObject().Count > 0)
+            if (configurator.configurationNames().Count>0)
             {
-                if (manager.configuredGameObject().Contains(chosenGO))
+                GUILayout.Label("Some configurations exist for " + chosenGO, EditorStyles.label);
+            }
+            /*EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Do you want to load it?", EditorStyles.label);
+            bool yes = GUILayout.Button("Yes");
+            bool no = GUILayout.Button("No");
+            EditorGUILayout.EndHorizontal();
+            if (yes)
+            {
+                disableProperties = false;
+                foreach (AbstractConfiguration s in manager.confs())
                 {
-                    GUILayout.Label("Some configurations exist for " + chosenGO, EditorStyles.label);
-                    /*EditorGUILayout.BeginHorizontal();
-                    GUILayout.Label("Do you want to load it?", EditorStyles.label);
-                    bool yes = GUILayout.Button("Yes");
-                    bool no = GUILayout.Button("No");
-                    EditorGUILayout.EndHorizontal();
-                    if (yes)
+                    if (s.gOName.Equals(chosenGO))
                     {
-                        disableProperties = false;
-                        foreach (AbstractConfiguration s in manager.confs())
+                        tracker.updateDataStructures(null, s);
+                        Repaint();
+                        return;
+                    }
+                }
+            }
+            if (no)
+            {
+                disableProperties = false;
+                updateDataStructures();
+                Repaint();
+            }
+            return;*/
+            List<string> confToShow = new List<string>();
+            confToShow.Add("New Configuration");
+            foreach (string c in configurator.configurationNames())
+            {
+                confToShow.Add(c);
+            }
+                    
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            GUILayout.BeginVertical();
+            chosenConfig = GUILayout.SelectionGrid(chosenConfig, confToShow.ToArray(), 1,new GUIStyle(GUI.skin.toggle), GUILayout.MaxWidth(300));//_------!!!!!!!!!!!!!!!!!!!!!!!!!!1
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Configure", GUILayout.MaxWidth(100)))
+            {
+                if (chosenConfig == 0)
+                {
+                    showingConfigurations = false;
+                    chosingNewConfigurationName = true;
+                }
+                else
+                {
+                    configuration = configurator.findConfiguration(confToShow[chosenConfig]);
+                    showingConfigurations = false;
+                    configuringConfiguration = true;
+                }
+            }
+            if (chosenConfig != 0)
+            {
+                Color contentTemp = GUI.contentColor;
+                Color backTemp = GUI.backgroundColor;
+                GUI.contentColor = Color.white;
+                GUI.backgroundColor = Color.red;
+                if (GUILayout.Button("Delete configuration",GUILayout.MaxWidth(150)))
+                {
+                    configurator.deleteConfiguration(confToShow[chosenConfig]);
+                    chosenConfig = 0;
+                }
+                GUI.contentColor = contentTemp;
+                GUI.backgroundColor=backTemp;
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+            
+            /*else
+            {
+                List<AbstractConfiguration> relatedConfiguration = new List<AbstractConfiguration>();
+                List<string> relatedGO = new List<string>();
+                relatedGO.Add("Chose a configuration");
+                foreach (AbstractConfiguration s in manager.confs())
+                {
+                    if (s.gOType != null)
+                    {
+                        UnityEngine.Object parent = PrefabUtility.GetCorrespondingObjectFromSource(tracker.GetGameObject(chosenGO));
+                        if (parent != null && s.gOType.Equals(parent.ToString()))
                         {
-                            if (s.gOName.Equals(chosenGO))
-                            {
-                                tracker.updateDataStructures(null, s);
-                                Repaint();
-                                return;
-                            }
+                            relatedConfiguration.Add(s);
+                            relatedGO.Add(s.gOName);
                         }
                     }
-                    if (no)
+                }
+                if (relatedConfiguration.Count > 0)
+                {
+                    GUILayout.Label("Following object of type " + PrefabUtility.GetCorrespondingObjectFromSource(tracker.GetGameObject(chosenGO)).ToString() + " have been configured.", EditorStyles.label);
+                    GUILayout.Label("Chose one to load its configuration or click \"Continue\" to start a new configuration.", EditorStyles.label);
+                    EditorGUILayout.BeginHorizontal();
+                    chosenConfig = EditorGUILayout.Popup(chosenConfig, relatedGO.ToArray());
+                    bool cont = GUILayout.Button("Continue");
+                    EditorGUILayout.EndHorizontal();
+                    if (cont)
                     {
                         disableProperties = false;
                         updateDataStructures();
                         Repaint();
                     }
-                    return;*/
-                    List<string> confToShow = new List<string>();
-                    confToShow.Add("Create New");
-                    foreach (AbstractConfiguration c in manager.confs())
+                    if (chosenConfig > 0)
                     {
-                        if (c.gOName.Equals(chosenGO))
-                        {
-                            confToShow.Add(c.name);
-                        }
+                        disableProperties = false;
+                        tracker.updateDataStructures(chosenGO, relatedConfiguration[chosenConfig - 1]);
+                        Repaint();
+                        chosenConfig = 0;
                     }
-                    GUIStyle style = new GUIStyle();
-                    style.fixedWidth = 50;
-                    chosenConfig = GUILayout.SelectionGrid(chosenConfig, confToShow.ToArray(), 1);
-                    if (GUILayout.Button("Configure"))
-                    {
-                        if (chosenConfig == 0)
-                        {
-                            showingConfigurations = false;
-                            chosingNewConfigurationName = true;
-                        }
-                        else
-                        {
-                            configuration = manager.findConfiguration(confToShow[chosenConfig]);
-                            configuration.gOName = configurator.gameObject.name;
-                            configuration.gO = configurator.gameObject;
-                            showingConfigurations = false;
-                            configuringConfiguration = true;
-                        }
-                    }
+                    return;
                 }
-                /*else
-                {
-                    List<AbstractConfiguration> relatedConfiguration = new List<AbstractConfiguration>();
-                    List<string> relatedGO = new List<string>();
-                    relatedGO.Add("Chose a configuration");
-                    foreach (AbstractConfiguration s in manager.confs())
-                    {
-                        if (s.gOType != null)
-                        {
-                            UnityEngine.Object parent = PrefabUtility.GetCorrespondingObjectFromSource(tracker.GetGameObject(chosenGO));
-                            if (parent != null && s.gOType.Equals(parent.ToString()))
-                            {
-                                relatedConfiguration.Add(s);
-                                relatedGO.Add(s.gOName);
-                            }
-                        }
-                    }
-                    if (relatedConfiguration.Count > 0)
-                    {
-                        GUILayout.Label("Following object of type " + PrefabUtility.GetCorrespondingObjectFromSource(tracker.GetGameObject(chosenGO)).ToString() + " have been configured.", EditorStyles.label);
-                        GUILayout.Label("Chose one to load its configuration or click \"Continue\" to start a new configuration.", EditorStyles.label);
-                        EditorGUILayout.BeginHorizontal();
-                        chosenConfig = EditorGUILayout.Popup(chosenConfig, relatedGO.ToArray());
-                        bool cont = GUILayout.Button("Continue");
-                        EditorGUILayout.EndHorizontal();
-                        if (cont)
-                        {
-                            disableProperties = false;
-                            updateDataStructures();
-                            Repaint();
-                        }
-                        if (chosenConfig > 0)
-                        {
-                            disableProperties = false;
-                            tracker.updateDataStructures(chosenGO, relatedConfiguration[chosenConfig - 1]);
-                            Repaint();
-                            chosenConfig = 0;
-                        }
-                        return;
-                    }
-                }*/
-            }
+            }*/
+            
         }
         protected void addProperties()
         {
@@ -539,8 +576,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 }
             }
             EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
             bool cancel = GUILayout.Button("Cancel");
             bool save = GUILayout.Button("Save");
+            GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
             if (cancel)
             {
@@ -565,7 +604,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
         }
 
-        protected virtual string onSaving() { return ""; }
+        
         internal virtual void addCustomFields(FieldOrProperty obj) { }
         protected virtual void updateConfiguredObject() { }
     }
