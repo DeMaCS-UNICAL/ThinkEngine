@@ -9,47 +9,15 @@ using EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows;
 using EmbASP4Unity.it.unical.mat.objectsMapper;
 using System.IO;
 
-[Serializable]
-public class SensorConfigurationWindow : AbstractConfigurationWindow
+[CustomEditor(typeof(SensorConfigurator))]
+public class SensorConfiguratorEditor : AbstractConfiguratorEditor
 {
 
-    
-
-    [MenuItem("Window/Sensor Configuration Window")]
-    public static void Init()
-    {
-        //Debug.Log("going to show");
-        EditorWindow.GetWindow(typeof(SensorConfigurationWindow));
-        //Debug.Log("showed");
-    }
-
-
-    void OnEnable()
-    {
-        if (AssetDatabase.LoadAssetAtPath("Assets/Resources/SensorsManager.asset", typeof(SensorsManager)) == null)
-        {
-           // Debug.Log("manager not found");
-            manager = SensorsManager.GetInstance();
-        }
-        else
-        {
-            manager = (SensorsManager)AssetDatabase.LoadAssetAtPath("Assets/Resources/SensorsManager.asset", typeof(SensorsManager));
-          //  Debug.Log("manager found");
-        }
-        tracker = new GameObjectsTracker();
-    }
-
-    private void OnFocus()
-    {
-        refreshAvailableGO();
-        
-    }
-
-    void OnGUI()
+    public override void OnInspectorGUI()
     {
         if (!objectMode)
         {
-            draw("Sensor");
+            base.OnInspectorGUI();
         }
         else
         {
@@ -57,8 +25,12 @@ public class SensorConfigurationWindow : AbstractConfigurationWindow
         }
     }
 
+    void OnEnable()
+    {
+        base.OnEnable();
+        typeOfConfigurator = "Sensor";        
+    }
     
-
     protected override void updateConfiguredObject()
     {
         
@@ -96,36 +68,7 @@ public class SensorConfigurationWindow : AbstractConfigurationWindow
         }
     }*/
 
-    protected override string onSaving()
-    {
-        if (!Directory.Exists("Assets/Resources/Sensors"))
-        {
-            Directory.CreateDirectory("Assets/Resources/Sensors");
-        }
-        if (AssetDatabase.LoadAssetAtPath("Assets/Resources/SensorsManager.asset", typeof(SensorsManager)) == null)
-        {
-            AssetDatabase.CreateAsset((SensorsManager)manager, "Assets/Resources/SensorsManager.asset");
-        }
-        else
-        {
-            EditorUtility.SetDirty((SensorsManager)manager);
-            AssetDatabase.SaveAssets();
-        }
-        foreach (AbstractConfiguration conf in ((SensorsManager)manager).confs())
-        {
-            SensorConfiguration sensorConf = (SensorConfiguration)conf;
-            if (AssetDatabase.LoadAssetAtPath("Assets/Resources/Sensors/" + sensorConf.configurationName + ".asset", typeof(SensorConfiguration)) == null)
-            {
-                AssetDatabase.CreateAsset(sensorConf, "Assets/Resources/Sensors/" + sensorConf.configurationName + ".asset");
-            }
-            else
-            {
-                EditorUtility.SetDirty(sensorConf);
-                AssetDatabase.SaveAssets();
-            }
-        }
-        return "";
-    }
+   
 
    
     internal override void addCustomFields(FieldOrProperty obj)

@@ -26,7 +26,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         private Thread executionThread;
         private SolverExectuor embasp;
         int count = 0;
-        private static new System.Timers.Timer timer;
+        private static System.Timers.Timer timer;
         public bool sensorsUpdated;
         [NonSerialized]
         public bool solverWaiting;
