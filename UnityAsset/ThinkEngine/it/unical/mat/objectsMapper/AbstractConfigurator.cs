@@ -98,6 +98,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
             if (i < gOConfigurations.Count)
             {
                 Debug.Log(gOConfigurations[i].configurationName);
+                onDeleting(gOConfigurations[i]);
                 gOConfigurations.RemoveAt(i);
                 localNames.Remove(v);
             }
