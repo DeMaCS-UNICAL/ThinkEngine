@@ -51,6 +51,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             configurator = target as AbstractConfigurator;
             tracker = new GameObjectsTracker();
             tracker.GO = configurator.gameObject;
+            chosenName = "";
             if (fault)
             {
                 objectMode = false;
@@ -546,10 +547,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                             objectMode = true;
                             objectToConfigure = f;
                             helpScroll = new Vector2(0, 0);
-                            Debug.Log("num: "+tracker.basicTypeCollectionsConfigurations.Count);
-                            Debug.Log("f " + tracker.basicTypeCollectionsConfigurations[f]);
+                            //Debug.Log("num: "+tracker.basicTypeCollectionsConfigurations.Count);
                             if (!tracker.basicTypeCollectionsConfigurations.ContainsKey(f))
                             {
+                                //Debug.Log("f " + tracker.basicTypeCollectionsConfigurations[f]);
                                 Debug.Log("adding simple tracker for " + objectToConfigure.Name() + " that is a " + objectToConfigure.Type());
 
                                 tracker.basicTypeCollectionsConfigurations.Add(f, new SimpleGameObjectsTracker(objectToConfigure.Type()));
