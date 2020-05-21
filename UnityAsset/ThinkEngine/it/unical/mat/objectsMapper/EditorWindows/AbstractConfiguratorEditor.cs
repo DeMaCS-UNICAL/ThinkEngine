@@ -43,50 +43,72 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
         protected void OnEnable()
         {
+            reset();
+        }
+
+        protected void reset(bool fault = false)
+        {
             configurator = target as AbstractConfigurator;
             tracker = new GameObjectsTracker();
             tracker.GO = configurator.gameObject;
-            if (!(configuringConfiguration || chosingNewConfigurationName))
-            {
-                showingConfigurations = true;
-            }
-            if(!(configuration is null))
-            {
-                tracker.updateDataStructures(null, configuration);
-            }
-            if(objectMode && objectToConfigure is null)
+            if (fault)
             {
                 objectMode = false;
+                showingConfigurations = true;
+                configuringConfiguration = false;
+                chosingNewConfigurationName = false;
+            }
+            else
+            {
+                if (!(configuringConfiguration || chosingNewConfigurationName))
+                {
+                    showingConfigurations = true;
+                }
+                if (!(configuration is null))
+                {
+                    tracker.updateDataStructures(null, configuration);
+                }
+                if (objectMode && objectToConfigure is null)
+                {
+                    objectMode = false;
+                }
             }
         }
-        
+
         override public void OnInspectorGUI()
         {
             //Debug.Log("manager "+manager);
-            GUILayout.Label(typeOfConfigurator +" Configurator", EditorStyles.boldLabel);
-
-            chosenGO = configurator.gameObject.name;
-            if (showingConfigurations)
+            try
             {
-                showConfigurations();
+                GUILayout.Label(typeOfConfigurator + " Configurator", EditorStyles.boldLabel);
+
+                chosenGO = configurator.gameObject.name;
+                if (showingConfigurations)
+                {
+                    showConfigurations();
+                    if (configuringConfiguration)
+                    {
+                        tracker.updateDataStructures(null, configuration);
+                    }
+                }
+
+                if (chosingNewConfigurationName)
+                {
+                    choseNewConfigurationName();
+                    if (configuringConfiguration && !(configuration is null))
+                    {
+                        tracker.updateDataStructures(null, configuration);
+                    }
+                }
+
                 if (configuringConfiguration)
                 {
-                    tracker.updateDataStructures(null, configuration);
+                    configure();
                 }
-            }
-
-            if (chosingNewConfigurationName)
+            }catch(Exception e)
             {
-                choseNewConfigurationName();
-                if (configuringConfiguration && !(configuration is null))
-                {
-                    tracker.updateDataStructures(null, configuration);
-                }
-            }
-
-            if (configuringConfiguration)
-            {
-                configure();
+                Debug.Log(e.StackTrace);
+                reset(true);
             }
         }
 
@@ -555,6 +577,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
         protected void drawObjectProperties()
         {
+            
             SimpleGameObjectsTracker st = tracker.basicTypeCollectionsConfigurations[objectToConfigure];
             GUILayout.Label("Configure " + st.objType + " object for " + objectToConfigure.Name() + " property ", EditorStyles.boldLabel);
             List<string> propertiesNames = new List<string>();

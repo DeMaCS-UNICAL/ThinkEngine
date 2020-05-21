@@ -44,6 +44,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                     if (AssetDatabase.LoadAssetAtPath("Assets/Resources/Sensors/" + sensorConf.configurationName + ".asset", typeof(SensorConfiguration)) == null)
                     {
                         AssetDatabase.CreateAsset(sensorConf, "Assets/Resources/Sensors/" + sensorConf.configurationName + ".asset");
+                       
                     }
                     else
                     {

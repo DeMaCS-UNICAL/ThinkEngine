@@ -15,13 +15,20 @@ public class SensorConfiguratorEditor : AbstractConfiguratorEditor
 
     public override void OnInspectorGUI()
     {
-        if (!objectMode)
+        try
         {
-            base.OnInspectorGUI();
-        }
-        else
+            if (!objectMode)
+            {
+                base.OnInspectorGUI();
+            }
+            else
+            {
+                drawObjectProperties();
+            }
+        }catch(Exception e)
         {
-            drawObjectProperties();
+            Debug.Log(e.StackTrace);
+            reset(true);
         }
     }
 
