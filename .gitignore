@@ -7,7 +7,7 @@ desktop.ini
 *.user
 *.userosscache
 *.sln.docstates
-**/Library
+ShowCase/**/Library
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
