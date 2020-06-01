@@ -53,31 +53,25 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                     Monitor.Wait(brain.toLock);
                     try
                     {
-                        stopwatch.Start();
-                        factsPath = Path.GetTempFileName();
-                        
+                        stopwatch.Restart();
+                        factsPath = Path.GetTempFileName();                    
 
                         using (StreamWriter fs = new StreamWriter(factsPath, true))
                         {
-                            //UnityEngine.Debug.Log("creating file "+ factsPath);
+                            //Debug.Log("creating file "+ factsPath);
+                            string toAppend = "";
                             foreach (AdvancedSensor sensor in brain.getSensors())
                             {
-
-                                
-                                //Debug.Log("sensor " + sensor.sensorName);
-                                /*if (!sensor.dataAvailable)
-                                {
-                                    //Debug.Log("waiting sensors");
-                                    Monitor.Wait(brain.toLock);
-                                }
-                                */
-                                string toAppend = sensorMapper.Map(sensor);
+                                //Stopwatch temp = new Stopwatch();
+                                //temp.Start();
+                                 toAppend += sensor.Map();
+                                //temp.Stop();
                                 //Debug.Log(toAppend);
                                 //Debug.Log(toAppend);
-                                fs.Write(toAppend);
 
                             }
                             //Debug.Lof(fs.)
+                            fs.Write(toAppend);
                             fs.Close();
                             //Debug.Log("closing stream");
                         }
@@ -101,7 +95,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                  handler.AddProgram(encoding);
                  handler.AddProgram(facts);
                 handler.AddOption(new OptionDescriptor("-filter=setOnActuator"));
-                stopwatch.Start();
+                stopwatch.Restart();
+                //Debug.Log("reasoning");
                 Output o = handler.StartSync();
                 //Debug.Log(o.ErrorsString+" "+o.OutputString);
                  AnswerSets answers = (AnswerSets)o;
@@ -109,7 +104,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 asSteps++;
                 asAvgTime += stopwatch.ElapsedMilliseconds;
                  //Debug.Log("debugging answer set");
-                //Debug.Log("there are "+answers.Answersets.Count);
+                 //Debug.Log("there are "+answers.Answersets.Count);
                  //Debug.Log("error: " + answers.ErrorsString);
                 if (answers.Answersets.Count > 0)
                 {
@@ -130,7 +125,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                         brain.setActuatorsReady(true);
                     }
                 }
-                //File.Delete(factsPath);
+                File.Delete(factsPath);
             }
             
         }

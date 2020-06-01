@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
+using Mono.Cecil;
+using System.Reflection;
 
 namespace EmbASP4Unity.it.unical.mat.objectsMapper
 {
@@ -22,7 +24,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
 
         protected void Awake()
         {
-            Debug.Log("awaken " + manager);
+            //Debug.Log("awaken " + manager);
             if (goName is null)
             {
                 goName = gameObject.name;
@@ -32,7 +34,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
         }
 
         private void checkConfigurations()
-        {
+        {   
+            
             localNames = new List<string>();
             gOConfigurations = new List<AbstractConfiguration>();
             foreach (AbstractConfiguration c in manager.getConfigurations())

@@ -77,6 +77,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
             return sensorMapping;
         }
 
+
+        public string basicMap(object o)
+        {
+            return "";
+        }
+
         public string getASPRepresentation(SimpleSensor s)
         {
             String sensorMapping = "";
@@ -107,6 +113,43 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                         sensorMapping += ").";
                     }
                     sensorMapping += Environment.NewLine;
+                }
+            }
+            return sensorMapping;
+        }
+
+        internal Dictionary<string, List<string>> getTemplateASPRepresentation(SimpleSensor s)
+        {
+            Dictionary<string, List<string>> sensorMapping = new Dictionary<string, List<string>>();
+            foreach (string p in s.properties.Distinct())
+            {
+                sensorMapping.Add(p, new List<string>());
+                if (s.operationPerProperty.ContainsKey(p))
+                {
+                    string keyWithoutDotsAndSpaces = p.Replace(".", "");
+                    keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace(" ", "");
+                    keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace("_", "");
+                    string sensorNameNotCapital = char.ToLower(s.sensorName[0]) + s.sensorName.Substring(1);
+                    //Debug.Log("goname " + s.gOName);
+                    string goNameNotCapital = "";
+                    if (s.gOName.Length > 0)
+                    {
+                        goNameNotCapital = char.ToLower(s.gOName[0]) + s.gOName.Substring(1);
+                    }
+
+                    sensorMapping[p].Add(sensorNameNotCapital + "(");
+                    if (!s.gOName.Equals(""))
+                    {
+                        sensorMapping[p][0] += goNameNotCapital + "(";
+                    }
+                    List<string> temp = ASPMapperHelper.getInstance().buildTemplateMapping(keyWithoutDotsAndSpaces, '^');
+                    sensorMapping[p][0] += temp[0];
+                    sensorMapping[p].Add("");
+                    sensorMapping[p].Add(temp[temp.Count - 1] + ")");
+                    if (!s.gOName.Equals(""))
+                    {
+                        sensorMapping[p][2] += ").";
+                    }
                 }
             }
             return sensorMapping;

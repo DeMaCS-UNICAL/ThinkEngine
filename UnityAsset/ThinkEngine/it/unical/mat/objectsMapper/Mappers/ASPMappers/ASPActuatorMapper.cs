@@ -49,6 +49,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
             return actuatorMapping;
         }
 
+        public string basicMap(object o)
+        {
+            return "";
+        }
+
+
         internal static IMapper getInstance()
         {
             if (instance == null)

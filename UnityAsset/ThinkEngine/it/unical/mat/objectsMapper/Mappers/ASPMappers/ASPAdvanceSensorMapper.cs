@@ -31,6 +31,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
             return sensorMapping;
         }
 
+        public string basicMap(object o)
+        {
+            return "";
+        }
+
         private static string matrixMapping(AdvancedSensor s, string sensorMapping, MappingManager manager)
         {
             foreach (string matrixPath in s.matrixProperties.Keys)
@@ -159,6 +164,79 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
             }
             return instance;
         }
+
+        public Dictionary<string,List<string>> getTemplateASPRepresentation(AdvancedSensor s)
+        {
+            MappingManager manager = MappingManager.getInstance();
+            Dictionary<string,List<string>> rep = ((ASPSimpleSensorMapper)manager.getMapper(typeof(SimpleSensor))).getTemplateASPRepresentation(s);
+            foreach (string p in s.advancedConf.Keys.Distinct())
+            {
+                List<string> elementConf = s.advancedConf[p].toSave;
+                string keyWithoutDotsAndSpaces = p.Replace(".", "");
+                keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace(" ", "");
+                keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace("_", "");
+                string sensorNameNotCapital = char.ToLower(s.sensorName[0]) + s.sensorName.Substring(1);
+                //Debug.Log("goname " + s.gOName);
+                string goNameNotCapital = "";
+                if (s.gOName.Length > 0)
+                {
+                    goNameNotCapital = char.ToLower(s.gOName[0]) + s.gOName.Substring(1);
+                }
+
+                foreach (string p2 in elementConf)
+                {
+                    rep.Add(p + "$" + p2, new List<string>()); //each property of the inner element is referred as propertyName$elementPropertyName
+                    List<string> partial = rep[p + "$" + p2];
+                    partial.Add(sensorNameNotCapital + "(");
+                    if (!s.gOName.Equals(""))
+                    {
+                        partial[0]+=goNameNotCapital + "(";
+                    }
+                    string elemType = s.advancedConf[p].name;
+                    elemType = Char.ToLower(elemType[0]) + elemType.Substring(1);
+
+                    List<string> inner = ASPMapperHelper.getInstance().buildTemplateMapping(p2, '^');
+                    inner[0] = elemType+"("+inner[0];
+                    inner[inner.Count - 1] += ")";
+
+                    List<string> temp = ASPMapperHelper.getInstance().buildTemplateMapping(keyWithoutDotsAndSpaces, '^');
+                    partial[0] = partial[0] + temp[0] + "(";
+                    partial.Add(inner[0]);
+                    partial.Add(inner[inner.Count - 1] + temp[temp.Count - 1] + "))");
+                    /*Debug.Log("Advanced conf " + p);
+                    if (s.matrixProperties.Count > 0)
+                    {
+                        //Debug.Log("matrix " + s.matrixProperties.First());
+                    }
+                    if (s.listProperties.Count > 0)
+                    {
+                        //Debug.Log("list " + s.listProperties.First());
+                    }
+                    if (s.matrixProperties.ContainsKey(p))
+                    {
+                        //Debug.Log("is a matrix");
+                        List<string> temp= ASPMapperHelper.getInstance().buildTemplateMapping(keyWithoutDotsAndSpaces, '^');//TODO: improve whene map other types
+                        partial[0] = partial[0] + temp[0]+"(" + inner[0];
+                        partial.Add("");
+                        partial.Add(inner[inner.Count - 1] + temp[temp.Count - 1] + "))");
+
+                    }
+                    else if (s.listProperties.ContainsKey(p))
+                    {
+                        //Debug.Log("is a list");
+                        rep += ASPMapperHelper.getInstance().buildMapping(keyWithoutDotsAndSpaces, '^', "(X," + partial + ")") + ")";//TODO: improve whene map other types
+
+                    }*/
+                    if (!s.gOName.Equals(""))
+                    {
+                         partial[partial.Count-1]+= ").";
+                    }
+
+                }
+            }
+            return rep;
+        }
+
         public string getASPRepresentation(AdvancedSensor s)
         {
             MappingManager manager = MappingManager.getInstance();

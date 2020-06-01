@@ -140,12 +140,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 
         public bool sensorsReady()
         {
-            if (sensorsUpdated)
-            {
-                sensorsUpdated = false;
-                return true;
-            }
-            return false;
+            
+            return sensorsUpdated;
         }
 
         internal IEnumerable<AdvancedSensor> getSensors()
@@ -248,6 +244,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
             {
                 //Debug.Log("waiting sensors");
                 yield return new WaitUntil(() => sensorsReady());
+                sensorsUpdated = false;
                 //Debug.Log("pulsing");
                 lock (toLock)
                 {

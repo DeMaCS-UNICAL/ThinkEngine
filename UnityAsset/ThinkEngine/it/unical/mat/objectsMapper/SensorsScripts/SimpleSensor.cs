@@ -104,6 +104,23 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             
         }
 
+        internal Type getPropertyValue()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal object getPropertyValue(string inner)
+        {
+            foreach(IDictionary dic in dictionaryPerType.Values.Distinct())
+            {
+                if (dic.Contains(inner))
+                {
+                    return ((IList)dic[inner])[0];
+                }
+            }
+            return null;
+        }
+
         public void cleanDataStructures()
         {
             unityASPVariationNames = new Dictionary<string, string>();

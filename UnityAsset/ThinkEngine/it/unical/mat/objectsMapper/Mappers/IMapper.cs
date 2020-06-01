@@ -9,7 +9,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
     {
         
        string Map(object o);
-        
+        string basicMap(object o);
 
     }
 }

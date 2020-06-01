@@ -108,6 +108,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 }
             }catch(Exception e)
             {
+                Debug.Log(e.Message);
                 Debug.Log(e.StackTrace);
                 reset(true);
             }

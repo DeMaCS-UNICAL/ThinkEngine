@@ -4,14 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using EmbASP4Unity.it.unical.mat.objectsMapper.Mappers;
 
 namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 {
     public class AdvancedSensor : SimpleSensor
     {
-        public Dictionary<string,SimpleGameObjectsTracker> advancedConf;
+        public Dictionary<string,SimpleGameObjectsTracker> advancedConf;// for each advanced property (matrix, list...) there exists a SimpleGameObjectsTracker that tracks the collection's element
         public Dictionary<string, SimpleSensor[,]> matrixProperties;
         public Dictionary<string, List<SimpleSensor>> listProperties;
+        public Dictionary<string, List<string>> mappings; //for each property, there is a template mapping: l[0]=function symbols; l[1]=actual value; l[2]=closing parentheses
 
 
         public AdvancedSensor(SensorConfiguration conf) :base(conf)
@@ -35,9 +37,81 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                     listProperties.Add(st.propertyName, new List<SimpleSensor>());
                 }
             }
+            mappings = ((ASPAdvancedSensorMapper)MappingManager.getInstance().getMapper(typeof(AdvancedSensor))).getTemplateASPRepresentation(this);
             
-            
-            
+        }
+
+        public string Map()
+        {
+            string facts = "";
+            facts = basicPropertiesMapping(facts);
+            facts = matrixPropertiesMapping(facts);
+            facts = listPropertiesMapping(facts);
+
+            return facts;
+        }
+
+        private string listPropertiesMapping(string facts)
+        {
+            foreach (string property in listProperties.Keys.Distinct())
+            {
+                for (int i = 0; i < listProperties[property].Count; i++)
+                {
+                    foreach (string inner in advancedConf[property].toSave)
+                    {
+                        object innerPropertyValue = listProperties[property][i].getPropertyValue(inner);
+                        IMapper mapperForT = MappingManager.getInstance().getMapper(innerPropertyValue.GetType());
+                        string temp = mapperForT.basicMap(innerPropertyValue);
+                        facts += mappings[property + "$" + inner][0] + i + "," + mappings[property + "$" + inner][1] + temp + mappings[property + "$" + inner][2] + Environment.NewLine;
+                    }
+                }
+            }
+            return facts;
+        }
+
+        private string matrixPropertiesMapping(string facts)
+        {
+            foreach (string property in matrixProperties.Keys.Distinct())
+            {
+                for (int i = 0; i < matrixProperties[property].GetLength(0); i++)
+                {
+                    for (int j = 0; j < matrixProperties[property].GetLength(1); j++)
+                    {
+                        foreach (string inner in advancedConf[property].toSave)
+                        {
+                            object innerPropertyValue = matrixProperties[property][i, j].getPropertyValue(inner);
+                            IMapper mapperForT = MappingManager.getInstance().getMapper(innerPropertyValue.GetType());
+                            string temp = mapperForT.basicMap(innerPropertyValue);
+                            facts += mappings[property + "$" + inner][0] + i + "," + j + "," + mappings[property + "$" + inner][1]+ temp + mappings[property + "$" + inner][2] + Environment.NewLine;
+                        }
+                    }
+                }
+
+            }
+
+            return facts;
+        }
+
+        private string basicPropertiesMapping(string facts)
+        {
+            List<string> done = new List<string>();
+            foreach (Type t in dictionaryPerType.Keys.Distinct())
+            {
+                IMapper mapperForT = MappingManager.getInstance().getMapper(t);
+                
+                foreach (string property in dictionaryPerType[t].Keys)
+                {
+                    if (done.Contains(property))
+                    {
+                        continue;
+                    }
+                    done.Add(property);
+                    string temp = mapperForT.basicMap(Operation.compute(operationPerProperty[property], dictionaryPerType[t][property]));
+                    facts += mappings[property][0] + temp + mappings[property][2] + Environment.NewLine;
+                }
+            }
+
+            return facts;
         }
 
         protected override void advancedUpdate(FieldOrProperty property, string entire_name, object parent)

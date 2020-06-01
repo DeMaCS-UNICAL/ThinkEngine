@@ -14,6 +14,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
             return ASPMapperHelper.getInstance().buildMapping((string)entry.Key, '^', value);
         }
 
+        public string basicMap(object l)
+        {
+            return "("+l+")";
+        }
+
         internal static IMapper getInstance()
         {
             if (instance == null)
