@@ -29,7 +29,7 @@ namespace RedRunner.Utilities
 		[SerializeField]
 		private float m_MinY = 0f;
 		[SerializeField]
-		private float m_MinX = 20f;
+		private float m_MinX = 0f;
 		[SerializeField]
 		private CameraControl m_ShakeControl;
 		[SerializeField]
