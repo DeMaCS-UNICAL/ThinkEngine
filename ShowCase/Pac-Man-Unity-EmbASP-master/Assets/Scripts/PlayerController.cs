@@ -6,8 +6,9 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine.Networking;
+using UnityEditor;
 
-
+[InitializeOnLoad]
 public class PlayerController : MonoBehaviour {
 
   public static int numberOfSteps = 0;
@@ -15,14 +16,27 @@ public class PlayerController : MonoBehaviour {
   Vector2 _dest = Vector2.zero;
   Vector2 _dir = Vector2.zero;
   Vector2 _nextDir = Vector2.zero;
-  private bool keyboard = false;
-  public string nextStep;
+    public List<MyString> avaialableMoves = new List<MyString>();
+  private bool keyboard = false;  
     public string previousStep;
     public string prePreviousStep;
+    private string _nextStep;
+    public string nextStep
+    {
+        get
+        {
+            return _nextStep;
+        }
+        set
+        {
+            prePreviousStep = previousStep;
+            previousStep = _nextStep;
+            _nextStep = value;
+        }
+    }
 
 
-
-  [Serializable]
+    [Serializable]
   public class PointSprites {
     public GameObject[] pointSprites;
   }
@@ -45,7 +59,7 @@ public class PlayerController : MonoBehaviour {
     GM = GameObject.Find("Game Manager").GetComponent<GameManager>();
     SM = GameObject.Find("Game Manager").GetComponent<ScoreManager>();
     GUINav = GameObject.Find("UI Manager").GetComponent<GameGUINavigation>();
-    _dest = transform.position;
+        _dest = transform.position;
         nextStep = "n";
         previousStep = "n";
         prePreviousStep = "n";
@@ -74,28 +88,30 @@ public class PlayerController : MonoBehaviour {
   // Update is called once per frame
   void FixedUpdate() {
     switch (GameManager.gameState) {
-      case GameManager.GameState.Game:
+            case GameManager.GameState.Game:
 
-        //if (keyboard)
-          ReadInputAndMove();
+                //if (keyboard)
+                avaialableMoves = new List<MyString>();
+                addAvailableMoves();
+                ReadInputAndMove();
 
-          //ReadInputAndMove(new SymbolicConstant());
-        /*else {
-          //StartCoroutine(GetText());
-          SymbolicConstant newMove = embasp.PreviousMove;
-          Vector3 currentPos = new Vector3((int)(embasp.Pacman.transform.position.x + 0.499f), (int)(embasp.Pacman.transform.position.y + 0.499f));
-          //Debug.Log(currentPos + " " + previousPos);
-          if (Math.Abs(currentPos.x - embasp.PreviousPos.x) + Math.Abs(currentPos.y - embasp.PreviousPos.y) >= 1) {
-            //Debug.Log("Current Pos: " + currentPos);
-            embasp.PreviousPos = currentPos;
-            newMove = embasp.ASPMove();
-          }
-          ReadInputAndMove(newMove);
-        }*/
-        Animate();
-        break;
+                //ReadInputAndMove(new SymbolicConstant());
+                /* else {
+                  StartCoroutine(GetText());
+                  SymbolicConstant newMove = embasp.PreviousMove;
+                  Vector3 currentPos = new Vector3((int)(embasp.Pacman.transform.position.x + 0.499f), (int)(embasp.Pacman.transform.position.y + 0.499f));
+                  Debug.Log(currentPos + " " + previousPos);
+                  if (Math.Abs(currentPos.x - embasp.PreviousPos.x) + Math.Abs(currentPos.y - embasp.PreviousPos.y) >= 1) {
+                    Debug.Log("Current Pos: " + currentPos);
+                    embasp.PreviousPos = currentPos;
+                    newMove = embasp.ASPMove();
+                  }
+                  ReadInputAndMove(newMove);
+                } */
+                Animate();
+                break;
 
-      case GameManager.GameState.Dead:
+            case GameManager.GameState.Dead:
                 /* if (!_deadPlaying)
                    EmbASPManager.Instance.GenerateCharacters();*/
                 nextStep = "n";
@@ -106,9 +122,31 @@ public class PlayerController : MonoBehaviour {
 
   }
 
+    private void addAvailableMoves()
+    {
+        if (Valid(Vector2.right))
+        {
+            avaialableMoves.Add(new MyString("right"));
+        }
+        if (Valid(-Vector2.right))
+        {
+            avaialableMoves.Add(new MyString("left"));
+        }
+        if (Valid(Vector2.up))
+        {
+            avaialableMoves.Add(new MyString("up"));
+        }
+        if (Valid(-Vector2.up))
+        {
+            avaialableMoves.Add(new MyString("down"));
+        }
+    }
 
-  IEnumerator PlayDeadAnimation() {
+    IEnumerator PlayDeadAnimation() {
     _deadPlaying = true;
+        nextStep = "n";
+        previousStep = "n";
+        prePreviousStep = "n";
     GetComponent<Animator>().SetBool("Die", true);
     yield return new WaitForSeconds(1);
     GetComponent<Animator>().SetBool("Die", false);
@@ -172,12 +210,12 @@ public class PlayerController : MonoBehaviour {
         }*/
         if (!keyboard)
         {
-            Debug.Log(nextStep);
+            //Debug.Log(nextStep);
             if (nextStep.Equals("right")) _nextDir = Vector2.right;
             if (nextStep.Equals("left")) _nextDir = -Vector2.right;
             if (nextStep.Equals("up")) _nextDir = Vector2.up;
             if (nextStep.Equals("down")) _nextDir = -Vector2.up;
-            if (previousStep.Equals("N"))
+            /*if (previousStep.Equals("n"))
             {
                 previousStep = nextStep;
             }else if (!previousStep.Equals(nextStep))
@@ -185,7 +223,7 @@ public class PlayerController : MonoBehaviour {
                 prePreviousStep = previousStep;
                 previousStep = nextStep;
             }
-
+            */
         }
         else
         {

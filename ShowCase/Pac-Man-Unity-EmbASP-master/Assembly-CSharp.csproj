@@ -78,6 +78,7 @@
     <Compile Include="Assets\Scripts\Managers\ScoreManager.cs" />
     <Compile Include="Assets\Scripts\Managers\TileManager.cs" />
     <Compile Include="Assets\Scripts\Maze_Tiles.cs" />
+    <Compile Include="Assets\Scripts\MyString.cs" />
     <Compile Include="Assets\Scripts\MyTile.cs" />
     <Compile Include="Assets\Scripts\Pacdot.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />

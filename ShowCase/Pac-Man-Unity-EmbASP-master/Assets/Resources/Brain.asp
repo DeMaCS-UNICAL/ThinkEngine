@@ -23,6 +23,7 @@ setOnActuator(nextMove(pacman(playerController(nextStep(X))))):-next(X).
 %tilesAndPacdots(pacdots(mazeTiles(tiles(X,Y,myTile(x(V)))))).
 %tilesAndPacdots(pacdots(mazeTiles(tiles(X,Y,myTile(y(V)))))).
 %previousMove(pacman(playerController(nextStep(X)))).
+%availableDirections(pacman(playerController(avaialableMoves(X,myString(value(V)))))).
 
 %% INPUT %%
 
@@ -35,6 +36,8 @@ setOnActuator(nextMove(pacman(playerController(nextStep(X))))):-next(X).
 % previous_action(X). %% left, right, up, down
 % min_distance(Xp,Yp,Xg,Yg,D).
 % distance/1
+
+available(X):-availableDirections(pacman(playerController(avaialableMoves(_,myString(value(X)))))).
 
 pellet(X,Y):-tiles(brain(aISupportScript(neededTiles(Z,myTile(pacdot(true)))))),tiles(brain(aISupportScript(neededTiles(Z,myTile(x(X)))))),tiles(brain(aISupportScript(neededTiles(Z,myTile(y(Y)))))).
 pacman2(X,Y):-pacman(pacman(positionToInt(x(X)))),pacman(pacman(positionToInt(y(Y)))).
@@ -54,6 +57,7 @@ sameAxis(up,down).
 sameAxis(Y,X):-sameAxis(X,Y).
 distance(1..10).
 next(left) | next(right) | next(up) | next(down).
+:- next(X), not available(X).
 
 nextCell(X,Y) :- pacman2(Px, Y), next(right), X=Px+1, tile(X,Y).
 nextCell(X,Y) :- pacman2(Px, Y), next(left), X=Px-1, tile(X,Y).
@@ -75,8 +79,8 @@ minDistancePacmanNextGhost(MD) :- #min{D : distancePacmanNextGhost(D, _)} = MD, 
 :~ minDistancePacmanNextGhost(MD), Min=10-MD, not powerup. [Min:5]
 :~ minDistancePacmanNextGhost(MD), powerup. [MD:5]
 :~ nextCell(X,Y), empty(X,Y). [1:4]
-:~ closestPellet(X,Y), not nextCell(X,Y). [1:3]
-:~ nextCell(X,Y), closestPellet(X1,Y1), min_distance(X,Y,X1,Y1,D), D<3. [D:1]%distanceClosestPellet(D). [D:2]
-:~ previous_action(X), next(Y), X!=Y. [1:2]
-:~ previous_action(X), next(Y), sameAxis(X,Y). [3:1]
+%:~ closestPellet(X,Y), not nextCell(X,Y). [1:3]
+:~ nextCell(X,Y), closestPellet(X1,Y1), min_distance(X,Y,X1,Y1,D). [D:2]%distanceClosestPellet(D). [D:2]
+:~ previous_action(X), next(Y), X!=Y. [2:1]
+:~ previous_action(X), next(Y), sameAxis(X,Y). [1:1]
 

@@ -26,25 +26,29 @@ public class Trigger:ScriptableObject{
     public bool sensorsNeeded()
     {
         waitingTime = GameManager.scared ? 0 : 0;
-        if (contr._deadPlaying)
-        {
-            return false;
-        }
-        if (stopWatch.ElapsedMilliseconds > waitingTime)
-        {
-            //UnityEngine.Debug.Log(stopWatch.ElapsedMilliseconds);
-            stopWatch.Stop();
-            stopWatch.Restart();
-            if(brain.solverWaiting && !brain.areActuatorsReady())
-            {
-               // Debug.Log("sensors " + Time.time);
+         if (contr._deadPlaying)
+         {
+             return false;
+         }
+         if (stopWatch.ElapsedMilliseconds > waitingTime)
+         {
+             //UnityEngine.Debug.Log(stopWatch.ElapsedMilliseconds);
+             //stopWatch.Stop();
+             //stopWatch.Restart();
+             lock (brain.toLock)
+             {
+                 if (!brain.sensorsReady())
+                 {
+                     // Debug.Log("sensors " + Time.time);
 
-                //UnityEngine.Debug.Log("updating sensors "+contr.nextStep +" pellet "+ai.closestPelletX+" "+ai.closestPelletY+" pacman "+ai.Pacman.transform.position.x+" "+ ai.Pacman.transform.position.y);
-                return true;
-            }
-            return false;
-        }
-        return false;
+                     //UnityEngine.Debug.Log("updating sensors "+contr.nextStep +" pellet "+ai.closestPelletX+" "+ai.closestPelletY+" pacman "+ai.Pacman.transform.position.x+" "+ ai.Pacman.transform.position.y);
+                     return true;
+                 }
+                 return false;
+             }
+         }
+         return false;
+         
     }
 
     public bool applyActuator()

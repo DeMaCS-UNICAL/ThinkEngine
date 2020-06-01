@@ -1,424 +1,62 @@
-facts 1,962.00ms 
-answer set 2,541.00ms 
-facts 2,201.60ms 
-answer set 2,307.40ms 
-facts 2,517.75ms 
-answer set 2,639.63ms 
-facts 2,331.40ms 
-answer set 2,429.00ms 
-facts 2,524.00ms 
-answer set 2,782.67ms 
-facts 2,286.00ms 
-answer set 2,430.50ms 
-facts 2,208.75ms 
-answer set 2,310.25ms 
-facts 2,384.33ms 
-answer set 2,625.00ms 
-facts 4,601.00ms 
-answer set 4,741.00ms 
-facts 2,207.00ms 
-answer set 2,366.00ms 
-facts 2,953.44ms 
-answer set 3,042.75ms 
-facts 5,150.25ms 
-answer set 5,298.25ms 
-facts 2,435.00ms 
-answer set 2,699.67ms 
-facts NaNms 
-answer set NaNms 
-facts 2,361.67ms 
-answer set 2,490.67ms 
-facts 2,193.80ms 
-answer set 2,290.20ms 
-facts 2,506.25ms 
-answer set 2,705.75ms 
-facts 2,365.75ms 
-answer set 2,558.00ms 
-facts 41,984.00ms 
-answer set 42,109.00ms 
-facts 2,282.50ms 
-answer set 2,387.75ms 
-facts 4,299.00ms 
-answer set 4,431.60ms 
-facts 7,807.25ms 
-answer set 7,899.00ms 
-facts 15,774.50ms 
-answer set 15,961.50ms 
-facts 6,180.60ms 
-answer set 6,301.20ms 
-facts 3,195.82ms 
-answer set 3,342.09ms 
-facts 6,861.17ms 
-answer set 6,979.33ms 
-facts 5,941.20ms 
-answer set 6,097.40ms 
-facts 3,049.50ms 
-answer set 3,170.00ms 
-facts 6,450.00ms 
-answer set 6,585.80ms 
-facts 2,019.00ms 
-answer set 2,538.00ms 
-facts 3,301.00ms 
-answer set 3,384.00ms 
-facts 821.00ms 
-answer set 923.00ms 
-facts 977.00ms 
-answer set 1,138.00ms 
-facts 12,404.80ms 
-answer set 12,790.00ms 
-facts 2,960.00ms 
-answer set 2,211.00ms 
-facts 2,135.00ms 
-answer set 2,640.00ms 
-facts 6,586.40ms 
-answer set 6,827.20ms 
-facts 6,048.80ms 
-answer set 6,282.80ms 
-facts 6,473.17ms 
-answer set 6,802.17ms 
-facts 6,129.80ms 
-answer set 6,374.40ms 
-facts 1,676.00ms 
-answer set 1,830.00ms 
-facts NaNms 
-answer set NaNms 
-facts 3,095.50ms 
-answer set 3,334.00ms 
-facts 2,168.00ms 
-answer set 2,379.00ms 
-facts 3,135.00ms 
-answer set 3,389.50ms 
-facts 551.00ms 
-answer set 822.50ms 
-facts 11.00ms 
-answer set 105.00ms 
-facts 438.00ms 
-answer set 683.75ms 
-facts 162.33ms 
-answer set 337.00ms 
-facts 300.50ms 
-answer set 705.00ms 
-facts 67.00ms 
-answer set 252.50ms 
-facts 63.50ms 
-answer set 100.00ms 
-facts 15.00ms 
-answer set 357.00ms 
-facts 527.60ms 
-answer set 780.80ms 
-facts 407.67ms 
-answer set 709.67ms 
-facts 82.00ms 
-answer set 343.50ms 
-facts 171.00ms 
-answer set 310.00ms 
-facts 528.00ms 
-answer set 944.67ms 
-facts 288.50ms 
-answer set 678.00ms 
-facts 189.67ms 
-answer set 397.67ms 
-facts 161.50ms 
-answer set 418.00ms 
-facts 74.00ms 
-answer set 292.00ms 
-facts 219.33ms 
-answer set 468.67ms 
-facts 224.00ms 
-answer set 474.67ms 
-facts 382.67ms 
-answer set 622.67ms 
-facts 84.50ms 
-answer set 219.50ms 
-facts 911.92ms 
-answer set 1,050.42ms 
-facts 375.00ms 
-answer set 792.50ms 
-facts 21.00ms 
-answer set 168.00ms 
-facts 74.00ms 
-answer set 264.00ms 
-facts 383.00ms 
-answer set 688.00ms 
-facts 86.50ms 
-answer set 294.00ms 
-facts 440.00ms 
-answer set 644.00ms 
-facts 145.00ms 
-answer set 278.67ms 
-facts 652.80ms 
-answer set 892.00ms 
-facts 271.00ms 
-answer set 534.33ms 
-facts 546.50ms 
-answer set 751.75ms 
-facts 78.00ms 
-answer set 242.50ms 
-facts 287.00ms 
-answer set 345.00ms 
-facts 2,080.46ms 
-answer set 2,201.33ms 
-facts 983.00ms 
-answer set 1,309.20ms 
-facts 1,268.25ms 
-answer set 1,563.50ms 
-facts 2,005.00ms 
-answer set 2,242.38ms 
-facts 1,648.10ms 
-answer set 1,900.00ms 
-facts 5,656.64ms 
-answer set 5,995.96ms 
-facts 4,431.05ms 
-answer set 4,883.53ms 
-facts 1,891.60ms 
-answer set 2,243.80ms 
-facts 5,749.04ms 
-answer set 6,081.12ms 
-facts 2,755.30ms 
-answer set 2,843.86ms 
-facts 3,633.21ms 
-answer set 3,713.48ms 
-facts 4,285.00ms 
-answer set 4,402.50ms 
-facts 13,896.88ms 
-answer set 14,156.09ms 
-facts 3,220.82ms 
-answer set 3,333.90ms 
-facts 5,182.45ms 
-answer set 5,276.85ms 
-facts 6,031.60ms 
-answer set 6,242.02ms 
-facts 11,751.79ms 
-answer set 11,874.19ms 
-facts 11,876.79ms 
-answer set 12,016.86ms 
-facts 4,620.27ms 
-answer set 4,748.00ms 
-facts 17,959.54ms 
-answer set 18,059.97ms 
-facts 13,981.19ms 
-answer set 14,100.39ms 
-facts 4,484.08ms 
-answer set 4,583.39ms 
-facts 4,453.03ms 
-answer set 4,575.29ms 
-facts 7,167.08ms 
-answer set 7,282.12ms 
-facts 6,308.62ms 
-answer set 6,407.88ms 
-facts 4,640.10ms 
-answer set 4,777.90ms 
-facts 2,896.68ms 
-answer set 3,146.73ms 
-facts 13,310.07ms 
-answer set 13,458.04ms 
-facts 16,056.19ms 
-answer set 16,192.49ms 
-facts 8,438.51ms 
-answer set 8,582.00ms 
-facts 2,373.44ms 
-answer set 2,619.83ms 
-facts 16,171.86ms 
-answer set 16,453.11ms 
-facts 9,850.31ms 
-answer set 9,960.58ms 
-facts 2,486.44ms 
-answer set 2,611.12ms 
-facts 2,244.33ms 
-answer set 2,633.75ms 
-facts 1,031.56ms 
-answer set 1,138.00ms 
-facts 9,313.77ms 
-answer set 9,500.05ms 
-facts 14,520.01ms 
-answer set 14,622.99ms 
-facts 18,581.39ms 
-answer set 18,713.01ms 
-facts 3,692.45ms 
-answer set 3,951.41ms 
-facts 10,087.25ms 
-answer set 10,224.55ms 
-facts 10,076.15ms 
-answer set 10,228.78ms 
-facts 9,260.98ms 
-answer set 9,596.67ms 
-facts 4,948.76ms 
-answer set 5,063.86ms 
-facts 3,722.90ms 
-answer set 3,831.93ms 
-facts 10,402.83ms 
-answer set 10,521.59ms 
-facts 13,602.03ms 
-answer set 13,757.20ms 
-facts 10,005.46ms 
-answer set 10,285.40ms 
-facts 8,680.45ms 
-answer set 8,954.11ms 
-facts 7,349.84ms 
-answer set 7,549.57ms 
-facts 2,090.13ms 
-answer set 2,360.50ms 
-facts 3,137.00ms 
-answer set 3,290.71ms 
-facts 329.50ms 
-answer set 592.75ms 
-facts 3,060.95ms 
-answer set 3,346.90ms 
-facts 4,904.39ms 
-answer set 5,043.50ms 
-facts 13,006.48ms 
-answer set 13,131.67ms 
-facts 11,338.18ms 
-answer set 11,528.20ms 
-facts 5,899.76ms 
-answer set 6,250.62ms 
-facts 1,800.86ms 
-answer set 2,158.57ms 
-facts 3,347.85ms 
-answer set 3,487.74ms 
-facts 1,576.54ms 
-answer set 1,920.62ms 
-facts 11,670.96ms 
-answer set 11,787.48ms 
-facts 1,777.08ms 
-answer set 1,912.00ms 
-facts 10,015.00ms 
-answer set 10,131.33ms 
-facts 4,197.96ms 
-answer set 4,354.00ms 
-facts 7,639.37ms 
-answer set 7,770.47ms 
-facts 1,083.47ms 
-answer set 1,129.25ms 
-facts 1,667.35ms 
-answer set 1,789.30ms 
-facts 943.44ms 
-answer set 982.67ms 
-facts 699.27ms 
-answer set 805.64ms 
-facts 849.22ms 
-answer set 993.44ms 
-facts 806.33ms 
-answer set 920.92ms 
-facts 650.58ms 
-answer set 688.64ms 
-facts 949.53ms 
-answer set 1,045.65ms 
-facts 2,539.86ms 
-answer set 2,684.77ms 
-facts 7,057.68ms 
-answer set 7,181.02ms 
-facts 6,977.08ms 
-answer set 7,144.22ms 
-facts 15,218.63ms 
-answer set 15,354.52ms 
-facts 17,434.52ms 
-answer set 17,564.22ms 
-facts 17,082.81ms 
-answer set 17,229.33ms 
-facts 6,396.00ms 
-answer set 6,707.63ms 
-facts 3,171.21ms 
-answer set 3,312.67ms 
-facts 1,950.29ms 
-answer set 2,253.94ms 
-facts 2,745.94ms 
-answer set 2,873.88ms 
-facts 3,826.86ms 
-answer set 4,397.19ms 
-facts 6,613.47ms 
-answer set 6,733.56ms 
-facts 12,564.94ms 
-answer set 12,790.79ms 
-facts 9,942.21ms 
-answer set 10,054.57ms 
-facts 12,886.66ms 
-answer set 12,996.31ms 
-facts 7,141.44ms 
-answer set 7,387.27ms 
-facts 4,759.79ms 
-answer set 4,906.04ms 
-facts 14,040.45ms 
-answer set 14,162.47ms 
-facts 12,942.96ms 
-answer set 13,194.22ms 
-facts 15,998.98ms 
-answer set 16,109.25ms 
-facts 21,789.60ms 
-answer set 21,919.57ms 
-facts 7,258.41ms 
-answer set 7,368.86ms 
-facts 26,775.06ms 
-answer set 26,892.77ms 
-facts 13,029.04ms 
-answer set 13,143.42ms 
-facts 12,834.03ms 
-answer set 12,948.35ms 
-facts 14,999.37ms 
-answer set 15,113.96ms 
-facts 10,395.60ms 
-answer set 10,638.86ms 
-facts 15,174.97ms 
-answer set 15,439.18ms 
-facts 3,903.03ms 
-answer set 4,021.21ms 
-facts 19,427.44ms 
-answer set 19,543.73ms 
-facts 18,708.98ms 
-answer set 18,828.75ms 
-facts 10,162.57ms 
-answer set 10,276.12ms 
-facts 6,317.88ms 
-answer set 6,565.83ms 
-facts 5,462.95ms 
-answer set 5,576.43ms 
-facts 21,002.52ms 
-answer set 21,126.06ms 
-facts 15,542.52ms 
-answer set 15,659.72ms 
-facts 20,919.66ms 
-answer set 21,049.66ms 
-facts 11,879.16ms 
-answer set 12,135.88ms 
-facts 2,178.39ms 
-answer set 2,226.06ms 
-facts 1,318.29ms 
-answer set 1,363.75ms 
-facts 886.71ms 
-answer set 1,009.67ms 
-facts 751.46ms 
-answer set 793.83ms 
-facts 12,262.91ms 
-answer set 12,377.13ms 
-facts 13,545.94ms 
-answer set 13,671.27ms 
-facts 20,474.31ms 
-answer set 20,596.45ms 
-facts 17,970.00ms 
-answer set 18,082.60ms 
-facts 165.00ms 
-answer set 289.00ms 
-facts 677.83ms 
-answer set 787.40ms 
-facts 15,958.60ms 
-answer set 16,078.10ms 
-facts 18,292.13ms 
-answer set 18,557.82ms 
-facts 19,143.84ms 
-answer set 19,255.35ms 
-facts 11,153.90ms 
-answer set 11,281.04ms 
-facts 16,851.97ms 
-answer set 16,968.72ms 
-facts 18,996.09ms 
-answer set 19,249.04ms 
-facts 188.50ms 
-answer set 313.00ms 
-facts 18,321.62ms 
-answer set 18,446.30ms 
-facts 13,382.10ms 
-answer set 13,494.54ms 
-facts 7,535.48ms 
-answer set 7,645.36ms 
-facts 3,655.82ms 
-answer set 3,885.61ms 
+facts 25.83ms 
+answer set 209.40ms 
+facts 31.84ms 
+answer set 229.50ms 
+facts 26.71ms 
+answer set 204.50ms 
+facts 26.24ms 
+answer set 219.13ms 
+facts 25.11ms 
+answer set 194.26ms 
+facts 29.84ms 
+answer set 210.20ms 
+facts 27.48ms 
+answer set 194.67ms 
+facts 14.94ms 
+answer set 266.34ms 
+facts 21.54ms 
+answer set 225.52ms 
+facts 18.09ms 
+answer set 185.05ms 
+facts 29.69ms 
+answer set 212.00ms 
+facts 28.38ms 
+answer set 200.19ms 
+facts 35.00ms 
+answer set 71.78ms 
+facts 30.90ms 
+answer set 201.92ms 
+facts 25.85ms 
+answer set 179.04ms 
+facts 23.53ms 
+answer set 160.77ms 
+facts 27.51ms 
+answer set 177.49ms 
+facts 28.77ms 
+answer set 173.44ms 
+facts 29.82ms 
+answer set 214.18ms 
+facts 23.36ms 
+answer set 181.42ms 
+facts 32.68ms 
+answer set 211.07ms 
+facts 35.77ms 
+answer set 230.49ms 
+facts 31.59ms 
+answer set 215.31ms 
+facts 29.50ms 
+answer set 200.03ms 
+facts 29.36ms 
+answer set 205.38ms 
+facts 24.56ms 
+answer set 181.70ms 
+facts 23.63ms 
+answer set 179.84ms 
+facts 23.92ms 
+answer set 179.84ms 
+facts 29.54ms 
+answer set 213.17ms 
+facts 21.54ms 
+answer set 164.06ms 
+facts 30.95ms 
+answer set 220.62ms 
