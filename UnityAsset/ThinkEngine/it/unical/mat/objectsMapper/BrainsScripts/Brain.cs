@@ -53,6 +53,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         void Awake()
         {
             triggerClassPath = @".\Assets\Scripts\Trigger.cs";
+            if (!Directory.Exists("Assets/Scripts"))
+            {
+                Directory.CreateDirectory("Assets/Scripts");
+            }
             if (ASPFilePath.Equals(null))
             {
                 ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
