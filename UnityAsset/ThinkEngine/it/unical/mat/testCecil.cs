@@ -13,7 +13,7 @@ public class testCecil
 
 
     //[MenuItem("Assets/Run Cecil")]
-    //[PostProcessScene(0)]
+    [PostProcessScene(0)]
     public static void Run()
     {
         using (var assembly = AssemblyDefinition.ReadAssembly("./Library/ScriptAssemblies", new ReaderParameters { ReadWrite = true }))
