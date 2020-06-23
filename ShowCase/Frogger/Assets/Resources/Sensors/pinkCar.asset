@@ -14,6 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gOName: pink
   properties:
+  - Car^moveRight
+  - Car
+  - Car^moveRight
   - Car^xpos
   - Car
   - Car^xpos
@@ -25,6 +28,8 @@ MonoBehaviour:
   configurationName: pinkCar
   advancedConf: []
   operationPerProperty:
+  - Key: Car^moveRight
+    Value: 0
   - Key: Car^xpos
     Value: 0
   - Key: Car^ypos

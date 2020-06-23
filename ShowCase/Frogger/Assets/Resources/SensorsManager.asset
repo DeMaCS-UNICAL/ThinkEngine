@@ -13,30 +13,44 @@ MonoBehaviour:
   m_Name: SensorsManager
   m_EditorClassIdentifier: 
   confsToSerialize:
-  - {fileID: 11400000, guid: f3ac2e08cf6cea743b06878690cc3949, type: 2}
+  - {fileID: 11400000, guid: a274b7d1b0154e342a65cc4a05b85d8a, type: 2}
+  - {fileID: 11400000, guid: 9b3c0a780a1265044a86fe6111b66853, type: 2}
+  - {fileID: 11400000, guid: f36516e418f5aea46837d6fe622a2643, type: 2}
+  - {fileID: 11400000, guid: 8c1ddc4138d53cb488384370964e44c2, type: 2}
+  - {fileID: 11400000, guid: 62cc05dcc8909ad4597edfa3ffa351e0, type: 2}
+  - {fileID: 11400000, guid: d5edb20067660b6489ab2fa72a1bc9c4, type: 2}
+  - {fileID: 11400000, guid: a6f41f765fbfd6148a286a3daa5ad15e, type: 2}
   - {fileID: 11400000, guid: ba63caa90b09fa74bbf4aede603b0f39, type: 2}
+  - {fileID: 11400000, guid: f3ac2e08cf6cea743b06878690cc3949, type: 2}
+  - {fileID: 11400000, guid: 0adfbba3b3c9bc14abe4d855e04e3f5c, type: 2}
   - {fileID: 11400000, guid: 1a86633b868d4544a96a851861de55f8, type: 2}
   - {fileID: 11400000, guid: dcf20e08c6a4f994ea3691f152cc21b0, type: 2}
-  - {fileID: 11400000, guid: a6f41f765fbfd6148a286a3daa5ad15e, type: 2}
-  - {fileID: 11400000, guid: d5edb20067660b6489ab2fa72a1bc9c4, type: 2}
-  - {fileID: 11400000, guid: 2f4ee6c72b840d849b3706a3636e74bd, type: 2}
-  - {fileID: 11400000, guid: 8c1ddc4138d53cb488384370964e44c2, type: 2}
-  - {fileID: 11400000, guid: 0adfbba3b3c9bc14abe4d855e04e3f5c, type: 2}
-  - {fileID: 11400000, guid: 9b3c0a780a1265044a86fe6111b66853, type: 2}
   - {fileID: 11400000, guid: 481bb90a4c9280d4094f27ab3a4ce475, type: 2}
-  - {fileID: 11400000, guid: f36516e418f5aea46837d6fe622a2643, type: 2}
-  - {fileID: 11400000, guid: a274b7d1b0154e342a65cc4a05b85d8a, type: 2}
-  ConfiguredGameObject:
-  - pink
-  - white
-  - green
-  - purple
-  - orange
-  - green3
-  - green2
-  - green4
-  - orange2
-  - pink2
+  configuredGameObject:
+  - Brain
   - purple2
   - white2
-  - Brain
+  - pink2
+  - green4
+  - green3
+  - green2
+  - orange2
+  - orange
+  - purple
+  - pink
+  - green
+  - white
+  configurationsNames:
+  - playerSensor
+  - purpleCar2
+  - whiteCar2
+  - pinkCar2
+  - greenCar4
+  - greenCar3
+  - greenCar2
+  - orangeCar2
+  - orangeCar
+  - purpleCar
+  - pinkCar
+  - greenCar
+  - whiteCar
