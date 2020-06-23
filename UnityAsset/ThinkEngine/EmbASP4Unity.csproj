@@ -49,18 +49,6 @@
       <HintPath>..\Dottorato\Ianni\EmbASP4Unity\EmbASP3.5\bin\Debug\EmbASP3_5.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Mono.Cecil">
-      <HintPath>packages\nuget.mono-cecil@0.1.5-preview\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Mdb">
-      <HintPath>packages\nuget.mono-cecil@0.1.5-preview\Mono.Cecil.Mdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Pdb">
-      <HintPath>packages\nuget.mono-cecil@0.1.5-preview\Mono.Cecil.Pdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Rocks">
-      <HintPath>packages\nuget.mono-cecil@0.1.5-preview\Mono.Cecil.Rocks.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.11.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -186,6 +174,7 @@
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\BrainEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\SensorConfiguratorEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\IManager.cs" />
+    <Compile Include="it\unical\mat\Performance.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\AdvancedSensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPActuatorMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPBoolMapper.cs" />
@@ -211,8 +200,6 @@
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\StringPair.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\StringStringPair.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SimpleGameObjectsTracker.cs" />
-    <Compile Include="it\unical\mat\Performance.cs" />
-    <Compile Include="it\unical\mat\testCecil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".git\objects\info\" />
