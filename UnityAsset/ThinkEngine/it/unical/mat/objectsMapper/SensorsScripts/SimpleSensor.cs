@@ -73,12 +73,13 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 
         public SimpleSensor(SensorConfiguration s)
         {
-            
+            Debug.Log("configuration "+s);
             sensorName = s.configurationName;
             properties = new List<string>();
             mappingManager = MappingManager.getInstance();
             ReflectionExecutor re = ScriptableObject.CreateInstance<ReflectionExecutor>();
             gO = re.GetGameObjectWithName(s.gOName);
+            Debug.Log("game object is " + gO);
             gOName = s.gOName;
             cleanDataStructures();
             properties.AddRange(s.properties.Distinct());

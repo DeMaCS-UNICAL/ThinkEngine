@@ -9,9 +9,11 @@ using System.IO;
 using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts;
 using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
 using System.Globalization;
+using Debug = UnityEngine.Debug;
 
 namespace EmbASP4Unity.it.unical.mat
 {
+    [ExecuteInEditMode]
     class Performance : MonoBehaviour
     {
         private int steps;
@@ -36,6 +38,7 @@ namespace EmbASP4Unity.it.unical.mat
         {
             //stopwatch = new Stopwatch();
             //stopwatch.Start();
+            Debug.Log("starting performace");
             if (!Directory.Exists("Performance"))
             {
                 Directory.CreateDirectory("Performance");

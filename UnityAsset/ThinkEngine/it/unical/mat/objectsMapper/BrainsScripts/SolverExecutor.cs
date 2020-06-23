@@ -98,7 +98,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 stopwatch.Restart();
                 //Debug.Log("reasoning");
                 Output o = handler.StartSync();
-                Debug.Log(o.ErrorsString+" "+o.OutputString);
+                if (!o.ErrorsString.Equals(""))
+                {
+                    Debug.Log(o.ErrorsString + " " + o.OutputString);
+                }
                  AnswerSets answers = (AnswerSets)o;
                 stopwatch.Stop();
                 asSteps++;

@@ -1022,6 +1022,29 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 43
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &376297313 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2733009380794909799, guid: b30200a90b72f52409f560fce3f72df7,
+    type: 3}
+  m_PrefabInstance: {fileID: 1307076478}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &376297314
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 376297313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gOConfigurations:
+  - {fileID: 11400000, guid: ba63caa90b09fa74bbf4aede603b0f39, type: 2}
+  localNames:
+  - orangeCar2
+  goName: orange2
 --- !u!1 &381505141
 GameObject:
   m_ObjectHideFlags: 0
@@ -1945,6 +1968,29 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 1
   isOccupied: 0
+--- !u!1 &716492897 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2733009380794909799, guid: b30200a90b72f52409f560fce3f72df7,
+    type: 3}
+  m_PrefabInstance: {fileID: 2733009379853430332}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &716492898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 716492897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gOConfigurations:
+  - {fileID: 11400000, guid: f3ac2e08cf6cea743b06878690cc3949, type: 2}
+  localNames:
+  - orangeCar
+  goName: orange
 --- !u!1 &718907774
 GameObject:
   m_ObjectHideFlags: 0
@@ -2721,6 +2767,52 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 1
   isOccupied: 0
+--- !u!1 &1040076123 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5849834770684454744, guid: 09b1a214c6637744faa7ff67df671504,
+    type: 3}
+  m_PrefabInstance: {fileID: 1457402470}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1040076124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1040076123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gOConfigurations:
+  - {fileID: 11400000, guid: d5edb20067660b6489ab2fa72a1bc9c4, type: 2}
+  localNames:
+  - greenCar3
+  goName: green3
+--- !u!1 &1052362119 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 97694910313298888, guid: 8bd82fc7964e85b48b489be54bdf4ba6,
+    type: 3}
+  m_PrefabInstance: {fileID: 8439172158050176946}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1052362120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1052362119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gOConfigurations:
+  - {fileID: 11400000, guid: 1a86633b868d4544a96a851861de55f8, type: 2}
+  localNames:
+  - pinkCar
+  goName: pink
 --- !u!1001 &1222146138
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2886,6 +2978,29 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1296716481 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5849834770684454744, guid: 09b1a214c6637744faa7ff67df671504,
+    type: 3}
+  m_PrefabInstance: {fileID: 540915825}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1296716482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1296716481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gOConfigurations:
+  - {fileID: 11400000, guid: a6f41f765fbfd6148a286a3daa5ad15e, type: 2}
+  localNames:
+  - greenCar2
+  goName: green2
 --- !u!1 &1301600776
 GameObject:
   m_ObjectHideFlags: 0
@@ -3903,6 +4018,7 @@ GameObject:
   - component: {fileID: 1665685957}
   - component: {fileID: 1665685956}
   - component: {fileID: 1665685955}
+  - component: {fileID: 1665685959}
   m_Layer: 0
   m_Name: log_small
   m_TagString: CollidableObject
@@ -4005,6 +4121,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 31
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1665685959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1665685954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gOConfigurations: []
+  localNames: []
+  goName: log_small
 --- !u!1 &1668991328
 GameObject:
   m_ObjectHideFlags: 0
@@ -4017,6 +4148,7 @@ GameObject:
   - component: {fileID: 1668991329}
   - component: {fileID: 1668991331}
   - component: {fileID: 1668991332}
+  - component: {fileID: 1668991333}
   m_Layer: 0
   m_Name: Brain
   m_TagString: Untagged
@@ -4040,7 +4172,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: dcf20e08c6a4f994ea3691f152cc21b0, type: 2}
   - {fileID: 11400000, guid: a6f41f765fbfd6148a286a3daa5ad15e, type: 2}
   - {fileID: 11400000, guid: d5edb20067660b6489ab2fa72a1bc9c4, type: 2}
-  - {fileID: 11400000, guid: 2f4ee6c72b840d849b3706a3636e74bd, type: 2}
+  - {fileID: 11400000, guid: 62cc05dcc8909ad4597edfa3ffa351e0, type: 2}
   - {fileID: 11400000, guid: f3ac2e08cf6cea743b06878690cc3949, type: 2}
   - {fileID: 11400000, guid: ba63caa90b09fa74bbf4aede603b0f39, type: 2}
   - {fileID: 11400000, guid: 1a86633b868d4544a96a851861de55f8, type: 2}
@@ -4055,10 +4187,10 @@ MonoBehaviour:
   sensorsUpdated: 0
   ASPFilePath: .\Assets\Resources\Brain.asp
   ASPFileTemplatePath: .\Assets\Resources\Brain_template.asp
-  enableBrain: 0
+  enableBrain: 1
   executeRepeatedly: 1
   startIn: 0.1
-  brainUpdateFrequency: 0.3
+  brainUpdateFrequency: 0.5
   executeOnTrigger: 0
   triggerClassPath: .\Assets\Scripts\Trigger.cs
   updateSensorsOn: 
@@ -4151,6 +4283,41 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1668991333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1668991328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 694937539, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &1702996714 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6308052464226184410, guid: 0b88d5d93e4ce0e4181c6d8553dd061d,
+    type: 3}
+  m_PrefabInstance: {fileID: 496934124}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1702996715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1702996714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gOConfigurations:
+  - {fileID: 11400000, guid: f36516e418f5aea46837d6fe622a2643, type: 2}
+  localNames:
+  - whiteCar2
+  goName: white2
 --- !u!1 &1718364869
 GameObject:
   m_ObjectHideFlags: 0
@@ -4256,6 +4423,29 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 27
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1719931866 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 97694910313298888, guid: 8bd82fc7964e85b48b489be54bdf4ba6,
+    type: 3}
+  m_PrefabInstance: {fileID: 1314769488}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1719931867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1719931866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gOConfigurations:
+  - {fileID: 11400000, guid: 8c1ddc4138d53cb488384370964e44c2, type: 2}
+  localNames:
+  - pinkCar2
+  goName: pink2
 --- !u!1 &1734011751
 GameObject:
   m_ObjectHideFlags: 0
@@ -4429,6 +4619,121 @@ RectTransform:
   m_AnchoredPosition: {x: -800, y: -680}
   m_SizeDelta: {x: 24, y: 24}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1848249489 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5849834770684454744, guid: 09b1a214c6637744faa7ff67df671504,
+    type: 3}
+  m_PrefabInstance: {fileID: 472608554}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1848249490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1848249489}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gOConfigurations:
+  - {fileID: 11400000, guid: 62cc05dcc8909ad4597edfa3ffa351e0, type: 2}
+  localNames:
+  - greenCar4
+  goName: green4
+--- !u!1 &1861290156 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5273863599961143660, guid: b79dc7bf9ca28c246aeb2524ea6bb7a5,
+    type: 3}
+  m_PrefabInstance: {fileID: 4030046645535879628}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1861290157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1861290156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gOConfigurations:
+  - {fileID: 11400000, guid: 0adfbba3b3c9bc14abe4d855e04e3f5c, type: 2}
+  localNames:
+  - purpleCar
+  goName: purple
+--- !u!1 &1919606933 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5273863599961143660, guid: b79dc7bf9ca28c246aeb2524ea6bb7a5,
+    type: 3}
+  m_PrefabInstance: {fileID: 1222146138}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1919606934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919606933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gOConfigurations:
+  - {fileID: 11400000, guid: 9b3c0a780a1265044a86fe6111b66853, type: 2}
+  localNames:
+  - purpleCar2
+  goName: purple2
+--- !u!1 &1919890341 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6308052464226184410, guid: 0b88d5d93e4ce0e4181c6d8553dd061d,
+    type: 3}
+  m_PrefabInstance: {fileID: 8388766454186306904}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1919890342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919890341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gOConfigurations:
+  - {fileID: 11400000, guid: 481bb90a4c9280d4094f27ab3a4ce475, type: 2}
+  localNames:
+  - whiteCar
+  goName: white
+--- !u!1 &2025857577 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5849834770684454744, guid: 09b1a214c6637744faa7ff67df671504,
+    type: 3}
+  m_PrefabInstance: {fileID: 4073951082689938225}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2025857578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2025857577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gOConfigurations:
+  - {fileID: 11400000, guid: dcf20e08c6a4f994ea3691f152cc21b0, type: 2}
+  localNames:
+  - greenCar
+  goName: green
 --- !u!1 &2051915659
 GameObject:
   m_ObjectHideFlags: 0

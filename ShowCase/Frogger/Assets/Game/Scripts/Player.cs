@@ -116,6 +116,7 @@ public class Player : MonoBehaviour
         //if (Input.GetKeyDown(KeyCode.UpArrow))
         if (move == 1)
         {
+            //Debug.Log("going up!");
             GetComponent<SpriteRenderer>().sprite = playerUp;
             pos += Vector2.up;
             move = 0;
