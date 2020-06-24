@@ -504,7 +504,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         protected void addSubProperties(object obj, string name, object objOwner)
         {
 
-            if (tracker.ObjectsOwners.ContainsKey(obj) && (!tracker.ObjectsOwners[obj].Key.Equals(objOwner) || !tracker.ObjectsOwners[obj].Value.Equals(name)) || obj.Equals(tracker.GO))
+            if (tracker.ObjectsOwners.ContainsKey(obj) && !obj.GetType().IsValueType && (!tracker.ObjectsOwners[obj].Key.Equals(objOwner) || !tracker.ObjectsOwners[obj].Value.Equals(name)) || obj.Equals(tracker.GO))
             {
                 EditorGUI.BeginDisabledGroup(true);
                 if (obj.Equals(tracker.GO))

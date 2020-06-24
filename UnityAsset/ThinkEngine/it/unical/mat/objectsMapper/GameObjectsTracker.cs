@@ -229,8 +229,9 @@ public class GameObjectsTracker
                 {
                     ObjectsOwners.Add(objValueForOb, new KeyValuePair<object, string>(obj, ob.Name()));
                 }
-            }
+                //Debug.Log(ob.Name() + " owner is " + ObjectsOwners[objValueForOb]+"and its value is "+objValueForOb);
 
+            }
             if (s!=null && s.properties.Contains(parent+"^"+ob.Name()))
             {
                 //Debug.Log("s contains " + parent + "^" + ob.Name());   
