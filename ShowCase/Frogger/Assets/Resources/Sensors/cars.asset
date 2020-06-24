@@ -10,28 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -1431113182, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
-  m_Name: whiteCar2
+  m_Name: cars
   m_EditorClassIdentifier: 
-  gOName: white2
+  gOName: Brain
   properties:
-  - Car^moveRight
-  - Car
-  - Car^moveRight
-  - Car^xpos
-  - Car
-  - Car^xpos
-  - Car^ypos
-  - Car
-  - Car^ypos
+  - CollidersCollector^cars
+  - CollidersCollector
+  - CollidersCollector^cars
   propertiesNames: []
-  gOType: white (UnityEngine.GameObject)
-  configurationName: whiteCar2
-  advancedConf: []
-  operationPerProperty:
-  - Key: Car^moveRight
-    Value: 0
-  - Key: Car^xpos
-    Value: 0
-  - Key: Car^ypos
-    Value: 0
+  gOType: 
+  configurationName: cars
+  advancedConf:
+  - objType: Car, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    toSave:
+    - moveRight
+    - xpos
+    - ypos
+    propertyName: CollidersCollector^cars
+    name: Car
+    propertyType: LIST
+  operationPerProperty: []
   specificValuePerProperty: []

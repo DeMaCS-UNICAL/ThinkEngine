@@ -111,12 +111,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                  //Debug.Log("error: " + answers.ErrorsString);
                 if (answers.Answersets.Count > 0)
                 {
-                    string asPath = Path.GetTempFileName();
+                    /*string asPath = Path.GetTempFileName();
                     using (StreamWriter fs = new StreamWriter(asPath, true))
                     {
                         fs.Write(o.OutputString);
                         fs.Close();
-                    }
+                    }*/
                         lock (brain.toLock)
                     {
                         foreach (SimpleActuator actuator in brain.getActuators())
@@ -128,7 +128,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                         brain.setActuatorsReady(true);
                     }
                 }
-                File.Delete(factsPath);
+                //File.Delete(factsPath);
             }
             
         }
