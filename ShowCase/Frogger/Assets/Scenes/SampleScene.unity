@@ -220,6 +220,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 1
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!1 &36316554
 GameObject:
   m_ObjectHideFlags: 0
@@ -319,6 +323,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!1 &77382783
 GameObject:
   m_ObjectHideFlags: 0
@@ -565,6 +573,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!1 &255914829
 GameObject:
   m_ObjectHideFlags: 0
@@ -675,6 +687,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!114 &260572204
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -944,6 +960,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!114 &308561370
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1040,11 +1060,21 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations:
-  - {fileID: 11400000, guid: ba63caa90b09fa74bbf4aede603b0f39, type: 2}
-  localNames:
-  - orangeCar2
+  gOConfigurations: []
+  localNames: []
   goName: orange2
+--- !u!114 &376297316 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2733009380794909793, guid: b30200a90b72f52409f560fce3f72df7,
+    type: 3}
+  m_PrefabInstance: {fileID: 1307076478}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 376297313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94a6789f452a55243a789498ba0ee172, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &381505141
 GameObject:
   m_ObjectHideFlags: 0
@@ -1169,6 +1199,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!212 &408749841
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1364,7 +1398,7 @@ PrefabInstance:
     - target: {fileID: 2770198149236494684, guid: 09b1a214c6637744faa7ff67df671504,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 7
+      value: 6.6000004
       objectReference: {fileID: 0}
     - target: {fileID: 2770198149236494684, guid: 09b1a214c6637744faa7ff67df671504,
         type: 3}
@@ -1443,7 +1477,7 @@ PrefabInstance:
     - target: {fileID: 959006422919534830, guid: 0b88d5d93e4ce0e4181c6d8553dd061d,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 959006422919534830, guid: 0b88d5d93e4ce0e4181c6d8553dd061d,
         type: 3}
@@ -1686,7 +1720,7 @@ PrefabInstance:
     - target: {fileID: 2770198149236494684, guid: 09b1a214c6637744faa7ff67df671504,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5
+      value: -5.3999996
       objectReference: {fileID: 0}
     - target: {fileID: 2770198149236494684, guid: 09b1a214c6637744faa7ff67df671504,
         type: 3}
@@ -1791,6 +1825,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!114 &543113359
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1968,6 +2006,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 1
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!1 &716492897 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2733009380794909799, guid: b30200a90b72f52409f560fce3f72df7,
@@ -1986,11 +2028,21 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations:
-  - {fileID: 11400000, guid: f3ac2e08cf6cea743b06878690cc3949, type: 2}
-  localNames:
-  - orangeCar
+  gOConfigurations: []
+  localNames: []
   goName: orange
+--- !u!114 &716492900 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2733009380794909793, guid: b30200a90b72f52409f560fce3f72df7,
+    type: 3}
+  m_PrefabInstance: {fileID: 2733009379853430332}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 716492897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94a6789f452a55243a789498ba0ee172, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &718907774
 GameObject:
   m_ObjectHideFlags: 0
@@ -2027,6 +2079,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!114 &718907776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2204,6 +2260,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 1
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!1 &760712942
 GameObject:
   m_ObjectHideFlags: 0
@@ -2254,6 +2314,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!212 &760712945
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2590,6 +2654,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!114 &1005239367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2767,6 +2835,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 1
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!1 &1040076123 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5849834770684454744, guid: 09b1a214c6637744faa7ff67df671504,
@@ -2785,11 +2857,21 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations:
-  - {fileID: 11400000, guid: d5edb20067660b6489ab2fa72a1bc9c4, type: 2}
-  localNames:
-  - greenCar3
+  gOConfigurations: []
+  localNames: []
   goName: green3
+--- !u!114 &1040076126 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4774680787993251460, guid: 09b1a214c6637744faa7ff67df671504,
+    type: 3}
+  m_PrefabInstance: {fileID: 1457402470}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1040076123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94a6789f452a55243a789498ba0ee172, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1052362119 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 97694910313298888, guid: 8bd82fc7964e85b48b489be54bdf4ba6,
@@ -2808,11 +2890,21 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations:
-  - {fileID: 11400000, guid: 1a86633b868d4544a96a851861de55f8, type: 2}
-  localNames:
-  - pinkCar
+  gOConfigurations: []
+  localNames: []
   goName: pink
+--- !u!114 &1052362121 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7713859974582282745, guid: 8bd82fc7964e85b48b489be54bdf4ba6,
+    type: 3}
+  m_PrefabInstance: {fileID: 8439172158050176946}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1052362119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94a6789f452a55243a789498ba0ee172, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1222146138
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2833,7 +2925,7 @@ PrefabInstance:
     - target: {fileID: 1859538624992697043, guid: b79dc7bf9ca28c246aeb2524ea6bb7a5,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5
+      value: 5.8
       objectReference: {fileID: 0}
     - target: {fileID: 1859538624992697043, guid: b79dc7bf9ca28c246aeb2524ea6bb7a5,
         type: 3}
@@ -2996,11 +3088,21 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations:
-  - {fileID: 11400000, guid: a6f41f765fbfd6148a286a3daa5ad15e, type: 2}
-  localNames:
-  - greenCar2
+  gOConfigurations: []
+  localNames: []
   goName: green2
+--- !u!114 &1296716484 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4774680787993251460, guid: 09b1a214c6637744faa7ff67df671504,
+    type: 3}
+  m_PrefabInstance: {fileID: 540915825}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1296716481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94a6789f452a55243a789498ba0ee172, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1301600776
 GameObject:
   m_ObjectHideFlags: 0
@@ -3100,6 +3202,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!1001 &1307076478
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3120,7 +3226,7 @@ PrefabInstance:
     - target: {fileID: 2733009380794909795, guid: b30200a90b72f52409f560fce3f72df7,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1
+      value: 0.39999998
       objectReference: {fileID: 0}
     - target: {fileID: 2733009380794909795, guid: b30200a90b72f52409f560fce3f72df7,
         type: 3}
@@ -3194,7 +3300,7 @@ PrefabInstance:
     - target: {fileID: 1165614652020247177, guid: 8bd82fc7964e85b48b489be54bdf4ba6,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 6
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1165614652020247177, guid: 8bd82fc7964e85b48b489be54bdf4ba6,
         type: 3}
@@ -3357,6 +3463,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!1 &1366470708
 GameObject:
   m_ObjectHideFlags: 0
@@ -3393,6 +3503,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!114 &1366470710
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3507,6 +3621,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!114 &1443173494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3595,7 +3713,7 @@ PrefabInstance:
     - target: {fileID: 2770198149236494684, guid: 09b1a214c6637744faa7ff67df671504,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2
+      value: -2.4
       objectReference: {fileID: 0}
     - target: {fileID: 2770198149236494684, guid: 09b1a214c6637744faa7ff67df671504,
         type: 3}
@@ -3714,6 +3832,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!212 &1519805112
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3814,6 +3936,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!114 &1572593624
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3928,6 +4054,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!114 &1591225320
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4043,6 +4173,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!114 &1665685956
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4148,7 +4282,8 @@ GameObject:
   - component: {fileID: 1668991329}
   - component: {fileID: 1668991331}
   - component: {fileID: 1668991332}
-  - component: {fileID: 1668991333}
+  - component: {fileID: 1668991334}
+  - component: {fileID: 1668991335}
   m_Layer: 0
   m_Name: Brain
   m_TagString: Untagged
@@ -4169,31 +4304,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sensorsConfigurations:
-  - {fileID: 11400000, guid: dcf20e08c6a4f994ea3691f152cc21b0, type: 2}
-  - {fileID: 11400000, guid: a6f41f765fbfd6148a286a3daa5ad15e, type: 2}
-  - {fileID: 11400000, guid: d5edb20067660b6489ab2fa72a1bc9c4, type: 2}
-  - {fileID: 11400000, guid: 62cc05dcc8909ad4597edfa3ffa351e0, type: 2}
-  - {fileID: 11400000, guid: f3ac2e08cf6cea743b06878690cc3949, type: 2}
-  - {fileID: 11400000, guid: ba63caa90b09fa74bbf4aede603b0f39, type: 2}
-  - {fileID: 11400000, guid: 1a86633b868d4544a96a851861de55f8, type: 2}
-  - {fileID: 11400000, guid: 8c1ddc4138d53cb488384370964e44c2, type: 2}
-  - {fileID: 11400000, guid: 0adfbba3b3c9bc14abe4d855e04e3f5c, type: 2}
-  - {fileID: 11400000, guid: 9b3c0a780a1265044a86fe6111b66853, type: 2}
-  - {fileID: 11400000, guid: 481bb90a4c9280d4094f27ab3a4ce475, type: 2}
-  - {fileID: 11400000, guid: f36516e418f5aea46837d6fe622a2643, type: 2}
+  - {fileID: 11400000, guid: 488437fd3c33e7647ada22186e03adaf, type: 2}
   - {fileID: 11400000, guid: a274b7d1b0154e342a65cc4a05b85d8a, type: 2}
+  - {fileID: 11400000, guid: 8607218b32e5ed14da6df27700371b19, type: 2}
   actuatorsConfigurations:
   - {fileID: 11400000, guid: 90124f0d70d92b64481c06cfdb0d6da9, type: 2}
   sensorsUpdated: 0
   ASPFilePath: .\Assets\Resources\Brain.asp
   ASPFileTemplatePath: .\Assets\Resources\Brain_template.asp
   enableBrain: 1
-  executeRepeatedly: 1
+  maintainFactFile: 0
+  executeRepeatedly: 0
   startIn: 0.1
   brainUpdateFrequency: 0.5
-  executeOnTrigger: 0
+  executeOnTrigger: 1
   triggerClassPath: .\Assets\Scripts\Trigger.cs
-  updateSensorsOn: 
+  updateSensorsOn: updateSensors
   executeReasonerOn: When Sensors are ready
   applyActuatorsCondition: Always
 --- !u!4 &1668991330
@@ -4233,6 +4359,7 @@ MonoBehaviour:
   move: 0
   xpos: 8
   ypos: 0
+  deadAnimation: 0
 --- !u!212 &1668991332
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4283,7 +4410,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1668991333
+--- !u!114 &1668991334
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4292,9 +4419,58 @@ MonoBehaviour:
   m_GameObject: {fileID: 1668991328}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 694937539, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Script: {fileID: 11500000, guid: 712c5118de5976444a0925ab09b937a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cars:
+  - {fileID: 376297316}
+  - {fileID: 716492900}
+  - {fileID: 1040076126}
+  - {fileID: 1052362121}
+  - {fileID: 1296716484}
+  - {fileID: 1702996717}
+  - {fileID: 1719931868}
+  - {fileID: 1848249492}
+  - {fileID: 1861290159}
+  - {fileID: 1919606936}
+  - {fileID: 1919890344}
+  - {fileID: 2025857580}
+  logs:
+  - {fileID: 260572203}
+  - {fileID: 308561369}
+  - {fileID: 408749840}
+  - {fileID: 543113358}
+  - {fileID: 718907775}
+  - {fileID: 760712944}
+  - {fileID: 1005239366}
+  - {fileID: 1366470709}
+  - {fileID: 1443173493}
+  - {fileID: 1519805111}
+  - {fileID: 1572593623}
+  - {fileID: 1591225319}
+  - {fileID: 1665685955}
+  - {fileID: 2051915661}
+--- !u!114 &1668991335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1668991328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gOConfigurations:
+  - {fileID: 11400000, guid: a274b7d1b0154e342a65cc4a05b85d8a, type: 2}
+  - {fileID: 11400000, guid: 488437fd3c33e7647ada22186e03adaf, type: 2}
+  - {fileID: 11400000, guid: 8607218b32e5ed14da6df27700371b19, type: 2}
+  localNames:
+  - playerSensor
+  - cars
+  - logs
+  goName: Brain
 --- !u!1 &1702996714 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6308052464226184410, guid: 0b88d5d93e4ce0e4181c6d8553dd061d,
@@ -4313,11 +4489,21 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations:
-  - {fileID: 11400000, guid: f36516e418f5aea46837d6fe622a2643, type: 2}
-  localNames:
-  - whiteCar2
+  gOConfigurations: []
+  localNames: []
   goName: white2
+--- !u!114 &1702996717 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7466520323106497561, guid: 0b88d5d93e4ce0e4181c6d8553dd061d,
+    type: 3}
+  m_PrefabInstance: {fileID: 496934124}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1702996714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94a6789f452a55243a789498ba0ee172, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1718364869
 GameObject:
   m_ObjectHideFlags: 0
@@ -4359,6 +4545,7 @@ MonoBehaviour:
   move: 0
   xpos: 0
   ypos: 0
+  deadAnimation: 0
 --- !u!212 &1718364871
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4441,11 +4628,21 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations:
-  - {fileID: 11400000, guid: 8c1ddc4138d53cb488384370964e44c2, type: 2}
-  localNames:
-  - pinkCar2
+  gOConfigurations: []
+  localNames: []
   goName: pink2
+--- !u!114 &1719931868 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7713859974582282745, guid: 8bd82fc7964e85b48b489be54bdf4ba6,
+    type: 3}
+  m_PrefabInstance: {fileID: 1314769488}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1719931866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94a6789f452a55243a789498ba0ee172, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1734011751
 GameObject:
   m_ObjectHideFlags: 0
@@ -4545,6 +4742,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!1 &1833468687
 GameObject:
   m_ObjectHideFlags: 0
@@ -4637,11 +4838,21 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations:
-  - {fileID: 11400000, guid: 62cc05dcc8909ad4597edfa3ffa351e0, type: 2}
-  localNames:
-  - greenCar4
+  gOConfigurations: []
+  localNames: []
   goName: green4
+--- !u!114 &1848249492 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4774680787993251460, guid: 09b1a214c6637744faa7ff67df671504,
+    type: 3}
+  m_PrefabInstance: {fileID: 472608554}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1848249489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94a6789f452a55243a789498ba0ee172, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1861290156 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5273863599961143660, guid: b79dc7bf9ca28c246aeb2524ea6bb7a5,
@@ -4660,11 +4871,21 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations:
-  - {fileID: 11400000, guid: 0adfbba3b3c9bc14abe4d855e04e3f5c, type: 2}
-  localNames:
-  - purpleCar
+  gOConfigurations: []
+  localNames: []
   goName: purple
+--- !u!114 &1861290159 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 716454651014873114, guid: b79dc7bf9ca28c246aeb2524ea6bb7a5,
+    type: 3}
+  m_PrefabInstance: {fileID: 4030046645535879628}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1861290156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94a6789f452a55243a789498ba0ee172, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1919606933 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5273863599961143660, guid: b79dc7bf9ca28c246aeb2524ea6bb7a5,
@@ -4683,11 +4904,21 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations:
-  - {fileID: 11400000, guid: 9b3c0a780a1265044a86fe6111b66853, type: 2}
-  localNames:
-  - purpleCar2
+  gOConfigurations: []
+  localNames: []
   goName: purple2
+--- !u!114 &1919606936 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 716454651014873114, guid: b79dc7bf9ca28c246aeb2524ea6bb7a5,
+    type: 3}
+  m_PrefabInstance: {fileID: 1222146138}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919606933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94a6789f452a55243a789498ba0ee172, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1919890341 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6308052464226184410, guid: 0b88d5d93e4ce0e4181c6d8553dd061d,
@@ -4706,11 +4937,21 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations:
-  - {fileID: 11400000, guid: 481bb90a4c9280d4094f27ab3a4ce475, type: 2}
-  localNames:
-  - whiteCar
+  gOConfigurations: []
+  localNames: []
   goName: white
+--- !u!114 &1919890344 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7466520323106497561, guid: 0b88d5d93e4ce0e4181c6d8553dd061d,
+    type: 3}
+  m_PrefabInstance: {fileID: 8388766454186306904}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919890341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94a6789f452a55243a789498ba0ee172, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2025857577 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5849834770684454744, guid: 09b1a214c6637744faa7ff67df671504,
@@ -4729,11 +4970,21 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations:
-  - {fileID: 11400000, guid: dcf20e08c6a4f994ea3691f152cc21b0, type: 2}
-  localNames:
-  - greenCar
+  gOConfigurations: []
+  localNames: []
   goName: green
+--- !u!114 &2025857580 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4774680787993251460, guid: 09b1a214c6637744faa7ff67df671504,
+    type: 3}
+  m_PrefabInstance: {fileID: 4073951082689938225}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2025857577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94a6789f452a55243a789498ba0ee172, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2051915659
 GameObject:
   m_ObjectHideFlags: 0
@@ -4784,6 +5035,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 0
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!212 &2051915662
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4947,6 +5202,10 @@ MonoBehaviour:
   isTurtle: 0
   isHomeBay: 1
   isOccupied: 0
+  leftMargin: 0
+  rightMargin: 0
+  y: 0
+  right: 0
 --- !u!1001 &2733009379853430332
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4962,7 +5221,7 @@ PrefabInstance:
     - target: {fileID: 2733009380794909795, guid: b30200a90b72f52409f560fce3f72df7,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -8
+      value: -7.66
       objectReference: {fileID: 0}
     - target: {fileID: 2733009380794909795, guid: b30200a90b72f52409f560fce3f72df7,
         type: 3}
@@ -5041,7 +5300,7 @@ PrefabInstance:
     - target: {fileID: 1859538624992697043, guid: b79dc7bf9ca28c246aeb2524ea6bb7a5,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4
+      value: -3.1999998
       objectReference: {fileID: 0}
     - target: {fileID: 1859538624992697043, guid: b79dc7bf9ca28c246aeb2524ea6bb7a5,
         type: 3}
@@ -5115,7 +5374,7 @@ PrefabInstance:
     - target: {fileID: 2770198149236494684, guid: 09b1a214c6637744faa7ff67df671504,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4
+      value: 3.6
       objectReference: {fileID: 0}
     - target: {fileID: 2770198149236494684, guid: 09b1a214c6637744faa7ff67df671504,
         type: 3}
@@ -5194,7 +5453,7 @@ PrefabInstance:
     - target: {fileID: 959006422919534830, guid: 0b88d5d93e4ce0e4181c6d8553dd061d,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5
+      value: -6
       objectReference: {fileID: 0}
     - target: {fileID: 959006422919534830, guid: 0b88d5d93e4ce0e4181c6d8553dd061d,
         type: 3}
@@ -5278,7 +5537,7 @@ PrefabInstance:
     - target: {fileID: 1165614652020247177, guid: 8bd82fc7964e85b48b489be54bdf4ba6,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 1165614652020247177, guid: 8bd82fc7964e85b48b489be54bdf4ba6,
         type: 3}

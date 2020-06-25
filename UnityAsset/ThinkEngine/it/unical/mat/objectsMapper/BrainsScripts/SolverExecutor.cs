@@ -121,14 +121,21 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                     {
                         foreach (SimpleActuator actuator in brain.getActuators())
                         {
-                            //Debug.Log("parsing " + actuator.actuatorName);
-                            //Debug.Log(answers.Answersets[0].GetAnswerSet()[0]);
+                            Debug.Log("input fact " + factsPath);
+                            Debug.Log("parsing " + actuator.actuatorName);
+                            if (answers.Answersets[0].GetAnswerSet().Count > 0)
+                            {
+                                Debug.Log(answers.Answersets[0].GetAnswerSet()[0]);
+                            }
                             actuator.parse(answers.Answersets[0]);
                         }
                         brain.setActuatorsReady(true);
                     }
                 }
-                //File.Delete(factsPath);
+                if (!brain.maintainFactFile)
+                {
+                    File.Delete(factsPath);
+                }
             }
             
         }

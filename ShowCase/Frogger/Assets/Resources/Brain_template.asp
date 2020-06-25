@@ -2,3 +2,9 @@ setOnActuator(player(brain(player(move(X))))):-
 %cars(brain(collidersCollector(cars(X,car(moveRight(V)))))).
 %cars(brain(collidersCollector(cars(X,car(xpos(V)))))).
 %cars(brain(collidersCollector(cars(X,car(ypos(V)))))).
+%playerSensor(brain(player(xpos(X)))).
+%playerSensor(brain(player(ypos(X)))).
+%logs(brain(collidersCollector(logs(X,collidableObject(leftMargin(V)))))).
+%logs(brain(collidersCollector(logs(X,collidableObject(rightMargin(V)))))).
+%logs(brain(collidersCollector(logs(X,collidableObject(y(V)))))).
+%logs(brain(collidersCollector(logs(X,collidableObject(right(V)))))).

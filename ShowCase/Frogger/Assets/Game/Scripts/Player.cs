@@ -32,6 +32,7 @@ public class Player : MonoBehaviour
     private int x = 0;
     private int y = 0;
 
+    public bool deadAnimation = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -230,6 +231,7 @@ public class Player : MonoBehaviour
 
         if (!isSafe)
         {
+            deadAnimation = true;
             if (lives == 0)
             {
                 GameOver();
@@ -246,6 +248,7 @@ public class Player : MonoBehaviour
         gameTimer = 0;
         lives -= 1;
         ResetPosition();
+        deadAnimation = false;
     }
 
     void GameOver()
@@ -268,7 +271,7 @@ public class Player : MonoBehaviour
 
         ResetPosition();
         occupiedCount = 0;
-
+        deadAnimation = false;
     }
 
     void ResetPosition()

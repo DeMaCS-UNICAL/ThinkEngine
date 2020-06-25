@@ -15,10 +15,37 @@ public class CollidableObject : MonoBehaviour
     Vector2 playerSize;
     Vector2 playerPosition;
 
+    public int leftMargin;
+    public int rightMargin;
+    public int y;
+    public bool right;
+
     Rect collidableObjectRect;
     Vector2 collidableObjectSize;
     Vector2 collidableObjectPosition;
 
+    private void Update()
+    {
+        leftMargin = (int)(transform.localPosition.x+ 8- collidableObjectSize.x/2);
+        rightMargin = (int)(leftMargin+ collidableObjectSize.x);
+        if (leftMargin < 0)
+        {
+            if (rightMargin > 0)
+            {
+                leftMargin = 0;
+            }
+            else
+            {
+                leftMargin = 17;
+                rightMargin = 17;
+            }
+        }
+        y = (int)transform.localPosition.y+6;
+        if (isLog)
+        {
+            right = GetComponent<Log>().moveRight;
+        }
+    }
 
     public bool IsColliding(GameObject playerGameObject)
     {

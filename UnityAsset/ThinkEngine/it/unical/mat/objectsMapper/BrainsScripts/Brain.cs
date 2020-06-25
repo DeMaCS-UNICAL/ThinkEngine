@@ -33,6 +33,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         public string ASPFilePath;
         public string ASPFileTemplatePath;
         public bool enableBrain;
+        public bool maintainFactFile;
         private bool updateSensors;
         private bool actuatorsReady;
         public bool executeRepeatedly;

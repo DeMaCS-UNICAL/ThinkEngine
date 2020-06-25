@@ -125,8 +125,8 @@ namespace EmbASP4Unity.it.unical.mat.embasp.platforms.desktop {
 
         Console.Error.WriteLine("Total time : " + watch.ElapsedMilliseconds);
 
-        if (tmpFile != null && File.Exists(tmpFile.Name)) { }
-         // File.Delete(tmpFile.Name);
+        if (tmpFile != null && File.Exists(tmpFile.Name)) { File.Delete(tmpFile.Name); }
+          //File.Delete(tmpFile.Name);
 
         return GetOutput(solverOutput.ToString(), solverError.ToString());
 
