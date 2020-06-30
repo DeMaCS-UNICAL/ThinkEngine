@@ -24,7 +24,7 @@ public class Player : MonoBehaviour
 
     private int occupiedCount;
 
-    public int move=0;
+    public int move = 0;
 
     public int xpos = 0;
     public int ypos = 0;
@@ -85,35 +85,6 @@ public class Player : MonoBehaviour
     {
         Vector2 pos = transform.localPosition;
 
-        x = (int)pos.x;
-        y = (int)pos.y;
-
-        if (x + 8 < 0)
-        {
-            xpos = 0;
-        }
-        else if (x + 8 > 16)
-        {
-            xpos = 16;
-        }
-        else
-        {
-            xpos = x + 8;
-        }
-
-        if (y + 6 < 0)
-        {
-            ypos = 0;
-        }
-        else if (y + 6 > 12)
-        {
-            ypos = 12;
-        }
-        else
-        {
-            ypos = y + 6;
-        }
-
         //if (Input.GetKeyDown(KeyCode.UpArrow))
         if (move == 1)
         {
@@ -156,7 +127,43 @@ public class Player : MonoBehaviour
             }
             move = 0;
         }
+        else if (move == 0)
+        {
+            move = 0;
+        }
         transform.localPosition = pos;
+
+
+        x = (int)pos.x;
+        y = (int)pos.y;
+
+        if (x + 8 < 0)
+        {
+            xpos = 0;
+        }
+        else if (x + 8 > 16)
+        {
+            xpos = 16;
+        }
+        else
+        {
+            xpos = x + 8;
+        }
+
+        if (y + 6 < 0)
+        {
+            ypos = 0;
+        }
+        else if (y + 6 > 12)
+        {
+            ypos = 12;
+        }
+        else
+        {
+            ypos = y + 6;
+        }
+
+
     }
 
     private void CheckCollisions()

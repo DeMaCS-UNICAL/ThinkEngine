@@ -14,7 +14,7 @@ using UnityEngine;
     public bool updateSensors()
     {
         watch.Stop();
-        if (watch.ElapsedMilliseconds < 250)
+        if (watch.ElapsedMilliseconds < 200)
         {
             watch.Start();
             return false;
