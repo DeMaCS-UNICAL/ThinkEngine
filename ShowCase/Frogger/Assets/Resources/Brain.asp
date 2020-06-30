@@ -1,5 +1,12 @@
 #maxint=100. 
 
+% noMove = 0
+% up     = 1
+% left   = 2
+% right  = 3
+% down   = 4
+% car(pos_x, pos_x, is_moving_right?)
+
 xCoord(0..16).
 yCoord(0..11).
 
@@ -24,33 +31,18 @@ occupiedByCar(X,Y) :- xCoord(X), yCoord(Y), car(X,Y,_).
  
 occupiedByLog(X,Y) :- xCoord(X), log(X1,X2,Y,_), X>=X1, X<=X2.
 
-safe(X,Y) :- xCoord(X), home(X1,X2,Y,false), X>=X1, X<=X2.
 
-% Final positions are also safe
-%safe(0,12). % not occupied(0,12); %there is not another frog inside
-%safe(2,12).
-%safe(4,12).
-%safe(5,12).
-%safe(8,12).
-%safe(9,12).
-%safe(12,12).
-%safe(13,12).
-%safe(16,12).
-%safe(17,12).
-
-%safe(X,Y):- occupiedByLog(X,Y).
+% Safe positions
 safe(X,Y):- xCoord(X), Y=0.
 safe(X,Y):- xCoord(X), Y=6.
 safe(X,Y):- occupiedByLog(X,Y).
 safe(X,Y):- not occupiedByCar(X,Y), xCoord(X), yCoord(Y), Y<6.
 
+% Final positions are also safe
+safe(X,Y) :- xCoord(X), home(X1,X2,Y,false), X>=X1, X<=X2.
+
 moveTo(0)|moveTo(1)|moveTo(2)|moveTo(3)|moveTo(4).
-% noMove = 0
-% up     = 1
-% left   = 2
-% right  = 3
-% down   = 4
-% car(pos_x, pos_x, is_moving_right?)
+
 
 nextPlayerPos(X,Y):-playerPos(X,Y), moveTo(0).
 nextPlayerPos(X,Y1):-playerPos(X,Y), moveTo(1), Y1=Y+1.%up
@@ -72,22 +64,3 @@ nextPlayerPos(X1,Y):-playerPos(X,Y), moveTo(3), X1=X+1.%right
 :~ moveTo(2), playerPos(0,Y). [2:1]
 
 setOnActuator(player(brain(player(move(A))))) :- moveTo(A).
-
-
-%moveTo(A) :- not occupiedByCar(X1,Y), playerPos(X2,Y), X1 = X2 + 1, car(_,Y1, false), Y1=Y+1, Y<6, A = 3. %move right
-%moveTo(A) :- not occupiedByCar(X1,Y), playerPos(X2,Y), X1 = X2 - 1, car(_,Y1, true), Y1=Y+1, Y<6, A = 2. %move left
-%moveTo(A) :- not occupiedByCar(X,Y1), playerPos(X,Y2), Y1 = Y2 + 1, Y2<6, A = 1. %move up
-%moveTo(A) :- not occupiedByCar(X,Y1), playerPos(X,Y2), Y1 = Y2 - 1, Y2<6, A = 4. %move down
-
-%moving :- moveTo(A), A<>0.
-%moveTo(1) :- occupiedByLog(X,Y), playerPos(X,Y1), Y1=Y-1.
-
-%stay at the same place
-%moveTo(A) :- occupiedByCar(X,Y1), playerPos(X,Y2), Y1 = Y2 + 1, A = 0.
-%moveTo(0) :- not moveTo(1), not moveTo(2), not moveTo(3), not moveTo(4).
-%moveTo(A) :- playerPos(_,Y), Y = 11, A = 0.
-
-%best(X) :- #min{A : moveTo(A)} = X, #int(X).
-%:~ best(X). [X:1]
-
-%setOnActuator(player(brain(player(move(A))))) :- best(A).
