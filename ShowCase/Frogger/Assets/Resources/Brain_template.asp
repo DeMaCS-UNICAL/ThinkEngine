@@ -8,3 +8,7 @@ setOnActuator(player(brain(player(move(X))))):-
 %logs(brain(collidersCollector(logs(X,collidableObject(rightMargin(V)))))).
 %logs(brain(collidersCollector(logs(X,collidableObject(y(V)))))).
 %logs(brain(collidersCollector(logs(X,collidableObject(right(V)))))).
+%homeBay(brain(collidersCollector(bay(X,collidableObject(isOccupied(V)))))).
+%homeBay(brain(collidersCollector(bay(X,collidableObject(leftMargin(V)))))).
+%homeBay(brain(collidersCollector(bay(X,collidableObject(rightMargin(V)))))).
+%homeBay(brain(collidersCollector(bay(X,collidableObject(y(V)))))).
