@@ -65,9 +65,10 @@ public class SimpleGameObjectsTracker
 
     public void save()
     {
+        toSave = new List<string>();
         foreach(string s in propertiesToggled.Keys)
         {
-            if (propertiesToggled[s] && !toSave.Contains(s))
+            if (propertiesToggled[s])
             {
                 toSave.Add(s);
             }

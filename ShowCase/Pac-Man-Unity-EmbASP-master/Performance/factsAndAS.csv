@@ -62,3 +62,11 @@ facts 30.95ms
 answer set 220.62ms 
 facts 28.64ms 
 answer set 215.17ms 
+facts NaNms 
+answer set NaNms 
+facts 2.20ms 
+answer set 80.40ms 
+facts 2.50ms 
+answer set 123.58ms 
+facts 3.05ms 
+answer set 98.26ms 

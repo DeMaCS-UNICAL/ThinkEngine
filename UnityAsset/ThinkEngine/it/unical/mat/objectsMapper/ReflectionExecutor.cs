@@ -88,6 +88,29 @@ public class ReflectionExecutor : ScriptableObject
         return  isBase ;
     }
 
+    public static List<Type> GetAvailableBasicTypes()
+    {
+        List<Type> toReturn = SignedIntegerTypes();
+        toReturn.AddRange(UnsignedIntegerTypes());
+        toReturn.AddRange(FloatingPointTypes());
+        toReturn.Add(typeof(char));
+        toReturn.Add(typeof(string));
+        toReturn.Add(typeof(Enum));
+        toReturn.Add(typeof(bool));
+        return toReturn;
+    }
+
+    public static Type GetCorrespondingBaseType(Type t)
+    {
+        List<Type> signedInteger = SignedIntegerTypes();
+        List<Type> unsignedInteger = UnsignedIntegerTypes();
+        List<Type> floatingPoint = FloatingPointTypes();
+        //Debug.Log(" level " + level);
+        return signedInteger.Contains(t) ? typeof(long) : unsignedInteger.Contains(t) ? typeof(ulong) : floatingPoint.Contains(t) ? typeof(float) :
+            t == typeof(char) ? typeof(char): t == typeof(bool)? typeof(bool) : t== typeof(Enum)? typeof(Enum): t == typeof(string)? typeof(string):null;
+
+    }
+
     public int isArrayOfRank(FieldOrProperty obj)
     {
         Type objType = obj.Type();

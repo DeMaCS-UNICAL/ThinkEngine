@@ -21,7 +21,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         [SerializeField]
         private List<string> configurationsNames;
         [NonSerialized]
-        public Dictionary<Brain, List<AdvancedSensor>> instantiatedSensors;
+        public Dictionary<Brain, List<IMonoBehaviourSensor>> instantiatedSensors;
         public static SensorsManager instance;
 
         public AbstractConfiguration findConfiguration(string s){
@@ -83,11 +83,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             return instance;
         }
 
-        public void registerSensors(Brain b, List<AdvancedSensor> instantiated)
+        public void registerSensors(Brain b, List<IMonoBehaviourSensor> instantiated)
         {
             if (instantiatedSensors == null)
             {
-                instantiatedSensors = new Dictionary<Brain, List<AdvancedSensor>>();
+                instantiatedSensors = new Dictionary<Brain, List<IMonoBehaviourSensor>>();
             }
             if (!instantiatedSensors.ContainsKey(b))
             {
@@ -98,7 +98,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                 instantiatedSensors[b] = instantiated;
             }
         }
-        public void updateSensors(Brain brain)
+        /*public void updateSensors(Brain brain)
         {
             Performance.updatingSensors = true;
             foreach (AdvancedSensor sens in instantiatedSensors[brain])
@@ -111,11 +111,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                 if (sens.listProperties.Count > 0)
                 {
                     Debug.Log(sens.listProperties.Count() + " " + sens.listProperties.First().Key + " " + sens.listProperties.First().Value);
-                }*/
+                }
 
             }
 
-        }
+        }*/
         public void OnBeforeSerialize()
         {
             confsToSerialize = new List<SensorConfiguration>();
@@ -196,6 +196,15 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             {
                 configuredGameObject.Add(abstractConfiguration.gOName);
             }
+        }
+
+        internal void addSensor(Brain brain, IMonoBehaviourSensor sensor)
+        {
+            instantiatedSensors[brain].Add(sensor);
+        }
+        internal void removeSensor(Brain brain, IMonoBehaviourSensor sensor)
+        {
+            instantiatedSensors[brain].Remove(sensor);
         }
     }
 }

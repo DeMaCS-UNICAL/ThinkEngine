@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts;
+using EmbASP4Unity.it.unical.mat.objectsMapper;
 
-namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
-{
-    [ExecuteInEditMode]
+[ExecuteInEditMode]
     public class SensorConfigurator:AbstractConfigurator
     {
 
@@ -67,4 +67,4 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             }
         }
     }
-}
+

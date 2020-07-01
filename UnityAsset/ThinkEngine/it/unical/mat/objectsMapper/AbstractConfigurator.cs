@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using System.Reflection;
+using EmbASP4Unity.it.unical.mat.objectsMapper;
 
-namespace EmbASP4Unity.it.unical.mat.objectsMapper
-{
-    [ExecuteInEditMode]
+[ExecuteInEditMode]
     public class AbstractConfigurator: MonoBehaviour
     {
         [SerializeField]
@@ -133,4 +132,4 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
         internal virtual string onSaving() { return ""; }
         internal virtual void onDeleting(AbstractConfiguration c) { }
     }
-}
+

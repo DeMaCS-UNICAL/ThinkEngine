@@ -17,12 +17,13 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         List<string> methodsToShowForReasoner = new List<string>();
         public int sensorsUpdateIndex = 0;
         public int reasoningExecutionIndex = 0;
-        public int applyActuatorsIndex;
+        public int applyActuatorsIndex=0;
         private List<string> methodsToShowForActuators=new List<string>();
         private Brain myScript;
 
         void OnEnable()
         {
+
             myScript = target as Brain;
             var triggerClass = ScriptableObject.CreateInstance("Trigger");
             MethodInfo[] methods = triggerClass.GetType().GetMethods();
@@ -32,27 +33,20 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 if (mI.ReturnType == typeof(bool))
                 {
                     methodsToShow.Add(mI.Name);
-                    Debug.Log(mI.Name);
+                    //Debug.Log(mI.Name);
                 }
             }
-            methodsToShowForReasoner.Add("When Sensors are ready");
+            //methodsToShowForReasoner.Add("When Sensors are ready");
             methodsToShowForReasoner.AddRange(methodsToShow);
             methodsToShowForActuators.Add("Always");
             methodsToShowForActuators.Add("Never");
             methodsToShowForActuators.AddRange(methodsToShow);
-            for(int i=0; i < methodsToShow.Count; i++)
-            {
-                if (myScript.updateSensorsOn.Equals(methodsToShow[i]))
-                {
-                    reasoningExecutionIndex = i;
-                    break;
-                }
-            }
+            
             for (int i = 0; i < methodsToShowForReasoner.Count; i++)
             {
                 if (myScript.executeReasonerOn.Equals(methodsToShowForReasoner[i]))
                 {
-                    sensorsUpdateIndex = i;
+                    reasoningExecutionIndex = i;
                     break;
                 }
             }
@@ -68,7 +62,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         public override void OnInspectorGUI()
         {
             // base.OnInspectorGUI();
-            if (myScript.executeOnTrigger && myScript.executeRepeatedly)
+            /*if (myScript.executeOnTrigger && myScript.executeRepeatedly)
             {
                 if (excludedProperties.Contains("triggerClassPath"))
                 {
@@ -89,16 +83,16 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 {
                     myScript.executeRepeatedly = true;
                 }
-            }
+            }*/
             excludedProperties = new List<string>();
             excludedProperties.Add("updateSensorsOn");
             excludedProperties.Add("executeReasonerOn");
             excludedProperties.Add("applyActuatorsCondition");
-            if (!myScript.executeRepeatedly)
+            /*if (!myScript.executeRepeatedly)
             {
                 excludedProperties.Add("brainUpdateFrequency");
                 excludedProperties.Add("startIn");
-            }
+            }*/
             if (!myScript.executeOnTrigger)
             {
                 excludedProperties.Add("triggerClassPath");
@@ -106,7 +100,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             SerializedObject serialized = new SerializedObject(myScript);
             DrawPropertiesExcluding(serialized, excludedProperties.ToArray());
             
-            if (myScript.executeOnTrigger)
+            /*if (myScript.executeOnTrigger)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Choose a method to use as trigger for Sensors Update");
@@ -117,7 +111,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             else
             {
                 myScript.updateSensorsOn = "";
-            }
+            }*/
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Choose when to run the reasoner");
