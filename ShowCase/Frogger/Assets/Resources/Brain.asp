@@ -1,4 +1,4 @@
-#maxint=100. 
+%#maxint=100. 
 
 % noMove = 0
 % up     = 1
@@ -42,7 +42,9 @@ safe(X,Y) :- xCoord(X), home(X1,X2,Y,false), X>=X1, X<=X2.
 
 
 % GUESS on the next move
-moveTo(0)|moveTo(1)|moveTo(2)|moveTo(3)|moveTo(4).
+% It is not possible to have a double move in 2 different sides with the choice rule
+possibleMoves(0..4).
+{moveTo(X):possibleMoves(X)}=1.
 
 % Evaluating the future player position
 nextPlayerPos(X,Y):-playerPos(X,Y), moveTo(0).
@@ -53,7 +55,6 @@ nextPlayerPos(X1,Y):-playerPos(X,Y), moveTo(3), X1=X+1.%right
 
 % CHECK on the movement
 % It is not possible to have a double move in 2 different sides
-:-moveTo(X),moveTo(Y),X!=Y.
 % Do not jump in front of a car
 :-moveTo(3), playerPos(_,Y), car(_,Y1,true), Y1=Y+1.
 :-moveTo(2), playerPos(_,Y), car(_,Y1,false), Y1=Y+1.
@@ -63,12 +64,12 @@ nextPlayerPos(X1,Y):-playerPos(X,Y), moveTo(3), X1=X+1.%right
 
 % OPTIMIZE
 % If possible, do not come back and do not stand still
-:~ nextPlayerPos(X,Y), playerPos(X1,Y1), Y<Y1, X=X1. [1:2]
-:~ nextPlayerPos(X,Y), playerPos(X1,Y1), Y=Y1, X=X1. [1:2]
+:~ nextPlayerPos(X,Y), playerPos(X1,Y1), Y<Y1, X=X1. [2@1,X,X1,Y,Y1]
+:~ nextPlayerPos(X,Y), playerPos(X1,Y1), Y=Y1, X=X1. [2@1,X,X1,Y,Y1]
 % Make a move
-:~ moveTo(X). [X:1]
+:~ moveTo(X). [1@X,X]
 % Do not try to move outside the game board
-:~ moveTo(2), playerPos(0,Y). [2:1]
+:~ moveTo(2), playerPos(0,Y). [1@2,Y]
 
 
 % Send the evaluated moves to the ThinkEngine Actuators
