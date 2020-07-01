@@ -4307,13 +4307,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 488437fd3c33e7647ada22186e03adaf, type: 2}
   - {fileID: 11400000, guid: a274b7d1b0154e342a65cc4a05b85d8a, type: 2}
   - {fileID: 11400000, guid: 8607218b32e5ed14da6df27700371b19, type: 2}
+  - {fileID: 11400000, guid: 84df1bcdabe0fab4782278cac3fd662f, type: 2}
   actuatorsConfigurations:
   - {fileID: 11400000, guid: 90124f0d70d92b64481c06cfdb0d6da9, type: 2}
   sensorsUpdated: 0
   ASPFilePath: .\Assets\Resources\Brain.asp
   ASPFileTemplatePath: .\Assets\Resources\Brain_template.asp
   enableBrain: 1
-  maintainFactFile: 0
+  maintainFactFile: 1
   executeRepeatedly: 0
   startIn: 0.1
   brainUpdateFrequency: 0.5
@@ -4450,6 +4451,12 @@ MonoBehaviour:
   - {fileID: 1591225319}
   - {fileID: 1665685955}
   - {fileID: 2051915661}
+  bay:
+  - {fileID: 33561282}
+  - {fileID: 704108692}
+  - {fileID: 724134612}
+  - {fileID: 1020298166}
+  - {fileID: 2058093747}
 --- !u!114 &1668991335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4466,10 +4473,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a274b7d1b0154e342a65cc4a05b85d8a, type: 2}
   - {fileID: 11400000, guid: 488437fd3c33e7647ada22186e03adaf, type: 2}
   - {fileID: 11400000, guid: 8607218b32e5ed14da6df27700371b19, type: 2}
+  - {fileID: 11400000, guid: 84df1bcdabe0fab4782278cac3fd662f, type: 2}
   localNames:
   - playerSensor
   - cars
   - logs
+  - homeBay
   goName: Brain
 --- !u!1 &1702996714 stripped
 GameObject:

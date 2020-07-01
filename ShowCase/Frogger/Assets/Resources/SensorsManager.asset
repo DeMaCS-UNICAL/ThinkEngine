@@ -16,9 +16,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a274b7d1b0154e342a65cc4a05b85d8a, type: 2}
   - {fileID: 11400000, guid: 488437fd3c33e7647ada22186e03adaf, type: 2}
   - {fileID: 11400000, guid: 8607218b32e5ed14da6df27700371b19, type: 2}
+  - {fileID: 11400000, guid: 84df1bcdabe0fab4782278cac3fd662f, type: 2}
   configuredGameObject:
   - Brain
   configurationsNames:
   - playerSensor
   - cars
   - logs
+  - homeBay

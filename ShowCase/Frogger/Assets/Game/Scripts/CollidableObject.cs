@@ -30,7 +30,7 @@ public class CollidableObject : MonoBehaviour
         rightMargin = (int)(leftMargin+ collidableObjectSize.x);
         if (leftMargin < 0)
         {
-            if (rightMargin > 0)
+            if (rightMargin >= 0)
             {
                 leftMargin = 0;
             }

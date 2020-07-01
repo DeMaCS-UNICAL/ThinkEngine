@@ -7,17 +7,23 @@ public class CollidersCollector : MonoBehaviour
 {
     public List<Car> cars;
     public List<CollidableObject> logs;
+    public List<CollidableObject> bay;
     // Start is called before the first frame update
     void Start()
     {
         cars = new List<Car>();
         cars.AddRange(GameObject.FindObjectsOfType<Car>());
         logs = new List<CollidableObject>();
-        foreach(CollidableObject o in GameObject.FindObjectsOfType<CollidableObject>())
+        bay= new List<CollidableObject>();
+        foreach (CollidableObject o in GameObject.FindObjectsOfType<CollidableObject>())
         {
             if (o.isLog)
             {
                 logs.Add(o);
+            }
+            if (o.isHomeBay)
+            {
+                bay.Add(o);
             }
         }
     }
