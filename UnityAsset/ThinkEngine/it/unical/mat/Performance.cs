@@ -13,7 +13,7 @@ using Debug = UnityEngine.Debug;
 
 namespace EmbASP4Unity.it.unical.mat
 {
-    [ExecuteInEditMode]
+
     class Performance : MonoBehaviour
     {
         private int steps;
@@ -31,7 +31,7 @@ namespace EmbASP4Unity.it.unical.mat
         public static bool updatingSensors;
         public static bool updatingActuators;
         static NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
-
+        static bool initialized;
 
 
         void Start()
@@ -73,7 +73,7 @@ namespace EmbASP4Unity.it.unical.mat
                 fs.Write("Iteration; Rate\n");
                 fs.Close();
             }
-
+            initialized = true;
         }
         void Update()
         {
@@ -137,6 +137,10 @@ namespace EmbASP4Unity.it.unical.mat
 
         public static void writeOnFile(string s, double d)
         {
+            if (!initialized)
+            {
+                return;
+            }
             using (StreamWriter fs = new StreamWriter(factsAndASPath, true))
             {
                 fs.Write(s + " " + d.ToString("N", nfi) + "ms \n");

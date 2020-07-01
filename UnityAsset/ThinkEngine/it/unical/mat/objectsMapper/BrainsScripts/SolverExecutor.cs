@@ -14,6 +14,7 @@ using System.Threading;
 using System.Diagnostics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using EmbASP4Unity.it.unical.mat.embasp.specializations.dlv2.desktop;
 
 namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 {
@@ -87,14 +88,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 
                 }
                 //Debug.Log(Path.GetFullPath(@".\lib\dlv.exe"));
-                 Handler handler = new DesktopHandler(new DLVDesktopService(@".\lib\dlv.exe"));
+                 Handler handler = new DesktopHandler(new DLVDesktopService(@".\lib\dlv2.exe"));
                  InputProgram encoding = new ASPInputProgram();
                  encoding.AddFilesPath(Path.GetFullPath(brain.ASPFilePath));
                  InputProgram facts = new ASPInputProgram();
                  facts.AddFilesPath(factsPath);
                  handler.AddProgram(encoding);
                  handler.AddProgram(facts);
-                handler.AddOption(new OptionDescriptor("-filter=setOnActuator"));
+                handler.AddOption(new OptionDescriptor("--filter=setOnActuator/1"));
                 stopwatch.Restart();
                 //Debug.Log("reasoning");
                 Output o = handler.StartSync();
