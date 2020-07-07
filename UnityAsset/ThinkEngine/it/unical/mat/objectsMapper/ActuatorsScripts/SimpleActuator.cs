@@ -37,7 +37,6 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             cleanDataStructures();
             properties = new List<string>();
             properties.AddRange(propertiesToTrack);
-            ReflectionExecutor re = ScriptableObject.CreateInstance<ReflectionExecutor>();
             cleanDataStructures();
             populateDataStructures();
 
@@ -48,8 +47,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             
             actuatorName = s.configurationName;
             properties = new List<string>();
-            ReflectionExecutor re = ScriptableObject.CreateInstance<ReflectionExecutor>();
-            gO = re.GetGameObjectWithName(s.gOName);
+            gO = ReflectionExecutor.GetGameObjectWithName(s.gOName);
            // Debug.Log(s.gOName);
            // Debug.Log(gO);
             gOName = s.gOName;

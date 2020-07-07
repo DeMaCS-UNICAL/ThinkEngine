@@ -59,20 +59,25 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                         using (StreamWriter fs = new StreamWriter(factsPath, true))
                         {
                             ////Debug.Log("creating file "+ factsPath);
-                            string toAppend = "";
-                            foreach (IMonoBehaviourSensor sensor in brain.getSensors())
+                            string toAppend = SensorsManager.GetSensorsMapping(brain);
+                            /*lock (SensorsManager.getLock(brain))
                             {
-                                //Stopwatch temp = new Stopwatch();
-                                //temp.Start();
-                                 toAppend += sensor.Map();
-                                //temp.Stop();
-                                ////Debug.Log(toAppend);
-                                ////Debug.Log(toAppend);
+                                foreach (IMonoBehaviourSensor sensor in brain.getSensors())
+                                {
+                                    //Stopwatch temp = new Stopwatch();
+                                    //temp.Start();
+                                    toAppend += sensor.Map();
+                                    //temp.Stop();
+                                    ////Debug.Log(toAppend);
+                                    ////Debug.Log(toAppend);
 
-                            }
+                                }
+                            }*/
+
                             ////Debug.Lof(fs.)
                             fs.Write(toAppend);
                             fs.Close();
+
                             ////Debug.Log("closing stream");
                         }
                         stopwatch.Stop();

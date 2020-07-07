@@ -17,6 +17,7 @@ using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
 public class Brain :MonoBehaviour
 {
     public readonly object toLock = new object();
+    public bool debug;
     public List<SensorConfiguration> sensorsConfigurations;
     public List<ActuatorConfiguration> actuatorsConfigurations;
     //private List<AdvancedSensor> sensors;
@@ -152,12 +153,9 @@ public class Brain :MonoBehaviour
             
         return sensorsUpdated;
     }
+    
 
-    internal IEnumerable<IMonoBehaviourSensor> getSensors()
-    {
-            ////Debug.Log("Sensor Manager " + sensorManager);
-        return sensorManager.instantiatedSensors[this];
-    }
+    
 
     /*void initBrain()
     {

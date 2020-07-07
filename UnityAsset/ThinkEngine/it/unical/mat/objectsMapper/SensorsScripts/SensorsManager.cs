@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using UnityEditor;
 using UnityEngine;
 
@@ -21,8 +22,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         [SerializeField]
         private List<string> configurationsNames;
         [NonSerialized]
-        public Dictionary<Brain, List<IMonoBehaviourSensor>> instantiatedSensors;
+        private static Dictionary<Brain, List<IMonoBehaviourSensor>> instantiatedSensors;
+        private static Dictionary<Brain, int> sensorsUpdated;
+
         public static SensorsManager instance;
+        private static Dictionary<Brain, object> to_lock;
 
         public AbstractConfiguration findConfiguration(string s){
             foreach(SensorConfiguration c in sensConfs)
@@ -83,19 +87,106 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             return instance;
         }
 
-        public void registerSensors(Brain b, List<IMonoBehaviourSensor> instantiated)
+        internal static string GetSensorsMapping(Brain brain)
         {
-            if (instantiatedSensors == null)
+            lock (getLock(brain))
             {
-                instantiatedSensors = new Dictionary<Brain, List<IMonoBehaviourSensor>>();
+                string mapping = "";
+                foreach(IMonoBehaviourSensor sensor in instantiatedSensors[brain])
+                {
+                    mapping += sensor.Map();
+                }
+                return mapping;
             }
-            if (!instantiatedSensors.ContainsKey(b))
+        }
+
+        public void registerSensors(Brain brain, List<IMonoBehaviourSensor> instantiated)
+        {
+            
+            lock (getLock(brain))
             {
-                instantiatedSensors.Add(b, instantiated);
+                if (instantiatedSensors == null)
+                {
+                    instantiatedSensors = new Dictionary<Brain, List<IMonoBehaviourSensor>>();
+                }
+                if (!instantiatedSensors.ContainsKey(brain))
+                {
+                    instantiatedSensors.Add(brain, instantiated);
+                }
+                else
+                {
+                    instantiatedSensors[brain] = instantiated;
+                }
             }
-            else
+        }
+
+        public static IEnumerable<IMonoBehaviourSensor> GetSensors(Brain brain)
+        {
+            lock (getLock(brain))
             {
-                instantiatedSensors[b] = instantiated;
+                if (sensorsUpdatedCount(brain) != instantiatedSensorsCount(brain))
+                {
+                    //MyDebug("I'm waiting since " + sensorManager.sensorsUpdatedCount(this) + "<>" + sensorManager.instantiatedSensorsCount(this));
+                    MyDebug(Thread.CurrentThread.Name+" is going to wait", brain.debug);
+                    Monitor.Wait(SensorsManager.getLock(brain));
+                    //MyDebug("I'm going to execute");
+
+                }
+                return getInstantiatedSensors(brain);
+            }
+        }
+
+        private static object getLock(Brain brain)
+        {
+            if (to_lock is null)
+            {
+                to_lock = new Dictionary<Brain, object>();
+            }
+            if (!to_lock.ContainsKey(brain))
+            {
+                to_lock.Add(brain, new object());
+            }
+            return to_lock[brain];
+        }
+
+        public static int sensorsUpdatedCount(Brain brain)
+        {
+            if(sensorsUpdated is null || !sensorsUpdated.ContainsKey(brain))
+            {
+                return 0;
+            }
+            return sensorsUpdated[brain];
+        }
+        public static int instantiatedSensorsCount(Brain brain)
+        {
+            if (instantiatedSensors is null || !instantiatedSensors.ContainsKey(brain))
+            {
+                return 0;
+            }
+            return instantiatedSensors[brain].Count;
+        }
+
+        public static void AddUpdatedSensor(Brain brain)
+        {
+            lock (getLock(brain))
+            {
+                if (sensorsUpdated is null)
+                {
+                    sensorsUpdated = new Dictionary<Brain, int>();
+                }
+                if (!sensorsUpdated.ContainsKey(brain))
+                {
+                    sensorsUpdated.Add(brain, 0);
+                }
+                if (sensorsUpdated[brain] == instantiatedSensors[brain].Count)
+                {
+                    sensorsUpdated[brain] = 0;
+                }
+                sensorsUpdated[brain]++;
+                if (sensorsUpdated[brain] == instantiatedSensors[brain].Count)
+                {
+                    Monitor.Pulse(getLock(brain));
+                }
             }
         }
         /*public void updateSensors(Brain brain)
@@ -127,6 +218,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             }
         }
 
+        internal static IEnumerable<IMonoBehaviourSensor> getInstantiatedSensors(Brain brain)
+        {
+            if(!(instantiatedSensors is null) && instantiatedSensors.ContainsKey(brain))
+            {
+                return instantiatedSensors[brain];
+            }
+            return new List<IMonoBehaviourSensor>();
+        }
 
         void OnEnable()
         {
@@ -200,11 +299,29 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 
         internal void addSensor(Brain brain, IMonoBehaviourSensor sensor)
         {
-            instantiatedSensors[brain].Add(sensor);
+            lock (getLock(brain))
+            {
+                if (!instantiatedSensors.ContainsKey(brain))
+                {
+                    instantiatedSensors.Add(brain, new List<IMonoBehaviourSensor>());
+                }
+                instantiatedSensors[brain].Add(sensor);
+            }
         }
         internal void removeSensor(Brain brain, IMonoBehaviourSensor sensor)
         {
-            instantiatedSensors[brain].Remove(sensor);
+            lock (getLock(brain))
+            {
+                instantiatedSensors[brain].Remove(sensor);
+            }
+        }
+        private static void MyDebug(string v, bool debug)
+        {
+            if (debug)
+            {
+                Debug.Log(v);
+            }
         }
     }
+
 }
