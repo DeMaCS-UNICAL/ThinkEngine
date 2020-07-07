@@ -11,10 +11,9 @@ using System.Threading;
 using System.Timers;
 using System.Reflection;
 using System.Collections;
+using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
 
-namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
-{
-    [ExecuteInEditMode]
+[ExecuteInEditMode]
     public class Brain :MonoBehaviour
     {
         public readonly object toLock = new object();
@@ -319,4 +318,4 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 
         }
     }
-}
+

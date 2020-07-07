@@ -11,8 +11,6 @@ using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
 using System.Globalization;
 using Debug = UnityEngine.Debug;
 
-namespace EmbASP4Unity.it.unical.mat
-{
 
     class Performance : MonoBehaviour
     {
@@ -149,4 +147,3 @@ namespace EmbASP4Unity.it.unical.mat
         }
 
     }
-}

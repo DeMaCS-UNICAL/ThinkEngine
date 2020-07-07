@@ -4283,7 +4283,7 @@ GameObject:
   - component: {fileID: 1668991331}
   - component: {fileID: 1668991332}
   - component: {fileID: 1668991334}
-  - component: {fileID: 1668991335}
+  - component: {fileID: 1668991333}
   m_Layer: 0
   m_Name: Brain
   m_TagString: Untagged
@@ -4300,7 +4300,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1668991328}
   m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: -2009356053, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Script: {fileID: 357554835, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   sensorsConfigurations:
@@ -4411,6 +4411,29 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1668991333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1668991328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1560303995, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gOConfigurations:
+  - {fileID: 11400000, guid: a274b7d1b0154e342a65cc4a05b85d8a, type: 2}
+  - {fileID: 11400000, guid: 488437fd3c33e7647ada22186e03adaf, type: 2}
+  - {fileID: 11400000, guid: 8607218b32e5ed14da6df27700371b19, type: 2}
+  - {fileID: 11400000, guid: 84df1bcdabe0fab4782278cac3fd662f, type: 2}
+  localNames:
+  - playerSensor
+  - cars
+  - logs
+  - homeBay
+  goName: Brain
 --- !u!114 &1668991334
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4457,29 +4480,6 @@ MonoBehaviour:
   - {fileID: 724134612}
   - {fileID: 1020298166}
   - {fileID: 2058093747}
---- !u!114 &1668991335
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1668991328}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gOConfigurations:
-  - {fileID: 11400000, guid: a274b7d1b0154e342a65cc4a05b85d8a, type: 2}
-  - {fileID: 11400000, guid: 488437fd3c33e7647ada22186e03adaf, type: 2}
-  - {fileID: 11400000, guid: 8607218b32e5ed14da6df27700371b19, type: 2}
-  - {fileID: 11400000, guid: 84df1bcdabe0fab4782278cac3fd662f, type: 2}
-  localNames:
-  - playerSensor
-  - cars
-  - logs
-  - homeBay
-  goName: Brain
 --- !u!1 &1702996714 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6308052464226184410, guid: 0b88d5d93e4ce0e4181c6d8553dd061d,

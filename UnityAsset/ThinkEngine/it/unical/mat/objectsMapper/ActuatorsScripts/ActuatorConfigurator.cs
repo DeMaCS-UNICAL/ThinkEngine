@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+using EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts;
+using EmbASP4Unity.it.unical.mat.objectsMapper;
 
-namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
-{
-    [ExecuteInEditMode]
+[ExecuteInEditMode]
     public class ActuatorConfigurator:AbstractConfigurator
     {
         void Awake()
@@ -75,4 +75,4 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             }
         }
     }
-}
+
