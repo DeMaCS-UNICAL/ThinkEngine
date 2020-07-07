@@ -27,22 +27,20 @@ public class Brain :MonoBehaviour
     private SolverExectuor embasp;
     int count = 0;
     private static System.Timers.Timer timer;
-    public bool sensorsUpdated;
-    [NonSerialized]
-    public bool solverWaiting;
+    //public bool sensorsUpdated;
+    internal bool solverWaiting;
     public string ASPFilePath;
     public string ASPFileTemplatePath;
     public bool enableBrain;
     public bool maintainFactFile;
     //private bool updateSensors;
     private bool actuatorsReady;
-    //public bool executeRepeatedly;
-    //public float startIn;
-    //public float brainUpdateFrequency;
+    public bool executeRepeatedly;
+    public float brainUpdateFrequencyMS;
     public bool executeOnTrigger;
     public string triggerClassPath;
-    //public string updateSensorsOn="";
-    //private MethodInfo sensorsUpdateMethod;
+    public string updateSensorsOn="";
+    private MethodInfo sensorsUpdateMethod;
     private MethodInfo reasonerMethod;
     private object triggerClass;
     public string executeReasonerOn;
@@ -148,11 +146,11 @@ public class Brain :MonoBehaviour
         }
     }
 
-    public bool sensorsReady()
+    /*public bool sensorsReady()
     {
             
         return sensorsUpdated;
-    }
+    }*/
     
 
     
@@ -244,6 +242,73 @@ public class Brain :MonoBehaviour
         triggerClass = ScriptableObject.CreateInstance("Trigger");
         MethodInfo[] methods = triggerClass.GetType().GetMethods();
         ////Debug.Log("creating sensors");
+        prepareSensors(sensors, sensorsManagers, methods, triggerClass);
+        prepareActuators(sensors, actuators, methods);
+        executionThread = new Thread(() =>
+        {
+            Thread.CurrentThread.IsBackground = true;
+            embasp.Run();
+        });
+        executionThread.Start();
+    }
+
+    private void prepareActuators(List<IMonoBehaviourSensor> sensors, List<SimpleActuator> actuators, MethodInfo[] methods)
+    {
+        foreach (ActuatorConfiguration conf in actuatorsConfigurations)
+        {
+            actuators.Add(new SimpleActuator(conf));
+            ////Debug.Log(conf.configurationName+" added");
+        }
+        sensorManager.registerSensors(this, sensors);
+        actuatorsManager.registerActuators(this, actuators);
+
+        if (!actuatorsManager.applyCoroutinStarted)
+        {
+            StartCoroutine(actuatorsManager.applyActuators());
+            actuatorsManager.applyCoroutinStarted = true;
+        }
+        if (!executeReasonerOn.Equals("When Sensors are ready"))
+        {
+            foreach (MethodInfo mI in methods)
+            {
+                if (mI.Name.Equals(executeReasonerOn))
+                {
+                    ////Debug.Log(mI.Name);
+                    reasonerMethod = mI;
+                    StartCoroutine("pulseOn");
+                    break;
+                }
+            }
+        }
+
+        ////Debug.Log("trigger method is "+triggerMethod);
+
+        foreach (MethodInfo mI in methods)
+        {
+            if (mI.Name.Equals(applyActuatorsCondition))
+            {
+                ////Debug.Log(mI.Name);
+                applyActuatorsMethod = mI;
+            }
+        }
+    }
+
+    private void prepareSensors(List<IMonoBehaviourSensor> sensors, HashSet<MonoBehaviourSensorsManager> sensorsManagers, MethodInfo[] methods, object triggerClass)
+    {
+        if (!updateSensorsOn.Equals(""))
+        {
+
+            foreach (MethodInfo mI in methods)
+            {
+                if (mI.Name.Equals(updateSensorsOn))
+                {
+                    ////Debug.Log(mI.Name);
+                    sensorsUpdateMethod = mI;
+                    break;
+                    //StartCoroutine("UpdateSensorsOnTrigger");
+                }
+            }
+        }
         foreach (SensorConfiguration conf in sensorsConfigurations)
         {
             MonoBehaviourSensorsManager currentManager = GameObject.Find(conf.gOName).GetComponent<MonoBehaviourSensorsManager>();
@@ -253,60 +318,26 @@ public class Brain :MonoBehaviour
                 currentManager.brain = this;
             }
             //Debug.Log("configuration of the manager of " + conf.gOName + " game object: " + currentManager.configurations);
+            if (executeRepeatedly)
+            {
+                currentManager.executeRepeteadly = executeRepeatedly;
+                currentManager.frequence = brainUpdateFrequencyMS;
+            }
+            else
+            {
+                currentManager.updateMethod = sensorsUpdateMethod;
+                currentManager.triggerClass = triggerClass;
+            }
             currentManager.configurations.Add(conf);
             sensorsManagers.Add(currentManager);
         }
-        foreach(MonoBehaviourSensorsManager manager in sensorsManagers)
+        
+        foreach (MonoBehaviourSensorsManager manager in sensorsManagers)
         {
             sensors.AddRange(manager.generateSensors());
+            
         }
-        foreach (ActuatorConfiguration conf in actuatorsConfigurations)
-        {
-            actuators.Add(new SimpleActuator(conf));
-            ////Debug.Log(conf.configurationName+" added");
-        }
-        sensorManager.registerSensors(this, sensors);
-        actuatorsManager.registerActuators(this, actuators);
-        if (!actuatorsManager.applyCoroutinStarted)
-        {
-            StartCoroutine(actuatorsManager.applyActuators());
-            actuatorsManager.applyCoroutinStarted = true;
-        }
-        if (executeReasonerOn.Equals("When Sensors are ready"))
-        {
-            StartCoroutine("pulseOnSensorsReady");
-        }
-        else
-        {
-            foreach (MethodInfo mI in methods)
-            {
-                if (mI.Name.Equals(executeReasonerOn))
-                {
-                    ////Debug.Log(mI.Name);
-                    reasonerMethod = mI;
-                    StartCoroutine("pulseOn");
-                }
-            }
-        }
-
-        ////Debug.Log("trigger method is "+triggerMethod);
-        
-        foreach (MethodInfo mI in methods)
-        {
-            if (mI.Name.Equals(applyActuatorsCondition))
-            {
-                ////Debug.Log(mI.Name);
-                applyActuatorsMethod = mI;
-            }
-        }
-        executionThread = new Thread(() => {
-            Thread.CurrentThread.IsBackground = true;
-            embasp.Run();
-        });
-        executionThread.Start();
     }
-
-
     private IEnumerator pulseOn()
     {
         while (true)

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,4 +20,8 @@ public interface IMonoBehaviourSensor
     IList propertyValues { get; set; }
     string Map();
     void done();
+    bool executeRepeteadly { get; set; }
+    float frequency { get; set; }
+    object triggerClass { get; set; }
+    MethodInfo updateMethod { get; set; }
 }

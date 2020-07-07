@@ -19,6 +19,12 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
     private Dictionary<string, string> sensorNameForCollectionProperty;
     private Dictionary<string, List<string>> elementForCollectionProperty;
     private Dictionary<string, List<int>> sizeToTrack;
+    public bool executeRepeteadly;
+    public float startIn;
+    public float frequence;
+    public MethodInfo updateMethod;
+    internal object triggerClass;
+
     // Use this for initialization
     void Awake()
     {
@@ -163,6 +169,16 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
             sensor.sensorName = confName;
             sensor.operationType = currentOperationPerProperty;
             sensor.brain = brain;
+            if (executeRepeteadly)
+            {
+                sensor.executeRepeteadly = executeRepeteadly;
+                sensor.frequency = frequence;
+            }
+            else
+            {
+                sensor.triggerClass = triggerClass;
+                sensor.updateMethod = updateMethod;
+            }
         }
         /*Debug.Log("adding " + sensor.path);
         if (sensor.indexes.Count > 0)

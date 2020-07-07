@@ -92,7 +92,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             lock (getLock(brain))
             {
                 string mapping = "";
-                foreach(IMonoBehaviourSensor sensor in instantiatedSensors[brain])
+                foreach(IMonoBehaviourSensor sensor in GetSensors(brain))
                 {
                     mapping += sensor.Map();
                 }

@@ -5,6 +5,8 @@ using System.Reflection;
 using System.Collections.Generic;
 using EmbASP4Unity.it.unical.mat.objectsMapper.Mappers;
 using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts;
+using System.Diagnostics;
+using Debug = UnityEngine.Debug;
 
 public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
 {
@@ -33,11 +35,18 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
     public IList propertyValues { get { return _propertyValues; } set { _propertyValues = (List<T>)value; } }
     public string collectionElementType { get { return _collectionElementType; } set { _collectionElementType = value; } }
 
+    public bool executeRepeteadly { get; set; }
+    public float frequency { get; set; }
+    public object triggerClass { get; set; }
+    public MethodInfo updateMethod { get; set; }
+
+    public Stopwatch watch;
+
     // Use this for initialization
     void Awake()
     {
         //Debug.unityLogger.logEnabled = false;
-
+        
         propertyValues = new List<T>();
         indexes = new List<int>();
     }
@@ -49,6 +58,14 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
         _ASPRepMid = ASPRepresentation[1];
         _ASPRepSuffix = ASPRepresentation[2];
         ready = true;
+        /*Debug.Log("execute rep " + executeRepeteadly);
+        Debug.Log("trigger class " + triggerClass);
+        Debug.Log("update method " + updateMethod);
+        Debug.Log("update frequency " + frequency);*/
+        if (executeRepeteadly)
+        {
+            watch = new Stopwatch();
+        }
     }
 
     private string[] ASPRep()
@@ -89,12 +106,27 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
         {
             return;
         }
+        if (executeRepeteadly)
+        {
+            watch.Stop();
+            if (watch.ElapsedMilliseconds < frequency)
+            {
+                watch.Start();
+                return;
+            }
+        }else if (!(bool)updateMethod.Invoke(triggerClass, null))
+        {
+            return;
+        }
         ReadProperty();
         if (propertyValues.Count == 100)
         {
             propertyValues.RemoveAt(0);
         }
         SensorsManager.AddUpdatedSensor(brain);
+        if (executeRepeteadly) {
+            watch.Restart();
+        }
     }
 
     public void ReadProperty()

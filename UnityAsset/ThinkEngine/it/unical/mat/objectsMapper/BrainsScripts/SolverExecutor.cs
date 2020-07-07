@@ -50,7 +50,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 lock (brain.toLock)
                 {
                     brain.solverWaiting = true;
-                    Monitor.Wait(brain.toLock);
+                    if (!brain.executeReasonerOn.Equals("When Sensors are ready"))
+                    {
+                        Monitor.Wait(brain.toLock);
+                    }
                     try
                     {
                         stopwatch.Restart();
