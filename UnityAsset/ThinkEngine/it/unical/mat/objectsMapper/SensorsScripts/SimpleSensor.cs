@@ -55,7 +55,6 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             properties = new List<string>();
             properties.AddRange(propertiesToTrack.Distinct());
             mappingManager = MappingManager.getInstance();
-            ReflectionExecutor re = ScriptableObject.CreateInstance<ReflectionExecutor>();
             init();
 
         }
@@ -77,8 +76,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             sensorName = s.configurationName;
             properties = new List<string>();
             mappingManager = MappingManager.getInstance();
-            ReflectionExecutor re = ScriptableObject.CreateInstance<ReflectionExecutor>();
-            gO = re.GetGameObjectWithName(s.gOName);
+            gO = ReflectionExecutor.GetGameObjectWithName(s.gOName);
             Debug.Log("game object is " + gO);
             gOName = s.gOName;
             cleanDataStructures();

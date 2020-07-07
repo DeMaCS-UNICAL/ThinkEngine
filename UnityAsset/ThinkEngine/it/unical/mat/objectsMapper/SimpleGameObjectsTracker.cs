@@ -16,8 +16,7 @@ public class SimpleGameObjectsTracker
 
     public SimpleGameObjectsTracker(Type type)
     {
-        ReflectionExecutor re = ScriptableObject.CreateInstance<ReflectionExecutor>();
-        Type listType = re.isListOfType(type);
+        Type listType = ReflectionExecutor.isListOfType(type);
         //Debug.Log("is of type " + listType);
         if (!(listType is null))
         {
@@ -43,13 +42,12 @@ public class SimpleGameObjectsTracker
     {
         Type local = Type.GetType(objType);
         Debug.Log("obtained type from " + objType + " is " + local);
-        ReflectionExecutor re = ScriptableObject.CreateInstance<ReflectionExecutor>();
-        List<FieldOrProperty> all = re.GetFieldsAndProperties(local);
+        List<FieldOrProperty> all = ReflectionExecutor.GetFieldsAndProperties(local);
         propertiesToggled = new Dictionary<string, bool>();
         
         foreach (FieldOrProperty f in all)
         {
-            if (re.IsBaseType(f) && !propertiesToggled.ContainsKey(f.Name()))
+            if (ReflectionExecutor.IsBaseType(f) && !propertiesToggled.ContainsKey(f.Name()))
             {
                 bool toggled = false;
                 if (toSave.Contains(f.Name()))
@@ -65,9 +63,10 @@ public class SimpleGameObjectsTracker
 
     public void save()
     {
+        toSave = new List<string>();
         foreach(string s in propertiesToggled.Keys)
         {
-            if (propertiesToggled[s] && !toSave.Contains(s))
+            if (propertiesToggled[s])
             {
                 toSave.Add(s);
             }

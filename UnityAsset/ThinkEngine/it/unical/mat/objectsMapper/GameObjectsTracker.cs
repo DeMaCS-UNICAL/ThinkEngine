@@ -6,7 +6,6 @@ using EmbASP4Unity.it.unical.mat.objectsMapper;
 
 public class GameObjectsTracker
 {
-     public ReflectionExecutor re;
 
      public GameObject GO { get; set; }
      public List<string> AvailableGameObjects { get; set; }
@@ -26,35 +25,34 @@ public class GameObjectsTracker
 
     public GameObjectsTracker()
     {
-        re = ScriptableObject.CreateInstance<ReflectionExecutor>();
         updateGameObjects();
     }
 
     public void updateGameObjects()
     {
-        AvailableGameObjects = re.GetGameObjects();
+        AvailableGameObjects = ReflectionExecutor.GetGameObjects();
     }
 
     
 
     public GameObject GetGameObject(string chosenGO)
     {
-        return re.GetGameObjectWithName(chosenGO);
+        return ReflectionExecutor.GetGameObjectWithName(chosenGO);
     }
 
     public List<Component> GetComponents(GameObject gO)
     {
-        return re.GetComponents(gO);
+        return ReflectionExecutor.GetComponents(gO);
     }
 
     public bool IsBaseType(FieldOrProperty obj)
     {
-        return re.IsBaseType(obj);
+        return ReflectionExecutor.IsBaseType(obj);
     }
 
     public List<FieldOrProperty> GetFieldsAndProperties(object gO)
     {
-        return re.GetFieldsAndProperties(gO);
+        return ReflectionExecutor.GetFieldsAndProperties(gO);
     }
 
     public AbstractConfiguration saveConfiguration(AbstractConfiguration conf, string chosenGO)
@@ -178,12 +176,12 @@ public class GameObjectsTracker
 
     public bool IsMappable(FieldOrProperty obj)
     {
-        return re.isMappable(obj); 
+        return ReflectionExecutor.isMappable(obj); 
     }
 
     public int IsArrayOfRank(FieldOrProperty obj)
     {
-        return re.isArrayOfRank(obj);
+        return ReflectionExecutor.isArrayOfRank(obj);
     }
 
     public void cleanDataStructures()
@@ -333,6 +331,6 @@ public class GameObjectsTracker
 
     internal Type TypeOf(FieldOrProperty f)
     {
-        return re.TypeOf(f);
+        return ReflectionExecutor.TypeOf(f);
     }
 }

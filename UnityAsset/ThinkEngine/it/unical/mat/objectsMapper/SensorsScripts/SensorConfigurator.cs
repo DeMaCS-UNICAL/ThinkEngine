@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
-using EmbASP4Unity.it.unical.mat.objectsMapper;
 using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts;
+using EmbASP4Unity.it.unical.mat.objectsMapper;
 
 [ExecuteInEditMode]
     public class SensorConfigurator:AbstractConfigurator

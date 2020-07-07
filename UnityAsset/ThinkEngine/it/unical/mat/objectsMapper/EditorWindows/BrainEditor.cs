@@ -17,16 +17,17 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         List<string> methodsToShowForReasoner = new List<string>();
         public int sensorsUpdateIndex = 0;
         public int reasoningExecutionIndex = 0;
-        public int applyActuatorsIndex;
+        public int applyActuatorsIndex=0;
         private List<string> methodsToShowForActuators=new List<string>();
         private Brain myScript;
 
         void OnEnable()
         {
+
             myScript = target as Brain;
             var triggerClass = ScriptableObject.CreateInstance("Trigger");
             MethodInfo[] methods = triggerClass.GetType().GetMethods();
-            
+
             foreach (MethodInfo mI in methods)
             {
                 if (mI.ReturnType == typeof(bool))
@@ -40,11 +41,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             methodsToShowForActuators.Add("Always");
             methodsToShowForActuators.Add("Never");
             methodsToShowForActuators.AddRange(methodsToShow);
-            for(int i=0; i < methodsToShow.Count; i++)
+            for (int i = 0; i < methodsToShow.Count; i++)
             {
                 if (myScript.updateSensorsOn.Equals(methodsToShow[i]))
                 {
-                    reasoningExecutionIndex = i;
+                    sensorsUpdateIndex = i;
                     break;
                 }
             }
@@ -52,7 +53,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             {
                 if (myScript.executeReasonerOn.Equals(methodsToShowForReasoner[i]))
                 {
-                    sensorsUpdateIndex = i;
+                    reasoningExecutionIndex = i;
                     break;
                 }
             }
@@ -96,13 +97,9 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             excludedProperties.Add("applyActuatorsCondition");
             if (!myScript.executeRepeatedly)
             {
-                excludedProperties.Add("brainUpdateFrequency");
-                excludedProperties.Add("startIn");
+                excludedProperties.Add("brainUpdateFrequencyMS");
             }
-            if (!myScript.executeOnTrigger)
-            {
-                excludedProperties.Add("triggerClassPath");
-            }
+            
             SerializedObject serialized = new SerializedObject(myScript);
             DrawPropertiesExcluding(serialized, excludedProperties.ToArray());
             

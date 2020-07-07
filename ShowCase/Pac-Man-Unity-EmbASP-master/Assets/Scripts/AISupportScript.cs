@@ -26,16 +26,8 @@ public class AISupportScript : MonoBehaviour
     private static List<Distance>[,] distances_10;
     private static List<Distance>[,] distances_5;
 
+   
     void Awake()
-    {
-        //Debug.Log("Support awaken");
-        /*manager = GameObject.Find("Game Manager").GetComponent<TileManager>();
-        Pacman = GameObject.Find("pacman");
-        PreviousPos = new Vector3(0, 0);
-        Tiles = new List<TileManager.Tile>();
-        Tiles = manager.tiles;*/
-    }
-    void Start()
     {
         //Debug.Log("Support  started");
         manager = GameObject.Find("Game Manager").GetComponent<TileManager>();

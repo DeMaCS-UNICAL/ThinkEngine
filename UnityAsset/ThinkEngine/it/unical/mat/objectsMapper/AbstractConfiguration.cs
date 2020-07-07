@@ -28,7 +28,6 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
 
         public void SaveConfiguration(GameObjectsTracker tr)
         {
-            
             properties = new List<string>();
             propertiesNames = new List<string>();
             advancedConf = new List<SimpleGameObjectsTracker>();
