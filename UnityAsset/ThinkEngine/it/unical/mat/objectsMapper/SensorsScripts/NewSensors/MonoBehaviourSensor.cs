@@ -40,7 +40,6 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
     public object triggerClass { get; set; }
     public MethodInfo updateMethod { get; set; }
 
-    public Stopwatch watch;
 
     // Use this for initialization
     void Awake()
@@ -58,14 +57,12 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
         _ASPRepMid = ASPRepresentation[1];
         _ASPRepSuffix = ASPRepresentation[2];
         ready = true;
-        /*Debug.Log("execute rep " + executeRepeteadly);
+        /*Debug.Log("sensor " + sensorName);
+        Debug.Log("execute rep " + executeRepeteadly);
         Debug.Log("trigger class " + triggerClass);
         Debug.Log("update method " + updateMethod);
         Debug.Log("update frequency " + frequency);*/
-        if (executeRepeteadly)
-        {
-            watch = new Stopwatch();
-        }
+       
     }
 
     private string[] ASPRep()
@@ -102,31 +99,29 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
     // Update is called once per frame
     void LateUpdate()
     {
+        //Debug.Break();
         if (!ready)
         {
             return;
         }
         if (executeRepeteadly)
         {
-            watch.Stop();
-            if (watch.ElapsedMilliseconds < frequency)
+            if(gameObject.GetComponent<MonoBehaviourSensorsManager>().elapsedMS < frequency)
             {
-                watch.Start();
                 return;
             }
         }else if (!(bool)updateMethod.Invoke(triggerClass, null))
         {
             return;
         }
+        //Debug.Log("updating " + sensorName);
         ReadProperty();
         if (propertyValues.Count == 100)
         {
             propertyValues.RemoveAt(0);
         }
         SensorsManager.AddUpdatedSensor(brain);
-        if (executeRepeteadly) {
-            watch.Restart();
-        }
+        
     }
 
     public void ReadProperty()

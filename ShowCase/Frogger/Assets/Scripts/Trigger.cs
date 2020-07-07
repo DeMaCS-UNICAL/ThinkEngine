@@ -1,9 +1,10 @@
 using System;
 using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 // every method of this class returning a bool value can be used to trigger the sensors update.
- public class Trigger:ScriptableObject{
+public class Trigger:ScriptableObject{
     Stopwatch watch;
     private void OnEnable()
     {
@@ -11,15 +12,8 @@ using UnityEngine;
         watch.Start();
     }
 
-    public bool updateSensors()
+    public bool runReasoner()
     {
-        watch.Stop();
-        if (watch.ElapsedMilliseconds < 200)
-        {
-            watch.Start();
-            return false;
-        }
-        watch.Restart();
         if (GameObject.FindObjectOfType<Player>().deadAnimation)
         {
             return false;
@@ -28,6 +22,7 @@ using UnityEngine;
         {
             return false;
         }
+        Debug.Log("returning true for sensors");
         return true;
     }
 

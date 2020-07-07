@@ -1060,9 +1060,6 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations: []
-  localNames: []
-  goName: orange2
 --- !u!114 &376297316 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2733009380794909793, guid: b30200a90b72f52409f560fce3f72df7,
@@ -2028,9 +2025,6 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations: []
-  localNames: []
-  goName: orange
 --- !u!114 &716492900 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2733009380794909793, guid: b30200a90b72f52409f560fce3f72df7,
@@ -2857,9 +2851,6 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations: []
-  localNames: []
-  goName: green3
 --- !u!114 &1040076126 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4774680787993251460, guid: 09b1a214c6637744faa7ff67df671504,
@@ -2890,9 +2881,6 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations: []
-  localNames: []
-  goName: pink
 --- !u!114 &1052362121 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7713859974582282745, guid: 8bd82fc7964e85b48b489be54bdf4ba6,
@@ -3088,9 +3076,6 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations: []
-  localNames: []
-  goName: green2
 --- !u!114 &1296716484 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4774680787993251460, guid: 09b1a214c6637744faa7ff67df671504,
@@ -4267,9 +4252,6 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations: []
-  localNames: []
-  goName: log_small
 --- !u!1 &1668991328
 GameObject:
   m_ObjectHideFlags: 0
@@ -4299,11 +4281,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1668991328}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 357554835, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  debug: 1
   sensorsConfigurations:
   - {fileID: 11400000, guid: 488437fd3c33e7647ada22186e03adaf, type: 2}
   - {fileID: 11400000, guid: a274b7d1b0154e342a65cc4a05b85d8a, type: 2}
@@ -4311,18 +4294,16 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 84df1bcdabe0fab4782278cac3fd662f, type: 2}
   actuatorsConfigurations:
   - {fileID: 11400000, guid: 90124f0d70d92b64481c06cfdb0d6da9, type: 2}
-  sensorsUpdated: 0
   ASPFilePath: .\Assets\Resources\Brain.asp
   ASPFileTemplatePath: .\Assets\Resources\Brain_template.asp
   enableBrain: 1
   maintainFactFile: 0
-  executeRepeatedly: 0
-  startIn: 0.1
-  brainUpdateFrequency: 0.5
-  executeOnTrigger: 1
+  executeRepeatedly: 1
+  brainUpdateFrequencyMS: 300
+  executeOnTrigger: 0
   triggerClassPath: .\Assets\Scripts\Trigger.cs
-  updateSensorsOn: updateSensors
-  executeReasonerOn: When Sensors are ready
+  updateSensorsOn: 
+  executeReasonerOn: runReasoner
   applyActuatorsCondition: Always
 --- !u!4 &1668991330
 Transform:
@@ -4511,9 +4492,6 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations: []
-  localNames: []
-  goName: white2
 --- !u!114 &1702996717 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7466520323106497561, guid: 0b88d5d93e4ce0e4181c6d8553dd061d,
@@ -4650,9 +4628,6 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations: []
-  localNames: []
-  goName: pink2
 --- !u!114 &1719931868 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7713859974582282745, guid: 8bd82fc7964e85b48b489be54bdf4ba6,
@@ -4860,9 +4835,6 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations: []
-  localNames: []
-  goName: green4
 --- !u!114 &1848249492 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4774680787993251460, guid: 09b1a214c6637744faa7ff67df671504,
@@ -4893,9 +4865,6 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations: []
-  localNames: []
-  goName: purple
 --- !u!114 &1861290159 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 716454651014873114, guid: b79dc7bf9ca28c246aeb2524ea6bb7a5,
@@ -4926,9 +4895,6 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations: []
-  localNames: []
-  goName: purple2
 --- !u!114 &1919606936 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 716454651014873114, guid: b79dc7bf9ca28c246aeb2524ea6bb7a5,
@@ -4959,9 +4925,6 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations: []
-  localNames: []
-  goName: white
 --- !u!114 &1919890344 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7466520323106497561, guid: 0b88d5d93e4ce0e4181c6d8553dd061d,
@@ -4992,9 +4955,6 @@ MonoBehaviour:
   m_Script: {fileID: -1874596999, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gOConfigurations: []
-  localNames: []
-  goName: green
 --- !u!114 &2025857580 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4774680787993251460, guid: 09b1a214c6637744faa7ff67df671504,

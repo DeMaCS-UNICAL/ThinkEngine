@@ -37,107 +37,74 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
             factsPath = "Assets/Resources/" + brain.gameObject.name + "Facts.asp";
             mapper = MappingManager.getInstance();
         }
-        
+
         public void Run()
         {
-            
+
             reason = true;
             IMapper sensorMapper = mapper.getMapper(typeof(AdvancedSensor));
-            ////Debug.Log("mapper " + sensorMapper);
             while (reason)
             {
-                //Thread.Sleep(1000);
-                ////Debug.Log("executing thread");
-                lock (brain.toLock)
+                if (!brain.executeReasonerOn.Equals("When Sensors are ready"))
                 {
-                    brain.solverWaiting = true;
-                    if (!brain.executeReasonerOn.Equals("When Sensors are ready"))
+                    lock (brain.toLock)
                     {
+                        Debug.Log("going to wait for pulse by brain");
+                        brain.solverWaiting = true;
                         Monitor.Wait(brain.toLock);
                     }
-                    try
-                    {
-                        stopwatch.Restart();
-                        factsPath = Path.GetTempFileName();                    
-
-                        using (StreamWriter fs = new StreamWriter(factsPath, true))
-                        {
-                            ////Debug.Log("creating file "+ factsPath);
-                            string toAppend = SensorsManager.GetSensorsMapping(brain);
-                            /*lock (SensorsManager.getLock(brain))
-                            {
-                                foreach (IMonoBehaviourSensor sensor in brain.getSensors())
-                                {
-                                    //Stopwatch temp = new Stopwatch();
-                                    //temp.Start();
-                                    toAppend += sensor.Map();
-                                    //temp.Stop();
-                                    ////Debug.Log(toAppend);
-                                    ////Debug.Log(toAppend);
-
-                                }
-                            }*/
-
-                            ////Debug.Lof(fs.)
-                            fs.Write(toAppend);
-                            fs.Close();
-
-                            ////Debug.Log("closing stream");
-                        }
-                        stopwatch.Stop();
-                        factsSteps++;
-                        factsAvgTime += stopwatch.ElapsedMilliseconds;
-                    }
-                    catch (Exception e)
-                    {
-                        UnityEngine.Debug.LogError(e.Message);
-                        UnityEngine.Debug.LogError(e.StackTrace);
-                    }
-
                 }
-                //Debug.Log(Path.GetFullPath(@".\lib\dlv.exe"));
-                 Handler handler = new DesktopHandler(new DLVDesktopService(@".\lib\dlv2.exe"));
-                ////Debug.Log(Path.GetFullPath(@".\lib\dlv.exe"));
-               //  Handler handler = new DesktopHandler(new DLVDesktopService(@".\lib\dlv.exe"));
-                 InputProgram encoding = new ASPInputProgram();
-                 encoding.AddFilesPath(Path.GetFullPath(brain.ASPFilePath));
-                 InputProgram facts = new ASPInputProgram();
-                 facts.AddFilesPath(factsPath);
-                 handler.AddProgram(encoding);
-                 handler.AddProgram(facts);
+                try
+                {
+                    stopwatch.Restart();
+                    factsPath = Path.GetTempFileName();
+
+                    using (StreamWriter fs = new StreamWriter(factsPath, true))
+                    {
+                        string toAppend = SensorsManager.GetSensorsMapping(brain);
+                        fs.Write(toAppend);
+                        fs.Close();
+                    }
+                    stopwatch.Stop();
+                    factsSteps++;
+                    factsAvgTime += stopwatch.ElapsedMilliseconds;
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("CAUGHT EXECPTION!!!!");
+                    UnityEngine.Debug.LogError(e.Message);
+                    UnityEngine.Debug.LogError(e.StackTrace);
+                }
+
+
+                Handler handler = new DesktopHandler(new DLVDesktopService(@".\lib\dlv2.exe"));
+                InputProgram encoding = new ASPInputProgram();
+                Debug.Log("adding encoding");
+                encoding.AddFilesPath(Path.GetFullPath(brain.ASPFilePath));
+                InputProgram facts = new ASPInputProgram();
+                Debug.Log("adding facts");
+                facts.AddFilesPath(factsPath);
+                handler.AddProgram(encoding);
+                handler.AddProgram(facts);
                 handler.AddOption(new OptionDescriptor("--filter=setOnActuator/1"));
                 stopwatch.Restart();
-                ////Debug.Log("reasoning");
+                Debug.Log("starting sync");
                 Output o = handler.StartSync();
                 if (!o.ErrorsString.Equals(""))
                 {
-                    //Debug.Log(o.ErrorsString + " " + o.OutputString);
+                    Debug.Log(o.ErrorsString + " " + o.OutputString);
                 }
-                 AnswerSets answers = (AnswerSets)o;
+                AnswerSets answers = (AnswerSets)o;
                 stopwatch.Stop();
                 asSteps++;
                 asAvgTime += stopwatch.ElapsedMilliseconds;
-                 ////Debug.Log("//Debugging answer set");
-                 ////Debug.Log("there are "+answers.Answersets.Count);
-                 ////Debug.Log("error: " + answers.ErrorsString);
+                Debug.Log("num of AS " + answers.Answersets.Count);
                 if (answers.Answersets.Count > 0)
                 {
-                    /*string asPath = Path.GetTempFileName();
-                    using (StreamWriter fs = new StreamWriter(asPath, true))
-                    {
-                        fs.Write(o.OutputString);
-                        fs.Close();
-                    }*/
-                        lock (brain.toLock)
+                    lock (brain.toLock)
                     {
                         foreach (SimpleActuator actuator in brain.getActuators())
                         {
-                            //Debug.Log("input fact " + factsPath);
-                            //Debug.Log("parsing " + actuator.actuatorName);
-                            if (answers.Answersets[0].GetAnswerSet().Count > 0)
-                            {
-                                //Debug.Log(answers.Answersets[0].GetAnswerSet()[0]);
-                            }
                             actuator.parse(answers.Answersets[0]);
                         }
                         brain.setActuatorsReady(true);
@@ -148,8 +115,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                     File.Delete(factsPath);
                 }
             }
-            
         }
+
+    
+
         public void finalize()
         {
             Performance.writeOnFile("facts",factsAvgTime/factsSteps);

@@ -86,6 +86,7 @@ public class Brain :MonoBehaviour
         {
             initBrain2();
         }
+        Debug.unityLogger.logEnabled = debug;
     }
     internal bool actuatorsUpdateCondition()
     {
@@ -245,29 +246,6 @@ public class Brain :MonoBehaviour
         ////Debug.Log("creating sensors");
         prepareSensors(sensors, sensorsManagers, methods, triggerClass);
         prepareActuators(sensors, actuators, methods);
-        executionThread = new Thread(() =>
-        {
-            Thread.CurrentThread.IsBackground = true;
-            embasp.Run();
-        });
-        executionThread.Start();
-    }
-
-    private void prepareActuators(List<IMonoBehaviourSensor> sensors, List<SimpleActuator> actuators, MethodInfo[] methods)
-    {
-        foreach (ActuatorConfiguration conf in actuatorsConfigurations)
-        {
-            actuators.Add(new SimpleActuator(conf));
-            ////Debug.Log(conf.configurationName+" added");
-        }
-        sensorManager.registerSensors(this, sensors);
-        actuatorsManager.registerActuators(this, actuators);
-
-        if (!actuatorsManager.applyCoroutinStarted)
-        {
-            StartCoroutine(actuatorsManager.applyActuators());
-            actuatorsManager.applyCoroutinStarted = true;
-        }
         if (!executeReasonerOn.Equals("When Sensors are ready"))
         {
             foreach (MethodInfo mI in methods)
@@ -281,14 +259,34 @@ public class Brain :MonoBehaviour
                 }
             }
         }
+        executionThread = new Thread(() =>
+        {
+            Thread.CurrentThread.Name = "Solver executor";
+            Thread.CurrentThread.IsBackground = true;
+            embasp.Run();
+        });
+        executionThread.Start();
+    }
 
-        ////Debug.Log("trigger method is "+triggerMethod);
+    private void prepareActuators(List<IMonoBehaviourSensor> sensors, List<SimpleActuator> actuators, MethodInfo[] methods)
+    {
+        foreach (ActuatorConfiguration conf in actuatorsConfigurations)
+        {
+            actuators.Add(new SimpleActuator(conf));
+            ////Debug.Log(conf.configurationName+" added");
+        }
+        actuatorsManager.registerActuators(this, actuators);
 
+        if (!actuatorsManager.applyCoroutinStarted)
+        {
+            StartCoroutine(actuatorsManager.applyActuators());
+            actuatorsManager.applyCoroutinStarted = true;
+        }
         foreach (MethodInfo mI in methods)
         {
             if (mI.Name.Equals(applyActuatorsCondition))
             {
-                ////Debug.Log(mI.Name);
+                Debug.Log("apply actuators on "+mI.Name);
                 applyActuatorsMethod = mI;
             }
         }
@@ -338,6 +336,7 @@ public class Brain :MonoBehaviour
             sensors.AddRange(manager.generateSensors());
             
         }
+        sensorManager.registerSensors(this, sensors);
     }
     private IEnumerator pulseOn()
     {
@@ -347,6 +346,7 @@ public class Brain :MonoBehaviour
             lock (toLock)
             {
                 solverWaiting = false;
+                Debug.Log("Pulsing in brain");
                 Monitor.Pulse(toLock);
             }
         }

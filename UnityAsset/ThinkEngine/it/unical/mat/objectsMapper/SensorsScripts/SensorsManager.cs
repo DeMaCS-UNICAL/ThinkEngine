@@ -89,10 +89,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 
         internal static string GetSensorsMapping(Brain brain)
         {
-            lock (getLock(brain))
+            object lockOn = getLock(brain);
+            lock (lockOn)
             {
                 string mapping = "";
-                foreach(IMonoBehaviourSensor sensor in GetSensors(brain))
+                foreach(IMonoBehaviourSensor sensor in GetSensors(brain,lockOn))
                 {
                     mapping += sensor.Map();
                 }
@@ -120,20 +121,16 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             }
         }
 
-        public static IEnumerable<IMonoBehaviourSensor> GetSensors(Brain brain)
+        public static IEnumerable<IMonoBehaviourSensor> GetSensors(Brain brain, object lockOn)
         {
-            lock (getLock(brain))
+            if (sensorsUpdatedCount(brain) != instantiatedSensorsCount(brain))
             {
-                if (sensorsUpdatedCount(brain) != instantiatedSensorsCount(brain))
-                {
-                    //MyDebug("I'm waiting since " + sensorManager.sensorsUpdatedCount(this) + "<>" + sensorManager.instantiatedSensorsCount(this));
-                    MyDebug(Thread.CurrentThread.Name+" is going to wait", brain.debug);
-                    Monitor.Wait(SensorsManager.getLock(brain));
-                    //MyDebug("I'm going to execute");
-
-                }
-                return getInstantiatedSensors(brain);
+               // MyDebug("I'm waiting since " + sensorsUpdatedCount(brain) + "<>" + instantiatedSensorsCount(brain),brain.debug);
+                MyDebug(Thread.CurrentThread.Name + " is going to wait", brain.debug);
+                Monitor.Wait(lockOn);
+                MyDebug(Thread.CurrentThread.Name + "is going to execute", brain.debug);
             }
+            return getInstantiatedSensors(brain);
         }
 
         private static object getLock(Brain brain)
@@ -168,7 +165,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 
         public static void AddUpdatedSensor(Brain brain)
         {
-            lock (getLock(brain))
+            object lockOn = getLock(brain);
+            lock (lockOn)
             {
                 if (sensorsUpdated is null)
                 {
@@ -178,14 +176,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                 {
                     sensorsUpdated.Add(brain, 0);
                 }
-                if (sensorsUpdated[brain] == instantiatedSensors[brain].Count)
-                {
-                    sensorsUpdated[brain] = 0;
-                }
                 sensorsUpdated[brain]++;
+                //Debug.Log("sensor instantiated: " + instantiatedSensors[brain].Count + " updated: " + sensorsUpdated[brain]);
+                //Debug.Break();
                 if (sensorsUpdated[brain] == instantiatedSensors[brain].Count)
                 {
-                    Monitor.Pulse(getLock(brain));
+                    //Debug.Log("pulsing on sensor updated");
+                    Monitor.Pulse(lockOn);
+                    sensorsUpdated[brain] = 0;
                 }
             }
         }

@@ -71,24 +71,24 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             // base.OnInspectorGUI();
             if (myScript.executeOnTrigger && myScript.executeRepeatedly)
             {
-                if (excludedProperties.Contains("triggerClassPath"))
+                if (excludedProperties.Contains("brainUpdateFrequencyMS"))
                 {
-                    myScript.executeRepeatedly = false;
+                    myScript.executeOnTrigger = false;
                 }
                 else
                 {
-                    myScript.executeOnTrigger = false;
+                    myScript.executeRepeatedly = false;
                 }
             }
             if (!(myScript.executeOnTrigger || myScript.executeRepeatedly))
             {
-                if (excludedProperties.Contains("triggerClassPath"))
+                if (excludedProperties.Contains("brainUpdateFrequencyMS"))
                 {
-                    myScript.executeOnTrigger = true;
+                    myScript.executeRepeatedly = true;
                 }
                 else
                 {
-                    myScript.executeRepeatedly = true;
+                    myScript.executeOnTrigger = true;
                 }
             }
             excludedProperties = new List<string>();

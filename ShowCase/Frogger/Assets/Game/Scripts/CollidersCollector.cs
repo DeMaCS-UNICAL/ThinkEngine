@@ -26,6 +26,9 @@ public class CollidersCollector : MonoBehaviour
                 bay.Add(o);
             }
         }
+        /*Debug.Log("#cars " + cars.Count);
+        Debug.Log("#logs " + logs.Count);
+        Debug.Log("#home " + bay.Count);*/
     }
 
     // Update is called once per frame
