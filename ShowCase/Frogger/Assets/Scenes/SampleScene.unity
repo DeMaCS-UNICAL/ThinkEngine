@@ -4284,6 +4284,7 @@ GameObject:
   - component: {fileID: 1668991332}
   - component: {fileID: 1668991334}
   - component: {fileID: 1668991333}
+  - component: {fileID: 1668991335}
   m_Layer: 0
   m_Name: Brain
   m_TagString: Untagged
@@ -4314,7 +4315,7 @@ MonoBehaviour:
   ASPFilePath: .\Assets\Resources\Brain.asp
   ASPFileTemplatePath: .\Assets\Resources\Brain_template.asp
   enableBrain: 1
-  maintainFactFile: 1
+  maintainFactFile: 0
   executeRepeatedly: 0
   startIn: 0.1
   brainUpdateFrequency: 0.5
@@ -4480,6 +4481,18 @@ MonoBehaviour:
   - {fileID: 724134612}
   - {fileID: 1020298166}
   - {fileID: 2058093747}
+--- !u!114 &1668991335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1668991328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1593125381, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1702996714 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6308052464226184410, guid: 0b88d5d93e4ce0e4181c6d8553dd061d,
