@@ -12,6 +12,8 @@ using System.Timers;
 using System.Reflection;
 using System.Collections;
 using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
+using System.Diagnostics;
+using Debug = UnityEngine.Debug;
 
 [ExecuteInEditMode]
 
@@ -36,9 +38,9 @@ public class Brain :MonoBehaviour
     public bool maintainFactFile;
     //private bool updateSensors;
     private bool actuatorsReady;
-    public bool executeRepeatedly;
-    public float brainUpdateFrequencyMS;
-    public bool executeOnTrigger;
+    public bool updateSensorsRepeteadly;
+    public float sensorsUpdateFrequencyMS;
+    public bool updateSensorsOnTrigger;
     public string triggerClassPath;
     public string updateSensorsOn="";
     private MethodInfo sensorsUpdateMethod;
@@ -49,6 +51,12 @@ public class Brain :MonoBehaviour
     private MethodInfo applyActuatorsMethod;
     private SensorsManager sensorManager;
     private ActuatorsManager actuatorsManager;
+    internal long elapsedMS;
+    private Stopwatch watch;
+    public long factsMSTotal;
+    public int factsStep;
+    public long asTotalMS;
+    public int asSteps;
 
     void Awake()
     {
@@ -88,6 +96,25 @@ public class Brain :MonoBehaviour
         }
         Debug.unityLogger.logEnabled = debug;
     }
+    void Update()
+    {
+        if (!Application.isPlaying || !enableBrain)
+        {
+            return;
+        }
+        if (updateSensorsRepeteadly)
+        {
+            if (elapsedMS > sensorsUpdateFrequencyMS)
+            {
+                watch.Restart();
+            }
+            elapsedMS = watch.ElapsedMilliseconds;
+            if (elapsedMS >= sensorsUpdateFrequencyMS)
+            {
+                Performance.updatingSensors = true;
+            }
+        }
+    }
     internal bool actuatorsUpdateCondition()
     {
         if (applyActuatorsMethod != null)
@@ -108,7 +135,7 @@ public class Brain :MonoBehaviour
         // brainUpdateFrequency = 500;
     }
 
-        
+      
 
     void OnValidate() {
         triggerClassPath = @".\Assets\Scripts\Trigger.cs";
@@ -147,93 +174,7 @@ public class Brain :MonoBehaviour
             }
         }
     }
-
-    /*public bool sensorsReady()
-    {
-            
-        return sensorsUpdated;
-    }*/
     
-
-    
-
-    /*void initBrain()
-    {
-
-        List<AdvancedSensor>  sensors = new List<AdvancedSensor>();
-        List<SimpleActuator>  actuators = new List<SimpleActuator>();
-        embasp = new SolverExectuor(this);
-        triggerClass = ScriptableObject.CreateInstance("Trigger");
-        MethodInfo[] methods = triggerClass.GetType().GetMethods();
-        ////Debug.Log("creating sensors");
-        foreach (SensorConfiguration conf in sensorsConfigurations)
-        {
-            sensors.Add(new AdvancedSensor(conf));
-            ////Debug.Log(conf.configurationName+" added");
-        }
-            
-        sensorManager.registerSensors(this, sensors);
-        foreach (ActuatorConfiguration conf in actuatorsConfigurations)
-        {
-            actuators.Add(new SimpleActuator(conf));
-            ////Debug.Log(conf.configurationName+" added");
-        }
-            
-        actuatorsManager.registerActuators(this, actuators);
-        if (!actuatorsManager.applyCoroutinStarted)
-        {
-            StartCoroutine(actuatorsManager.applyActuators());
-            actuatorsManager.applyCoroutinStarted = true;
-        }
-        if(executeReasonerOn.Equals("When Sensors are ready"))
-        {
-            StartCoroutine("pulseOnSensorsReady");
-        }
-        else
-        {
-            foreach (MethodInfo mI in methods)
-            {
-                if (mI.Name.Equals(updateSensorsOn))
-                {
-                    ////Debug.Log(mI.Name);
-                    reasonerMethod = mI;
-                    StartCoroutine("pulseOn");
-                }
-            }
-        }
-
-        ////Debug.Log("trigger method is "+triggerMethod);
-        if (executeRepeatedly)
-        {
-            InvokeRepeating("UpdateSensors", startIn, brainUpdateFrequency);
-        }
-        else if (!updateSensorsOn.Equals(""))
-        {
-            foreach (MethodInfo mI in methods)
-            {
-                if (mI.Name.Equals(updateSensorsOn))
-                {
-                    ////Debug.Log(mI.Name);
-                    sensorsUpdateMethod = mI;
-                    StartCoroutine("UpdateSensorsOnTrigger");
-                }
-            }
-        }
-        foreach (MethodInfo mI in methods)
-        {
-            if (mI.Name.Equals(applyActuatorsCondition))
-            {
-                ////Debug.Log(mI.Name);
-                applyActuatorsMethod = mI;
-            }
-        }
-        executionThread = new Thread(() => {
-            Thread.CurrentThread.IsBackground = true;
-            embasp.Run();
-        });
-        executionThread.Start();
-    }*/
-
 
     void initBrain2()
     {
@@ -266,6 +207,8 @@ public class Brain :MonoBehaviour
             embasp.Run();
         });
         executionThread.Start();
+        watch = new Stopwatch();
+        watch.Start();
     }
 
     private void prepareActuators(List<IMonoBehaviourSensor> sensors, List<SimpleActuator> actuators, MethodInfo[] methods)
@@ -317,10 +260,10 @@ public class Brain :MonoBehaviour
                 currentManager.brain = this;
             }
             //Debug.Log("configuration of the manager of " + conf.gOName + " game object: " + currentManager.configurations);
-            if (executeRepeatedly)
+            if (updateSensorsRepeteadly)
             {
-                currentManager.executeRepeteadly = executeRepeatedly;
-                currentManager.frequence = brainUpdateFrequencyMS;
+                currentManager.executeRepeteadly = updateSensorsRepeteadly;
+                currentManager.frequence = sensorsUpdateFrequencyMS;
             }
             else
             {
@@ -376,25 +319,17 @@ public class Brain :MonoBehaviour
         if (embasp != null) {
             embasp.reason = false;
             ////Debug.Log("finalize");
-            embasp.finalize();
+            sensorManager.pulseExecutor(this);
+            finalize();
         }
     }
 
-        
 
-
-    /*void UpdateSensors()
+    public void finalize()
     {
-            
-        lock (toLock)
-        {
-            ////Debug.Log("updating sensors");
-            sensorManager.updateSensors(this);
-            sensorsUpdated = true;
-        }
-          
-
-    }*/
-        
+        Performance.writeOnFile("facts", factsMSTotal / factsStep, true);
+        Performance.writeOnFile("answer set", asTotalMS / asSteps);
     }
+
+}
 

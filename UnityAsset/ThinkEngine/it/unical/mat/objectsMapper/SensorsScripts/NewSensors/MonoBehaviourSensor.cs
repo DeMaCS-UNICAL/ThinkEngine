@@ -106,11 +106,12 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
         }
         if (executeRepeteadly)
         {
-            if(gameObject.GetComponent<MonoBehaviourSensorsManager>().elapsedMS < frequency)
+            if(gameObject.GetComponent<MonoBehaviourSensorsManager>().brain.elapsedMS < frequency)
             {
                 return;
             }
-        }else if (!(bool)updateMethod.Invoke(triggerClass, null))
+        }
+        else if (!(bool)updateMethod.Invoke(triggerClass, null))
         {
             return;
         }

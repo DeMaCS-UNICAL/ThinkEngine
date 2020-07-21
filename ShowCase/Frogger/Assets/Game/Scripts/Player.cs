@@ -44,10 +44,31 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        KeyboarMove();
         UpdatePosition();
         CheckCollisions();
         CheckGameTimer();
-        
+
+    }
+
+    private void KeyboarMove()
+    {
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            move = 1;
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            move = 2;
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            move = 3;
+        }
+        else if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            move = 4;
+        }
     }
 
     private void CheckGameTimer()

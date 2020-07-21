@@ -56,22 +56,22 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 }
                 try
                 {
-                    stopwatch.Restart();
                     factsPath = Path.GetTempFileName();
 
                     using (StreamWriter fs = new StreamWriter(factsPath, true))
                     {
                         string toAppend = SensorsManager.GetSensorsMapping(brain);
+                        if (!reason)
+                        {
+                            return;
+                        }
                         fs.Write(toAppend);
                         fs.Close();
                     }
-                    stopwatch.Stop();
-                    factsSteps++;
-                    factsAvgTime += stopwatch.ElapsedMilliseconds;
                 }
                 catch (Exception e)
                 {
-                    Debug.Log("CAUGHT EXECPTION!!!!");
+                   Debug.Log("CAUGHT EXECPTION!!!!");
                     UnityEngine.Debug.LogError(e.Message);
                     UnityEngine.Debug.LogError(e.StackTrace);
                 }
@@ -96,8 +96,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 }
                 AnswerSets answers = (AnswerSets)o;
                 stopwatch.Stop();
-                asSteps++;
-                asAvgTime += stopwatch.ElapsedMilliseconds;
+                brain.asSteps++;
+                brain.asTotalMS += stopwatch.ElapsedMilliseconds;
                 Debug.Log("num of AS " + answers.Answersets.Count);
                 if (answers.Answersets.Count > 0)
                 {
@@ -118,11 +118,5 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         }
 
     
-
-        public void finalize()
-        {
-            Performance.writeOnFile("facts",factsAvgTime/factsSteps);
-            Performance.writeOnFile("answer set",asAvgTime/asSteps);
-        }
     }
 }

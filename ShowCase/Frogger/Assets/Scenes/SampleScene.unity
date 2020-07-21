@@ -4286,7 +4286,7 @@ MonoBehaviour:
   m_Script: {fileID: 357554835, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debug: 1
+  debug: 0
   sensorsConfigurations:
   - {fileID: 11400000, guid: 488437fd3c33e7647ada22186e03adaf, type: 2}
   - {fileID: 11400000, guid: a274b7d1b0154e342a65cc4a05b85d8a, type: 2}
@@ -4298,13 +4298,17 @@ MonoBehaviour:
   ASPFileTemplatePath: .\Assets\Resources\Brain_template.asp
   enableBrain: 1
   maintainFactFile: 0
-  executeRepeatedly: 1
-  brainUpdateFrequencyMS: 300
-  executeOnTrigger: 0
+  updateSensorsRepeteadly: 1
+  sensorsUpdateFrequencyMS: 200
+  updateSensorsOnTrigger: 0
   triggerClassPath: .\Assets\Scripts\Trigger.cs
   updateSensorsOn: 
-  executeReasonerOn: runReasoner
-  applyActuatorsCondition: Always
+  executeReasonerOn: When Sensors are ready
+  applyActuatorsCondition: runReasoner
+  factsMSTotal: 0
+  factsStep: 0
+  asTotalMS: 0
+  asSteps: 0
 --- !u!4 &1668991330
 Transform:
   m_ObjectHideFlags: 0

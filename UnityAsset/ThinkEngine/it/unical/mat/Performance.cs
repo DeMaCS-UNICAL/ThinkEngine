@@ -38,6 +38,7 @@ class Performance : MonoBehaviour
         //stopwatch = new Stopwatch();
         //stopwatch.Start();
         //Debug.Log("starting performace");
+        Application.targetFrameRate = 60;
         if (!Directory.Exists("Performance"))
         {
             Directory.CreateDirectory("Performance");
@@ -60,21 +61,26 @@ class Performance : MonoBehaviour
                 fs.Write("Iteration; Rate\n");
                 fs.Close();
             }
-        
+            path = withoutBrainPath;
+
+        }
+        using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, false))
+        {
+            fs.Write("Iteration; Rate\n");
+            fs.Close();
+        }
+        using (StreamWriter fs = new StreamWriter(actuatorsUpdateRate, false))
+        {
+            fs.Write("Iteration; Rate\n");
+            fs.Close();
         }
         initialized = true;
     }
-    void Update()
+    void LateUpdate()
     {
 
         double current = 1f / Time.unscaledDeltaTime;
-        //UnityEngine.//Debug.Log(current);
-        //totalFrames +=current;
         steps++;
-        // avgFrames += current;
-        // if (steps % 20 == 0)
-        //{
-        // avgFrames /= 20;
         using (StreamWriter fs = new StreamWriter(path, true))
         {
             fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + "\n");
@@ -99,16 +105,6 @@ class Performance : MonoBehaviour
                 fs.Close();
             }
         }
-        //avgFrames=0;
-        /* if (minRate > current & steps>5)
-            {
-                minRate = (int)current;
-            }
-            if (maxRate < current)
-            {
-                maxRate = (int)current;
-            }*/
-        //  }
     }
 
     void OnApplicationQuit()
@@ -134,7 +130,7 @@ class Performance : MonoBehaviour
         }*/
     }
 
-    public static void writeOnFile(string s, double d)
+    public static void writeOnFile(string s, double d, bool printDate=false)
     {
         if (!initialized)
         {
@@ -142,6 +138,10 @@ class Performance : MonoBehaviour
         }
         using (StreamWriter fs = new StreamWriter(factsAndASPath, true))
         {
+            if (printDate)
+            {
+                fs.Write("date: " + System.DateTime.Today);
+            }
             fs.Write(s + " " + d.ToString("N", nfi) + "ms \n");
             fs.Close();
         }

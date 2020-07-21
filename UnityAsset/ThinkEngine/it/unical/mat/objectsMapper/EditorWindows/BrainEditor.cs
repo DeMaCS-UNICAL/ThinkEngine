@@ -69,41 +69,41 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         public override void OnInspectorGUI()
         {
             // base.OnInspectorGUI();
-            if (myScript.executeOnTrigger && myScript.executeRepeatedly)
+            if (myScript.updateSensorsOnTrigger && myScript.updateSensorsRepeteadly)
             {
-                if (excludedProperties.Contains("brainUpdateFrequencyMS"))
+                if (excludedProperties.Contains("sensorsUpdateFrequencyMS"))
                 {
-                    myScript.executeOnTrigger = false;
+                    myScript.updateSensorsOnTrigger = false;
                 }
                 else
                 {
-                    myScript.executeRepeatedly = false;
+                    myScript.updateSensorsRepeteadly = false;
                 }
             }
-            if (!(myScript.executeOnTrigger || myScript.executeRepeatedly))
+            if (!(myScript.updateSensorsOnTrigger || myScript.updateSensorsRepeteadly))
             {
-                if (excludedProperties.Contains("brainUpdateFrequencyMS"))
+                if (excludedProperties.Contains("sensorsUpdateFrequencyMS"))
                 {
-                    myScript.executeRepeatedly = true;
+                    myScript.updateSensorsRepeteadly = true;
                 }
                 else
                 {
-                    myScript.executeOnTrigger = true;
+                    myScript.updateSensorsOnTrigger = true;
                 }
             }
             excludedProperties = new List<string>();
             excludedProperties.Add("updateSensorsOn");
             excludedProperties.Add("executeReasonerOn");
             excludedProperties.Add("applyActuatorsCondition");
-            if (!myScript.executeRepeatedly)
+            if (!myScript.updateSensorsRepeteadly)
             {
-                excludedProperties.Add("brainUpdateFrequencyMS");
+                excludedProperties.Add("sensorsUpdateFrequencyMS");
             }
             
             SerializedObject serialized = new SerializedObject(myScript);
             DrawPropertiesExcluding(serialized, excludedProperties.ToArray());
             
-            if (myScript.executeOnTrigger)
+            if (myScript.updateSensorsOnTrigger)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Choose a method to use as trigger for Sensors Update");

@@ -1,12 +1,14 @@
 ﻿using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 {
@@ -93,10 +95,16 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             lock (lockOn)
             {
                 string mapping = "";
-                foreach(IMonoBehaviourSensor sensor in GetSensors(brain,lockOn))
+                IEnumerable<IMonoBehaviourSensor> sensors = GetSensors(brain, lockOn);
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+                foreach (IMonoBehaviourSensor sensor in sensors)
                 {
                     mapping += sensor.Map();
                 }
+                watch.Stop();
+                brain.factsStep++;
+                brain.factsMSTotal += watch.ElapsedMilliseconds;
                 return mapping;
             }
         }
@@ -318,6 +326,15 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             if (debug)
             {
                 Debug.Log(v);
+            }
+        }
+
+        internal void pulseExecutor(Brain brain)
+        {
+            object toLock = getLock(brain);
+            lock (toLock)
+            {
+                Monitor.Pulse(toLock);
             }
         }
     }

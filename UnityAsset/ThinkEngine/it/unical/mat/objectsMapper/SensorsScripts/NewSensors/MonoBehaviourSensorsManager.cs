@@ -25,15 +25,12 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
     public float frequence;
     public MethodInfo updateMethod;
     internal object triggerClass;
-    internal float elapsedMS = 0;
-    private Stopwatch watch;
 
     // Use this for initialization
     void Awake()
     {
         ////Debug.Log("Awakening");
         //Debug.unityLogger.logEnabled = true;
-        watch = new Stopwatch();
         sizeToTrack = new Dictionary<string, List<int>>();
         typeForCollectionProperty = new Dictionary<string, string>();
         elementForCollectionProperty = new Dictionary<string, List<string>>();
@@ -90,7 +87,6 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
             }
         }
         ready = true;
-        watch.Start();
         return generatedSensors;
     }
 
@@ -313,10 +309,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
         {
             return;
         }
-        if (elapsedMS > frequence)
-        {
-            watch.Restart();
-        }
+        
         List<int> newSizes = new List<int>();
         
         foreach (string property in sizeToTrack.Keys.ToList())
@@ -364,7 +357,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
             }
             
         }
-        elapsedMS = watch.ElapsedMilliseconds;
+        
 
     }
 
