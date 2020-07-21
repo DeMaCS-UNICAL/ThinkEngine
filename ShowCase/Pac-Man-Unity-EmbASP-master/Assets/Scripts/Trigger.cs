@@ -30,24 +30,7 @@ public class Trigger:ScriptableObject{
          {
              return false;
          }
-         if (stopWatch.ElapsedMilliseconds > waitingTime)
-         {
-             //UnityEngine.Debug.Log(stopWatch.ElapsedMilliseconds);
-             //stopWatch.Stop();
-             //stopWatch.Restart();
-             lock (brain.toLock)
-             {
-                 if (!brain.sensorsReady())
-                 {
-                     // Debug.Log("sensors " + Time.time);
-
-                     //UnityEngine.Debug.Log("updating sensors "+contr.nextStep +" pellet "+ai.closestPelletX+" "+ai.closestPelletY+" pacman "+ai.Pacman.transform.position.x+" "+ ai.Pacman.transform.position.y);
-                     return true;
-                 }
-                 return false;
-             }
-         }
-         return false;
+         return true;
          
     }
 

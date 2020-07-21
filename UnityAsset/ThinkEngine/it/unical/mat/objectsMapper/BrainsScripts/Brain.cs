@@ -53,10 +53,10 @@ public class Brain :MonoBehaviour
     private ActuatorsManager actuatorsManager;
     internal long elapsedMS;
     private Stopwatch watch;
-    public long factsMSTotal;
-    public int factsStep;
-    public long asTotalMS;
-    public int asSteps;
+    internal long factsMSTotal;
+    internal int factsStep;
+    internal long asTotalMS;
+    internal int asSteps;
 
     void Awake()
     {
