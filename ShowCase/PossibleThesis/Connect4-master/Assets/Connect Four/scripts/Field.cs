@@ -32,7 +32,7 @@ namespace ConnectFour
 
     private bool allowDiagonally = true;
 
-    protected int[,] field;
+    public int[,] field;
 
     private bool isPlayersTurn;
 
@@ -50,43 +50,46 @@ namespace ConnectFour
     private int dropColumn;
     private int dropRow;
 
-    // Field constructor
-    public Field (int numRows, int numColumns, int numPiecesToWin, bool allowDiagonally)
-    {
-      this.numRows = numRows;
-      this.numColumns = numColumns;
-      this.numPiecesToWin = numPiecesToWin;
-      this.allowDiagonally = allowDiagonally;
+  // Field constructor
+  public Field(int numRows, int numColumns, int numPiecesToWin, bool allowDiagonally)
+  {
+            this.numRows = numRows;
+            this.numColumns = numColumns;
+            this.numPiecesToWin = numPiecesToWin;
+            this.allowDiagonally = allowDiagonally;
 
-      isPlayersTurn = System.Convert.ToBoolean (UnityEngine.Random.Range (0, 2));
+            isPlayersTurn = System.Convert.ToBoolean(UnityEngine.Random.Range(0, 2));
 
-      field = new int[numColumns, numRows];
-      for (int x = 0; x < numColumns; x++) {
-        for (int y = 0; y < numRows; y++) {
-          field [x, y] = (int)Piece.Empty;
+            field = new int[numColumns, numRows];
+            for (int x = 0; x < numColumns; x++)
+            {
+                for (int y = 0; y < numRows; y++)
+                {
+                    field[x, y] = (int)Piece.Empty;
+                }
+            }
+            dropColumn = 0;
+            dropRow = 0;
         }
-      }
 
-      dropColumn = 0;
-      dropRow = 0;
-    }
+        public Field(int numRows, int numColumns, int numPiecesToWin, bool allowDiagonally, bool isPlayersTurn, int piecesNumber, int[,] field)
+        {
+            this.numRows = numRows;
+            this.numColumns = numColumns;
+            this.numPiecesToWin = numPiecesToWin;
+            this.allowDiagonally = allowDiagonally;
+            this.isPlayersTurn = isPlayersTurn;
+            this.piecesNumber = piecesNumber;
 
-    public Field (int numRows, int numColumns, int numPiecesToWin, bool allowDiagonally, bool isPlayersTurn, int piecesNumber, int[,] field)
-    {
-      this.numRows = numRows;
-      this.numColumns = numColumns;
-      this.numPiecesToWin = numPiecesToWin;
-      this.allowDiagonally = allowDiagonally;
-      this.isPlayersTurn = isPlayersTurn;
-      this.piecesNumber = piecesNumber;
-
-      this.field = new int[numColumns, numRows];
-      for (int x = 0; x < numColumns; x++) {
-        for (int y = 0; y < numRows; y++) {
-          this.field [x, y] = field [x, y];
+            this.field = new int[numColumns, numRows];
+            for (int x = 0; x < numColumns; x++)
+            {
+                for (int y = 0; y < numRows; y++)
+                {
+                    this.field[x, y] = field[x, y];
+                }
+            }
         }
-      }
-    }
   	
     // Renvoie la liste des cases où le joueur peut ajouter une pièce
     public Dictionary<int, int> GetPossibleCells ()

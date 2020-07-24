@@ -7,8 +7,7 @@ using System.Threading;
 namespace ConnectFour
 {
   public class GameController : MonoBehaviour
-  {
-
+  { 
     [Range (3, 8)]
     public int numRows = 4;
     [Range (3, 8)]
@@ -55,7 +54,7 @@ namespace ConnectFour
     /// 1 = Blue
     /// 2 = Red
     /// </summary>
-    Field field;
+    public Field field;
 
     bool isLoading = true;
     bool isDropping = false;
@@ -65,9 +64,9 @@ namespace ConnectFour
     bool isCheckingForWinner = false;
 
     // Use this for initialization
-   
     void Start ()
     {
+
       int max = Mathf.Max (numRows, numColumns);
 
       if (numPiecesToWin > max)
@@ -80,6 +79,12 @@ namespace ConnectFour
       btnPlayAgainOrigColor = btnPlayAgain.GetComponent<Renderer> ().material.color;
     }
 
+    public Field GetField()
+    {
+            if(field != null)
+                return field.Clone();
+            return null;
+    }
     /// <summary>
     /// Creates the field.
     /// </summary>
@@ -98,7 +103,6 @@ namespace ConnectFour
 
       // create an empty field and instantiate the cells
       field = new Field (numRows, numColumns, numPiecesToWin, allowDiagonally);
-
       for (int x = 0; x < numColumns; x++) {
         for (int y = 0; y < numRows; y++) {
           GameObject g = Instantiate (pieceField, new Vector3 (x, y * -1, -1), Quaternion.identity) as GameObject;
