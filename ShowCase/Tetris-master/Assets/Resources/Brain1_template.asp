@@ -1,0 +1,11 @@
+setOnActuator(player(aI(assetsScriptsAIPlayer(numOfMove(X))))):-
+setOnActuator(player(aI(assetsScriptsAIPlayer(numOfLateralMove(X))))):-
+setOnActuator(player(aI(assetsScriptsAIPlayer(numOfRotation(X))))):-
+setOnActuator(player(aI(assetsScriptsAIPlayer(aiProgressive(X))))):-
+setOnActuator(player(aI(assetsScriptsAIPlayer(typeOfLateralMove(X))))):-
+%arenaGrid(arena(arena(tiles(X,Y,arenaTile(empty(V)))))).
+%arenaGrid(arena(arena(tiles(X,Y,arenaTile(x(V)))))).
+%arenaGrid(arena(arena(tiles(X,Y,arenaTile(y(V)))))).
+%tetromino(aI(assetsScriptsAIPlayer(currentTetromino(X)))).
+%spawner(tetrominoSpawner(tetrominoSpawner(progressiveNumber(X)))).
+%spawner(tetrominoSpawner(tetrominoSpawner(lastInstantiated(X)))).

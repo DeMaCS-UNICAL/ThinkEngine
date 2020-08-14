@@ -327,8 +327,8 @@ public class Brain :MonoBehaviour
 
     public void finalize()
     {
-        Performance.writeOnFile("facts", factsMSTotal / factsStep, true);
-        Performance.writeOnFile("answer set", asTotalMS / asSteps);
+        //Performance.writeOnFile("facts", factsMSTotal / factsStep, true);
+        //Performance.writeOnFile("answer set", asTotalMS / asSteps);
     }
 
 }

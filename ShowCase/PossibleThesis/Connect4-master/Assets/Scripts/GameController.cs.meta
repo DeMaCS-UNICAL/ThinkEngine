@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: be5fdcec6c727c94cb03acde772511d5
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - aiplayer: {instanceID: 0}
+  - pieceRed: {fileID: 100000, guid: 7faddc12bb4db9c469c873982168faa2, type: 3}
+  - pieceBlue: {fileID: 100000, guid: f1274e8c2df69e74eadfe7559af71d3f, type: 3}
+  - pieceField: {fileID: 100000, guid: 9ec510e0b04c22842b98158e86b57333, type: 3}
+  - winningText: {instanceID: 0}
+  - btnPlayAgain: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -34,6 +34,7 @@ namespace Assets.Scripts
             start = Vector3.zero;
             end = Vector3.zero;
             brain = GameObject.FindObjectOfType<Brain>();
+            Debug.Log(brain);
             spawner = GameObject.FindObjectOfType<TetrominoSpawner>();
             //StartCoroutine("move");
             
