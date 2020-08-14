@@ -114,13 +114,13 @@ public static class SensorsUtility
         string parentName = st.Substring(0, st.IndexOf("^"));
         string child = st.Substring(st.IndexOf("^") + 1, st.Length - st.IndexOf("^") - 1);
         MemberInfo[] members = objType.GetMember(parentName, SensorsUtility.BindingAttr);
-        //////Debug.Log("members with name " + parentName + " " + members.Length);
+        Debug.Log("members with name " + parentName + " " + members.Length);
         if (members.Length == 0)
         {
             return ReadComponent(gameObject, entire_name, st, objType, obj, ReadSimpleProperty);
         }
         FieldOrProperty parentProperty = new FieldOrProperty(members[0]);
-        //////Debug.Log(parentProperty.Name());
+        ///Debug.Log(parentProperty.Name());
         object parent = parentProperty.GetValue(obj);
         Type parentType = parent.GetType();
         if (!child.Contains("^"))
@@ -137,23 +137,27 @@ public static class SensorsUtility
         ////Debug.unityLogger.logEnabled = false;
         string parentName = st.Substring(0, st.IndexOf("^"));
         string child = st.Substring(st.IndexOf("^") + 1, st.Length - st.IndexOf("^") - 1);
-        ////Debug.Log("component " + entire_name + " parent " + parentName + " child " + child);
+        Debug.Log("component " + entire_name + " parent " + parentName + " child " + child+" goType "+gOType);
         if (gOType == typeof(GameObject))
         {
-            Component c = gameObject.GetComponent(parentName);
-            if (c != null)
+            Debug.Log(gameObject.name + " is the GO");
+            foreach(Component c in gameObject.GetComponents(typeof(MonoBehaviour)))
             {
-                ////Debug.Log("component " +c);
-                if (!child.Contains("^"))
+                if (c.GetType().Name.Equals(parentName))
                 {
-                    ////Debug.Log(" of type "+c.GetType());
-                    return ReadSimpleProperty(child, c.GetType(), c);
-                }
-                else
-                {
-                    return ReadComposedProperty(gameObject, entire_name, child, c.GetType(), c, ReadSimpleProperty);
+                    Debug.Log("component " + c);
+                    if (!child.Contains("^"))
+                    {
+                        Debug.Log(" of type " + c.GetType());
+                        return ReadSimpleProperty(child, c.GetType(), c);
+                    }
+                    else
+                    {
+                        return ReadComposedProperty(gameObject, entire_name, child, c.GetType(), c, ReadSimpleProperty);
+                    }
                 }
             }
+            
         }
         return null;
     }
