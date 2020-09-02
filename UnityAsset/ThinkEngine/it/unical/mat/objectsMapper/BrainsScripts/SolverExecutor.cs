@@ -77,7 +77,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 }
 
 
-                Handler handler = new DesktopHandler(new DLVDesktopService(@".\lib\dlv2.exe"));
+                Handler handler = new DesktopHandler(new DLV2DesktopService(@".\lib\dlv2.exe"));                //With DLV2DesktopService I get a Error during parsing: --> Invalid #show directive: setOnActuator/1--competition-output.
+                //With DLVDesktopService the AS, obviously, are wrongly parsed
                 InputProgram encoding = new ASPInputProgram();
                 Debug.Log("adding encoding");
                 encoding.AddFilesPath(Path.GetFullPath(brain.ASPFilePath));
@@ -86,7 +87,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 facts.AddFilesPath(factsPath);
                 handler.AddProgram(encoding);
                 handler.AddProgram(facts);
-                handler.AddOption(new OptionDescriptor("--filter=setOnActuator/1"));
+                handler.AddOption(new OptionDescriptor("--filter=setOnActuator/1 "));
                 stopwatch.Restart();
                 Debug.Log("starting sync");
                 Output o = handler.StartSync();
