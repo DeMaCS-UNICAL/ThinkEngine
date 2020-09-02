@@ -4265,8 +4265,9 @@ GameObject:
   - component: {fileID: 1668991331}
   - component: {fileID: 1668991332}
   - component: {fileID: 1668991334}
-  - component: {fileID: 1668991333}
   - component: {fileID: 1668991335}
+  - component: {fileID: 1668991336}
+  - component: {fileID: 1668991333}
   m_Layer: 0
   m_Name: Brain
   m_TagString: Untagged
@@ -4304,11 +4305,7 @@ MonoBehaviour:
   triggerClassPath: .\Assets\Scripts\Trigger.cs
   updateSensorsOn: 
   executeReasonerOn: When Sensors are ready
-  applyActuatorsCondition: runReasoner
-  factsMSTotal: 0
-  factsStep: 0
-  asTotalMS: 0
-  asSteps: 0
+  applyActuatorsCondition: applyActuators
 --- !u!4 &1668991330
 Transform:
   m_ObjectHideFlags: 0
@@ -4343,7 +4340,7 @@ MonoBehaviour:
   gameTime: 30
   gameTimeWarning: 5
   gameTimer: 0
-  move: 0
+  move: 
   xpos: 8
   ypos: 0
   deadAnimation: 0
@@ -4406,19 +4403,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1668991328}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1560303995, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Script: {fileID: -1277370436, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   gOConfigurations:
-  - {fileID: 11400000, guid: a274b7d1b0154e342a65cc4a05b85d8a, type: 2}
-  - {fileID: 11400000, guid: 488437fd3c33e7647ada22186e03adaf, type: 2}
-  - {fileID: 11400000, guid: 8607218b32e5ed14da6df27700371b19, type: 2}
-  - {fileID: 11400000, guid: 84df1bcdabe0fab4782278cac3fd662f, type: 2}
+  - {fileID: 11400000, guid: 90124f0d70d92b64481c06cfdb0d6da9, type: 2}
   localNames:
-  - playerSensor
-  - cars
-  - logs
-  - homeBay
+  - player
   goName: Brain
 --- !u!114 &1668991334
 MonoBehaviour:
@@ -4478,6 +4469,29 @@ MonoBehaviour:
   m_Script: {fileID: 1593125381, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1668991336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1668991328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1560303995, guid: 19618f8d5b4501f41b8a1d1799b629ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gOConfigurations:
+  - {fileID: 11400000, guid: a274b7d1b0154e342a65cc4a05b85d8a, type: 2}
+  - {fileID: 11400000, guid: 488437fd3c33e7647ada22186e03adaf, type: 2}
+  - {fileID: 11400000, guid: 8607218b32e5ed14da6df27700371b19, type: 2}
+  - {fileID: 11400000, guid: 84df1bcdabe0fab4782278cac3fd662f, type: 2}
+  localNames:
+  - playerSensor
+  - cars
+  - logs
+  - homeBay
+  goName: Brain
 --- !u!1 &1702996714 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6308052464226184410, guid: 0b88d5d93e4ce0e4181c6d8553dd061d,
@@ -4546,7 +4560,7 @@ MonoBehaviour:
   gameTime: 30
   gameTimeWarning: 5
   gameTimer: 0
-  move: 0
+  move: 
   xpos: 0
   ypos: 0
   deadAnimation: 0

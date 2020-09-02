@@ -24,7 +24,7 @@ public class Player : MonoBehaviour
 
     private int occupiedCount;
 
-    public int move = 0;
+    public string move = "still";
 
     public int xpos = 0;
     public int ypos = 0;
@@ -55,19 +55,19 @@ public class Player : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            move = 1;
+            move = "up";
         }
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            move = 2;
+            move = "left";
         }
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            move = 3;
+            move = "right";
         }
         else if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            move = 4;
+            move = "down";
         }
     }
 
@@ -107,15 +107,14 @@ public class Player : MonoBehaviour
         Vector2 pos = transform.localPosition;
 
         //if (Input.GetKeyDown(KeyCode.UpArrow))
-        if (move == 1)
+        if (move.Equals("up"))
         {
             //Debug.Log("going up!");
             GetComponent<SpriteRenderer>().sprite = playerUp;
             pos += Vector2.up;
-            move = 0;
         }
         //else if (Input.GetKeyDown(KeyCode.DownArrow))
-        else if (move == 4)
+        else if (move.Equals("down"))
         {
             GetComponent<SpriteRenderer>().sprite = playerDown;
 
@@ -123,11 +122,10 @@ public class Player : MonoBehaviour
             {
                 pos += Vector2.down;
             }
-            move = 0;
 
         }
         //else if (Input.GetKeyDown(KeyCode.LeftArrow))
-        else if (move == 2)
+        else if (move.Equals("left"))
         {
             GetComponent<SpriteRenderer>().sprite = playerLeft;
 
@@ -135,10 +133,9 @@ public class Player : MonoBehaviour
             {
                 pos += Vector2.left;
             }
-            move = 0;
         }
         //else if (Input.GetKeyDown(KeyCode.RightArrow))
-        else if (move == 3)
+        else if (move.Equals("right"))
         {
             GetComponent<SpriteRenderer>().sprite = playerRight;
 
@@ -146,14 +143,9 @@ public class Player : MonoBehaviour
             {
                 pos += Vector2.right;
             }
-            move = 0;
-        }
-        else if (move == 0)
-        {
-            move = 0;
         }
         transform.localPosition = pos;
-
+        move = "still";
 
         x = (int)pos.x;
         y = (int)pos.y;

@@ -1,10 +1,4 @@
-%#maxint=100. 
 
-% noMove = 0
-% up     = 1
-% left   = 2
-% right  = 3
-% down   = 4
 % car(pos_x, pos_x, is_moving_right?)
 
 xCoord(0..16).
@@ -43,34 +37,35 @@ safe(X,Y) :- xCoord(X), home(X1,X2,Y,false), X>=X1, X<=X2.
 
 % GUESS on the next move
 % It is not possible to have a double move in 2 different sides with the choice rule
-possibleMoves(0..4).
+possibleMoves(still).
+possibleMoves(up).
+possibleMoves(left).
+possibleMoves(right).
+possibleMoves(down).
 {moveTo(X):possibleMoves(X)}=1.
 
 % Evaluating the future player position
-nextPlayerPos(X,Y):-playerPos(X,Y), moveTo(0).
-nextPlayerPos(X,Y1):-playerPos(X,Y), moveTo(1), Y1=Y+1.%up
-nextPlayerPos(X,Y1):-playerPos(X,Y), moveTo(4), Y1=Y-1.%down
-nextPlayerPos(X1,Y):-playerPos(X,Y), moveTo(2), X1=X-1.%left
-nextPlayerPos(X1,Y):-playerPos(X,Y), moveTo(3), X1=X+1.%right
+nextPlayerPos(X,Y):-playerPos(X,Y), moveTo(still).
+nextPlayerPos(X,Y1):-playerPos(X,Y), moveTo(up), Y1=Y+1.
+nextPlayerPos(X,Y1):-playerPos(X,Y), moveTo(down), Y1=Y-1.
+nextPlayerPos(X1,Y):-playerPos(X,Y), moveTo(left), X1=X-1.
+nextPlayerPos(X1,Y):-playerPos(X,Y), moveTo(right), X1=X+1.
 
 % CHECK on the movement
-% It is not possible to have a double move in 2 different sides
-% Do not jump in front of a car
-:-moveTo(3), playerPos(_,Y), car(_,Y1,true), Y1=Y+1.
-:-moveTo(2), playerPos(_,Y), car(_,Y1,false), Y1=Y+1.
+% Do not move accordingly with the car in the upper line
+:-moveTo(right), playerPos(_,Y), car(_,Y1,true), Y1=Y+1.
+:-moveTo(left), playerPos(_,Y), car(_,Y1,false), Y1=Y+1.
 
 % No suicide (move admissible only in safe positions)
 :- nextPlayerPos(X,Y), not safe(X,Y).
-
+% Do not move outside the game board
+:- moveTo(left), playerPos(0,Y).
 % OPTIMIZE
-% If possible, do not come back and do not stand still
-:~ nextPlayerPos(X,Y), playerPos(X1,Y1), Y<Y1, X=X1. [2@1,X,X1,Y,Y1]
-:~ nextPlayerPos(X,Y), playerPos(X1,Y1), Y=Y1, X=X1. [2@1,X,X1,Y,Y1]
-% Make a move
-:~ moveTo(X). [1@X,X]
-% Do not try to move outside the game board
-:~ moveTo(2), playerPos(0,Y). [1@2,Y]
-
+% Make a move preferring up. Go back only if it's the unique possible move.
+:~ moveTo(left). [1@1,2]
+:~ moveTo(right). [2@1,3]
+:~ moveTo(still). [3@1,0]
+:~ moveTo(down). [4@1,4]
 
 % Send the evaluated moves to the ThinkEngine Actuators
 setOnActuator(player(brain(player(move(A))))) :- moveTo(A).

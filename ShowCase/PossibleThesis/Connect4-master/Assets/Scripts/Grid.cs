@@ -5,48 +5,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Video;
 
-public class Cell
-{
-    int x;
-    int y;
-    int content;
-
-    public int Content
-    {
-        get { return this.content; }
-        set { this.content = value; }
-    }
-
-    public int X
-    {
-        get { return this.x; }
-        set { this.x = value; }
-    }
-
-    public int Y
-    {
-        get { return this.y; }
-        set { this.y = value; }
-    }
-
-    //public int x { get; set; }
-    //public int y { get; set; }
-    //public int content { get; set; }
-    public Cell()
-    {
-        content = 0;
-        x = 0;
-        y = 0;
-    }
-
-    public Cell(int v)
-    {
-        content = v;
-        x = 0;
-        y = 0;
-    }
-}
-
 [ExecuteInEditMode]
 public class Grid : MonoBehaviour
 {

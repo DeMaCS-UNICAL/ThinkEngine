@@ -60,6 +60,7 @@ public class Brain :MonoBehaviour
 
     void Awake()
     {
+        Debug.unityLogger.logEnabled = debug;
         //Debug.unityLogger.logEnabled = false;
         triggerClassPath = @".\Assets\Scripts\Trigger.cs";
         if (!Directory.Exists("Assets/Scripts"))
@@ -94,7 +95,7 @@ public class Brain :MonoBehaviour
         {
             initBrain2();
         }
-        Debug.unityLogger.logEnabled = debug;
+        
     }
     void Update()
     {

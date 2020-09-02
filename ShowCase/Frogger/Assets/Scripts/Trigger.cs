@@ -12,17 +12,18 @@ public class Trigger:ScriptableObject{
         watch.Start();
     }
 
-    public bool runReasoner()
+    public bool applyActuators()
     {
+        Debug.Log("checking if apply");
         if (GameObject.FindObjectOfType<Player>().deadAnimation)
         {
             return false;
         }
-        if (GameObject.FindObjectOfType<Player>().move != 0)
+        if (!GameObject.FindObjectOfType<Player>().move.Equals("still"))
         {
             return false;
         }
-        Debug.Log("returning true for sensors");
+        Debug.Log("returning true for actuators");
         return true;
     }
 
