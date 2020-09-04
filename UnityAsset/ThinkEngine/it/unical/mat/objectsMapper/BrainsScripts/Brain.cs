@@ -14,13 +14,16 @@ using System.Collections;
 using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
+using System.ComponentModel;
 
 [ExecuteInEditMode]
 
 public class Brain :MonoBehaviour
 {
     public readonly object toLock = new object();
+    public bool enableBrain;
     public bool debug;
+    public bool maintainFactFile;
     public List<SensorConfiguration> sensorsConfigurations;
     public List<ActuatorConfiguration> actuatorsConfigurations;
     //private List<AdvancedSensor> sensors;
@@ -34,14 +37,13 @@ public class Brain :MonoBehaviour
     internal bool solverWaiting;
     public string ASPFilePath;
     public string ASPFileTemplatePath;
-    public bool enableBrain;
-    public bool maintainFactFile;
+    public string triggerClassPath;
     //private bool updateSensors;
     private bool actuatorsReady;
     public bool updateSensorsRepeteadly;
+    [DisplayNameAttribute("test")]
     public float sensorsUpdateFrequencyMS;
     public bool updateSensorsOnTrigger;
-    public string triggerClassPath;
     public string updateSensorsOn="";
     private MethodInfo sensorsUpdateMethod;
     private MethodInfo reasonerMethod;

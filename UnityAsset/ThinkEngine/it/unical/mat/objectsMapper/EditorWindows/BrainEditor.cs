@@ -68,7 +68,6 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         }
         public override void OnInspectorGUI()
         {
-            // base.OnInspectorGUI();
             if (myScript.updateSensorsOnTrigger && myScript.updateSensorsRepeteadly)
             {
                 if (excludedProperties.Contains("sensorsUpdateFrequencyMS"))
@@ -99,9 +98,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             {
                 excludedProperties.Add("sensorsUpdateFrequencyMS");
             }
-            
-            SerializedObject serialized = new SerializedObject(myScript);
-            DrawPropertiesExcluding(serialized, excludedProperties.ToArray());
+            DrawPropertiesExcluding(serializedObject, excludedProperties.ToArray());
             
             if (myScript.updateSensorsOnTrigger)
             {
@@ -128,14 +125,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             EditorGUILayout.EndHorizontal();
             myScript.applyActuatorsCondition = methodsToShowForActuators[applyActuatorsIndex];
 
-            serialized.ApplyModifiedProperties();//CHECK SERIALIZATION
+            serializedObject.ApplyModifiedProperties();//CHECK SERIALIZATION
 
             Brain current = (Brain)target;
             if(GUILayout.Button("Generate ASP file template", GUILayout.Width(300)))
             {
                 current.generateFile();
             }
-            EditorGUILayout.LabelField("Warning! Generating a new file will delete the previouse template.");
+            EditorGUILayout.LabelField("Warning! Generating a new file will delete the previouse template."); 
 
         }
     }

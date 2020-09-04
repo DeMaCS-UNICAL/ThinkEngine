@@ -321,8 +321,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             {
                 Color contentTemp = GUI.contentColor;
                 Color backTemp = GUI.backgroundColor;
-                GUI.contentColor = Color.white;
-                GUI.backgroundColor = Color.red;
+                GUI.backgroundColor = Color.white;
+                GUI.contentColor = Color.red;
                 if (GUILayout.Button("Delete configuration",GUILayout.MaxWidth(150)))
                 {
                     configurator.deleteConfiguration(confToShow[chosenConfig]);
