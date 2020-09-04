@@ -4,7 +4,7 @@ Assume you are working on a Unity project stored in the *UnityGameProject* folde
 
 - Copy the EmbASP4Unity.dll file from bin\Debug to *UnityGameProject*\Assets\Plugins  [create the folder if not existing]
 - Copy the Newtonsoft.Json.dll file from bin\Debug to *UnityGameProject*\Assets\Plugins
-- Copy the dlv.exe binary from bin\Debug to *UnityGameProject*\lib
+- Copy the dlv2.exe binary from bin\Debug to *UnityGameProject*\lib
 - Make sure that dlv.exe has executability access rights.
 
 From now on you can use ThinkEngine for adding AI capabilities to your gameobject.
