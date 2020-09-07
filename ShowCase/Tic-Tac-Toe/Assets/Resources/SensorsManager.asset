@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -930550604, guid: 69449a7adfb3dc04c949fa4aca73af90, type: 3}
+  m_Name: SensorsManager
+  m_EditorClassIdentifier: 
+  confsToSerialize:
+  - {fileID: 11400000, guid: edabea8338cf84e41b47f02ea0d70b1a, type: 2}
+  - {fileID: 11400000, guid: d971a470b4ae2d646a86d71b8147be27, type: 2}
+  - {fileID: 11400000, guid: 6a4ce16c9f347e14b9acbca775ca5ddc, type: 2}
+  configuredGameObject:
+  - GridSpace
+  - Grid
+  - GameController
+  configurationsNames:
+  - GridSpace
+  - Grid
+  - GameController
