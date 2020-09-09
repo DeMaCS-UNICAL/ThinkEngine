@@ -15,6 +15,7 @@ using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 using System.ComponentModel;
+using UnityEditor;
 
 [ExecuteInEditMode]
 
@@ -41,7 +42,6 @@ public class Brain :MonoBehaviour
     //private bool updateSensors;
     private bool actuatorsReady;
     public bool updateSensorsRepeteadly;
-    [DisplayNameAttribute("test")]
     public float sensorsUpdateFrequencyMS;
     public bool updateSensorsOnTrigger;
     public string updateSensorsOn="";
@@ -62,14 +62,15 @@ public class Brain :MonoBehaviour
 
     void Awake()
     {
+        debug = true;
         Debug.unityLogger.logEnabled = debug;
         //Debug.unityLogger.logEnabled = false;
         triggerClassPath = @".\Assets\Scripts\Trigger.cs";
-        if (!Directory.Exists("Assets/Scripts"))
+        if (!Directory.Exists(@"Assets\Scripts"))
         {
-            Directory.CreateDirectory("Assets/Scripts");
+            Directory.CreateDirectory(@"Assets\Scripts");
         }
-        if (ASPFilePath.Equals(null))
+        if (ASPFilePath is null)
         {
             ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
         }
@@ -86,6 +87,7 @@ public class Brain :MonoBehaviour
                 Byte[] info = new UTF8Encoding(true).GetBytes(triggerClassContent);
                 fs.Write(info, 0, info.Length);
             }
+            AssetDatabase.Refresh();
         }
         //Debug.Log("FINISH WITH AWAKE");
     }
