@@ -20,11 +20,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
         }
         public string buildMapping(string name, char c, string value)
         {
-            //Debug.Log(name);
+            //MyDebugger.MyDebug(name);
             name = char.ToLower(name[0]) + name.Substring(1);
             for (int i = 1; i < name.Length; i++)
             {
-                //Debug.Log(name);
+                //MyDebugger.MyDebug(name);
                 if (name[i] == '^')
                 {
                     name = name.Substring(0,i+1)+ char.ToLower(name[i + 1]) + name.Substring(i+2);
@@ -45,12 +45,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
 
         public List<string> buildTemplateMapping(string name, char c)
         {
-            //Debug.Log(name);
+            //MyDebugger.MyDebug(name);
             List<string> res = new List<string>();
             name = char.ToLower(name[0]) + name.Substring(1);
             for (int i = 1; i < name.Length; i++)
             {
-                //Debug.Log(name);
+                //MyDebugger.MyDebug(name);
                 if (name[i] == '^')
                 {
                     name = name.Substring(0, i + 1) + char.ToLower(name[i + 1]) + name.Substring(i + 2);

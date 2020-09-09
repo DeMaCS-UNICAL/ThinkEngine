@@ -161,6 +161,7 @@
     <Compile Include="it\unical\mat\embasp\specializations\solver_planning_domains\SPDPlan.cs" />
     <Compile Include="it\unical\mat\embasp\specializations\solver_planning_domains\SPDUtility.cs" />
     <Compile Include="it\unical\mat\embasp\unity\AIManager.cs" />
+    <Compile Include="it\unical\mat\MyDebugger.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorConfigurator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\SimpleActuator.cs" />

@@ -58,7 +58,7 @@ public class GameObjectsTracker
     public AbstractConfiguration saveConfiguration(AbstractConfiguration conf, string chosenGO)
     {        
         conf.SaveConfiguration(this);
-        //Debug.Log(conf);
+        //MyDebugger.MyDebug(conf);
         return conf;
     }
 
@@ -106,11 +106,11 @@ public class GameObjectsTracker
             {
                 if (s!= null && s.properties.Contains(obj.Name()))
                 {
-                    //Debug.Log(obj.Name() + " found.");
+                    //MyDebugger.MyDebug(obj.Name() + " found.");
                     ObjectsToggled.Add(obj, true);
                     if (!IsMappable(obj) && gOValueForObj != null)
                     {
-                        // Debug.Log("calling update");
+                        // MyDebugger.MyDebug("calling update");
                         updateDataStructures(gOValueForObj, s, obj.Name());
                     }
                     else
@@ -122,7 +122,7 @@ public class GameObjectsTracker
                                 {
                                     //st.objType = obj.Type().GetElementType().ToString();
                                     basicTypeCollectionsConfigurations.Add(obj, st);
-                                    //Debug.Log("Adding st for " + obj.Name() + " whit type " + st.objType);
+                                    //MyDebugger.MyDebug("Adding st for " + obj.Name() + " whit type " + st.objType);
                                     break;
                                 }
                             }
@@ -162,7 +162,7 @@ public class GameObjectsTracker
         {
             if (s != null && s.properties.Contains(c.GetType().ToString()))
             {
-                //Debug.Log("component "+c+" name "+c.name+" type "+c.GetType());
+                //MyDebugger.MyDebug("component "+c+" name "+c.name+" type "+c.GetType());
                 ObjectsToggled.Add(c, true);                
                 updateDataStructures(c, s, c.GetType().ToString());
                 
@@ -199,16 +199,16 @@ public class GameObjectsTracker
 
     internal void updateDataStructures(object obj, AbstractConfiguration s, string parent)
     {
-        //Debug.Log("updating " + parent);
+        //MyDebugger.MyDebug("updating " + parent);
         
         List<FieldOrProperty> p = GetFieldsAndProperties(obj);
         ObjectsProperties.Add(obj, new Dictionary<string, FieldOrProperty>());
-        //Debug.Log("Adding derived from fields entry");
+        //MyDebugger.MyDebug("Adding derived from fields entry");
         ObjectDerivedFromFields.Add(obj, new Dictionary<string, object>());
         
         foreach (FieldOrProperty ob in p)
         {
-            //Debug.Log("Property " + ob.Name());
+            //MyDebugger.MyDebug("Property " + ob.Name());
             object objValueForOb;
             try
             {
@@ -216,23 +216,23 @@ public class GameObjectsTracker
             }
             catch (Exception e)
             {
-                //Debug.Log("cannot get value for property " + ob.Name());
+                //MyDebugger.MyDebug("cannot get value for property " + ob.Name());
                 objValueForOb = null;
             }
             ObjectsProperties[obj].Add(ob.Name(), ob);
-            //Debug.Log("complete name " + parent + "^" + ob.Name());
+            //MyDebugger.MyDebug("complete name " + parent + "^" + ob.Name());
             if (objValueForOb != null) 
             {
                 if (!ObjectsOwners.ContainsKey(objValueForOb))
                 {
                     ObjectsOwners.Add(objValueForOb, new KeyValuePair<object, string>(obj, ob.Name()));
                 }
-                //Debug.Log(ob.Name() + " owner is " + ObjectsOwners[objValueForOb]+"and its value is "+objValueForOb);
+                //MyDebugger.MyDebug(ob.Name() + " owner is " + ObjectsOwners[objValueForOb]+"and its value is "+objValueForOb);
 
             }
             if (s!=null && s.properties.Contains(parent+"^"+ob.Name()))
             {
-                //Debug.Log("s contains " + parent + "^" + ob.Name());   
+                //MyDebugger.MyDebug("s contains " + parent + "^" + ob.Name());   
                 ObjectsToggled.Add(ob, true);
                 if (!IsMappable(ob) && objValueForOb != null)
                 {
@@ -247,7 +247,7 @@ public class GameObjectsTracker
                             if (st.propertyName.Equals(parent + "^" + ob.Name()))
                             {
                                 //st.objType = ob.Type().GetElementType().ToString();
-                                //Debug.Log("Adding st for " + ob.Name() + " whit type " + st.objType);
+                                //MyDebugger.MyDebug("Adding st for " + ob.Name() + " whit type " + st.objType);
                                 basicTypeCollectionsConfigurations.Add(ob, st);
                                 break;
                             }
@@ -294,7 +294,7 @@ public class GameObjectsTracker
             {
                 if (s != null && s.properties.Contains(c.GetType().ToString()))
                 {
-                    //Debug.Log(obj.Name() + " found.");
+                    //MyDebugger.MyDebug(obj.Name() + " found.");
                     ObjectsToggled.Add(c, true);
                     updateDataStructures(c, s, c.GetType().ToString());
 

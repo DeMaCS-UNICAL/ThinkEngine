@@ -9,7 +9,7 @@ public class FieldOrProperty
 
     public FieldOrProperty(MemberInfo m)
     {
-        //Debug.Log(m.MemberType);
+        //MyDebugger.MyDebug(m.MemberType);
         if(m.MemberType == MemberTypes.Field)
         {
             f = (FieldInfo)m;

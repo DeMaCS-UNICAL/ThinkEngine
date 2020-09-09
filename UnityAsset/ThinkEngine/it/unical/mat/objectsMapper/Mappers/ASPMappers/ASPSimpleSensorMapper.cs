@@ -31,7 +31,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                 {
                     foreach (DictionaryEntry entry in dictionary)
                     {
-                        //Debug.Log(entry.Key);
+                        //MyDebugger.MyDebug(entry.Key);
                         string keyWithoutDotsAndSpaces = ((string)entry.Key).Replace(".", "");
                         keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace(" ", "");
                         keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace("_", "");
@@ -43,7 +43,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                         DictionaryEntry toMap = new DictionaryEntry();
                         toMap.Key = keyWithoutDotsAndSpaces;
                         string sensorNameNotCapital = char.ToLower(s.sensorName[0]) + s.sensorName.Substring(1);
-                        //Debug.Log("goname " + s.gOName);
+                        //MyDebugger.MyDebug("goname " + s.gOName);
                         string goNameNotCapital = "";
                         if (s.gOName.Length > 0)
                         {
@@ -56,9 +56,9 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                             {
                                 sensorMapping += goNameNotCapital + "(";
                             }
-                            //Debug.Log(sensorMapping + " " + entry.Value + " " + s.operationPerProperty[(string)toMap.Key]);
+                            //MyDebugger.MyDebug(sensorMapping + " " + entry.Value + " " + s.operationPerProperty[(string)toMap.Key]);
                             toMap.Value = Operation.compute(s.operationPerProperty[(string)entry.Key], entry.Value);
-                            //Debug.Log("toMap: " + toMap.Key + " " + toMap.Value);
+                            //MyDebugger.MyDebug("toMap: " + toMap.Key + " " + toMap.Value);
                             sensorMapping += manager.getMapper(mapperType).Map(toMap) + ")";
                             if (!s.gOName.Equals(""))
                             {
@@ -66,7 +66,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                             }
                             sensorMapping += Environment.NewLine;
                         }
-                        //Debug.Log("sensorMapping done for " + sensorMapping);
+                        //MyDebugger.MyDebug("sensorMapping done for " + sensorMapping);
                     }
                 }
                 foreach (IDictionary dic in s.dictionaryPerType.Values.Distinct())
@@ -95,7 +95,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                     keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace(" ", "");
                     keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace("_", "");
                     string sensorNameNotCapital = char.ToLower(s.sensorName[0]) + s.sensorName.Substring(1);
-                    //Debug.Log("goname " + s.gOName);
+                    //MyDebugger.MyDebug("goname " + s.gOName);
                     string goNameNotCapital = "";
                     if (s.gOName.Length > 0)
                     {
@@ -130,7 +130,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                     keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace(" ", "");
                     keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace("_", "");
                     string sensorNameNotCapital = char.ToLower(s.sensorName[0]) + s.sensorName.Substring(1);
-                    //Debug.Log("goname " + s.gOName);
+                    //MyDebugger.MyDebug("goname " + s.gOName);
                     string goNameNotCapital = "";
                     if (s.gOName.Length > 0)
                     {

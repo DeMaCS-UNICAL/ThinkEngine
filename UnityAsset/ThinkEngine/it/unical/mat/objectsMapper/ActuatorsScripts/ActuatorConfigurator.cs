@@ -60,7 +60,7 @@ using EmbASP4Unity.it.unical.mat.objectsMapper;
              popup.window = this;
              PopupWindow.Show(popupRect,popup);
              popup.wait();
-             Debug.Log("Configuration name " + configurationName);
+             MyDebugger.MyDebug("Configuration name " + configurationName);
              return configurationName;*/
             return "";
         }

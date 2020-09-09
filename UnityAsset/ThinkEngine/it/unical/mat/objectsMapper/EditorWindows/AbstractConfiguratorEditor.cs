@@ -78,7 +78,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
         override public void OnInspectorGUI()
         {
-            //Debug.Log("manager "+manager);
+            //MyDebugger.MyDebug("manager "+manager);
             try
             {
                 GUILayout.Label(typeOfConfigurator + " Configurator", EditorStyles.boldLabel);
@@ -108,8 +108,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 }
             }catch(Exception e)
             {
-                Debug.Log(e.Message);
-                Debug.Log(e.StackTrace);
+                MyDebugger.MyDebug(e.Message);
+                MyDebugger.MyDebug(e.StackTrace);
                 reset(true);
             }
         }
@@ -162,7 +162,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             }
             if (save)
             {
-                //Debug.Log("saving fdgdfgdfgdfgdf");
+                //MyDebugger.MyDebug("saving fdgdfgdfgdfgdf");
                 // checkToggled();
                 updateConfiguredObject();
                 configurator.onSaving();
@@ -239,15 +239,15 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             }*/
             try
             {
-                //Debug.Log("before adding"+manager.confs().Count);
+                //MyDebugger.MyDebug("before adding"+manager.confs().Count);
                 configurator.addConfiguration(tracker.saveConfiguration(conf, chosenGO));
-                //Debug.Log("after adding" + manager.confs().Count);
+                //MyDebugger.MyDebug("after adding" + manager.confs().Count);
 
             }
             catch (Exception e)
             {
-                //Debug.Log("error while adding");
-                //Debug.Log(e.StackTrace);
+                //MyDebugger.MyDebug("error while adding");
+                //MyDebugger.MyDebug(e.StackTrace);
             }
         }
 
@@ -407,7 +407,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                                     helpScroll = new Vector2(0, 0);
                                     if (!tracker.basicTypeCollectionsConfigurations.ContainsKey(obj))
                                     {
-                                        Debug.Log("adding simple tracker for " + objectToConfigure.Name() + " that is a " + objectToConfigure.Type());
+                                        MyDebugger.MyDebug("adding simple tracker for " + objectToConfigure.Name() + " that is a " + objectToConfigure.Type());
                                         tracker.basicTypeCollectionsConfigurations.Add(obj, new SimpleGameObjectsTracker(objectToConfigure.Type()));
                                     }
                                     tracker.basicTypeCollectionsConfigurations[obj].getBasicProperties();
@@ -434,7 +434,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
                     foreach (Component c in tracker.GOComponents[gO])
                     {
-                        //Debug.Log(c);
+                        //MyDebugger.MyDebug(c);
                         tracker.ObjectsToggled[c] = EditorGUILayout.Foldout(tracker.ObjectsToggled[c], c.GetType().ToString());
                         if (tracker.ObjectsToggled[c])
                         {
@@ -495,7 +495,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         {
 
             mainScroll = new Vector2(0, 0);
-            //Debug.Log(chosenGO);
+            //MyDebugger.MyDebug(chosenGO);
             tracker.updateDataStructures(chosenGO, null);
 
 
@@ -548,11 +548,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                             objectMode = true;
                             objectToConfigure = f;
                             helpScroll = new Vector2(0, 0);
-                            //Debug.Log("num: "+tracker.basicTypeCollectionsConfigurations.Count);
+                            //MyDebugger.MyDebug("num: "+tracker.basicTypeCollectionsConfigurations.Count);
                             if (!tracker.basicTypeCollectionsConfigurations.ContainsKey(f))
                             {
-                                //Debug.Log("f " + tracker.basicTypeCollectionsConfigurations[f]);
-                                Debug.Log("adding simple tracker for " + objectToConfigure.Name() + " that is a " + objectToConfigure.Type());
+                                //MyDebugger.MyDebug("f " + tracker.basicTypeCollectionsConfigurations[f]);
+                                MyDebugger.MyDebug("adding simple tracker for " + objectToConfigure.Name() + " that is a " + objectToConfigure.Type());
 
                                 tracker.basicTypeCollectionsConfigurations.Add(f, new SimpleGameObjectsTracker(objectToConfigure.Type()));
 
@@ -583,7 +583,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             SimpleGameObjectsTracker st = tracker.basicTypeCollectionsConfigurations[objectToConfigure];
             GUILayout.Label("Configure " + st.objType + " object for " + objectToConfigure.Name() + " property ", EditorStyles.boldLabel);
             List<string> propertiesNames = new List<string>();
-            //Debug.Log(st.propertiesToggled);
+            //MyDebugger.MyDebug(st.propertiesToggled);
             foreach (string s in st.propertiesToggled.Keys)
             {
                 propertiesNames.Add(s);

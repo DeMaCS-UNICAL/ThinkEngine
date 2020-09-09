@@ -57,11 +57,11 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
         _ASPRepMid = ASPRepresentation[1];
         _ASPRepSuffix = ASPRepresentation[2];
         ready = true;
-        /*Debug.Log("sensor " + sensorName);
-        Debug.Log("execute rep " + executeRepeteadly);
-        Debug.Log("trigger class " + triggerClass);
-        Debug.Log("update method " + updateMethod);
-        Debug.Log("update frequency " + frequency);*/
+        /*MyDebugger.MyDebug("sensor " + sensorName);
+        MyDebugger.MyDebug("execute rep " + executeRepeteadly);
+        MyDebugger.MyDebug("trigger class " + triggerClass);
+        MyDebugger.MyDebug("update method " + updateMethod);
+        MyDebugger.MyDebug("update frequency " + frequency);*/
        
     }
 
@@ -72,7 +72,7 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
         keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace(" ", "");
         keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace("_", "");
         string sensorNameNotCapital = char.ToLower(sensorName[0]) + sensorName.Substring(1);
-        ////Debug.Log("goname " + s.gOName);
+        ////MyDebugger.MyDebug("goname " + s.gOName);
         string goNameNotCapital = "";
         goNameNotCapital = char.ToLower(gameObject.name[0]) + gameObject.name.Substring(1);
         sensorMapping[0] = sensorNameNotCapital + "(";
@@ -115,7 +115,7 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
         {
             return;
         }
-        //Debug.Log("updating " + sensorName);
+        //MyDebugger.MyDebug("updating " + sensorName);
         ReadProperty();
         if (propertyValues.Count == 100)
         {
@@ -145,7 +145,7 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
 
     private object ReadSimplePropertyMethod(string path, Type type, object obj)
     {
-        //Debug.Log("SWITCHING");
+        //MyDebugger.MyDebug("SWITCHING");
 
         if (propertyType.Equals("VALUE"))
         {
@@ -167,17 +167,17 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
 
     private void ReadSimpleArrayProperty(string path, Type type, object obj)
     {
-        //Debug.Log("READING");
+        //MyDebugger.MyDebug("READING");
 
         object[] matrixValue = SensorsUtility.GetArrayProperty(path, collectionElementProperty, type, obj, indexes[0], indexes[1]);
-        //Debug.Log("Matrix: " + matrixValue[0]);
-        //Debug.Log("Property: " + matrixValue[1]);
+        //MyDebugger.MyDebug("Matrix: " + matrixValue[0]);
+        //MyDebugger.MyDebug("Property: " + matrixValue[1]);
         if (matrixValue[0] != null && matrixValue[1] != null)
         {
             FieldOrProperty toRead = (FieldOrProperty)matrixValue[1];
             Array matrix = (Array)matrixValue[0];
             
-            //Debug.Log("Casting " + toRead.GetValue(matrix.GetValue(indexes[0], indexes[1])).GetType() + " to " + typeof(T));
+            //MyDebugger.MyDebug("Casting " + toRead.GetValue(matrix.GetValue(indexes[0], indexes[1])).GetType() + " to " + typeof(T));
             propertyValues.Add((T)Convert.ChangeType(toRead.GetValue(matrix.GetValue(indexes[0], indexes[1])),typeof(T)));
         }
         else
@@ -202,7 +202,7 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
 
         else
         {
-           // Debug.Log("Destroing " + path);
+           // MyDebugger.MyDebug("Destroing " + path);
             SensorsManager.GetInstance().removeSensor(brain, this);
             Destroy(this);
             return;
@@ -217,7 +217,7 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
             return;
         }
         FieldOrProperty property = new FieldOrProperty(members[0]);
-        //Debug.Log("Casting " + property.GetValue(obj).GetType() + " to " + typeof(T));
+        //MyDebugger.MyDebug("Casting " + property.GetValue(obj).GetType() + " to " + typeof(T));
 
         propertyValues.Add((T)Convert.ChangeType(property.GetValue(obj), typeof(T)));        
     }

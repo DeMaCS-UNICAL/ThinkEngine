@@ -22,7 +22,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             set {
                 lock (toLock)
                 {
-                    Debug.Log("locking");
+                    MyDebugger.MyDebug("locking");
                     dataAvailable = value;
                 }
             }
@@ -64,7 +64,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             cleanDataStructures();
             foreach (string st in properties)
             {
-                //Debug.Log(st);
+                //MyDebugger.MyDebug(st);
                 operationPerProperty.Add(st, 0);
             }
             UpdateProperties();
@@ -72,24 +72,24 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 
         public SimpleSensor(SensorConfiguration s)
         {
-            Debug.Log("configuration "+s);
+            MyDebugger.MyDebug("configuration "+s);
             sensorName = s.configurationName;
             properties = new List<string>();
             mappingManager = MappingManager.getInstance();
             gO = ReflectionExecutor.GetGameObjectWithName(s.gOName);
-            Debug.Log("game object is " + gO);
+            MyDebugger.MyDebug("game object is " + gO);
             gOName = s.gOName;
             cleanDataStructures();
             properties.AddRange(s.properties.Distinct());
             foreach (StringIntPair p in s.operationPerProperty)
             {
                 operationPerProperty.Add(p.Key, p.Value);
-                //Debug.Log(p.Key + " " + p.Value);
+                //MyDebugger.MyDebug(p.Key + " " + p.Value);
                 if (p.Value == Operation.SPECIFIC)
                 {
                     foreach (StringStringPair pair2 in s.specificValuePerProperty)
                     {
-                        //Debug.Log(pair2.Key + " " + pair2.Value);
+                        //MyDebugger.MyDebug(pair2.Key + " " + pair2.Value);
                         if (pair2.Key.Equals(p.Key))
                         {
                             specificValuePerProperty.Add(p.Key, pair2.Value);
@@ -176,17 +176,17 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         {
             string parentName = st.Substring(0, st.IndexOf("^"));
             string child = st.Substring(st.IndexOf("^") + 1, st.Length - st.IndexOf("^") - 1);
-            //Debug.Log("component " + entire_name + " parent " + parentName + " child " + child);
+            //MyDebugger.MyDebug("component " + entire_name + " parent " + parentName + " child " + child);
             if (gOType== typeof(GameObject))
             {
                 Component c = ((GameObject)gO).GetComponent(parentName);
                 if (c != null)
                 {
                     
-                    //Debug.Log(c);
+                    //MyDebugger.MyDebug(c);
                     if (!child.Contains("^"))
                     {
-                        //Debug.Log(c.GetType());
+                        //MyDebugger.MyDebug(c.GetType());
                         updateSimpleProperty(entire_name, child, c.GetType(), c);
 
                     }
@@ -201,13 +201,13 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         private void updateSimpleProperty(string entire_name,string st, Type gOType, object obj)
         {
             MemberInfo[] members = gOType.GetMember(st,BindingAttr);
-            //Debug.Log("update "+entire_name+" members length"+ members.Length+" st "+st+" type "+gOType);
+            //MyDebugger.MyDebug("update "+entire_name+" members length"+ members.Length+" st "+st+" type "+gOType);
             if (members.Length == 0)
             {
                 return;
             }
             FieldOrProperty property = new FieldOrProperty(members[0]);
-            //Debug.Log(property.Type()+" contained: "+ dictionaryPerType.ContainsKey(property.Type()));
+            //MyDebugger.MyDebug(property.Type()+" contained: "+ dictionaryPerType.ContainsKey(property.Type()));
             if (dictionaryPerType.ContainsKey(property.Type()))
             {
                 Type listType = dictionaryPerType[property.Type()].GetType().GetGenericArguments()[1];
@@ -222,16 +222,16 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                 {
                     ((IList)dictionaryPerType[property.Type()][entire_name]).RemoveAt(0);
                 }
-                //Debug.Log("added " + entire_name);  
+                //MyDebugger.MyDebug("added " + entire_name);  
                    
             }
             else
             {
-                //Debug.Log("advanced update for " + entire_name);
+                //MyDebugger.MyDebug("advanced update for " + entire_name);
                 advancedUpdate(property,entire_name,obj);
             }
 
-            //Debug.Log("added " + st + "with value " + ((IList)dictionaryPerType[property.Type()][st])[((IList)dictionaryPerType[property.Type()][st]).Count - 1]);
+            //MyDebugger.MyDebug("added " + st + "with value " + ((IList)dictionaryPerType[property.Type()][st])[((IList)dictionaryPerType[property.Type()][st]).Count - 1]);
             
         }
 
@@ -246,14 +246,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             string parentName = st.Substring(0, st.IndexOf("^"));
             string child = st.Substring(st.IndexOf("^") + 1, st.Length - st.IndexOf("^") - 1);
             MemberInfo[] members = objType.GetMember(parentName, BindingAttr);
-            //Debug.Log("members with name " + parentName + " " + members.Length);
+            //MyDebugger.MyDebug("members with name " + parentName + " " + members.Length);
             if (members.Length == 0)
             {
                 updateComponent(entire_name, st, objType,obj);
                 return;
             }
             FieldOrProperty parentProperty = new FieldOrProperty(members[0]);
-            //Debug.Log(parentProperty.Name());
+            //MyDebugger.MyDebug(parentProperty.Name());
             object parent = parentProperty.GetValue(obj);
             Type parentType = parent.GetType();
             if (!child.Contains("^"))

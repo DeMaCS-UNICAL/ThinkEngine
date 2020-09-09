@@ -33,7 +33,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 if (mI.ReturnType == typeof(bool))
                 {
                     methodsToShow.Add(mI.Name);
-                    Debug.Log(mI.Name);
+                    MyDebugger.MyDebug(mI.Name);
                 }
             }
             methodsToShowForReasoner.Add("When Sensors are ready");

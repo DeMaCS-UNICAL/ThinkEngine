@@ -29,7 +29,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
-        ////Debug.Log("Awakening");
+        ////MyDebugger.MyDebug("Awakening");
         //Debug.unityLogger.logEnabled = true;
         sizeToTrack = new Dictionary<string, List<int>>();
         typeForCollectionProperty = new Dictionary<string, string>();
@@ -50,7 +50,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
         {
             foreach(string property in conf.properties.Distinct())
             {
-                Debug.Log("ADDING SENSOR FOR " + property + " TO " + gameObject.name);
+                MyDebugger.MyDebug("ADDING SENSOR FOR " + property + " TO " + gameObject.name);
                 object[] result=null;
                 Type type=null;
                 currentSubProperty = "";
@@ -62,7 +62,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
                         currentPropertyType= tracker.propertyType;
                         foreach(string subproperty in tracker.toSave)
                         {
-                            Debug.Log("SUBPROPERTY " + subproperty);
+                            MyDebugger.MyDebug("SUBPROPERTY " + subproperty);
                             currentSubProperty = subproperty;
                             result = ReadProperty(property);
                             configureSensor(result, type, conf, property, currentOperationPerProperty, generatedSensors);
@@ -92,7 +92,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
 
     private void configureSensor(object[] result, Type type, SensorConfiguration conf,string property, int currentOperationPerProperty,List<IMonoBehaviourSensor> generatedSensors)
     {
-        //Debug.Log("configuring sensors for " + property);
+        //MyDebugger.MyDebug("configuring sensors for " + property);
         if (result != null)
         {
             type = (Type)result[0];
@@ -100,7 +100,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
         if (type != null && currentPropertyType.Equals("VALUE"))
         {
             IMonoBehaviourSensor sensor = addSensor(conf.name, property, currentOperationPerProperty, type);
-            //Debug.Log("AND IT'S VALUE");
+            //MyDebugger.MyDebug("AND IT'S VALUE");
             sensor.done();
             generatedSensors.Add(sensor);
         }
@@ -109,7 +109,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
             List<int> currentSize = new List<int>();
             if (currentPropertyType.Equals("LIST"))
             {
-                //Debug.Log("AND IT'S LIST");
+                //MyDebugger.MyDebug("AND IT'S LIST");
                 currentSize.Add((int)result[1]);
                 for (int i = 0; i < (int)result[1]; i++)
                 {
@@ -123,7 +123,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
             }
             else if (currentPropertyType.Equals("ARRAY2"))
             {
-                Debug.Log("AND IT'S ARRAY2");
+                MyDebugger.MyDebug("AND IT'S ARRAY2");
                 currentSize.Add((int)result[1]);
                 currentSize.Add((int)result[2]);
                 for (int i = 0; i < (int)result[1]; i++)
@@ -142,8 +142,8 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
             }
             if (!sizeToTrack.ContainsKey(property))
             {
-                //Debug.Log("property " + property);
-                //Debug.Log("size " + currentSize.Count);
+                //MyDebugger.MyDebug("property " + property);
+                //MyDebugger.MyDebug("size " + currentSize.Count);
                 sizeToTrack.Add(property, currentSize);
                 typeForCollectionProperty.Add(property, currentPropertyType);
                 elementForCollectionProperty.Add(property, new List<string>());
@@ -156,11 +156,11 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
 
     private IMonoBehaviourSensor addSensor(string confName, string property, int currentOperationPerProperty, Type type)
     {
-        Debug.Log("ACTUALLY ADDING COMPONENT TO " + gameObject.name);
+        MyDebugger.MyDebug("ACTUALLY ADDING COMPONENT TO " + gameObject.name);
         sensorsAdded++;
-        Debug.Log("Added " + sensorsAdded + "sensors to " + gameObject.name);
+        MyDebugger.MyDebug("Added " + sensorsAdded + "sensors to " + gameObject.name);
         Component component = gameObject.AddComponent(SensorsUtility.actualMonoBehaviourSensor[type]);
-        //Debug.Log("component " + component);
+        //MyDebugger.MyDebug("component " + component);
         component.hideFlags = HideFlags.HideInInspector;
         IMonoBehaviourSensor sensor = component as IMonoBehaviourSensor;
         if (!sensor.ready)
@@ -181,10 +181,10 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
                 sensor.updateMethod = updateMethod;
             }
         }
-        /*Debug.Log("adding " + sensor.path);
+        /*MyDebugger.MyDebug("adding " + sensor.path);
         if (sensor.indexes.Count > 0)
         {
-            Debug.Log(" index " + sensor.indexes[0]);
+            MyDebugger.MyDebug(" index " + sensor.indexes[0]);
         }
         */
         return sensor;
@@ -195,34 +195,34 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
         object[] toReturn = null;
         if (!_path.Contains("^"))
         {
-            Debug.Log("SIMPLE PROPERTY");
+            MyDebugger.MyDebug("SIMPLE PROPERTY");
             toReturn = new object[1];
             toReturn[0] = ReadSimpleValueProperty(_path, typeof(GameObject), gameObject);
         }
         else
         {
-            Debug.Log("COMPOSED PROPERTY");
+            MyDebugger.MyDebug("COMPOSED PROPERTY");
             toReturn = (object[])SensorsUtility.ReadComposedProperty(gameObject, _path, _path, typeof(GameObject), gameObject, ReadSimplePropertyMethod);
         }
         return toReturn;
     }
     public object[] ReadSimplePropertyMethod(string path, Type type, object obj)
     {
-        Debug.Log("SWITCHING ON " + path);
+        MyDebugger.MyDebug("SWITCHING ON " + path);
         object[] toReturn = null;
         if (currentPropertyType.Equals("VALUE"))
         {
-            Debug.Log("VALUE PROPERTY");
+            MyDebugger.MyDebug("VALUE PROPERTY");
             toReturn = new object[1];
             toReturn[0] = ReadSimpleValueProperty(path, type, obj);
         }else if (currentPropertyType.Equals("ARRAY2"))
         {
-            Debug.Log("ARRAY2 PROPERTY");
+            MyDebugger.MyDebug("ARRAY2 PROPERTY");
             toReturn =  ReadSimpleArrayProperty(path,currentSubProperty, type, obj,0,0);
         }
         else if (currentPropertyType.Equals("LIST"))
         {
-            Debug.Log("LIST PROPERTY");
+            MyDebugger.MyDebug("LIST PROPERTY");
             toReturn =  ReadSimpleListProperty(path,currentSubProperty, type, obj,0);
         }
         return toReturn;
@@ -234,14 +234,14 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
         object[] toReturn = new object[4];
         if (matrixValue[0] != null && matrixValue[1] != null)
         {
-            Debug.Log("READING THE MATRIX!");
+            MyDebugger.MyDebug("READING THE MATRIX!");
             FieldOrProperty toRead = (FieldOrProperty)matrixValue[1];
             Array matrix = (Array)matrixValue[0];
             toReturn[0] = toRead.GetValue(matrix.GetValue(i, j)).GetType(); //Property type of the element of the collection
             toReturn[1] = matrix.GetLength(0);
             toReturn[2] = matrix.GetLength(1);
             toReturn[3] = matrix.GetValue(i,j).GetType(); //Collection Element Type
-            Debug.Log("LENGTH " + toReturn[1] + " " + toReturn[2]);
+            MyDebugger.MyDebug("LENGTH " + toReturn[1] + " " + toReturn[2]);
             return toReturn;
         }
         else if (matrixValue[0] != null)
@@ -319,18 +319,18 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
             {
                 newSizes = new List<int>();
                 currentSubProperty = currentElement;
-                Debug.Log("checking " + property + " sub " + currentSubProperty + " " + currentPropertyType);
+                MyDebugger.MyDebug("checking " + property + " sub " + currentSubProperty + " " + currentPropertyType);
                 object[] result = ReadProperty(property);
-                //Debug.Log(result.Length);
-                //Debug.Log("Collection type "+result[result.Length - 1]);
-                //Debug.Log("Collection length "+result[1]);
-                //Debug.Log("Property type " + result[0]);
-                //Debug.Log("Old size dimensions: " + sizeToTrack[property].Count);
+                //MyDebugger.MyDebug(result.Length);
+                //MyDebugger.MyDebug("Collection type "+result[result.Length - 1]);
+                //MyDebugger.MyDebug("Collection length "+result[1]);
+                //MyDebugger.MyDebug("Property type " + result[0]);
+                //MyDebugger.MyDebug("Old size dimensions: " + sizeToTrack[property].Count);
                 for (int i = 0; i < sizeToTrack[property].Count; i++)
                 {
                     newSizes.Add((int)result[i + 1]);
-                    //Debug.Log("property " + property + " element " + currentSubProperty);
-                    //Debug.Log("new size is "+newSizes[i]+" old one is "+ sizeToTrack[property][i]);
+                    //MyDebugger.MyDebug("property " + property + " element " + currentSubProperty);
+                    //MyDebugger.MyDebug("new size is "+newSizes[i]+" old one is "+ sizeToTrack[property][i]);
                     if (newSizes[i] > sizeToTrack[property][i])
                     {
                         if (currentPropertyType.Equals("LIST"))
@@ -343,9 +343,9 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
                             enlargedArray2(property, i, newSizes[i], (Type)result[0], (Type)result[3]);
                         }
                     }
-                    //Debug.Log("Still alive at " + i);
+                    //MyDebugger.MyDebug("Still alive at " + i);
                 }
-                //Debug.Log("New size dimensions: " + newSizes.Count);
+                //MyDebugger.MyDebug("New size dimensions: " + newSizes.Count);
             }
             sizeToTrack[property] = newSizes;
         }

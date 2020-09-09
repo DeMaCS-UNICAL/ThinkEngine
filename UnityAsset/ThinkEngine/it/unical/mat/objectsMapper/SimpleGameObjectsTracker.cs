@@ -17,7 +17,7 @@ public class SimpleGameObjectsTracker
     public SimpleGameObjectsTracker(Type type)
     {
         Type listType = ReflectionExecutor.isListOfType(type);
-        //Debug.Log("is of type " + listType);
+        //MyDebugger.MyDebug("is of type " + listType);
         if (!(listType is null))
         {
             propertyType = "LIST";
@@ -30,7 +30,7 @@ public class SimpleGameObjectsTracker
             objType = type.GetElementType().AssemblyQualifiedName;
             name = type.GetElementType().ToString();
         }
-        //Debug.Log("to string " + objType);
+        //MyDebugger.MyDebug("to string " + objType);
         toSave = new List<string>();
         propertiesToggled = new Dictionary<string, bool>();
         
@@ -41,7 +41,7 @@ public class SimpleGameObjectsTracker
     public void getBasicProperties()
     {
         Type local = Type.GetType(objType);
-        Debug.Log("obtained type from " + objType + " is " + local);
+        MyDebugger.MyDebug("obtained type from " + objType + " is " + local);
         List<FieldOrProperty> all = ReflectionExecutor.GetFieldsAndProperties(local);
         propertiesToggled = new Dictionary<string, bool>();
         

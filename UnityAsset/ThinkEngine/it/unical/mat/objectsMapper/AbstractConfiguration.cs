@@ -45,10 +45,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
                 
                 if (tr.ObjectsToggled[gOProperties[s]])
                 {
-                    //Debug.Log("property " + s + " toggled");
+                    //MyDebugger.MyDebug("property " + s + " toggled");
                     if (tracker.IsMappable(gOProperties[s]))
                     {
-                        //Debug.Log("adding " + gOProperties[s].Name());
+                        //MyDebugger.MyDebug("adding " + gOProperties[s].Name());
                         properties.Add(s);
                         if (!tracker.IsBaseType(gOProperties[s]))
                         {
@@ -62,7 +62,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
                     }
                     else if (tracker.ObjectDerivedFromFields.ContainsKey(gO))
                     {
-                        //Debug.Log("recursing on " + gOProperties[s].Name());
+                        //MyDebugger.MyDebug("recursing on " + gOProperties[s].Name());
                         recursevelyAdd(gO, gOProperties[s], "");
                     }
                 }
@@ -71,7 +71,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
             {
                 if (tr.ObjectsToggled[c])
                 {
-                    //Debug.Log("adding " + c.GetType().ToString());
+                    //MyDebugger.MyDebug("adding " + c.GetType().ToString());
                    // properties.Add(c.GetType().ToString());
                     Dictionary<string, FieldOrProperty> componentProperties = tr.ObjectsProperties[c];
                     foreach (string s in componentProperties.Keys)
@@ -81,7 +81,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
                             if (tracker.IsMappable(componentProperties[s]))
                             {
                                 string adding = c.GetType() + "^" + s;
-                                // Debug.Log("adding " + c.GetType().ToString() + "^" + s);
+                                // MyDebugger.MyDebug("adding " + c.GetType().ToString() + "^" + s);
                                 properties.Add(adding);
                                 if (tracker.IsBaseType(componentProperties[s]))
                                 {
@@ -103,7 +103,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
                             }
                             else if (tracker.ObjectDerivedFromFields.ContainsKey(c))// && !tracker.IsBaseType(componentProperties[s]))
                             {
-                                //Debug.Log("recursing on " + c.name);
+                                //MyDebugger.MyDebug("recursing on " + c.name);
                                 recursevelyAdd(c, componentProperties[s], c.GetType() + "^");
                             }
 
@@ -116,7 +116,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
             {
                 throw new Exception("No properties selected, invalid configuration to save.");
             }
-            //Debug.Log("success");
+            //MyDebugger.MyDebug("success");
         }
 
         
@@ -126,7 +126,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
             object derivedObj = tracker.ObjectDerivedFromFields[obj][fieldOrProperty.Name()];
             if (derivedObj == null || (tracker.ObjectsOwners.ContainsKey(derivedObj) && !tracker.ObjectsOwners[derivedObj].Key.Equals(obj)) || !tracker.ObjectsOwners[derivedObj].Value.Equals(fieldOrProperty.Name()) || derivedObj.Equals(tracker.GO))
             {
-               // Debug.Log(fieldOrProperty.Name()+" returning ");
+               // MyDebugger.MyDebug(fieldOrProperty.Name()+" returning ");
                 return;
             }
             if (tracker.ObjectsProperties.ContainsKey(derivedObj))
@@ -137,11 +137,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
 
                     if (tracker.ObjectsToggled[derivedObjProperties[s]])
                     {
-                        //Debug.Log(s + " is toggled");
+                        //MyDebugger.MyDebug(s + " is toggled");
                         if (tracker.IsMappable(derivedObjProperties[s]))
                         {
-                            //Debug.Log(derivedObjProperties[s].Name() + " toggled");
-                            // Debug.Log("adding " + parent + fieldOrProperty.Name() + "^" + s);
+                            //MyDebugger.MyDebug(derivedObjProperties[s].Name() + " toggled");
+                            // MyDebugger.MyDebug("adding " + parent + fieldOrProperty.Name() + "^" + s);
                             string adding = parent + fieldOrProperty.Name() + "^" + s;
                             properties.Add(adding);
                             if (tracker.IsBaseType(derivedObjProperties[s]))
@@ -164,7 +164,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper
 
                         else if (tracker.ObjectDerivedFromFields.ContainsKey(derivedObj) && !tracker.IsBaseType(derivedObjProperties[s]))
                         {
-                            //Debug.Log("recursin on " + parent + fieldOrProperty.Name() + "^" + derivedObjProperties[s].Name());
+                            //MyDebugger.MyDebug("recursin on " + parent + fieldOrProperty.Name() + "^" + derivedObjProperties[s].Name());
 
                             recursevelyAdd(derivedObj, derivedObjProperties[s], parent + fieldOrProperty.Name() + "^");
 

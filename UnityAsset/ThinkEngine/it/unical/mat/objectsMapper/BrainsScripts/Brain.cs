@@ -62,8 +62,7 @@ public class Brain :MonoBehaviour
 
     void Awake()
     {
-        debug = true;
-        Debug.unityLogger.logEnabled = debug;
+        MyDebugger.enabled = debug;
         //Debug.unityLogger.logEnabled = false;
         triggerClassPath = @".\Assets\Scripts\Trigger.cs";
         if (!Directory.Exists(@"Assets\Scripts"))
@@ -89,12 +88,12 @@ public class Brain :MonoBehaviour
             }
             AssetDatabase.Refresh();
         }
-        //Debug.Log("FINISH WITH AWAKE");
+        //MyDebugger.MyDebug("FINISH WITH AWAKE");
     }
     void Start()
     {
         //Debug.unityLogger.logEnabled = false;
-        //Debug.Log("STARTING BRAIN");
+        //MyDebugger.MyDebug("STARTING BRAIN");
         if (Application.isPlaying && enableBrain)
         {
             initBrain2();
@@ -155,12 +154,12 @@ public class Brain :MonoBehaviour
         foreach (SensorConfiguration conf in sensorsConfigurations)
         {
             sensors.Add(new AdvancedSensor(conf));
-            ////Debug.Log(conf.configurationName+" added");
+            ////MyDebugger.MyDebug(conf.configurationName+" added");
         }
         foreach (ActuatorConfiguration conf in actuatorsConfigurations)
         {
             actuators.Add(new SimpleActuator(conf));
-            ////Debug.Log(conf.configurationName+" added");
+            ////MyDebugger.MyDebug(conf.configurationName+" added");
         }
         mapper = MappingManager.getInstance();
         IMapper actuatorMapper = mapper.getMapper(typeof(SimpleActuator));
@@ -189,7 +188,7 @@ public class Brain :MonoBehaviour
         embasp = new SolverExectuor(this);
         triggerClass = ScriptableObject.CreateInstance("Trigger");
         MethodInfo[] methods = triggerClass.GetType().GetMethods();
-        ////Debug.Log("creating sensors");
+        ////MyDebugger.MyDebug("creating sensors");
         prepareSensors(sensors, sensorsManagers, methods, triggerClass);
         prepareActuators(sensors, actuators, methods);
         if (!executeReasonerOn.Equals("When Sensors are ready"))
@@ -198,7 +197,7 @@ public class Brain :MonoBehaviour
             {
                 if (mI.Name.Equals(executeReasonerOn))
                 {
-                    ////Debug.Log(mI.Name);
+                    ////MyDebugger.MyDebug(mI.Name);
                     reasonerMethod = mI;
                     StartCoroutine("pulseOn");
                     break;
@@ -221,7 +220,7 @@ public class Brain :MonoBehaviour
         foreach (ActuatorConfiguration conf in actuatorsConfigurations)
         {
             actuators.Add(new SimpleActuator(conf));
-            ////Debug.Log(conf.configurationName+" added");
+            ////MyDebugger.MyDebug(conf.configurationName+" added");
         }
         actuatorsManager.registerActuators(this, actuators);
 
@@ -234,7 +233,7 @@ public class Brain :MonoBehaviour
         {
             if (mI.Name.Equals(applyActuatorsCondition))
             {
-                Debug.Log("apply actuators on "+mI.Name);
+                MyDebugger.MyDebug("apply actuators on "+mI.Name);
                 applyActuatorsMethod = mI;
             }
         }
@@ -249,7 +248,7 @@ public class Brain :MonoBehaviour
             {
                 if (mI.Name.Equals(updateSensorsOn))
                 {
-                    ////Debug.Log(mI.Name);
+                    ////MyDebugger.MyDebug(mI.Name);
                     sensorsUpdateMethod = mI;
                     break;
                     //StartCoroutine("UpdateSensorsOnTrigger");
@@ -264,7 +263,7 @@ public class Brain :MonoBehaviour
                 currentManager = GameObject.Find(conf.gOName).AddComponent<MonoBehaviourSensorsManager>();
                 currentManager.brain = this;
             }
-            //Debug.Log("configuration of the manager of " + conf.gOName + " game object: " + currentManager.configurations);
+            //MyDebugger.MyDebug("configuration of the manager of " + conf.gOName + " game object: " + currentManager.configurations);
             if (updateSensorsRepeteadly)
             {
                 currentManager.executeRepeteadly = updateSensorsRepeteadly;
@@ -294,7 +293,7 @@ public class Brain :MonoBehaviour
             lock (toLock)
             {
                 solverWaiting = false;
-                Debug.Log("Pulsing in brain");
+                MyDebugger.MyDebug("Pulsing in brain");
                 Monitor.Pulse(toLock);
             }
         }
@@ -323,7 +322,7 @@ public class Brain :MonoBehaviour
         }
         if (embasp != null) {
             embasp.reason = false;
-            ////Debug.Log("finalize");
+            ////MyDebugger.MyDebug("finalize");
             sensorManager.pulseExecutor(this);
             finalize();
         }

@@ -53,30 +53,30 @@ public static class SensorsUtility
         //////Debug.unityLogger.logEnabled = false;
 
         MemberInfo[] members = type.GetMember(path, BindingAttr);
-        //////Debug.Log("LOOKING FOR " + path + " MATRIX");
+        //////MyDebugger.MyDebug("LOOKING FOR " + path + " MATRIX");
         object[] toReturn = new object[2];
         if (members.Length == 0)
         {
             return toReturn;
         }
-        //////Debug.Log("MATRIX FOUND");
+        //////MyDebugger.MyDebug("MATRIX FOUND");
 
         FieldOrProperty property = new FieldOrProperty(members[0]);
         Array matrix = property.GetValue(obj) as Array;
-        //////Debug.Log("THE MATRIX "+property.Name()+" IN " + obj + " IS " + matrix);
+        //////MyDebugger.MyDebug("THE MATRIX "+property.Name()+" IN " + obj + " IS " + matrix);
         toReturn[0] = matrix;
         if (matrix!=null && matrix.GetLength(0) > i && matrix.GetLength(1) > j)
         {
-            ////Debug.Log("COLLECTION ELEMENT PROPERTY " + collectionElementProperty);
+            ////MyDebugger.MyDebug("COLLECTION ELEMENT PROPERTY " + collectionElementProperty);
             MemberInfo[] m = matrix.GetValue(i, j).GetType().GetMember(collectionElementProperty, BindingAttr);
-            ////Debug.Log("MATRIX ELEMENTS TYPE " + matrix.GetValue(i, j).GetType());
+            ////MyDebugger.MyDebug("MATRIX ELEMENTS TYPE " + matrix.GetValue(i, j).GetType());
             if (m.Length == 0)
             {
                 return toReturn;
             }
             else
             {
-                ////Debug.Log("FOUND INNER PROPERTY ");
+                ////MyDebugger.MyDebug("FOUND INNER PROPERTY ");
             }
             toReturn[1] = new FieldOrProperty(m[0]);
 
@@ -114,13 +114,13 @@ public static class SensorsUtility
         string parentName = st.Substring(0, st.IndexOf("^"));
         string child = st.Substring(st.IndexOf("^") + 1, st.Length - st.IndexOf("^") - 1);
         MemberInfo[] members = objType.GetMember(parentName, SensorsUtility.BindingAttr);
-        Debug.Log("members with name " + parentName + " " + members.Length);
+        MyDebugger.MyDebug("members with name " + parentName + " " + members.Length);
         if (members.Length == 0)
         {
             return ReadComponent(gameObject, entire_name, st, objType, obj, ReadSimpleProperty);
         }
         FieldOrProperty parentProperty = new FieldOrProperty(members[0]);
-        ///Debug.Log(parentProperty.Name());
+        ///MyDebugger.MyDebug(parentProperty.Name());
         object parent = parentProperty.GetValue(obj);
         Type parentType = parent.GetType();
         if (!child.Contains("^"))
@@ -137,18 +137,18 @@ public static class SensorsUtility
         ////Debug.unityLogger.logEnabled = false;
         string parentName = st.Substring(0, st.IndexOf("^"));
         string child = st.Substring(st.IndexOf("^") + 1, st.Length - st.IndexOf("^") - 1);
-        Debug.Log("component " + entire_name + " parent " + parentName + " child " + child+" goType "+gOType);
+        MyDebugger.MyDebug("component " + entire_name + " parent " + parentName + " child " + child+" goType "+gOType);
         if (gOType == typeof(GameObject))
         {
-            Debug.Log(gameObject.name + " is the GO");
+            MyDebugger.MyDebug(gameObject.name + " is the GO");
             foreach(Component c in gameObject.GetComponents(typeof(MonoBehaviour)))
             {
                 if (c.GetType().Name.Equals(parentName))
                 {
-                    Debug.Log("component " + c);
+                    MyDebugger.MyDebug("component " + c);
                     if (!child.Contains("^"))
                     {
-                        Debug.Log(" of type " + c.GetType());
+                        MyDebugger.MyDebug(" of type " + c.GetType());
                         return ReadSimpleProperty(child, c.GetType(), c);
                     }
                     else

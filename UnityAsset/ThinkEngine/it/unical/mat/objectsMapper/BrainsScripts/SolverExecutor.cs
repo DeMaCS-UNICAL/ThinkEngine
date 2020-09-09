@@ -49,7 +49,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 {
                     lock (brain.toLock)
                     {
-                        Debug.Log("going to wait for pulse by brain");
+                        MyDebugger.MyDebug("going to wait for pulse by brain");
                         brain.solverWaiting = true;
                         Monitor.Wait(brain.toLock);
                     }
@@ -71,35 +71,35 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 }
                 catch (Exception e)
                 {
-                   Debug.Log("CAUGHT EXECPTION!!!!");
-                    UnityEngine.Debug.LogError(e.Message);
-                    UnityEngine.Debug.LogError(e.StackTrace);
+                   MyDebugger.MyDebug("CAUGHT EXECPTION!!!!");
+                    MyDebugger.MyDebug(e.Message);
+                    MyDebugger.MyDebug(e.StackTrace);
                 }
 
 
                 Handler handler = new DesktopHandler(new DLV2DesktopService(@".\lib\dlv2.exe"));                //With DLV2DesktopService I get a Error during parsing: --> Invalid #show directive: setOnActuator/1--competition-output.
                 //With DLVDesktopService the AS, obviously, are wrongly parsed
                 InputProgram encoding = new ASPInputProgram();
-                Debug.Log("adding encoding");
+                MyDebugger.MyDebug("adding encoding");
                 encoding.AddFilesPath(Path.GetFullPath(brain.ASPFilePath));
                 InputProgram facts = new ASPInputProgram();
-                Debug.Log("adding facts");
+                MyDebugger.MyDebug("adding facts");
                 facts.AddFilesPath(factsPath);
                 handler.AddProgram(encoding);
                 handler.AddProgram(facts);
                 handler.AddOption(new OptionDescriptor("--filter=setOnActuator/1 "));
                 stopwatch.Restart();
-                Debug.Log("starting sync");
+                MyDebugger.MyDebug("starting sync");
                 Output o = handler.StartSync();
                 if (!o.ErrorsString.Equals(""))
                 {
-                    Debug.Log(o.ErrorsString + " " + o.OutputString);
+                    MyDebugger.MyDebug(o.ErrorsString + " " + o.OutputString);
                 }
                 AnswerSets answers = (AnswerSets)o;
                 stopwatch.Stop();
                 brain.asSteps++;
                 brain.asTotalMS += stopwatch.ElapsedMilliseconds;
-                Debug.Log("num of AS " + answers.Answersets.Count);
+                MyDebugger.MyDebug("num of AS " + answers.Answersets.Count);
                 if (answers.Answersets.Count > 0)
                 {
                     lock (brain.toLock)

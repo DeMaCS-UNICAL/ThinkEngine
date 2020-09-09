@@ -22,7 +22,7 @@ using EmbASP4Unity.it.unical.mat.objectsMapper;
 
         protected void Awake()
         {
-            //Debug.Log("awaken " + manager);
+            //MyDebugger.MyDebug("awaken " + manager);
             if (goName is null)
             {
                 goName = gameObject.name;
@@ -87,7 +87,7 @@ using EmbASP4Unity.it.unical.mat.objectsMapper;
 
         internal void deleteConfiguration(string v)
         {
-            Debug.Log("deleting " + v);
+            MyDebugger.MyDebug("deleting " + v);
             int i = 0;
             for (; i < gOConfigurations.Count; i++)
             {
@@ -98,7 +98,7 @@ using EmbASP4Unity.it.unical.mat.objectsMapper;
             }
             if (i < gOConfigurations.Count)
             {
-                Debug.Log(gOConfigurations[i].configurationName);
+                MyDebugger.MyDebug(gOConfigurations[i].configurationName);
                 onDeleting(gOConfigurations[i]);
                 gOConfigurations.RemoveAt(i);
                 localNames.Remove(v);

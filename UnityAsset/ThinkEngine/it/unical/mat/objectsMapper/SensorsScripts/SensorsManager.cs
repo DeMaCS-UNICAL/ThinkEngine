@@ -68,7 +68,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 
         internal static SensorsManager GetInstance()
         {
-           // Debug.Log("instance " + instance);
+           // MyDebugger.MyDebug("instance " + instance);
             if (instance == null)
             {
                 if (!Directory.Exists("Assets/Resources"))
@@ -84,8 +84,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                     instance = (SensorsManager)AssetDatabase.LoadAssetAtPath("Assets/Resources/SensorsManager.asset", typeof(SensorsManager));
                 }
             }
-            //Debug.Log("instance after " + instance);
-            //Debug.Log("confs: " + instance.sensConfs.Count);
+            //MyDebugger.MyDebug("instance after " + instance);
+            //MyDebugger.MyDebug("confs: " + instance.sensConfs.Count);
             return instance;
         }
 
@@ -133,10 +133,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         {
             if (sensorsUpdatedCount(brain) != instantiatedSensorsCount(brain))
             {
-               // MyDebug("I'm waiting since " + sensorsUpdatedCount(brain) + "<>" + instantiatedSensorsCount(brain),brain.debug);
-                MyDebug(Thread.CurrentThread.Name + " is going to wait", brain.debug);
+               // MyDebugger.MyDebug("I'm waiting since " + sensorsUpdatedCount(brain) + "<>" + instantiatedSensorsCount(brain),brain.debug);
+                MyDebugger.MyDebug(Thread.CurrentThread.Name + " is going to wait");
                 Monitor.Wait(lockOn);
-                MyDebug(Thread.CurrentThread.Name + "is going to execute", brain.debug);
+                MyDebugger.MyDebug(Thread.CurrentThread.Name + "is going to execute");
             }
             return getInstantiatedSensors(brain);
         }
@@ -185,11 +185,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                     sensorsUpdated.Add(brain, 0);
                 }
                 sensorsUpdated[brain]++;
-                //Debug.Log("sensor instantiated: " + instantiatedSensors[brain].Count + " updated: " + sensorsUpdated[brain]);
+                //MyDebugger.MyDebug("sensor instantiated: " + instantiatedSensors[brain].Count + " updated: " + sensorsUpdated[brain]);
                 //Debug.Break();
                 if (sensorsUpdated[brain] == instantiatedSensors[brain].Count)
                 {
-                    //Debug.Log("pulsing on sensor updated");
+                    //MyDebugger.MyDebug("pulsing on sensor updated");
                     Monitor.Pulse(lockOn);
                     sensorsUpdated[brain] = 0;
                 }
@@ -203,11 +203,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                 sens.UpdateProperties();
                 /*if (sens.matrixProperties.Count() > 0)
                 {
-                    Debug.Log(sens.matrixProperties.Count() + " " + sens.matrixProperties.First().Key + " " + sens.matrixProperties.First().Value);
+                    MyDebugger.MyDebug(sens.matrixProperties.Count() + " " + sens.matrixProperties.First().Key + " " + sens.matrixProperties.First().Value);
                 }
                 if (sens.listProperties.Count > 0)
                 {
-                    Debug.Log(sens.listProperties.Count() + " " + sens.listProperties.First().Key + " " + sens.listProperties.First().Value);
+                    MyDebugger.MyDebug(sens.listProperties.Count() + " " + sens.listProperties.First().Key + " " + sens.listProperties.First().Value);
                 }
 
             }
@@ -218,7 +218,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             confsToSerialize = new List<SensorConfiguration>();
             foreach (AbstractConfiguration conf in sensConfs)
             {
-                //Debug.Log("before serialization " + ((SensorConfiguration)conf).operationPerProperty.Count);
+                //MyDebugger.MyDebug("before serialization " + ((SensorConfiguration)conf).operationPerProperty.Count);
                 SensorConfiguration sensorConf = (SensorConfiguration)conf;
                 confsToSerialize.Add(sensorConf);
             }
@@ -290,7 +290,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 
         public void addConfiguration(AbstractConfiguration abstractConfiguration)
         {
-            //Debug.Log("checking if to delete " + abstractConfiguration.name);
+            //MyDebugger.MyDebug("checking if to delete " + abstractConfiguration.name);
             delete(abstractConfiguration.configurationName);
             sensConfs.Add(abstractConfiguration);
             if (!configurationsNames.Contains(abstractConfiguration.configurationName))
@@ -321,14 +321,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                 instantiatedSensors[brain].Remove(sensor);
             }
         }
-        private static void MyDebug(string v, bool debug)
-        {
-            if (debug)
-            {
-                Debug.Log(v);
-            }
-        }
-
+        
         internal void pulseExecutor(Brain brain)
         {
             object toLock = getLock(brain);

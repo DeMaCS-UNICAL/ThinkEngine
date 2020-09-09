@@ -19,15 +19,15 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
             lock (s.toLock)
             {
                 MappingManager manager = MappingManager.getInstance();
-                //Debug.Log("mapping " + s.sensorName);
+                //MyDebugger.MyDebug("mapping " + s.sensorName);
                 sensorMapping = manager.getMapper(typeof(SimpleSensor)).Map(s);
-                //Debug.Log("mapped as simple "+sensorMapping);
+                //MyDebugger.MyDebug("mapped as simple "+sensorMapping);
                 sensorMapping = matrixMapping(s, sensorMapping, manager);
                 sensorMapping = listMapping(s, sensorMapping, manager);
 
                 s.dataAvailable = false;
             }
-            //Debug.Log(s.sensorName+" sensor mapping: " + sensorMapping);
+            //MyDebugger.MyDebug(s.sensorName+" sensor mapping: " + sensorMapping);
             return sensorMapping;
         }
 
@@ -40,20 +40,20 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
         {
             foreach (string matrixPath in s.matrixProperties.Keys)
             {
-                //Debug.Log(matrixPath);
+                //MyDebugger.MyDebug(matrixPath);
                 if (s.matrixProperties.ContainsKey(matrixPath))
                 {
-                    //Debug.Log("matrix found");
+                    //MyDebugger.MyDebug("matrix found");
                     string keyWithoutDotsAndSpaces = matrixPath.Replace(".", "");
                     keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace(" ", "");
                     keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace("_", "");
 
                     SimpleSensor[,] matrix = s.matrixProperties[matrixPath];
-                    //Debug.Log("matrix size "+matrix.GetLength(0) + " " + matrix.GetLength(1));
+                    //MyDebugger.MyDebug("matrix size "+matrix.GetLength(0) + " " + matrix.GetLength(1));
                     int r = matrix.GetLength(0), c = matrix.GetLength(1);
                     string sensorNameNotCapital = char.ToLower(s.sensorName[0]) + s.sensorName.Substring(1);
                     
-                    //Debug.Log("goname " + s.gOName);
+                    //MyDebugger.MyDebug("goname " + s.gOName);
                     string goNameNotCapital = "";
                     if (s.gOName.Length > 0)
                     {
@@ -74,7 +74,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                     string toConcat = keyWithoutDotsAndSpaces.Substring(start, keyWithoutDotsAndSpaces.Length - start);
                     prefix += char.ToLower(toConcat[0]) + toConcat.Substring(1) + "(";
                     suffix = ")" + suffix;
-                    //Debug.Log("prefix " + prefix + " suffix " + suffix);
+                    //MyDebugger.MyDebug("prefix " + prefix + " suffix " + suffix);
                     for (int i = 0; i < r; i++)
                     {
                         for (int j = 0; j < c; j++)
@@ -83,10 +83,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                             Type mapperType = typeof(SimpleSensor);
                             string[] innerSensorMapping = manager.getMapper(mapperType).Map(matrix[i, j]).Split(
         new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-                            //Debug.Log("innerSensorMapping count " + innerSensorMapping.Length);
+                            //MyDebugger.MyDebug("innerSensorMapping count " + innerSensorMapping.Length);
                             foreach (string partialMap in innerSensorMapping)
                             {
-                                //Debug.Log(partialMap);
+                                //MyDebugger.MyDebug(partialMap);
                                 sensorMapping += prefix + i + "," + j + "," + partialMap + suffix + "\n";
 
                             }
@@ -95,7 +95,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                     }
                 }
             }
-            //Debug.Log(sensorMapping);
+            //MyDebugger.MyDebug(sensorMapping);
 
             //s.matrixProperties = new Dictionary<string, SimpleSensor[,]>();
             return sensorMapping;
@@ -105,7 +105,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
         {
             foreach (string listPath in s.listProperties.Keys)
             {
-                //Debug.Log(listPath);
+                //MyDebugger.MyDebug(listPath);
                 if (s.listProperties.ContainsKey(listPath))
                 {
                     string keyWithoutDotsAndSpaces = listPath.Replace(".", "");
@@ -113,9 +113,9 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                     keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace("_", "");
 
                     List<SimpleSensor> list = s.listProperties[listPath];
-                    //Debug.Log(list.Count);
+                    //MyDebugger.MyDebug(list.Count);
                     string sensorNameNotCapital = char.ToLower(s.sensorName[0]) + s.sensorName.Substring(1);
-                    //Debug.Log("goname " + s.gOName);
+                    //MyDebugger.MyDebug("goname " + s.gOName);
                     string goNameNotCapital = "";
                     if (s.gOName.Length > 0)
                     {
@@ -143,7 +143,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
         new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                             foreach (string partialMap in innerSensorMapping)
                             {
-                               // Debug.Log(partialMap);
+                               // MyDebugger.MyDebug(partialMap);
                                 sensorMapping += prefix + i + "," + partialMap + suffix + "\n";
                              }
                     }
@@ -151,7 +151,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
             }
 
             //s.matrixProperties = new Dictionary<string, SimpleSensor[,]>();
-            //Debug.Log(sensorMapping);
+            //MyDebugger.MyDebug(sensorMapping);
 
             return sensorMapping;
         }
@@ -176,7 +176,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                 keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace(" ", "");
                 keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace("_", "");
                 string sensorNameNotCapital = char.ToLower(s.sensorName[0]) + s.sensorName.Substring(1);
-                //Debug.Log("goname " + s.gOName);
+                //MyDebugger.MyDebug("goname " + s.gOName);
                 string goNameNotCapital = "";
                 if (s.gOName.Length > 0)
                 {
@@ -203,18 +203,18 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                     partial[0] = partial[0] + temp[0] + "(";
                     partial.Add(inner[0]);
                     partial.Add(inner[inner.Count - 1] + temp[temp.Count - 1] + "))");
-                    /*Debug.Log("Advanced conf " + p);
+                    /*MyDebugger.MyDebug("Advanced conf " + p);
                     if (s.matrixProperties.Count > 0)
                     {
-                        //Debug.Log("matrix " + s.matrixProperties.First());
+                        //MyDebugger.MyDebug("matrix " + s.matrixProperties.First());
                     }
                     if (s.listProperties.Count > 0)
                     {
-                        //Debug.Log("list " + s.listProperties.First());
+                        //MyDebugger.MyDebug("list " + s.listProperties.First());
                     }
                     if (s.matrixProperties.ContainsKey(p))
                     {
-                        //Debug.Log("is a matrix");
+                        //MyDebugger.MyDebug("is a matrix");
                         List<string> temp= ASPMapperHelper.getInstance().buildTemplateMapping(keyWithoutDotsAndSpaces, '^');//TODO: improve whene map other types
                         partial[0] = partial[0] + temp[0]+"(" + inner[0];
                         partial.Add("");
@@ -223,7 +223,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                     }
                     else if (s.listProperties.ContainsKey(p))
                     {
-                        //Debug.Log("is a list");
+                        //MyDebugger.MyDebug("is a list");
                         rep += ASPMapperHelper.getInstance().buildMapping(keyWithoutDotsAndSpaces, '^', "(X," + partial + ")") + ")";//TODO: improve whene map other types
 
                     }*/
@@ -248,7 +248,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                 keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace(" ", "");
                 keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace("_", "");
                 string sensorNameNotCapital = char.ToLower(s.sensorName[0]) + s.sensorName.Substring(1);
-                //Debug.Log("goname " + s.gOName);
+                //MyDebugger.MyDebug("goname " + s.gOName);
                 string goNameNotCapital = "";
                 if (s.gOName.Length > 0)
                 {
@@ -264,24 +264,24 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
                     string elemType = s.advancedConf[p].name;
                     elemType = Char.ToLower(elemType[0])+elemType.Substring(1);
                     string partial = elemType+"("+ ASPMapperHelper.getInstance().buildMapping(p2, '^', "(V)")+")";
-                    //Debug.Log("Advanced conf " + p);
+                    //MyDebugger.MyDebug("Advanced conf " + p);
                     if (s.matrixProperties.Count > 0)
                     {
-                        //Debug.Log("matrix " + s.matrixProperties.First());
+                        //MyDebugger.MyDebug("matrix " + s.matrixProperties.First());
                     }
                     if (s.listProperties.Count > 0)
                     {
-                        //Debug.Log("list " + s.listProperties.First());
+                        //MyDebugger.MyDebug("list " + s.listProperties.First());
                     }
                     if (s.matrixProperties.ContainsKey(p))
                     {
-                        //Debug.Log("is a matrix");
+                        //MyDebugger.MyDebug("is a matrix");
                         rep += ASPMapperHelper.getInstance().buildMapping(keyWithoutDotsAndSpaces, '^', "(X,Y," + partial + ")") + ")";//TODO: improve whene map other types
 
                     }
                     else if (s.listProperties.ContainsKey(p))
                     {
-                        //Debug.Log("is a list");
+                        //MyDebugger.MyDebug("is a list");
                         rep += ASPMapperHelper.getInstance().buildMapping(keyWithoutDotsAndSpaces, '^', "(X," + partial + ")") + ")";//TODO: improve whene map other types
 
                     }

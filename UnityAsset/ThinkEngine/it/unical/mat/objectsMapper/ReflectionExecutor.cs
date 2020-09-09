@@ -31,14 +31,14 @@ public static class ReflectionExecutor
         List<Type> signedInteger = SignedIntegerTypes();
         List<Type> unsignedInteger = UnsignedIntegerTypes();
         List<Type> floatingPoint = FloatingPointTypes();
-        //Debug.Log(" level " + level);
+        //MyDebugger.MyDebug(" level " + level);
         Type objType = obj.Type();
         uint u = 1;
         byte b = 1;
         ulong l = 1;
         ushort s = 1;
         l = s;
-        //Debug.Log(obj.GetProperties()[0].PropertyType+" with name "+ obj.GetProperties()[0].Name);
+        //MyDebugger.MyDebug(obj.GetProperties()[0].PropertyType+" with name "+ obj.GetProperties()[0].Name);
         bool isBase = signedInteger.Contains(objType) || unsignedInteger.Contains(objType) || floatingPoint.Contains(objType);
         isBase |= objType == typeof(char) || objType == typeof(bool) || objType == typeof(Enum) || objType == typeof(string);
         return  isBase ;
@@ -61,7 +61,7 @@ public static class ReflectionExecutor
         List<Type> signedInteger = SignedIntegerTypes();
         List<Type> unsignedInteger = UnsignedIntegerTypes();
         List<Type> floatingPoint = FloatingPointTypes();
-        //Debug.Log(" level " + level);
+        //MyDebugger.MyDebug(" level " + level);
         return signedInteger.Contains(t) ? typeof(long) : unsignedInteger.Contains(t) ? typeof(ulong) : floatingPoint.Contains(t) ? typeof(float) :
             t == typeof(char) ? typeof(char): t == typeof(bool)? typeof(bool) : t== typeof(Enum)? typeof(Enum): t == typeof(string)? typeof(string):null;
 

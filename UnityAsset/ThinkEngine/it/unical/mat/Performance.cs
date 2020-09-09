@@ -37,7 +37,7 @@ class Performance : MonoBehaviour
     {
         //stopwatch = new Stopwatch();
         //stopwatch.Start();
-        //Debug.Log("starting performace");
+        //MyDebugger.MyDebug("starting performace");
         Application.targetFrameRate = 60;
         if (!Directory.Exists("Performance"))
         {

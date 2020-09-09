@@ -48,8 +48,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             actuatorName = s.configurationName;
             properties = new List<string>();
             gO = ReflectionExecutor.GetGameObjectWithName(s.gOName);
-           // Debug.Log(s.gOName);
-           // Debug.Log(gO);
+           // MyDebugger.MyDebug(s.gOName);
+           // MyDebugger.MyDebug(gO);
             gOName = s.gOName;
             cleanDataStructures();
             foreach(string st in s.properties)
@@ -109,16 +109,16 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
 
         internal void parse(AnswerSet set)
         {
-            //Debug.Log("parsing " + actuatorName);
+            //MyDebugger.MyDebug("parsing " + actuatorName);
             MappingManager mapper = MappingManager.getInstance();
             IMapper actuatorMapper = mapper.getMapper(typeof(SimpleActuator));
             string[] mappedProperties = actuatorMapper.Map(this).Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             foreach(string literal in set.GetAnswerSet())
             {
-                //Debug.Log("literal "+literal);
+                //MyDebugger.MyDebug("literal "+literal);
                 foreach(string mapped in mappedProperties)
                 {
-                    //Debug.Log("mapped " + mapped);
+                    //MyDebugger.MyDebug("mapped " + mapped);
                     string withoutVariable = mapped.Substring(0,mapped.LastIndexOf('('));
                     if (literal.StartsWith(withoutVariable))
                     {
@@ -127,17 +127,17 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
                         clean = clean.Remove(clean.IndexOf(')'));
                         string val = clean.Substring(clean.LastIndexOf('^')+1);
                         clean = clean.Remove(clean.LastIndexOf('^'));
-                        //Debug.Log(clean+" has value "+val);
+                        //MyDebugger.MyDebug(clean+" has value "+val);
                         string property = unityASPVariationNames[clean];
                         foreach(Type t in dictionaryPerType.Keys)
                         {
 
-                            //Debug.Log(t + " " + property);
+                            //MyDebugger.MyDebug(t + " " + property);
                             IDictionary dic = dictionaryPerType[t];
                             if (dic.Contains(property))
                             {
                                 dic[property] = Convert.ChangeType(val, dic.GetType().GetGenericArguments()[1]);
-                                //Debug.Log(property + " " + dic[property]);
+                                //MyDebugger.MyDebug(property + " " + dic[property]);
                             }
                             
                         }
@@ -178,14 +178,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
                 return;
             }
             FieldOrProperty property = new FieldOrProperty(members[0]);
-            //Debug.Log("property " + property.Name() + " " + property.Type());
+            //MyDebugger.MyDebug("property " + property.Name() + " " + property.Type());
             if (dictionaryPerType.ContainsKey(property.Type()))
             {
                 IDictionary dic = dictionaryPerType[property.Type()];
                 Type propertyInDictionaryType = dic.GetType().GetGenericArguments()[1];
                 if (!dic.Contains(entire_name))
                 {
-                    //Debug.Log("Adding " + entire_name);
+                    //MyDebugger.MyDebug("Adding " + entire_name);
                     dic.Add(entire_name, Convert.ChangeType("0", propertyInDictionaryType));
                 }
                 else
@@ -230,7 +230,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             Type gOType = gO.GetType();
             foreach (string st in properties)
             {
-                //Debug.Log(st);
+                //MyDebugger.MyDebug(st);
                 if (!st.Contains("^"))
                 {
                     
@@ -248,16 +248,16 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
         {
             string parentName = st.Substring(0, st.IndexOf("^"));
             string child = st.Substring(st.IndexOf("^") + 1, st.Length - st.IndexOf("^") - 1);
-            //Debug.Log("component " + entire_name + " parent " + parentName + " child " + child);
+            //MyDebugger.MyDebug("component " + entire_name + " parent " + parentName + " child " + child);
             if (gOType== typeof(GameObject))
             {
                 Component c = ((GameObject)gO).GetComponent(parentName);
                 if (c != null)
                 {
-                    //Debug.Log(c);
+                    //MyDebugger.MyDebug(c);
                     if (!child.Contains("^"))
                     {
-                        //Debug.Log(c.GetType());
+                        //MyDebugger.MyDebug(c.GetType());
                         updateSimpleProperty(entire_name, child, c.GetType(), c);
 
                     }
@@ -272,21 +272,21 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
         private void updateSimpleProperty(string entire_name,string st, Type gOType, object obj)
         {
             MemberInfo[] members = gOType.GetMember(st,BindingAttr);
-            //Debug.Log("update "+entire_name+" members length"+ members.Length+" st "+st+" type "+gOType);
+            //MyDebugger.MyDebug("update "+entire_name+" members length"+ members.Length+" st "+st+" type "+gOType);
             if (members.Length == 0)
             {
                 return;
             }
             FieldOrProperty property = new FieldOrProperty(members[0]);
-            //Debug.Log(property.Type()+" contained: "+ dictionaryPerType.ContainsKey(property.Type()));
+            //MyDebugger.MyDebug(property.Type()+" contained: "+ dictionaryPerType.ContainsKey(property.Type()));
             if (dictionaryPerType.ContainsKey(property.Type()))
             {
                 Type propertyInDictionaryType = dictionaryPerType[property.Type()].GetType().GetGenericArguments()[1];
                 property.SetValue(obj, Convert.ChangeType(dictionaryPerType[property.Type()][entire_name],property.Type()));
-                //Debug.Log("sat value " + property.GetValue(obj));
+                //MyDebugger.MyDebug("sat value " + property.GetValue(obj));
             }
 
-            //Debug.Log("added " + st + "with value " + ((IList)dictionaryPerType[property.Type()][st])[((IList)dictionaryPerType[property.Type()][st]).Count - 1]);
+            //MyDebugger.MyDebug("added " + st + "with value " + ((IList)dictionaryPerType[property.Type()][st])[((IList)dictionaryPerType[property.Type()][st]).Count - 1]);
             
         }
 
@@ -299,14 +299,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             string parentName = st.Substring(0, st.IndexOf("^"));
             string child = st.Substring(st.IndexOf("^") + 1, st.Length - st.IndexOf("^") - 1);
             MemberInfo[] members = objType.GetMember(parentName, BindingAttr);
-          // Debug.Log("members with name " + parentName + " " + members.Length);
+          // MyDebugger.MyDebug("members with name " + parentName + " " + members.Length);
             if (members.Length == 0)
             {
                 updateComponent(entire_name, st, objType,obj);
                 return;
             }
             FieldOrProperty parentProperty = new FieldOrProperty(objType.GetMember(parentName)[0]);
-            //Debug.Log(parentProperty.Name());
+            //MyDebugger.MyDebug(parentProperty.Name());
             object parent = parentProperty.GetValue(obj);
             Type parentType = parent.GetType();
             if (!child.Contains("^"))
