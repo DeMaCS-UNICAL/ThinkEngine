@@ -17,10 +17,10 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
     private string currentPropertyType;
     private string currentSubProperty;
     private int sensorsAdded = 0;
-    private Dictionary<string, string> typeForCollectionProperty;
-    private Dictionary<string, string> sensorNameForCollectionProperty;
-    private Dictionary<string, List<string>> elementForCollectionProperty;
-    private Dictionary<string, List<int>> sizeToTrack;
+    private Dictionary<List<string>, string> typeForCollectionProperty;
+    private Dictionary<List<string>, string> sensorNameForCollectionProperty;
+    private Dictionary<List<string>, List<string>> elementForCollectionProperty;
+    private Dictionary<List<string>, List<int>> sizeToTrack;
     public bool executeRepeteadly;
     public float frequence;
     public MethodInfo updateMethod;
@@ -31,10 +31,10 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
     {
         ////MyDebugger.MyDebug("Awakening");
         //Debug.unityLogger.logEnabled = true;
-        sizeToTrack = new Dictionary<string, List<int>>();
-        typeForCollectionProperty = new Dictionary<string, string>();
-        elementForCollectionProperty = new Dictionary<string, List<string>>();
-        sensorNameForCollectionProperty = new Dictionary<string, string>();
+        sizeToTrack = new Dictionary<List<string>, List<int>>();
+        typeForCollectionProperty = new Dictionary<List<string>, string>();
+        elementForCollectionProperty = new Dictionary<List<string>, List<string>>();
+        sensorNameForCollectionProperty = new Dictionary<List<string>, string>();
         configurations = new List<SensorConfiguration>();
     }
 
@@ -48,7 +48,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
         List<IMonoBehaviourSensor> generatedSensors = new List<IMonoBehaviourSensor>();
         foreach (SensorConfiguration conf in configurations)
         {
-            foreach(string property in conf.properties.Distinct())
+            foreach(List<string> property in conf.properties.Distinct())
             {
                 MyDebugger.MyDebug("ADDING SENSOR FOR " + property + " TO " + gameObject.name);
                 object[] result=null;
@@ -74,7 +74,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
                 {
                     result = ReadProperty(property);
                     configureSensor(result, type, conf, property, currentOperationPerProperty, generatedSensors);
-                    foreach (StringIntPair pair in conf.operationPerProperty)
+                    foreach (ListOfStringIntPair pair in conf.operationPerProperty)
                     {
                         if (pair.Key.Equals(property))
                         {
@@ -90,7 +90,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
         return generatedSensors;
     }
 
-    private void configureSensor(object[] result, Type type, SensorConfiguration conf,string property, int currentOperationPerProperty,List<IMonoBehaviourSensor> generatedSensors)
+    private void configureSensor(object[] result, Type type, SensorConfiguration conf, List<string> property, int currentOperationPerProperty,List<IMonoBehaviourSensor> generatedSensors)
     {
         //MyDebugger.MyDebug("configuring sensors for " + property);
         if (result != null)
@@ -154,7 +154,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
         
     }
 
-    private IMonoBehaviourSensor addSensor(string confName, string property, int currentOperationPerProperty, Type type)
+    private IMonoBehaviourSensor addSensor(string confName, List<string> property, int currentOperationPerProperty, Type type)
     {
         MyDebugger.MyDebug("ACTUALLY ADDING COMPONENT TO " + gameObject.name);
         sensorsAdded++;
@@ -190,14 +190,14 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
         return sensor;
     }
 
-    public object[] ReadProperty(string _path)
+    public object[] ReadProperty(List<string> _path)
     {
         object[] toReturn = null;
-        if (!_path.Contains("^"))
+        if (_path.Count==1)
         {
             MyDebugger.MyDebug("SIMPLE PROPERTY");
             toReturn = new object[1];
-            toReturn[0] = ReadSimpleValueProperty(_path, typeof(GameObject), gameObject);
+            toReturn[0] = ReadSimpleValueProperty(_path[0], typeof(GameObject), gameObject);
         }
         else
         {
@@ -312,7 +312,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
         
         List<int> newSizes = new List<int>();
         
-        foreach (string property in sizeToTrack.Keys.ToList())
+        foreach (List<string> property in sizeToTrack.Keys.ToList())
         {
             currentPropertyType = typeForCollectionProperty[property];
             foreach (string currentElement in elementForCollectionProperty[property])
@@ -361,7 +361,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
 
     }
 
-    private void enlargedArray2(string property, int increasedDimension, int newSize, Type propertyType, Type collectionElementType)
+    private void enlargedArray2(List<string> property, int increasedDimension, int newSize, Type propertyType, Type collectionElementType)
     {
         
         for (int i = sizeToTrack[property][increasedDimension]; i < newSize; i++)
@@ -379,7 +379,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
         }
     }
 
-    private void enlargedList(string property, int newSize, Type propertyType, Type collectionElementType)
+    private void enlargedList(List<string> property, int newSize, Type propertyType, Type collectionElementType)
     {
 
         for (int i = sizeToTrack[property][0]; i < newSize; i++)

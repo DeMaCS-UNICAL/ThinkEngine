@@ -9,8 +9,8 @@ using EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows;
 using EmbASP4Unity.it.unical.mat.objectsMapper;
 using System.IO;
 
-[CustomEditor(typeof(SensorConfigurator))]
-public class SensorConfiguratorEditor : AbstractConfiguratorEditor
+[CustomEditor(typeof(SensorConfiguration))]
+public class SensorConfiguratorEditor : AbstractConfigurationEditor
 {
 
     public override void OnInspectorGUI()
@@ -38,11 +38,7 @@ public class SensorConfiguratorEditor : AbstractConfiguratorEditor
         typeOfConfigurator = "Sensor";        
     }
     
-    protected override void updateConfiguredObject()
-    {
-        
-        updateConfiguredObject( SensorConfiguration.CreateInstance< SensorConfiguration>());
-    }
+    
     
 
     /*void OnDisable()

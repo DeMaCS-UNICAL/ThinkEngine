@@ -11,39 +11,15 @@ using UnityEngine;
 
 namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
 {
-    [Serializable]
-    public class ActuatorsManager : ScriptableObject,IManager
+    public class ActuatorsManager : IManager
     {
-        [SerializeField]
-        private List<AbstractConfiguration> actuatorsConfs;
-        [SerializeField]
-        private List<ActuatorConfiguration> confsToSerialize;
-        [SerializeField]
         private List<string> configuredGameObject;
-        [SerializeField]
         private List<string> configurationsNames;
-        [NonSerialized]
         public Dictionary<Brain,List<SimpleActuator>> instantiatedActuators;
         public static ActuatorsManager instance;
-        [NonSerialized]
         public bool applyCoroutinStarted=false;
-
-        public AbstractConfiguration findConfiguration(string s)
-        {
-            foreach (ActuatorConfiguration c in actuatorsConfs)
-            {
-                if (c.configurationName.Equals(s))
-                {
-                    return c;
-                }
-            }
-            return null;
-        }
-
-        public List<AbstractConfiguration> getConfigurations()
-        {
-            return actuatorsConfs;
-        }
+        
+        
         public List<string> getUsedNames()
         {
             return configurationsNames;
@@ -52,19 +28,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
         {
             if (instance == null)
             {
-                if (!Directory.Exists("Assets/Resources"))
-                {
-                    Directory.CreateDirectory("Assets/Resources");
-                }
-                if (AssetDatabase.LoadAssetAtPath("Assets/Resources/ActuatorsManager.asset", typeof(ActuatorsManager)) == null)
-                {
-                    instance = new ActuatorsManager();
-                }
-                else
-                {
-                    instance = (ActuatorsManager)AssetDatabase.LoadAssetAtPath("Assets/Resources/ActuatorsManager.asset", typeof(ActuatorsManager));
-
-                }
+                instance = new ActuatorsManager();
+                instance.configuredGameObject = new List<string>();
+                instance.configurationsNames = new List<string>();
+                //MyDebugger.MyDebug("instance after " + instance);
+                //MyDebugger.MyDebug("confs: " + instance.sensConfs.Count);
             }
             return instance;
         }
@@ -111,98 +79,31 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             return configuredGameObject;
         }
 
-        void OnEnable()
-        {
-
-            if (actuatorsConfs == null)
-            {
-                actuatorsConfs = new List<AbstractConfiguration>();
-            }
-            if (configuredGameObject == null)
-            {
-                configuredGameObject = new List<string>();
-            }
-            if(configurationsNames == null)
-            {
-                configurationsNames = new List<string>();
-            }
-            
-            
-        }
-
-        public void OnBeforeSerialize()
-        {
-            confsToSerialize = new List<ActuatorConfiguration>();
-            foreach (AbstractConfiguration conf in actuatorsConfs)
-            {
-                //MyDebugger.MyDebug("before serialization " + ((ActuatorConfiguration)conf));
-                ActuatorConfiguration actuatorConf = (ActuatorConfiguration)conf;
-                confsToSerialize.Add(actuatorConf);
-                
-            }
-        }
-
-        public void OnAfterDeserialize()
-        {
-            instance = this;
-            actuatorsConfs = new List<AbstractConfiguration>();
-            foreach (ActuatorConfiguration conf in confsToSerialize)
-            {
-
-                actuatorsConfs.Add(conf);
-
-            }
-        }
+        
 
         public void delete(string v)
         {
-            int i = 0;
-            for (; i < actuatorsConfs.Count; i++)
+            int elementPosition = configurationsNames.IndexOf(v);
+            if (elementPosition != -1)
             {
-                if (actuatorsConfs[i].configurationName.Equals(v))
-                {
-                    break;
-                }
+                configurationsNames.RemoveAt(elementPosition);
+                configuredGameObject.RemoveAt(elementPosition);
             }
-            if (i < actuatorsConfs.Count) {
-                deleteGO(actuatorsConfs[i]);
-                actuatorsConfs.RemoveAt(i);
-            }
-            configurationsNames.Remove(v);
         }
 
-        public AbstractConfiguration newConfiguration(string n, string go)
-        {
-            return new ActuatorConfiguration(n,go);
-        }
-
-        private void deleteGO(AbstractConfiguration abstractConfiguration)
-        {
-            foreach (ActuatorConfiguration c in actuatorsConfs)
-            {
-                if (!c.configurationName.Equals(abstractConfiguration.configurationName))
-                {
-                    if (c.gOName.Equals(abstractConfiguration.gOName))
-                    {
-                        return;
-                    }
-                }
-            }
-            configuredGameObject.Remove(abstractConfiguration.gOName);
-        }
 
         public void addConfiguration(AbstractConfiguration abstractConfiguration)
         {
-            delete(abstractConfiguration.configurationName);
-            actuatorsConfs.Add(abstractConfiguration);
             if (!configurationsNames.Contains(abstractConfiguration.configurationName))
             {
                 configurationsNames.Add(abstractConfiguration.configurationName);
+                configuredGameObject.Add(abstractConfiguration.gameObject.name);
             }
-            if (!configuredGameObject.Contains(abstractConfiguration.gOName))
-            {
-                configuredGameObject.Add(abstractConfiguration.gOName);
-            }
+        }
+
+        public bool existsConfigurationWithName(string name)
+        {
+            return configurationsNames.Contains(name);
         }
     }
 }

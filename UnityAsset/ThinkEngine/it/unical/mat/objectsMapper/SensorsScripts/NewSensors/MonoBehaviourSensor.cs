@@ -15,7 +15,7 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
     public Brain brain { get; set; }
     public bool dataAvailable;
     public string _sensorName;    
-    public string _path;
+    public List<string> _path;
     public string _propertyType; //VALUE, ARRAY2, LIST
     public int _operationType;
     public string _collectionElementProperty; //for collections
@@ -26,7 +26,7 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
     public string _ASPRepMid;
     public string _ASPRepSuffix;
     public string sensorName { get { return _sensorName; } set { _sensorName = value; } }
-    public string path { get { return _path; } set { _path = value; } }
+    public List<string> path { get { return _path; } set { _path = value; } }
     public string propertyType { get { return _propertyType; } set { _propertyType = value; } }
     public int operationType { get { return _operationType; } set { _operationType = value; } }
     public string collectionElementProperty { get { return _collectionElementProperty; } set { _collectionElementProperty = value; } }
@@ -68,25 +68,26 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
     private string[] ASPRep()
     {
         string[] sensorMapping = new string[3];
-        string keyWithoutDotsAndSpaces = path.Replace(".", "");
-        keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace(" ", "");
-        keyWithoutDotsAndSpaces = keyWithoutDotsAndSpaces.Replace("_", "");
-        string sensorNameNotCapital = char.ToLower(sensorName[0]) + sensorName.Substring(1);
+        string pathInASPFormat = "";
+        string suffix = "";
+        foreach(string hierarchyLevel in path)
+        {
+            pathInASPFormat += ASPMapperHelper.aspFormat(hierarchyLevel) + "(";
+            suffix += ")";
+        }
+        
+        string sensorNameNotCapital = ASPMapperHelper.aspFormat(sensorName);
         ////MyDebugger.MyDebug("goname " + s.gOName);
-        string goNameNotCapital = "";
-        goNameNotCapital = char.ToLower(gameObject.name[0]) + gameObject.name.Substring(1);
-        sensorMapping[0] = sensorNameNotCapital + "(";
-        sensorMapping[0] += goNameNotCapital + "(";
-        List<string> temp = ASPMapperHelper.getInstance().buildTemplateMapping(keyWithoutDotsAndSpaces, '^');
-        sensorMapping[0] += temp[0];
-        sensorMapping[2] = temp[temp.Count - 1] + ")).";
+        string goNameNotCapital = ASPMapperHelper.aspFormat(gameObject.name);
+        sensorMapping[0] = sensorNameNotCapital + "("+ goNameNotCapital + ", objectIndex(+"+ gameObject.GetComponent<IndexTracker>().currentIndex +"),";
+        suffix += ").";
+        sensorMapping[0] += pathInASPFormat;
+        sensorMapping[2] = suffix;
         if (!propertyType.Equals("VALUE"))
         {
-            List<string> inner = ASPMapperHelper.getInstance().buildTemplateMapping(collectionElementProperty, '^');
-            inner[0] = Char.ToLower(collectionElementType[0]) + collectionElementType.Substring(1) + "(" + inner[0];
-            inner[inner.Count - 1] += ")";
-            sensorMapping[1] = inner[0];
-            sensorMapping[2] = inner[inner.Count - 1] + sensorMapping[2];
+            
+            sensorMapping[1] = ASPMapperHelper.aspFormat(collectionElementType) + "(" + ASPMapperHelper.aspFormat(collectionElementProperty);
+            sensorMapping[2] = ")" + sensorMapping[2];
         }
         return sensorMapping;
     }
@@ -129,10 +130,10 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
     {
         lock (toLock)
         {
-            if (!_path.Contains("^"))
+            if (_path.Count==-1)
                 {
 
-                    ReadSimplePropertyMethod(_path, typeof(GameObject), gameObject);
+                    ReadSimplePropertyMethod(_path[0], typeof(GameObject), gameObject);
                 }
                 else
                 {
@@ -209,9 +210,9 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
         }
     }
     
-    public  void ReadSimpleValueProperty(string st, Type gOType, object obj)
+    public  void ReadSimpleValueProperty(string path, Type gOType, object obj)
     {
-        MemberInfo[] members = gOType.GetMember(st, SensorsUtility.BindingAttr);
+        MemberInfo[] members = gOType.GetMember(path, SensorsUtility.BindingAttr);
         if (members.Length == 0)
         {
             return;

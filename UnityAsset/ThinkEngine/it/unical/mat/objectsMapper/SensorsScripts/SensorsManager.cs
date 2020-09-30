@@ -12,34 +12,32 @@ using Debug = UnityEngine.Debug;
 
 namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 {
-    [Serializable]
-    public class SensorsManager : ScriptableObject, IManager
+ 
+    public  class SensorsManager : IManager
     {
-
-        private List<AbstractConfiguration> sensConfs;
-        [SerializeField]
-        private List<SensorConfiguration> confsToSerialize;
-        [SerializeField]
         private List<string> configuredGameObject;
-        [SerializeField]
         private List<string> configurationsNames;
-        [NonSerialized]
         private static Dictionary<Brain, List<IMonoBehaviourSensor>> instantiatedSensors;
         private static Dictionary<Brain, int> sensorsUpdated;
 
         public static SensorsManager instance;
         private static Dictionary<Brain, object> to_lock;
 
-        public AbstractConfiguration findConfiguration(string s){
-            foreach(SensorConfiguration c in sensConfs)
+
+        internal static SensorsManager GetInstance()
+        {
+            // MyDebugger.MyDebug("instance " + instance);
+            if (instance == null)
             {
-                if (c.configurationName.Equals(s))
-                {
-                    return c;
-                }
+                instance = new SensorsManager();
+                instance.configuredGameObject = new List<string>();
+                instance.configurationsNames = new List<string>();
+                //MyDebugger.MyDebug("instance after " + instance);
+                //MyDebugger.MyDebug("confs: " + instance.sensConfs.Count);
             }
-            return null;
+            return instance;
         }
+        
 
         public List<string> getConfiguredGameObject()
         {
@@ -49,45 +47,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         {
             return configurationsNames;
         }
-        public List<AbstractConfiguration> getConfigurations()
-        {
-            return sensConfs;
-        }
+        
 
-        public void OnAfterDeserialize()
-        {
-            instance = this;
-            sensConfs = new List<AbstractConfiguration>();
-            foreach (SensorConfiguration conf in confsToSerialize)
-            {
-               
-                sensConfs.Add(conf);
-               
-            }
-        }
-
-        internal static SensorsManager GetInstance()
-        {
-           // MyDebugger.MyDebug("instance " + instance);
-            if (instance == null)
-            {
-                if (!Directory.Exists("Assets/Resources"))
-                {
-                    Directory.CreateDirectory("Assets/Resources");
-                }
-                if (AssetDatabase.LoadAssetAtPath("Assets/Resources/SensorsManager.asset", typeof(SensorsManager)) == null)
-                {
-                    instance = new SensorsManager();
-                }
-                else
-                {
-                    instance = (SensorsManager)AssetDatabase.LoadAssetAtPath("Assets/Resources/SensorsManager.asset", typeof(SensorsManager));
-                }
-            }
-            //MyDebugger.MyDebug("instance after " + instance);
-            //MyDebugger.MyDebug("confs: " + instance.sensConfs.Count);
-            return instance;
-        }
+        
+        
 
         internal static string GetSensorsMapping(Brain brain)
         {
@@ -213,16 +176,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             }
 
         }*/
-        public void OnBeforeSerialize()
-        {
-            confsToSerialize = new List<SensorConfiguration>();
-            foreach (AbstractConfiguration conf in sensConfs)
-            {
-                //MyDebugger.MyDebug("before serialization " + ((SensorConfiguration)conf).operationPerProperty.Count);
-                SensorConfiguration sensorConf = (SensorConfiguration)conf;
-                confsToSerialize.Add(sensorConf);
-            }
-        }
+       
 
         internal static IEnumerable<IMonoBehaviourSensor> getInstantiatedSensors(Brain brain)
         {
@@ -232,74 +186,24 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             }
             return new List<IMonoBehaviourSensor>();
         }
-
-        void OnEnable()
-        {
-            
-            if (sensConfs == null)
-            {
-                sensConfs = new List<AbstractConfiguration>();
-            }
-            if (configuredGameObject == null)
-            {
-                configuredGameObject = new List<string>();
-            }
-            if (configurationsNames == null)
-            {
-                configurationsNames = new List<string>();
-            }
-        }
-
+        
         public void delete(string v)
         {
-            int i = 0;
-            for (; i < sensConfs.Count; i++)
+            int elementPosition = configurationsNames.IndexOf(v);
+            if (elementPosition != -1)
             {
-                if (sensConfs[i].configurationName.Equals(v))
-                {
-                    break;
-                }
+                configurationsNames.RemoveAt(elementPosition);
+                configuredGameObject.RemoveAt(elementPosition);
             }
-            if (i < sensConfs.Count)
-            {
-                deleteGO(sensConfs[i]);
-                sensConfs.RemoveAt(i);
-            }
-            configurationsNames.Remove(v);
-        }
-
-        private void deleteGO(AbstractConfiguration abstractConfiguration)
-        {
-            foreach(SensorConfiguration c in sensConfs)
-            {
-                if (!c.configurationName.Equals(abstractConfiguration.configurationName))
-                {
-                    if (c.gOName.Equals(abstractConfiguration.gOName))
-                    {
-                        return;
-                    }
-                }
-            }
-            configuredGameObject.Remove(abstractConfiguration.gOName);
-        }
-
-        public AbstractConfiguration newConfiguration(string n,string go)
-        {
-            return new SensorConfiguration(n,go);
-        }
+        }        
 
         public void addConfiguration(AbstractConfiguration abstractConfiguration)
         {
             //MyDebugger.MyDebug("checking if to delete " + abstractConfiguration.name);
-            delete(abstractConfiguration.configurationName);
-            sensConfs.Add(abstractConfiguration);
             if (!configurationsNames.Contains(abstractConfiguration.configurationName))
             {
                 configurationsNames.Add(abstractConfiguration.configurationName);
-            }
-            if (!configuredGameObject.Contains(abstractConfiguration.gOName))
-            {
-                configuredGameObject.Add(abstractConfiguration.gOName);
+                configuredGameObject.Add(abstractConfiguration.gameObject.name);
             }
         }
 
@@ -329,6 +233,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             {
                 Monitor.Pulse(toLock);
             }
+        }
+
+        public bool existsConfigurationWithName(string name)
+        {
+            return configurationsNames.Contains(name);
         }
     }
 

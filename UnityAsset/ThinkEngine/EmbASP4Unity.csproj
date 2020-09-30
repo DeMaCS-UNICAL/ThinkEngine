@@ -163,18 +163,18 @@
     <Compile Include="it\unical\mat\embasp\unity\AIManager.cs" />
     <Compile Include="it\unical\mat\MyDebugger.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorConfiguration.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorConfigurator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\SimpleActuator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Brain.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\SolverExecutor.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\AbstractConfigurator.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\EditorWindows\AbstractConfiguratorEditor.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\EditorWindows\AbstractConfigurationEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\ActuatorConfiguratorEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorsManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\AbstractConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\BrainEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\SensorConfiguratorEditor.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\GlobalIndexer.cs" />
     <Compile Include="it\unical\mat\objectsMapper\IManager.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\IndexTracker.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\NewSensors\IMonoBehaviourSensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\NewSensors\MonoBehaviourSensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\NewSensors\MonoBehaviourSensorsManager.cs" />
@@ -186,6 +186,7 @@
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\NewSensors\SpecificMonoBehaviourSensor\MonoBehaviourSignedIntegerSensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\NewSensors\SpecificMonoBehaviourSensor\MonoBehaviourStringSensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\NewSensors\SpecificMonoBehaviourSensor\MonoBehaviourUnsignedIntegerSensor.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\TestingAddMonobehaviour.cs" />
     <Compile Include="it\unical\mat\Performance.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\AdvancedSensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPActuatorMapper.cs" />
@@ -202,15 +203,14 @@
     <Compile Include="it\unical\mat\objectsMapper\Mappers\MappingManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Operation.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ReflectionExecutor.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SensorConfigurator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SimpleSensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SensorConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SensorsManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPSignedIntegerMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPStringMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPUnsignedIntegerMapper.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\StringPair.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\StringStringPair.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\ListOfStringIntPair.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\ListOfStringStringPair.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SimpleGameObjectsTracker.cs" />
   </ItemGroup>
   <ItemGroup>

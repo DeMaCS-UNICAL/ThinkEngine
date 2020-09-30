@@ -13,24 +13,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
     public class ActuatorConfiguration : AbstractConfiguration
     {
 
-        public ActuatorConfiguration(string s)
+        void Awake()
         {
-            this.configurationName = s;
+            base.Awake();
+            manager = ActuatorsManager.GetInstance();
         }
 
-        public ActuatorConfiguration(string s, string go) : this(s)
-        {
-            this.gOName = go;
-        }
-
-        internal override void cleanSpecificDataStructure()
-        {
-            
-        }
-
-        internal override void specificConfiguration(FieldOrProperty fieldOrProperty, string s)
-        {
-            
-        }
     }
 }

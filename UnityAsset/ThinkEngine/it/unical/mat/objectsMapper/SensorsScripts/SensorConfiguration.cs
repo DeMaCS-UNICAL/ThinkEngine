@@ -9,44 +9,42 @@ using System.Collections;
 
 namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 {
-    [Serializable]
+ 
     public class SensorConfiguration : AbstractConfiguration
     {
-        [SerializeField]
-        internal List<StringIntPair> operationPerProperty;
-        [SerializeField]
-        internal List<StringStringPair> specificValuePerProperty;
+        internal List<ListOfStringIntPair> operationPerProperty;
+        internal List<ListOfStringStringPair> specificValuePerProperty;
 
-        public SensorConfiguration(string s, string go)
+        void Awake()
         {
-            this.configurationName = s;
-            this.gOName = go;
-            operationPerProperty = new List<StringIntPair>();
-            specificValuePerProperty = new List<StringStringPair>();
-        }
-
-        internal SensorConfiguration()
-        {
-            operationPerProperty = new List<StringIntPair>();
-            specificValuePerProperty = new List<StringStringPair>();
+            base.Awake();
+            manager = SensorsManager.GetInstance();
+            if (operationPerProperty is null)
+            {
+                operationPerProperty = new List<ListOfStringIntPair>();
+            }
+            if (specificValuePerProperty is null)
+            {
+                specificValuePerProperty = new List<ListOfStringStringPair>();
+            }
         }
 
         internal override void cleanSpecificDataStructure()
         {
-            operationPerProperty = new List<StringIntPair>();
-            specificValuePerProperty = new List<StringStringPair>();
+            operationPerProperty = new List<ListOfStringIntPair>();
+            specificValuePerProperty = new List<ListOfStringStringPair>();
         }
 
-        internal override void specificConfiguration(FieldOrProperty fieldOrProperty, string s)
+        internal override void specificConfiguration(FieldOrProperty fieldOrProperty, List<string> property)
         {
-            StringIntPair pair = new StringIntPair();
-            pair.Key = s;
+            ListOfStringIntPair pair = new ListOfStringIntPair();
+            pair.Key = property;
             pair.Value = tracker.operationPerProperty[fieldOrProperty];
             operationPerProperty.Add(pair);
             if (tracker.specificValuePerProperty.ContainsKey(fieldOrProperty))
             {
-                StringStringPair pair2 = new StringStringPair();
-                pair2.Key = s;
+                ListOfStringStringPair pair2 = new ListOfStringStringPair();
+                pair2.Key = property;
                 pair2.Value = tracker.specificValuePerProperty[fieldOrProperty];
                 specificValuePerProperty.Add(pair2);
             }

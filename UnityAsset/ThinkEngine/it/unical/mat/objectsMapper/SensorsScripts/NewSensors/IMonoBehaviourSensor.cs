@@ -10,7 +10,7 @@ public interface IMonoBehaviourSensor
 {
     string sensorName { get; set; }
     Brain brain { get; set; }
-    string path { get; set; }
+    List<string> path { get; set; }
     string propertyType { get; set; }
     int operationType { get; set; }
     string collectionElementProperty { get; set; }

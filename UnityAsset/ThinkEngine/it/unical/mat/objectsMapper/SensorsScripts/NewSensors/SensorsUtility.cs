@@ -107,37 +107,37 @@ public static class SensorsUtility
         }
         return toReturn;
     }
-    public static object ReadComposedProperty(GameObject gameObject, string entire_name, string st, Type objType, object obj, ReadSimpleProperty ReadSimpleProperty)
+    public static object ReadComposedProperty(GameObject gameObject, List<string> property, List<string> partialHierarchyProperty, Type objType, object obj, ReadSimpleProperty ReadSimpleProperty)
     {
 
         ////Debug.unityLogger.logEnabled = false;
-        string parentName = st.Substring(0, st.IndexOf("^"));
-        string child = st.Substring(st.IndexOf("^") + 1, st.Length - st.IndexOf("^") - 1);
+        string parentName = partialHierarchyProperty[0];
+        List<string> child = partialHierarchyProperty.GetRange(1,partialHierarchyProperty.Count-1);
         MemberInfo[] members = objType.GetMember(parentName, SensorsUtility.BindingAttr);
         MyDebugger.MyDebug("members with name " + parentName + " " + members.Length);
         if (members.Length == 0)
         {
-            return ReadComponent(gameObject, entire_name, st, objType, obj, ReadSimpleProperty);
+            return ReadComponent(gameObject, property, partialHierarchyProperty, objType, obj, ReadSimpleProperty);
         }
         FieldOrProperty parentProperty = new FieldOrProperty(members[0]);
         ///MyDebugger.MyDebug(parentProperty.Name());
         object parent = parentProperty.GetValue(obj);
         Type parentType = parent.GetType();
-        if (!child.Contains("^"))
+        if (child.Count==1)
         {
-            return ReadSimpleProperty(child, parentType, parent);
+            return ReadSimpleProperty(child[0], parentType, parent);
         }
         else
         {
-            return ReadComposedProperty(gameObject, entire_name, child, parentType, parent, ReadSimpleProperty);
+            return ReadComposedProperty(gameObject, property, child, parentType, parent, ReadSimpleProperty);
         }
     }
-    public static object ReadComponent(GameObject gameObject, string entire_name, string st, Type gOType, object obj, ReadSimpleProperty ReadSimpleProperty)
+    public static object ReadComponent(GameObject gameObject, List<string> property, List<string> partialHierarchyProperty, Type gOType, object obj, ReadSimpleProperty ReadSimpleProperty)
     {
         ////Debug.unityLogger.logEnabled = false;
-        string parentName = st.Substring(0, st.IndexOf("^"));
-        string child = st.Substring(st.IndexOf("^") + 1, st.Length - st.IndexOf("^") - 1);
-        MyDebugger.MyDebug("component " + entire_name + " parent " + parentName + " child " + child+" goType "+gOType);
+        string parentName = partialHierarchyProperty[0];
+        List<string> child = partialHierarchyProperty.GetRange(1,partialHierarchyProperty.Count - 1);
+        MyDebugger.MyDebug("component " + property + " parent " + parentName + " child " + child+" goType "+gOType);
         if (gOType == typeof(GameObject))
         {
             MyDebugger.MyDebug(gameObject.name + " is the GO");
@@ -146,14 +146,14 @@ public static class SensorsUtility
                 if (c.GetType().Name.Equals(parentName))
                 {
                     MyDebugger.MyDebug("component " + c);
-                    if (!child.Contains("^"))
+                    if (child.Count==1)
                     {
                         MyDebugger.MyDebug(" of type " + c.GetType());
-                        return ReadSimpleProperty(child, c.GetType(), c);
+                        return ReadSimpleProperty(child[0], c.GetType(), c);
                     }
                     else
                     {
-                        return ReadComposedProperty(gameObject, entire_name, child, c.GetType(), c, ReadSimpleProperty);
+                        return ReadComposedProperty(gameObject, property, child, c.GetType(), c, ReadSimpleProperty);
                     }
                 }
             }

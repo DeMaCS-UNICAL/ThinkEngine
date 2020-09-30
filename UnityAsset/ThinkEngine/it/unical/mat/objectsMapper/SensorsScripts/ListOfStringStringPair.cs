@@ -7,10 +7,10 @@ using UnityEngine;
 namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
 {
     [Serializable]
-    class StringStringPair
+    class ListOfStringStringPair
     {
         [SerializeField]
-        public string Key;
+        public List<string> Key;
         [SerializeField]
         public string Value;
     }
