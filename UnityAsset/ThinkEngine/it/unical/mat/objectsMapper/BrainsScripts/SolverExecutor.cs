@@ -1,6 +1,4 @@
-﻿using EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts;
-using EmbASP4Unity.it.unical.mat.objectsMapper.Mappers;
-using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts;
+﻿using EmbASP4Unity.it.unical.mat.objectsMapper.Mappers;
 using EmbASP4Unity.it.unical.mat.embasp.@base;
 using EmbASP4Unity.it.unical.mat.embasp.languages.asp;
 using EmbASP4Unity.it.unical.mat.embasp.platforms.desktop;
@@ -22,7 +20,6 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
     {
         public Brain brain;
         string factsPath;
-        MappingManager mapper;
         public bool reason;
         Stopwatch stopwatch = new Stopwatch();
         int factsSteps = 0;
@@ -35,14 +32,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         {
             brain = b;
             factsPath = "Assets/Resources/" + brain.gameObject.name + "Facts.asp";
-            mapper = MappingManager.getInstance();
         }
 
         public void Run()
         {
 
             reason = true;
-            IMapper sensorMapper = mapper.getMapper(typeof(AdvancedSensor));
             while (reason)
             {
                 if (!brain.executeReasonerOn.Equals("When Sensors are ready"))
@@ -77,7 +72,8 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 }
 
 
-                Handler handler = new DesktopHandler(new DLV2DesktopService(@".\lib\dlv2.exe"));                //With DLV2DesktopService I get a Error during parsing: --> Invalid #show directive: setOnActuator/1--competition-output.
+                Handler handler = new DesktopHandler(new DLV2DesktopService(@".\lib\dlv2.exe"));
+                //With DLV2DesktopService I get a Error during parsing: --> Invalid #show directive: setOnActuator/1--competition-output.
                 //With DLVDesktopService the AS, obviously, are wrongly parsed
                 InputProgram encoding = new ASPInputProgram();
                 MyDebugger.MyDebug("adding encoding");

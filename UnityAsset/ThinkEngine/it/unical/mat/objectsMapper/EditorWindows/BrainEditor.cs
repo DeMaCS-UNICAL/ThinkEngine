@@ -15,6 +15,13 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         List<string> excludedProperties=new List<string>();
         List<string> methodsToShow = new List<string>();
         List<string> methodsToShowForReasoner = new List<string>();
+        Dictionary<int, List<string>> sensorsConfigurationNames = new Dictionary<int, List<string>>();
+        Dictionary<int, List<string>> actuatorsConfigurationNames = new Dictionary<int, List<string>>();
+        Dictionary<int, string> gameObjectNamesPerIndex = new Dictionary<int, string>();
+        Dictionary<string, bool> toggledSensorsConfigurations = new Dictionary<string, bool>();
+        Dictionary<string, bool> toggledActuatorsConfigurations = new Dictionary<string, bool>();
+        Dictionary<int, bool> toggledGameObjectsForSensors = new Dictionary<int, bool>();
+        Dictionary<int, bool> toggledGameObjectsForActuators = new Dictionary<int, bool>();
         public int sensorsUpdateIndex = 0;
         public int reasoningExecutionIndex = 0;
         public int applyActuatorsIndex=0;
@@ -23,32 +30,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
         void OnEnable()
         {
-
             myScript = target as Brain;
-            var triggerClass = ScriptableObject.CreateInstance("Trigger");
-            MethodInfo[] methods = triggerClass.GetType().GetMethods();
+            basicConfiguration();
+            synchWithBrain();
+        }
 
-            foreach (MethodInfo mI in methods)
-            {
-                if (mI.ReturnType == typeof(bool))
-                {
-                    methodsToShow.Add(mI.Name);
-                    MyDebugger.MyDebug(mI.Name);
-                }
-            }
-            methodsToShowForReasoner.Add("When Sensors are ready");
-            methodsToShowForReasoner.AddRange(methodsToShow);
-            methodsToShowForActuators.Add("Always");
-            methodsToShowForActuators.Add("Never");
-            methodsToShowForActuators.AddRange(methodsToShow);
-            for (int i = 0; i < methodsToShow.Count; i++)
-            {
-                if (myScript.updateSensorsOn.Equals(methodsToShow[i]))
-                {
-                    sensorsUpdateIndex = i;
-                    break;
-                }
-            }
+        private void synchWithBrain()
+        {
+            
             for (int i = 0; i < methodsToShowForReasoner.Count; i++)
             {
                 if (myScript.executeReasonerOn.Equals(methodsToShowForReasoner[i]))
@@ -57,83 +46,100 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                     break;
                 }
             }
-            for (int i = 0; i < methodsToShowForActuators.Count; i++)
+            
+            foreach (SensorConfiguration sensorConf in myScript.sensorsConfigurations)
             {
-                if (myScript.applyActuatorsCondition.Equals(methodsToShowForActuators[i]))
-                {
-                    applyActuatorsIndex = i;
-                    break;
-                }
+                toggledGameObjectsForSensors[sensorConf.GetComponent<IndexTracker>().currentIndex] = true;
+                toggledSensorsConfigurations[sensorConf.name] = true;
+            }
+            foreach (ActuatorConfiguration actuatorConf in myScript.actuatorsConfigurations)
+            {
+                toggledGameObjectsForActuators[actuatorConf.GetComponent<IndexTracker>().currentIndex] = true;
+                toggledActuatorsConfigurations[actuatorConf.name] = true;
             }
         }
+
+        private void basicConfiguration()
+        {
+            var triggerClass = ScriptableObject.CreateInstance("Trigger");
+            MethodInfo[] methods = triggerClass.GetType().GetMethods();
+
+            foreach (MethodInfo mI in methods)
+            {
+                if (mI.ReturnType == typeof(bool) && mI.GetParameters().Length == 0)
+                {
+                    methodsToShow.Add(mI.Name);
+                    MyDebugger.MyDebug(mI.Name);
+                }
+            }
+            methodsToShowForReasoner.Add("When Sensors are ready");
+            methodsToShowForReasoner.AddRange(methodsToShow);
+
+            foreach (SensorConfiguration sensorConf in FindObjectsOfType<SensorConfiguration>())
+            {
+                addConfigurationName(sensorConf, sensorsConfigurationNames, toggledGameObjectsForSensors, toggledSensorsConfigurations);
+            }
+            foreach (ActuatorConfiguration actuatorConf in FindObjectsOfType<ActuatorConfiguration>())
+            {
+                addConfigurationName(actuatorConf, actuatorsConfigurationNames, toggledGameObjectsForActuators, toggledActuatorsConfigurations);
+            }
+        }
+
+        private void addConfigurationName(AbstractConfiguration configuration, Dictionary<int, List<string>> configurationsNames, Dictionary<int,bool> toggledGameObjects, Dictionary<string, bool> toggledConfigurations)
+        {
+            int currentGameObjectIndex = configuration.GetComponent<IndexTracker>().currentIndex;
+            if (!configurationsNames.ContainsKey(currentGameObjectIndex))
+            {
+                configurationsNames.Add(currentGameObjectIndex, new List<string>());
+                if (!gameObjectNamesPerIndex.ContainsKey(currentGameObjectIndex))
+                {
+                    gameObjectNamesPerIndex.Add(currentGameObjectIndex, configuration.gameObject.name);
+                    toggledGameObjects.Add(currentGameObjectIndex, false);
+                }
+            }
+            configurationsNames[currentGameObjectIndex].Add(configuration.name);
+            toggledConfigurations.Add(configuration.name, false);
+        }
+
         public override void OnInspectorGUI()
         {
-            if (myScript.updateSensorsOnTrigger && myScript.updateSensorsRepeteadly)
-            {
-                if (excludedProperties.Contains("sensorsUpdateFrequencyMS"))
-                {
-                    myScript.updateSensorsOnTrigger = false;
-                }
-                else
-                {
-                    myScript.updateSensorsRepeteadly = false;
-                }
-            }
-            if (!(myScript.updateSensorsOnTrigger || myScript.updateSensorsRepeteadly))
-            {
-                if (excludedProperties.Contains("sensorsUpdateFrequencyMS"))
-                {
-                    myScript.updateSensorsRepeteadly = true;
-                }
-                else
-                {
-                    myScript.updateSensorsOnTrigger = true;
-                }
-            }
-            excludedProperties = new List<string>();
-            excludedProperties.Add("updateSensorsOn");
-            excludedProperties.Add("executeReasonerOn");
-            excludedProperties.Add("applyActuatorsCondition");
-            if (!myScript.updateSensorsRepeteadly)
-            {
-                excludedProperties.Add("sensorsUpdateFrequencyMS");
-            }
-            DrawPropertiesExcluding(serializedObject, excludedProperties.ToArray());
+            //SENSORS
+            showConfigurations(toggledGameObjectsForSensors, sensorsConfigurationNames, toggledSensorsConfigurations);
+            //ACTUATORS
+            showConfigurations(toggledGameObjectsForActuators, actuatorsConfigurationNames, toggledActuatorsConfigurations);
             
-            if (myScript.updateSensorsOnTrigger)
-            {
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("Choose a method to use as trigger for Sensors Update");
-                sensorsUpdateIndex = EditorGUILayout.Popup(sensorsUpdateIndex, methodsToShow.ToArray());
-                EditorGUILayout.EndHorizontal();
-                myScript.updateSensorsOn = methodsToShow[sensorsUpdateIndex];
-            }
-            else
-            {
-                myScript.updateSensorsOn = "";
-            }
-
+            excludedProperties = new List<string>();
+            excludedProperties.Add("executeReasonerOn");
+            DrawPropertiesExcluding(serializedObject, excludedProperties.ToArray());
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Choose when to run the reasoner");
             reasoningExecutionIndex = EditorGUILayout.Popup(reasoningExecutionIndex, methodsToShowForReasoner.ToArray());
             EditorGUILayout.EndHorizontal();
             myScript.executeReasonerOn = methodsToShowForReasoner[reasoningExecutionIndex];
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Choose when to apply Actuators actions");
-            applyActuatorsIndex = EditorGUILayout.Popup(applyActuatorsIndex, methodsToShowForActuators.ToArray());
-            EditorGUILayout.EndHorizontal();
-            myScript.applyActuatorsCondition = methodsToShowForActuators[applyActuatorsIndex];
-
             serializedObject.ApplyModifiedProperties();//CHECK SERIALIZATION
 
             Brain current = (Brain)target;
-            if(GUILayout.Button("Generate ASP file template", GUILayout.Width(300)))
+            if (GUILayout.Button("Generate ASP file template", GUILayout.Width(300)))
             {
                 current.generateFile();
             }
-            EditorGUILayout.LabelField("Warning! Generating a new file will delete the previouse template."); 
+            EditorGUILayout.HelpBox("Generating a new file will delete the previouse template!", MessageType.Warning);
 
+        }
+
+        private void showConfigurations(Dictionary<int,bool> toggledGameObjects, Dictionary<int,List<string>> configurationNames, Dictionary<string, bool> toggledConfigurations)
+        {
+            foreach (int gameObjectIndex in toggledGameObjects.Keys)
+            {
+                toggledGameObjects[gameObjectIndex] = EditorGUILayout.Foldout(toggledGameObjects[gameObjectIndex], gameObjectNamesPerIndex[gameObjectIndex]);
+                if (toggledGameObjects[gameObjectIndex])
+                {
+                    foreach (string confName in configurationNames[gameObjectIndex])
+                    {
+                        toggledConfigurations[confName] = EditorGUILayout.ToggleLeft(confName, toggledConfigurations[confName]);
+                    }
+                }
+            }
         }
     }
 }

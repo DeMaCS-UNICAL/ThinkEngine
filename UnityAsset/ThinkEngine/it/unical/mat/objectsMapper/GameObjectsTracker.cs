@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts;
 using EmbASP4Unity.it.unical.mat.objectsMapper;
 using System.Linq;
 
@@ -163,7 +162,7 @@ public class GameObjectsTracker
         }
     }
 
-    private bool checkIfPropertyIsToToggle(List<List<string>> properties, List<string> currentPropertyHierarchy, string latterLevelProperty)
+    private bool checkIfPropertyIsToToggle(List<MyListString> properties, List<string> currentPropertyHierarchy, string latterLevelProperty)
     {
         if (properties is null || properties.Count == 0)
         {
@@ -193,7 +192,7 @@ public class GameObjectsTracker
         }
         return false;
     }
-    private bool checkIfPropertyIsToToggle(List<List<string>> properties, string firstLevelProperty)
+    private bool checkIfPropertyIsToToggle(List<MyListString> properties, string firstLevelProperty)
     {
         if(properties is null || properties.Count == 0)
         {

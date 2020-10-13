@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
+
+[Serializable]
+class ListOfStringIntPair
 {
-    [Serializable]
-    class ListOfStringIntPair
-    {
-        [SerializeField]
-        public List<string> Key;
-        [SerializeField]
-        public int Value;
-    }
+    [SerializeField]
+    public List<string> Key;
+    [SerializeField]
+    public int Value;
+
 }

@@ -10,14 +10,14 @@ public interface IMonoBehaviourSensor
 {
     string sensorName { get; set; }
     Brain brain { get; set; }
-    List<string> path { get; set; }
+    MyListString path { get; set; }
     string propertyType { get; set; }
     int operationType { get; set; }
-    string collectionElementProperty { get; set; }
+    List<string> collectionElementProperties { get; set; }
     string collectionElementType { get; set; }
     List<int> indexes { get; set; }
     bool ready { get; set; }
-    IList propertyValues { get; set; }
+    List<IList> propertyValues { get; set; }
     string Map();
     void done();
     bool executeRepeteadly { get; set; }

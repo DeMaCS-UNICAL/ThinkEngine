@@ -10,9 +10,6 @@ using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
-{
- 
     public  class SensorsManager : IManager
     {
         private List<string> configuredGameObject;
@@ -186,18 +183,18 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             }
             return new List<IMonoBehaviourSensor>();
         }
-        
-        public void delete(string v)
-        {
-            int elementPosition = configurationsNames.IndexOf(v);
-            if (elementPosition != -1)
-            {
-                configurationsNames.RemoveAt(elementPosition);
-                configuredGameObject.RemoveAt(elementPosition);
-            }
-        }        
 
-        public void addConfiguration(AbstractConfiguration abstractConfiguration)
+    public void deleteConfiguration(AbstractConfiguration abstractConfiguration)
+    {
+        if (configurationsNames.Contains(abstractConfiguration.configurationName))
+        {
+            int toDelete = configurationsNames.IndexOf(abstractConfiguration.configurationName);
+            configurationsNames.RemoveAt(toDelete);
+            configuredGameObject.RemoveAt(toDelete);
+        }
+    }
+
+    public void addConfiguration(AbstractConfiguration abstractConfiguration)
         {
             //MyDebugger.MyDebug("checking if to delete " + abstractConfiguration.name);
             if (!configurationsNames.Contains(abstractConfiguration.configurationName))
@@ -206,6 +203,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                 configuredGameObject.Add(abstractConfiguration.gameObject.name);
             }
         }
+
 
         internal void addSensor(Brain brain, IMonoBehaviourSensor sensor)
         {
@@ -241,4 +239,3 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         }
     }
 
-}

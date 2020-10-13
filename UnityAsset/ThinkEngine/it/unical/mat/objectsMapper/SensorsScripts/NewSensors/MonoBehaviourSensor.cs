@@ -4,36 +4,25 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using EmbASP4Unity.it.unical.mat.objectsMapper.Mappers;
-using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts;
 using System.Diagnostics;
 using Debug = UnityEngine.Debug;
+using System.Linq;
 
-public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
+public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
 {
     readonly object toLock = new object();
     bool _ready;
     public Brain brain { get; set; }
     public bool dataAvailable;
-    public string _sensorName;    
-    public List<string> _path;
-    public string _propertyType; //VALUE, ARRAY2, LIST
-    public int _operationType;
-    public string _collectionElementProperty; //for collections
-    public List<int> _indexes; //for collections
-    public string _collectionElementType; //for collections
-    List<T> _propertyValues;
-    public string _ASPRepPrefix;
-    public string _ASPRepMid;
-    public string _ASPRepSuffix;
-    public string sensorName { get { return _sensorName; } set { _sensorName = value; } }
-    public List<string> path { get { return _path; } set { _path = value; } }
-    public string propertyType { get { return _propertyType; } set { _propertyType = value; } }
-    public int operationType { get { return _operationType; } set { _operationType = value; } }
-    public string collectionElementProperty { get { return _collectionElementProperty; } set { _collectionElementProperty = value; } }
-    public List<int> indexes { get { return _indexes; } set { _indexes = value; } }
-    public bool ready { get { return _ready; } set { _ready = value; } }
-    public IList propertyValues { get { return _propertyValues; } set { _propertyValues = (List<T>)value; } }
-    public string collectionElementType { get { return _collectionElementType; } set { _collectionElementType = value; } }
+    public string sensorName { get; set; }
+    public MyListString path { get; set; }
+    public string propertyType { get; set; }
+    public int operationType { get; set; }
+    public List<string> collectionElementProperties { get; set; }
+    public List<int> indexes { get; set; }
+    public bool ready { get; set; }
+    public List<IList> propertyValues { get; set; }
+    public string collectionElementType { get; set; }
 
     public bool executeRepeteadly { get; set; }
     public float frequency { get; set; }
@@ -46,51 +35,24 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
     {
         //Debug.unityLogger.logEnabled = false;
         
-        propertyValues = new List<T>();
+        propertyValues = new List<IList>();
         indexes = new List<int>();
     }
-
+    public void addListToPropertyValues(IList list)
+    {
+        propertyValues.Add(list);
+    }
     public void done()
     {
-        string[] ASPRepresentation = ASPRep();
-        _ASPRepPrefix = ASPRepresentation[0];
-        _ASPRepMid = ASPRepresentation[1];
-        _ASPRepSuffix = ASPRepresentation[2];
         ready = true;
         /*MyDebugger.MyDebug("sensor " + sensorName);
         MyDebugger.MyDebug("execute rep " + executeRepeteadly);
         MyDebugger.MyDebug("trigger class " + triggerClass);
         MyDebugger.MyDebug("update method " + updateMethod);
         MyDebugger.MyDebug("update frequency " + frequency);*/
-       
     }
 
-    private string[] ASPRep()
-    {
-        string[] sensorMapping = new string[3];
-        string pathInASPFormat = "";
-        string suffix = "";
-        foreach(string hierarchyLevel in path)
-        {
-            pathInASPFormat += ASPMapperHelper.aspFormat(hierarchyLevel) + "(";
-            suffix += ")";
-        }
-        
-        string sensorNameNotCapital = ASPMapperHelper.aspFormat(sensorName);
-        ////MyDebugger.MyDebug("goname " + s.gOName);
-        string goNameNotCapital = ASPMapperHelper.aspFormat(gameObject.name);
-        sensorMapping[0] = sensorNameNotCapital + "("+ goNameNotCapital + ", objectIndex(+"+ gameObject.GetComponent<IndexTracker>().currentIndex +"),";
-        suffix += ").";
-        sensorMapping[0] += pathInASPFormat;
-        sensorMapping[2] = suffix;
-        if (!propertyType.Equals("VALUE"))
-        {
-            
-            sensorMapping[1] = ASPMapperHelper.aspFormat(collectionElementType) + "(" + ASPMapperHelper.aspFormat(collectionElementProperty);
-            sensorMapping[2] = ")" + sensorMapping[2];
-        }
-        return sensorMapping;
-    }
+    
 
     public bool configured()
     {
@@ -130,14 +92,14 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
     {
         lock (toLock)
         {
-            if (_path.Count==-1)
+            if (path.Count==-1)
                 {
 
-                    ReadSimplePropertyMethod(_path[0], typeof(GameObject), gameObject);
+                    ReadSimplePropertyMethod(path[0], typeof(GameObject), gameObject);
                 }
                 else
                 {
-                    SensorsUtility.ReadComposedProperty(gameObject, _path, _path, typeof(GameObject), gameObject, ReadSimplePropertyMethod);
+                    SensorsUtility.ReadComposedProperty(gameObject, path, path, typeof(GameObject), gameObject, ReadSimplePropertyMethod);
                 }
             
             dataAvailable = true;
@@ -170,16 +132,20 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
     {
         //MyDebugger.MyDebug("READING");
 
-        object[] matrixValue = SensorsUtility.GetArrayProperty(path, collectionElementProperty, type, obj, indexes[0], indexes[1]);
+        object[] matrixValue = SensorsUtility.GetArrayProperty(path, collectionElementProperties, type, obj, indexes[0], indexes[1]);
         //MyDebugger.MyDebug("Matrix: " + matrixValue[0]);
         //MyDebugger.MyDebug("Property: " + matrixValue[1]);
         if (matrixValue[0] != null && matrixValue[1] != null)
         {
-            FieldOrProperty toRead = (FieldOrProperty)matrixValue[1];
+            List<FieldOrProperty> toRead = (List<FieldOrProperty>)matrixValue[1];
             Array matrix = (Array)matrixValue[0];
-            
             //MyDebugger.MyDebug("Casting " + toRead.GetValue(matrix.GetValue(indexes[0], indexes[1])).GetType() + " to " + typeof(T));
-            propertyValues.Add((T)Convert.ChangeType(toRead.GetValue(matrix.GetValue(indexes[0], indexes[1])),typeof(T)));
+            for (int i = 0; i < collectionElementProperties.Count; i++)
+            {
+                IList currentValuesList = propertyValues[i];
+                Type currentValuesListType = currentValuesList.GetType().GetGenericArguments()[0];
+                currentValuesList.Add(Convert.ChangeType(toRead[i].GetValue(matrix.GetValue(indexes[0], indexes[1])), currentValuesListType));
+            }
         }
         else
         {
@@ -192,13 +158,17 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
 
     private void ReadSimpleListProperty(string path, Type type, object obj)
     {
-        object[] listValue = SensorsUtility.GetListProperty(path, collectionElementProperty, type, obj, indexes[0]);
+        object[] listValue = SensorsUtility.GetListProperty(path, collectionElementProperties, type, obj, indexes[0]);
         if (listValue[0] != null && listValue[1] != null)
         {
-            FieldOrProperty toRead = (FieldOrProperty)listValue[1];
+            List<FieldOrProperty> toRead = (List<FieldOrProperty>)listValue[1];
             IList list = (IList)listValue[0];
-            
-            propertyValues.Add((T)Convert.ChangeType(toRead.GetValue(list[indexes[0]]), typeof(T)));
+            for (int i = 0; i < collectionElementProperties.Count; i++)
+            {
+                IList currentValuesList = propertyValues[i];
+                Type currentValuesListType = currentValuesList.GetType().GetGenericArguments()[0];
+                currentValuesList.Add(Convert.ChangeType(toRead[i].GetValue(list[indexes[0]]), currentValuesListType));
+            }
         }
 
         else
@@ -219,36 +189,83 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
         }
         FieldOrProperty property = new FieldOrProperty(members[0]);
         //MyDebugger.MyDebug("Casting " + property.GetValue(obj).GetType() + " to " + typeof(T));
-
-        propertyValues.Add((T)Convert.ChangeType(property.GetValue(obj), typeof(T)));        
+        IList currentValuesList = propertyValues[0];
+        Type currentValuesListType = currentValuesList.GetType().GetGenericArguments()[0];
+        currentValuesList.Add(Convert.ChangeType(property.GetValue(obj), currentValuesListType));
     }
 
     public string Map()
     {
-
-        if (_propertyValues.Count == 0)
-        {
-            return "";
-        }
-        
-        IMapper mapperForT = MappingManager.getInstance().getMapper(typeof(T));
+        List<string> myTemplate = getMyTemplate();
+        string toReturn="";
+        IMapper mapperForT;
+        IList currentValuesList;
+        Type currentValuesListType;
+        string value;
         if (propertyType.Equals("VALUE"))
         {
-            string temp = mapperForT.basicMap(Operation.compute(operationType, _propertyValues));
-            return _ASPRepPrefix + temp +_ASPRepSuffix + Environment.NewLine;
+            currentValuesList = propertyValues[0];
+            currentValuesListType = currentValuesList.GetType().GetGenericArguments()[0];
+            mapperForT  = MappingManager.getInstance().getMapper(currentValuesListType);
+            value = mapperForT.basicMap(Operation.compute(operationType, propertyValues));
+            return string.Format(myTemplate[0], value);
         }
-        if (propertyType.Equals("LIST"))
+        if (propertyType.Equals("LIST") || propertyType.Equals("ARRAY2"))
         {
-            string temp = mapperForT.basicMap(_propertyValues[_propertyValues.Count-1]);
-            return _ASPRepPrefix +"("+ indexes[0] + "," + _ASPRepMid + temp +")"+ _ASPRepSuffix + Environment.NewLine;
-        }
-        if (propertyType.Equals("ARRAY2"))
-        {
-            string temp = mapperForT.basicMap(_propertyValues[_propertyValues.Count - 1]);
-            return _ASPRepPrefix +"("+ indexes[0] + "," + indexes[1] + "," + _ASPRepMid+ temp + ")"+_ASPRepSuffix + Environment.NewLine;
-        }
-        return "";
-    }
-    
+            object[] parameters;
+            if (propertyType.Equals("LIST"))
+            {
+                parameters = new object[2];
+                parameters[0] = indexes[0];
+            }
+            else
+            {
+                parameters = new object[3];
+                parameters[0] = indexes[0];
+                parameters[1] = indexes[1];
+            }
+            for (int i = 0; i < collectionElementProperties.Count; i++)
+            {
+                currentValuesList = propertyValues[i];
+                currentValuesListType = currentValuesList.GetType().GetGenericArguments()[0];
+                mapperForT = MappingManager.getInstance().getMapper(currentValuesListType);
+                value = mapperForT.basicMap(propertyValues[i][propertyValues.Count - 1]);
+                parameters[parameters.Length - 1] = value;
+                toReturn += string.Format(myTemplate[i], parameters) + Environment.NewLine;
+            }
 
+        }
+        return toReturn;
+    }
+
+    private List<string> getMyTemplate()
+    {
+        SensorConfiguration myConfiguration = getCorrespondingConfiguration();
+        int myPropertyIndex=-1;
+        foreach(MyListString property in myConfiguration.properties)
+        {
+            if (property.SequenceEqual(path))
+            {
+                myPropertyIndex = myConfiguration.properties.IndexOf(property);
+                break;
+            }
+        }
+        if (myPropertyIndex ==-1)
+        {
+            return null;
+        }
+        return myConfiguration.aspTemplate[myPropertyIndex];
+    }
+
+    private SensorConfiguration getCorrespondingConfiguration()
+    {
+        foreach(SensorConfiguration sensorConfiguration in gameObject.GetComponents<SensorConfiguration>())
+        {
+            if (sensorConfiguration.configurationName.Equals(sensorName))
+            {
+                return sensorConfiguration;
+            }
+        }
+        return null;
+    }
 }

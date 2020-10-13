@@ -12,19 +12,21 @@ public class AbstractConfiguration :MonoBehaviour
 {
     protected GameObjectsTracker tracker;
     internal IManager manager;
-    public List<List<string>> properties;
+    public List<MyListString> properties;
     public List<string> propertiesNames;
     public string configurationName;
     public List<SimpleGameObjectsTracker> advancedConf;
+    internal Dictionary<int,List<string>> aspTemplate; //the int is the position of the property in "properties"
 
     protected void Awake()
     {
         gameObject.AddComponent<IndexTracker>();
         manager.addConfiguration(this);
+        ASPRep();
     }
     public void SaveConfiguration(GameObjectsTracker tr)
     {
-        properties = new List<List<string>>();
+        properties = new List<MyListString>();
         propertiesNames = new List<string>();
         advancedConf = new List<SimpleGameObjectsTracker>();
         cleanSpecificDataStructure();
@@ -38,7 +40,7 @@ public class AbstractConfiguration :MonoBehaviour
             if (tr.ObjectsToggled[gOProperties[s]])
             {
                 //MyDebugger.MyDebug("property " + s + " toggled");
-                List<string> currentProperty = new List<string>();
+                MyListString currentProperty = new MyListString();
                 properties.Add(currentProperty);
                 if (tracker.IsMappable(gOProperties[s]))
                 {
@@ -52,6 +54,7 @@ public class AbstractConfiguration :MonoBehaviour
                     else
                     {
                         specificConfiguration(gOProperties[s], currentProperty);
+                        advancedConf.Add(null);
                     }
                 }
                 else if (tracker.ObjectDerivedFromFields.ContainsKey(gameObject))
@@ -65,7 +68,7 @@ public class AbstractConfiguration :MonoBehaviour
         {
             if (tr.ObjectsToggled[c])
             {
-                List<string> currentProperty = new List<string>();
+                MyListString currentProperty = new MyListString();
                 properties.Add(currentProperty);
                 currentProperty.Add(c.GetType() + "");
                 //MyDebugger.MyDebug("adding " + c.GetType().ToString());
@@ -82,9 +85,9 @@ public class AbstractConfiguration :MonoBehaviour
                             if (tracker.IsBaseType(componentProperties[s]))
                             {
                                 specificConfiguration(componentProperties[s], currentProperty);
+                                advancedConf.Add(null);
                             }
-                                
-                            if (!tracker.IsBaseType(componentProperties[s]))
+                            else
                             {
                                 tracker.basicTypeCollectionsConfigurations[componentProperties[s]].propertyName = currentProperty;
                                 advancedConf.Add(tracker.basicTypeCollectionsConfigurations[componentProperties[s]]);
@@ -106,12 +109,97 @@ public class AbstractConfiguration :MonoBehaviour
             throw new Exception("No properties selected, invalid configuration to save.");
         }
         manager.addConfiguration(this);
+        ASPRep();
         //MyDebugger.MyDebug("success");
     }
 
-        
+    internal virtual void ASPRep()
+    {
+        aspTemplate = new Dictionary<int,List<string>>();
+        for(int i=0; i<properties.Count;i++)
+        {
+            aspTemplate.Add(i, new List<string>());
+            MyListString property = properties[i];
+            string currentASPRep = "";
+            string pathInASPFormat = "";
+            string suffix = "";
+            for(int j=0; i<property.Count;j++)
+            {
+                pathInASPFormat += ASPMapperHelper.aspFormat(property[j]) + "(";
+                suffix += ")";
+            }
 
-    protected void recursevelyAdd(object obj, FieldOrProperty fieldOrProperty, List<string> currentPropertyHierarchy)
+            string configurationNameAspFormat = ASPMapperHelper.aspFormat(configurationName);
+            ////MyDebugger.MyDebug("goname " + s.gOName);
+            string goNameNotCapital = ASPMapperHelper.aspFormat(gameObject.name);
+            currentASPRep = configurationNameAspFormat + "(" + goNameNotCapital + ", objectIndex(+" + gameObject.GetComponent<IndexTracker>().currentIndex + "),";
+            suffix += ")";
+            currentASPRep += pathInASPFormat;
+            if (advancedConf.Count > i)
+            {
+                if (advancedConf[i].propertyType.Equals("LIST") || advancedConf[i].propertyType.Equals("ARRAY2"))
+                {
+                    string indexesPlaceholder = "";
+                    string valuePlaceholder = "";
+                    if (advancedConf[i].propertyType.Equals("LIST"))
+                    {
+                        indexesPlaceholder = "{0}";
+                        valuePlaceholder = "{1}";
+                    }
+                    else
+                    {
+                        indexesPlaceholder = "{0}{1}";
+                        valuePlaceholder = "{2}";
+                    }
+                    for(int j=0; j< advancedConf[i].toSave.Count; j++)
+                    {
+                        string localASPRep = currentASPRep;
+                        localASPRep += indexesPlaceholder+"," + ASPMapperHelper.aspFormat(Type.GetType(advancedConf[i].objType).ToString()) + "("
+                            + ASPMapperHelper.aspFormat(advancedConf[i].toSave[j]) + "("+ valuePlaceholder+")";
+                        localASPRep = ")" + suffix;
+                        aspTemplate[i].Add(localASPRep);
+                    }
+                }
+            }
+            else
+            {
+                currentASPRep += "{0}"+suffix;
+                aspTemplate[i].Add(currentASPRep);
+            }
+        }
+    }
+
+    internal string getAspTemplate()
+    {
+        string toReturn = "";
+        for (int i = 0; i < properties.Count; i++)
+        {
+            if (advancedConf.Count > i && !(advancedConf[i] is null))
+            {
+                if (advancedConf[i].propertyType.Equals("LIST"))
+                {
+                    for (int j = 0; j < advancedConf[i].toSave.Count; j++)
+                    {
+                        toReturn += String.Format(aspTemplate[i][j], "P", "V")+Environment.NewLine;
+                    }
+                }
+                else if (advancedConf[i].propertyType.Equals("ARRAY2"))
+                {
+                    for (int j = 0; j < advancedConf[i].toSave.Count; j++)
+                    {
+                        toReturn += String.Format(aspTemplate[i][j], "R", "C", "V")+Environment.NewLine;
+                    }
+                }
+            }
+            else
+            {
+                toReturn += String.Format(aspTemplate[i][0], "V")+ Environment.NewLine;
+            }
+        }
+        return toReturn;
+    }
+
+    protected void recursevelyAdd(object obj, FieldOrProperty fieldOrProperty, MyListString currentPropertyHierarchy)
     {
         object derivedObj = tracker.ObjectDerivedFromFields[obj][fieldOrProperty.Name()];
         if (derivedObj == null || (tracker.ObjectsOwners.ContainsKey(derivedObj) && !tracker.ObjectsOwners[derivedObj].Key.Equals(obj)) || !tracker.ObjectsOwners[derivedObj].Value.Equals(fieldOrProperty.Name()) || derivedObj.Equals(tracker.GO))
@@ -137,9 +225,9 @@ public class AbstractConfiguration :MonoBehaviour
                         if (tracker.IsBaseType(derivedObjProperties[s]))/////CHECK
                         {
                             specificConfiguration(derivedObjProperties[s], currentPropertyHierarchy);
+                            advancedConf.Add(null);
                         }
-                           
-                        if (!tracker.IsBaseType(derivedObjProperties[s]))
+                        else
                         {
                             tracker.basicTypeCollectionsConfigurations[derivedObjProperties[s]].propertyName = currentPropertyHierarchy;
                             advancedConf.Add(tracker.basicTypeCollectionsConfigurations[derivedObjProperties[s]]);
@@ -157,7 +245,16 @@ public class AbstractConfiguration :MonoBehaviour
             }
         }
     }
-    internal virtual void specificConfiguration(FieldOrProperty fieldOrProperty, List<string> property) { }
+    private void OnDestroy()
+    {
+        manager.deleteConfiguration(this);
+    }
+    public override bool Equals(object other)
+    {
+        return GetType().Equals(other.GetType()) && configurationName.Equals(((AbstractConfiguration)other).configurationName);
+    }
+
+    internal virtual void specificConfiguration(FieldOrProperty fieldOrProperty, MyListString property) { }
     internal virtual void cleanSpecificDataStructure() { }
 }
     

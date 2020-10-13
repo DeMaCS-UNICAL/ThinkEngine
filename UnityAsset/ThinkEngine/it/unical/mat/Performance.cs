@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using UnityEngine;
 using System.IO;
-using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts;
 using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
 using System.Globalization;
 using Debug = UnityEngine.Debug;

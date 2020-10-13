@@ -5,8 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
-{
+
     static class Operation 
     {
         public static Dictionary<Type, Type> operationsPerType;
@@ -298,4 +297,4 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         
     }
     
-}
+

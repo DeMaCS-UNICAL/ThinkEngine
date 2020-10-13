@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using UnityEngine;
 
 class GlobalIndexer
 {
@@ -16,5 +16,16 @@ class GlobalIndexer
         {
             return ++maxIndexUsed;
         }
+    }
+    internal static GameObject find(int index)
+    {
+        foreach (IndexTracker tracker in GameObject.FindObjectsOfType<IndexTracker>())
+        {
+            if (tracker.currentIndex == index)
+            {
+                return tracker.gameObject;
+            }
+        }
+        return null;
     }
 }

@@ -7,17 +7,21 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 
-namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
+public class ActuatorConfiguration : AbstractConfiguration
 {
-    [Serializable]
-    public class ActuatorConfiguration : AbstractConfiguration
+
+    void Awake()
     {
+        base.Awake();
+        manager = ActuatorsManager.GetInstance();
+    }
 
-        void Awake()
+    internal override void ASPRep()
+    {
+        base.ASPRep();
+        for(int i=0; i < aspTemplate.Count; i++)
         {
-            base.Awake();
-            manager = ActuatorsManager.GetInstance();
+            aspTemplate[i] = "setOnActuator(" + aspTemplate[i] + ")";
         }
-
     }
 }

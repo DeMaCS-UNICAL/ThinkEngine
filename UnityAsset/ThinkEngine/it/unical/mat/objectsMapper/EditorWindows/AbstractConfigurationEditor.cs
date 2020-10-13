@@ -416,11 +416,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             }
 
         }
-        protected void updateConfiguredObject()
-        {
-            configuration.manager.addConfiguration(configuration);
-        }
-
+       
         internal virtual void addCustomFields(FieldOrProperty obj) { }
     }
 }

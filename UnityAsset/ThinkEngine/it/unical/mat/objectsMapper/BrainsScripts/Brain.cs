@@ -1,6 +1,4 @@
-﻿using EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts;
-using EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,8 +23,8 @@ public class Brain :MonoBehaviour
     public bool enableBrain;
     public bool debug;
     public bool maintainFactFile;
-    public List<SensorConfiguration> sensorsConfigurations;
-    public List<ActuatorConfiguration> actuatorsConfigurations;
+    internal List<SensorConfiguration> sensorsConfigurations;
+    internal List<ActuatorConfiguration> actuatorsConfigurations;
     //private List<AdvancedSensor> sensors;
     //private List<SimpleActuator> actuators;
     private MappingManager mapper;
@@ -41,11 +39,11 @@ public class Brain :MonoBehaviour
     public string triggerClassPath;
     //private bool updateSensors;
     private bool actuatorsReady;
-    public bool updateSensorsRepeteadly;
-    public float sensorsUpdateFrequencyMS;
-    public bool updateSensorsOnTrigger;
-    public string updateSensorsOn="";
-    private MethodInfo sensorsUpdateMethod;
+    //public bool updateSensorsRepeteadly;
+    //public float sensorsUpdateFrequencyMS;
+    //public bool updateSensorsOnTrigger;
+    //public string updateSensorsOn="";
+    //private MethodInfo sensorsUpdateMethod;
     private MethodInfo reasonerMethod;
     private object triggerClass;
     public string executeReasonerOn;
@@ -64,6 +62,14 @@ public class Brain :MonoBehaviour
     {
         MyDebugger.enabled = debug;
         //Debug.unityLogger.logEnabled = false;
+        checkTriggerClass();
+        actuatorsManager = ActuatorsManager.GetInstance();
+        sensorManager = SensorsManager.GetInstance();
+        //MyDebugger.MyDebug("FINISH WITH AWAKE");
+    }
+
+    private void checkTriggerClass()
+    {
         triggerClassPath = @".\Assets\Scripts\Trigger.cs";
         if (!Directory.Exists(@"Assets\Scripts"))
         {
@@ -73,23 +79,28 @@ public class Brain :MonoBehaviour
         {
             ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
         }
-        actuatorsManager = ActuatorsManager.GetInstance();
-        sensorManager = SensorsManager.GetInstance();
-        if (Application.isEditor && !File.Exists(triggerClassPath)) {
-            using (FileStream fs = File.Create(triggerClassPath))
-            {
-                string triggerClassContent = "using System;\n";
-                triggerClassContent+="using UnityEngine;\n\n" ;
-                triggerClassContent += @"// every method of this class returning a bool value can be used to trigger the sensors update.";
-                triggerClassContent += "\n public class Trigger:ScriptableObject{\n\n";
-                triggerClassContent += "}";
-                Byte[] info = new UTF8Encoding(true).GetBytes(triggerClassContent);
-                fs.Write(info, 0, info.Length);
-            }
-            AssetDatabase.Refresh();
+
+        if (Application.isEditor && !File.Exists(triggerClassPath))
+        {
+            createTriggerScript();
         }
-        //MyDebugger.MyDebug("FINISH WITH AWAKE");
     }
+
+    private void createTriggerScript()
+    {
+        using (FileStream fs = File.Create(triggerClassPath))
+        {
+            string triggerClassContent = "using System;\n";
+            triggerClassContent += "using UnityEngine;\n\n";
+            triggerClassContent += @"// every method of this class without parameters and that returns a bool value can be used to trigger the reasoner.";
+            triggerClassContent += "\n public class Trigger:ScriptableObject{\n\n";
+            triggerClassContent += "}";
+            Byte[] info = new UTF8Encoding(true).GetBytes(triggerClassContent);
+            fs.Write(info, 0, info.Length);
+        }
+        AssetDatabase.Refresh();
+    }
+
     void Start()
     {
         //Debug.unityLogger.logEnabled = false;
@@ -100,25 +111,7 @@ public class Brain :MonoBehaviour
         }
         
     }
-    void Update()
-    {
-        if (!Application.isPlaying || !enableBrain)
-        {
-            return;
-        }
-        if (updateSensorsRepeteadly)
-        {
-            if (elapsedMS > sensorsUpdateFrequencyMS)
-            {
-                watch.Restart();
-            }
-            elapsedMS = watch.ElapsedMilliseconds;
-            if (elapsedMS >= sensorsUpdateFrequencyMS)
-            {
-                Performance.updatingSensors = true;
-            }
-        }
-    }
+   
     internal bool actuatorsUpdateCondition()
     {
         if (applyActuatorsMethod != null)
@@ -132,68 +125,46 @@ public class Brain :MonoBehaviour
     }
 
     void Reset() {
-        //executeRepeatedly = true;
         triggerClassPath = @".\Assets\Scripts\Trigger.cs";
-        //ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
         ASPFileTemplatePath = @".\Assets\Resources\" + gameObject.name + "_template.asp";
-        // brainUpdateFrequency = 500;
     }
 
       
 
     void OnValidate() {
         triggerClassPath = @".\Assets\Scripts\Trigger.cs";
-        //ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
         ASPFileTemplatePath = @".\Assets\Resources\" + gameObject.name + "_template.asp";
     }
 
     internal void generateFile()
     {
-        List<AdvancedSensor> sensors = new List<AdvancedSensor>();
-        List<SimpleActuator> actuators = new List<SimpleActuator>();
-        foreach (SensorConfiguration conf in sensorsConfigurations)
-        {
-            sensors.Add(new AdvancedSensor(conf));
-            ////MyDebugger.MyDebug(conf.configurationName+" added");
-        }
-        foreach (ActuatorConfiguration conf in actuatorsConfigurations)
-        {
-            actuators.Add(new SimpleActuator(conf));
-            ////MyDebugger.MyDebug(conf.configurationName+" added");
-        }
-        mapper = MappingManager.getInstance();
-        IMapper actuatorMapper = mapper.getMapper(typeof(SimpleActuator));
-        ASPAdvancedSensorMapper sensorMapper = (ASPAdvancedSensorMapper)mapper.getMapper(typeof(AdvancedSensor));
         using (FileStream fs = File.Create(ASPFileTemplatePath))
         {
-            foreach (SimpleActuator act in actuators)
+            foreach (ActuatorConfiguration actuatorConf in actuatorsConfigurations)
             {
-                Byte[] info = new UTF8Encoding(true).GetBytes(actuatorMapper.Map(act));
+                Byte[] info = new UTF8Encoding(true).GetBytes(actuatorConf.getAspTemplate());
                 fs.Write(info, 0, info.Length);
             }
-            foreach (AdvancedSensor sens in sensors)
+            foreach (SensorConfiguration sensorConf in sensorsConfigurations)
             {
-                Byte[] info = new UTF8Encoding(true).GetBytes(sensorMapper.getASPRepresentation(sens));
+                Byte[] info = new UTF8Encoding(true).GetBytes(sensorConf.getAspTemplate());
                 fs.Write(info, 0, info.Length);
             }
         }
     }
-    
 
     void initBrain2()
     {
-        List<IMonoBehaviourSensor> sensors = new List<IMonoBehaviourSensor>();
-        HashSet<MonoBehaviourSensorsManager> sensorsManagers = new HashSet<MonoBehaviourSensorsManager>();
-        List<SimpleActuator> actuators = new List<SimpleActuator>();
+       
         embasp = new SolverExectuor(this);
         triggerClass = ScriptableObject.CreateInstance("Trigger");
-        MethodInfo[] methods = triggerClass.GetType().GetMethods();
+        MethodInfo[] triggerMethods = triggerClass.GetType().GetMethods();
         ////MyDebugger.MyDebug("creating sensors");
-        prepareSensors(sensors, sensorsManagers, methods, triggerClass);
-        prepareActuators(sensors, actuators, methods);
+        prepareSensors();
+        prepareActuators(triggerMethods);
         if (!executeReasonerOn.Equals("When Sensors are ready"))
         {
-            foreach (MethodInfo mI in methods)
+            foreach (MethodInfo mI in triggerMethods)
             {
                 if (mI.Name.Equals(executeReasonerOn))
                 {
@@ -215,21 +186,21 @@ public class Brain :MonoBehaviour
         watch.Start();
     }
 
-    private void prepareActuators(List<IMonoBehaviourSensor> sensors, List<SimpleActuator> actuators, MethodInfo[] methods)
+    private void prepareActuators(MethodInfo[] triggerMethods)
     {
-        foreach (ActuatorConfiguration conf in actuatorsConfigurations)
+        foreach (ActuatorConfiguration actuatorConfiguration in actuatorsConfigurations)
         {
-            actuators.Add(new SimpleActuator(conf));
+            GameObject currentGameObject = actuatorConfiguration.gameObject;
+            MonoBehaviourActuatorsManager currentManager = currentGameObject.GetComponent<MonoBehaviourActuatorsManager>();
+            if (currentManager is null)
+            {
+                currentManager = currentGameObject.AddComponent<MonoBehaviourActuatorsManager>();
+            }
+            currentManager.instantiateActuator(actuatorConfiguration);
             ////MyDebugger.MyDebug(conf.configurationName+" added");
         }
-        actuatorsManager.registerActuators(this, actuators);
 
-        if (!actuatorsManager.applyCoroutinStarted)
-        {
-            StartCoroutine(actuatorsManager.applyActuators());
-            actuatorsManager.applyCoroutinStarted = true;
-        }
-        foreach (MethodInfo mI in methods)
+        foreach (MethodInfo mI in triggerMethods)
         {
             if (mI.Name.Equals(applyActuatorsCondition))
             {
@@ -239,51 +210,20 @@ public class Brain :MonoBehaviour
         }
     }
 
-    private void prepareSensors(List<IMonoBehaviourSensor> sensors, HashSet<MonoBehaviourSensorsManager> sensorsManagers, MethodInfo[] methods, object triggerClass)
+    private void prepareSensors()
     {
-        if (!updateSensorsOn.Equals(""))
+        foreach (SensorConfiguration sensorConfiguration in sensorsConfigurations)
         {
-
-            foreach (MethodInfo mI in methods)
-            {
-                if (mI.Name.Equals(updateSensorsOn))
-                {
-                    ////MyDebugger.MyDebug(mI.Name);
-                    sensorsUpdateMethod = mI;
-                    break;
-                    //StartCoroutine("UpdateSensorsOnTrigger");
-                }
-            }
-        }
-        foreach (SensorConfiguration conf in sensorsConfigurations)
-        {
-            MonoBehaviourSensorsManager currentManager = GameObject.Find(conf.gOName).GetComponent<MonoBehaviourSensorsManager>();
+            GameObject currentGameObject = sensorConfiguration.gameObject;
+            MonoBehaviourSensorsManager currentManager = currentGameObject.GetComponent<MonoBehaviourSensorsManager>();
             if (currentManager is null)
             {
-                currentManager = GameObject.Find(conf.gOName).AddComponent<MonoBehaviourSensorsManager>();
-                currentManager.brain = this;
+                currentManager = currentGameObject.AddComponent<MonoBehaviourSensorsManager>();
             }
             //MyDebugger.MyDebug("configuration of the manager of " + conf.gOName + " game object: " + currentManager.configurations);
-            if (updateSensorsRepeteadly)
-            {
-                currentManager.executeRepeteadly = updateSensorsRepeteadly;
-                currentManager.frequence = sensorsUpdateFrequencyMS;
-            }
-            else
-            {
-                currentManager.updateMethod = sensorsUpdateMethod;
-                currentManager.triggerClass = triggerClass;
-            }
-            currentManager.configurations.Add(conf);
-            sensorsManagers.Add(currentManager);
-        }
-        
-        foreach (MonoBehaviourSensorsManager manager in sensorsManagers)
-        {
-            sensors.AddRange(manager.generateSensors());
             
+            currentManager.instantiateSensor(sensorConfiguration);
         }
-        sensorManager.registerSensors(this, sensors);
     }
     private IEnumerator pulseOn()
     {
