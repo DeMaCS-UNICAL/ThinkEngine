@@ -187,10 +187,13 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                 sensorsUpdated[brain]++;
                 //MyDebugger.MyDebug("sensor instantiated: " + instantiatedSensors[brain].Count + " updated: " + sensorsUpdated[brain]);
                 //Debug.Break();
-                if (sensorsUpdated[brain] == instantiatedSensors[brain].Count)
+                if (sensorsUpdated[brain] >= instantiatedSensors[brain].Count)
                 {
                     //MyDebugger.MyDebug("pulsing on sensor updated");
-                    Monitor.Pulse(lockOn);
+                    if (sensorsUpdated[brain] == instantiatedSensors[brain].Count)
+                    {
+                        Monitor.Pulse(lockOn);
+                    }
                     sensorsUpdated[brain] = 0;
                 }
             }
