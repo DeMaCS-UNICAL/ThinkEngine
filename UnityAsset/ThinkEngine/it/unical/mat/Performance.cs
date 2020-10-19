@@ -14,11 +14,6 @@ using Debug = UnityEngine.Debug;
 class Performance : MonoBehaviour
 {
     private int steps;
-    private double avgFrames;
-    private int minRate = int.MaxValue;
-    private int maxRate = int.MinValue;
-    private double totalFrames;
-    private Stopwatch stopwatch;
     private static string withBrainPath = @"Performance\withBrain.csv";
     private static string withoutBrainPath = @"Performance\withoutBrain.csv";
     private static string factsAndASPath = @"Performance\factsAndAS.csv";

@@ -21,90 +21,55 @@ public class Brain :MonoBehaviour
 {
     public readonly object toLock = new object();
     public bool enableBrain;
-    public bool debug;
+    public bool debug=true;
     public bool maintainFactFile;
+    [SerializeField]
     internal List<SensorConfiguration> sensorsConfigurations;
+    [SerializeField]
     internal List<ActuatorConfiguration> actuatorsConfigurations;
-    //private List<AdvancedSensor> sensors;
-    //private List<SimpleActuator> actuators;
-    private MappingManager mapper;
     private Thread executionThread;
     private SolverExectuor embasp;
-    int count = 0;
-    private static System.Timers.Timer timer;
-    //public bool sensorsUpdated;
     internal bool solverWaiting;
-    public string ASPFilePath;
-    public string ASPFileTemplatePath;
-    public string triggerClassPath;
-    //private bool updateSensors;
-    private bool actuatorsReady;
-    //public bool updateSensorsRepeteadly;
-    //public float sensorsUpdateFrequencyMS;
-    //public bool updateSensorsOnTrigger;
-    //public string updateSensorsOn="";
-    //private MethodInfo sensorsUpdateMethod;
+    internal string ASPFilePath;
+    internal string ASPFileTemplatePath;
     private MethodInfo reasonerMethod;
     private object triggerClass;
     public string executeReasonerOn;
-    public string applyActuatorsCondition;
-    private MethodInfo applyActuatorsMethod;
-    private SensorsManager sensorManager;
-    private ActuatorsManager actuatorsManager;
-    internal long elapsedMS;
+    internal string sensorsMapping;
     private Stopwatch watch;
     internal long factsMSTotal;
     internal int factsStep;
     internal long asTotalMS;
     internal int asSteps;
 
-    void Awake()
+    void Reset()
     {
-        MyDebugger.enabled = debug;
-        //Debug.unityLogger.logEnabled = false;
-        checkTriggerClass();
-        actuatorsManager = ActuatorsManager.GetInstance();
-        sensorManager = SensorsManager.GetInstance();
-        //MyDebugger.MyDebug("FINISH WITH AWAKE");
-    }
-
-    private void checkTriggerClass()
-    {
-        triggerClassPath = @".\Assets\Scripts\Trigger.cs";
-        if (!Directory.Exists(@"Assets\Scripts"))
+        triggerClass = Utility.triggerClass;
+        if(sensorsConfigurations is null)
         {
-            Directory.CreateDirectory(@"Assets\Scripts");
+            sensorsConfigurations = new List<SensorConfiguration>();
+            actuatorsConfigurations = new List<ActuatorConfiguration>();
         }
         if (ASPFilePath is null)
         {
             ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
+            ASPFileTemplatePath = @".\Assets\Resources\" + gameObject.name + "Template.asp";
         }
-
-        if (Application.isEditor && !File.Exists(triggerClassPath))
+        if(executeReasonerOn is null)
         {
-            createTriggerScript();
+            executeReasonerOn = "";
         }
     }
-
-    private void createTriggerScript()
+    void OnEnable()
     {
-        using (FileStream fs = File.Create(triggerClassPath))
-        {
-            string triggerClassContent = "using System;\n";
-            triggerClassContent += "using UnityEngine;\n\n";
-            triggerClassContent += @"// every method of this class without parameters and that returns a bool value can be used to trigger the reasoner.";
-            triggerClassContent += "\n public class Trigger:ScriptableObject{\n\n";
-            triggerClassContent += "}";
-            Byte[] info = new UTF8Encoding(true).GetBytes(triggerClassContent);
-            fs.Write(info, 0, info.Length);
-        }
-        AssetDatabase.Refresh();
+        Reset();
     }
-
+    void Awake()
+    {
+        OnEnable();
+    }
     void Start()
     {
-        //Debug.unityLogger.logEnabled = false;
-        //MyDebugger.MyDebug("STARTING BRAIN");
         if (Application.isPlaying && enableBrain)
         {
             initBrain2();
@@ -112,30 +77,6 @@ public class Brain :MonoBehaviour
         
     }
    
-    internal bool actuatorsUpdateCondition()
-    {
-        if (applyActuatorsMethod != null)
-        {
-            return (bool)applyActuatorsMethod.Invoke(triggerClass, null);
-        }else if (applyActuatorsCondition.Equals("Never"))
-        {
-            return false;
-        }
-        return true;
-    }
-
-    void Reset() {
-        triggerClassPath = @".\Assets\Scripts\Trigger.cs";
-        ASPFileTemplatePath = @".\Assets\Resources\" + gameObject.name + "_template.asp";
-    }
-
-      
-
-    void OnValidate() {
-        triggerClassPath = @".\Assets\Scripts\Trigger.cs";
-        ASPFileTemplatePath = @".\Assets\Resources\" + gameObject.name + "_template.asp";
-    }
-
     internal void generateFile()
     {
         using (FileStream fs = File.Create(ASPFileTemplatePath))
@@ -157,22 +98,15 @@ public class Brain :MonoBehaviour
     {
        
         embasp = new SolverExectuor(this);
-        triggerClass = ScriptableObject.CreateInstance("Trigger");
-        MethodInfo[] triggerMethods = triggerClass.GetType().GetMethods();
         ////MyDebugger.MyDebug("creating sensors");
         prepareSensors();
-        prepareActuators(triggerMethods);
+        prepareActuators();
         if (!executeReasonerOn.Equals("When Sensors are ready"))
         {
-            foreach (MethodInfo mI in triggerMethods)
+            reasonerMethod = Utility.getTriggerMethod(executeReasonerOn);
+            if (!(reasonerMethod is null))
             {
-                if (mI.Name.Equals(executeReasonerOn))
-                {
-                    ////MyDebugger.MyDebug(mI.Name);
-                    reasonerMethod = mI;
-                    StartCoroutine("pulseOn");
-                    break;
-                }
+                StartCoroutine("pulseOn");
             }
         }
         executionThread = new Thread(() =>
@@ -186,7 +120,17 @@ public class Brain :MonoBehaviour
         watch.Start();
     }
 
-    private void prepareActuators(MethodInfo[] triggerMethods)
+    internal void removeNullSensorConfigurations()
+    {
+        MyDebugger.MyDebug("removing null");
+        sensorsConfigurations.RemoveAll(x => (x == null||x is null));
+    }
+    internal void removeNullActuatorConfigurations()
+    {
+        actuatorsConfigurations.RemoveAll(x => x == null);
+    }
+
+    private void prepareActuators()
     {
         foreach (ActuatorConfiguration actuatorConfiguration in actuatorsConfigurations)
         {
@@ -196,18 +140,10 @@ public class Brain :MonoBehaviour
             {
                 currentManager = currentGameObject.AddComponent<MonoBehaviourActuatorsManager>();
             }
-            currentManager.instantiateActuator(actuatorConfiguration);
+            currentManager.instantiateActuator(actuatorConfiguration, this);
             ////MyDebugger.MyDebug(conf.configurationName+" added");
         }
-
-        foreach (MethodInfo mI in triggerMethods)
-        {
-            if (mI.Name.Equals(applyActuatorsCondition))
-            {
-                MyDebugger.MyDebug("apply actuators on "+mI.Name);
-                applyActuatorsMethod = mI;
-            }
-        }
+        
     }
 
     private void prepareSensors()
@@ -224,6 +160,8 @@ public class Brain :MonoBehaviour
             
             currentManager.instantiateSensor(sensorConfiguration);
         }
+        SensorsManager sensorManager = FindObjectOfType<SensorsManager>();
+        sensorManager.registerSensors(this, sensorsConfigurations);
     }
     private IEnumerator pulseOn()
     {
@@ -238,32 +176,29 @@ public class Brain :MonoBehaviour
             }
         }
     }
-
-    public void setActuatorsReady(bool v)
-    {
-        actuatorsReady = v;
-    }
-
-    public bool areActuatorsReady()
-    {
-        return actuatorsReady;
-    }
-
-    public IEnumerable<SimpleActuator> getActuators()
-    {
-        return actuatorsManager.instantiatedActuators[this];
-    }
     
+    void Update()
+    {
+        MyDebugger.enabled = debug;
+        if (reasonerMethod is null && SensorsManager.frameFromLastUpdate == 1)
+        {
+            lock (toLock)
+            {
+                solverWaiting = false;
+                Monitor.Pulse(toLock);
+            }
+        }
+    }
+
     void OnApplicationQuit()
     {
-        if (timer != null)
-        {
-            timer.Enabled = false;
-        }
         if (embasp != null) {
             embasp.reason = false;
             ////MyDebugger.MyDebug("finalize");
-            sensorManager.pulseExecutor(this);
+            lock (toLock)
+            {
+                Monitor.Pulse(toLock);
+            }
             finalize();
         }
     }

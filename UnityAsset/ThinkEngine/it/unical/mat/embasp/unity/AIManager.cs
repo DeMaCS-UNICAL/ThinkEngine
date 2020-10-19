@@ -10,7 +10,6 @@ namespace EmbASP4Unity.it.unical.mat.embasp.unity
     class AIManager
     {
         MonoBehaviour character {get; set;}
-        List<GameObject> objectsToObserv;
 
     }
 }

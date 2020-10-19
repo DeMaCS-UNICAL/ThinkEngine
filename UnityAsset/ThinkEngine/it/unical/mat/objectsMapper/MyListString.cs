@@ -20,6 +20,17 @@ public class MyListString:List<string>
     {
         return this.SequenceEqual((MyListString)obj);
     }
+    public override int GetHashCode()
+    {
+        int prime = 31;
+        int result = 1;
+        foreach(string s in this)
+        {
+            result = result * prime + s.GetHashCode();
+        }
+        return base.GetHashCode();
+    }
+
     public new MyListString GetRange(int start, int count)
     {
         return new MyListString(base.GetRange(start, count));

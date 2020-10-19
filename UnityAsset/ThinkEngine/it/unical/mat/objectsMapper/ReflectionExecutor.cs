@@ -33,12 +33,6 @@ public static class ReflectionExecutor
         List<Type> floatingPoint = FloatingPointTypes();
         //MyDebugger.MyDebug(" level " + level);
         Type objType = obj.Type();
-        uint u = 1;
-        byte b = 1;
-        ulong l = 1;
-        ushort s = 1;
-        l = s;
-        //MyDebugger.MyDebug(obj.GetProperties()[0].PropertyType+" with name "+ obj.GetProperties()[0].Name);
         bool isBase = signedInteger.Contains(objType) || unsignedInteger.Contains(objType) || floatingPoint.Contains(objType);
         isBase |= objType == typeof(char) || objType == typeof(bool) || objType == typeof(Enum) || objType == typeof(string);
         return  isBase ;

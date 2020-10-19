@@ -6,22 +6,55 @@ using System.Runtime.Serialization;
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
+using System.Reflection;
 
+[ExecuteInEditMode]
 public class ActuatorConfiguration : AbstractConfiguration
 {
+    public Brain assignedTo;
+    private object triggerClass;
+    internal MethodInfo applyMethod;
 
-    void Awake()
+    new void OnEnable()
     {
-        base.Awake();
-        manager = ActuatorsManager.GetInstance();
+        triggerClass = Utility.triggerClass;
+        manager = FindObjectOfType<ActuatorsManager>();
+        if (manager is null)
+        {
+            manager = gameObject.AddComponent<ActuatorsManager>();
+            ((ActuatorsManager)manager).hideFlags = HideFlags.HideInInspector;
+        }
+        base.OnEnable();
     }
-
     internal override void ASPRep()
     {
         base.ASPRep();
-        for(int i=0; i < aspTemplate.Count; i++)
+        foreach(MyListString property in aspTemplate.Keys)
         {
-            aspTemplate[i] = "setOnActuator(" + aspTemplate[i] + ")";
+            for (int j = 0; j < aspTemplate[property].Count; j++)
+            {
+                aspTemplate[property][j] = "setOnActuator(" + aspTemplate[property][j] + ")";
+            }
         }
+    }
+
+    internal override string getAspTemplate()
+    {
+        string original = base.getAspTemplate();
+        string toReturn = "";
+        foreach(string line in original.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
+        {
+            toReturn += "setOnActuator(" + line + "):-"+Environment.NewLine;
+        }
+        return toReturn;
+    }
+
+    internal bool checkIfApply()
+    {
+        if(applyMethod is null)
+        {
+            return true;
+        }
+        return (bool) applyMethod.Invoke(triggerClass, null);
     }
 }

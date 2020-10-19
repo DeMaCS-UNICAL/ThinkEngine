@@ -10,179 +10,136 @@ using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-    public  class SensorsManager : IManager
+[ExecuteInEditMode]
+public  class SensorsManager : MonoBehaviour,IManager
+{
+    [SerializeField]
+    private List<string> configuredGameObject;
+    [SerializeField]
+    private List<string> configurationsNames;
+    private static Dictionary<Brain, List<SensorConfiguration>> instantiatedSensors;
+    private static Queue<Brain> requestedMappings;
+    private static object waitOn = new object();
+
+    internal static int updateFrequencyInFrames;
+    internal static int avgFps=0;
+    internal static int frameCount=0;
+    internal static int numberOfLiveSensor = 0;
+    internal static int frameFromLastUpdate = 0;
+    internal static float updateScaleFactor = 1;
+
+    void Reset()
     {
-        private List<string> configuredGameObject;
-        private List<string> configurationsNames;
-        private static Dictionary<Brain, List<IMonoBehaviourSensor>> instantiatedSensors;
-        private static Dictionary<Brain, int> sensorsUpdated;
-
-        public static SensorsManager instance;
-        private static Dictionary<Brain, object> to_lock;
-
-
-        internal static SensorsManager GetInstance()
+        if (FindObjectsOfType<SensorsManager>().Length > 1)
         {
-            // MyDebugger.MyDebug("instance " + instance);
-            if (instance == null)
+            try
             {
-                instance = new SensorsManager();
-                instance.configuredGameObject = new List<string>();
-                instance.configurationsNames = new List<string>();
-                //MyDebugger.MyDebug("instance after " + instance);
-                //MyDebugger.MyDebug("confs: " + instance.sensConfs.Count);
+                throw new Exception("Only one SensorsManager can be instantiated");
             }
-            return instance;
-        }
-        
-
-        public List<string> getConfiguredGameObject()
-        {
-            return configuredGameObject;
-        }
-        public List<string> getUsedNames()
-        {
-            return configurationsNames;
-        }
-        
-
-        
-        
-
-        internal static string GetSensorsMapping(Brain brain)
-        {
-            object lockOn = getLock(brain);
-            lock (lockOn)
+            finally
             {
+                Destroy(this);
+            }
+        }
+        if (requestedMappings == null)
+        {
+            requestedMappings = new Queue<Brain>();
+        }
+        if (configuredGameObject == null)
+        {
+            configuredGameObject = new List<string>();
+        }
+        if (configurationsNames == null)
+        {
+            configurationsNames = new List<string>();
+        }
+    }
+    
+    void OnEnable()
+    {
+        Reset();
+    }
+    void Update()
+    {
+        if (Application.isPlaying)
+        {
+            returnSensorsMappings();// here is safe since the sensors are updated in the LateUpdate
+            frameFromLastUpdate++;
+            frameCount++;
+            int currentFps = (int)(1f / Time.unscaledDeltaTime);
+            avgFps = (avgFps * (frameCount - 1) + currentFps) / frameCount;
+            if (frameFromLastUpdate > updateFrequencyInFrames)
+            {
+                updateScaleFactor = (avgFps - currentFps) / (float)avgFps * 10;
+                frameFromLastUpdate = 1;
+                numberOfLiveSensor = FindObjectsOfType<MonoBehaviourSensor>().Length;
+                updateFrequencyInFrames = numberOfLiveSensor / avgFps;
+                updateFrequencyInFrames += (int)Math.Ceiling(updateFrequencyInFrames * updateScaleFactor);
+            }
+        }
+    }
+
+    public List<string> getConfiguredGameObject()
+    {
+        return configuredGameObject;
+    }
+    public List<string> getUsedNames()
+    {
+        return configurationsNames;
+    }
+    
+    internal static void requestSensorsMapping(Brain brain)
+    {
+        lock (waitOn)
+        {
+            requestedMappings.Enqueue(brain);
+            Monitor.Wait(waitOn);
+        }
+    }
+
+    internal static void returnSensorsMappings()
+    {
+        lock (waitOn)
+        {
+            while (requestedMappings.Count > 0)
+            {
+                Brain brain = requestedMappings.Dequeue();
                 string mapping = "";
-                IEnumerable<IMonoBehaviourSensor> sensors = GetSensors(brain, lockOn);
+                List<MonoBehaviourSensor> sensors = new List<MonoBehaviourSensor>();
+                foreach (SensorConfiguration sensorConf in instantiatedSensors[brain])
+                {
+                    sensors.AddRange(sensorConf.gameObject.GetComponent<MonoBehaviourSensorsManager>().configurations[sensorConf]);
+                }
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
-                foreach (IMonoBehaviourSensor sensor in sensors)
+                foreach (MonoBehaviourSensor sensor in sensors)
                 {
                     mapping += sensor.Map();
                 }
                 watch.Stop();
                 brain.factsStep++;
                 brain.factsMSTotal += watch.ElapsedMilliseconds;
-                return mapping;
+                brain.sensorsMapping = mapping;
             }
         }
+        Monitor.PulseAll(waitOn);
+    }
 
-        public void registerSensors(Brain brain, List<IMonoBehaviourSensor> instantiated)
+    public void registerSensors(Brain brain, List<SensorConfiguration> instantiated)
+    {
+        if (instantiatedSensors == null)
         {
-            
-            lock (getLock(brain))
-            {
-                if (instantiatedSensors == null)
-                {
-                    instantiatedSensors = new Dictionary<Brain, List<IMonoBehaviourSensor>>();
-                }
-                if (!instantiatedSensors.ContainsKey(brain))
-                {
-                    instantiatedSensors.Add(brain, instantiated);
-                }
-                else
-                {
-                    instantiatedSensors[brain] = instantiated;
-                }
-            }
+            instantiatedSensors = new Dictionary<Brain, List<SensorConfiguration>>();
         }
-
-        public static IEnumerable<IMonoBehaviourSensor> GetSensors(Brain brain, object lockOn)
+        if (!instantiatedSensors.ContainsKey(brain))
         {
-            if (sensorsUpdatedCount(brain) != instantiatedSensorsCount(brain))
-            {
-               // MyDebugger.MyDebug("I'm waiting since " + sensorsUpdatedCount(brain) + "<>" + instantiatedSensorsCount(brain),brain.debug);
-                MyDebugger.MyDebug(Thread.CurrentThread.Name + " is going to wait");
-                Monitor.Wait(lockOn);
-                MyDebugger.MyDebug(Thread.CurrentThread.Name + "is going to execute");
-            }
-            return getInstantiatedSensors(brain);
+            instantiatedSensors.Add(brain, instantiated);
         }
-
-        private static object getLock(Brain brain)
+        else
         {
-            if (to_lock is null)
-            {
-                to_lock = new Dictionary<Brain, object>();
-            }
-            if (!to_lock.ContainsKey(brain))
-            {
-                to_lock.Add(brain, new object());
-            }
-            return to_lock[brain];
+            instantiatedSensors[brain] = instantiated;
         }
-
-        public static int sensorsUpdatedCount(Brain brain)
-        {
-            if(sensorsUpdated is null || !sensorsUpdated.ContainsKey(brain))
-            {
-                return 0;
-            }
-            return sensorsUpdated[brain];
-        }
-        public static int instantiatedSensorsCount(Brain brain)
-        {
-            if (instantiatedSensors is null || !instantiatedSensors.ContainsKey(brain))
-            {
-                return 0;
-            }
-            return instantiatedSensors[brain].Count;
-        }
-
-        public static void AddUpdatedSensor(Brain brain)
-        {
-            object lockOn = getLock(brain);
-            lock (lockOn)
-            {
-                if (sensorsUpdated is null)
-                {
-                    sensorsUpdated = new Dictionary<Brain, int>();
-                }
-                if (!sensorsUpdated.ContainsKey(brain))
-                {
-                    sensorsUpdated.Add(brain, 0);
-                }
-                sensorsUpdated[brain]++;
-                //MyDebugger.MyDebug("sensor instantiated: " + instantiatedSensors[brain].Count + " updated: " + sensorsUpdated[brain]);
-                //Debug.Break();
-                if (sensorsUpdated[brain] == instantiatedSensors[brain].Count)
-                {
-                    //MyDebugger.MyDebug("pulsing on sensor updated");
-                    Monitor.Pulse(lockOn);
-                    sensorsUpdated[brain] = 0;
-                }
-            }
-        }
-        /*public void updateSensors(Brain brain)
-        {
-            Performance.updatingSensors = true;
-            foreach (AdvancedSensor sens in instantiatedSensors[brain])
-            {
-                sens.UpdateProperties();
-                /*if (sens.matrixProperties.Count() > 0)
-                {
-                    MyDebugger.MyDebug(sens.matrixProperties.Count() + " " + sens.matrixProperties.First().Key + " " + sens.matrixProperties.First().Value);
-                }
-                if (sens.listProperties.Count > 0)
-                {
-                    MyDebugger.MyDebug(sens.listProperties.Count() + " " + sens.listProperties.First().Key + " " + sens.listProperties.First().Value);
-                }
-
-            }
-
-        }*/
-       
-
-        internal static IEnumerable<IMonoBehaviourSensor> getInstantiatedSensors(Brain brain)
-        {
-            if(!(instantiatedSensors is null) && instantiatedSensors.ContainsKey(brain))
-            {
-                return instantiatedSensors[brain];
-            }
-            return new List<IMonoBehaviourSensor>();
-        }
+    }
 
     public void deleteConfiguration(AbstractConfiguration abstractConfiguration)
     {
@@ -195,47 +152,17 @@ using Debug = UnityEngine.Debug;
     }
 
     public void addConfiguration(AbstractConfiguration abstractConfiguration)
+    {
+        if (!configurationsNames.Contains(abstractConfiguration.configurationName))
         {
-            //MyDebugger.MyDebug("checking if to delete " + abstractConfiguration.name);
-            if (!configurationsNames.Contains(abstractConfiguration.configurationName))
-            {
-                configurationsNames.Add(abstractConfiguration.configurationName);
-                configuredGameObject.Add(abstractConfiguration.gameObject.name);
-            }
-        }
-
-
-        internal void addSensor(Brain brain, IMonoBehaviourSensor sensor)
-        {
-            lock (getLock(brain))
-            {
-                if (!instantiatedSensors.ContainsKey(brain))
-                {
-                    instantiatedSensors.Add(brain, new List<IMonoBehaviourSensor>());
-                }
-                instantiatedSensors[brain].Add(sensor);
-            }
-        }
-        internal void removeSensor(Brain brain, IMonoBehaviourSensor sensor)
-        {
-            lock (getLock(brain))
-            {
-                instantiatedSensors[brain].Remove(sensor);
-            }
-        }
-        
-        internal void pulseExecutor(Brain brain)
-        {
-            object toLock = getLock(brain);
-            lock (toLock)
-            {
-                Monitor.Pulse(toLock);
-            }
-        }
-
-        public bool existsConfigurationWithName(string name)
-        {
-            return configurationsNames.Contains(name);
+            configurationsNames.Add(abstractConfiguration.configurationName);
+            configuredGameObject.Add(abstractConfiguration.gameObject.name);
         }
     }
+    
+    public bool existsConfigurationWithName(string name)
+    {
+        return configurationsNames.Contains(name);
+    }
+}
 

@@ -10,7 +10,7 @@ public class SimpleGameObjectsTracker
     [SerializeField]
     public List<string> toSave;
     [SerializeField]
-    public List<string> propertyName;
+    public MyListString propertyName;
     public string name;
     public string propertyType; //ARRAY2, LIST
 

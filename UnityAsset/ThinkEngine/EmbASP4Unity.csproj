@@ -45,9 +45,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EmbASP3_5">
-      <HintPath>..\Dottorato\Ianni\EmbASP4Unity\EmbASP3.5\bin\Debug\EmbASP3_5.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.11.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -64,9 +61,6 @@
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\..\..\..\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\..\Program Files\Unity\Editor\Data\UnityExtensions\Unity\GUISystem\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -169,7 +163,7 @@
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Brain.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\SolverExecutor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\AbstractConfigurationEditor.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\EditorWindows\ActuatorConfiguratorEditor.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\EditorWindows\ActuatorConfigurationEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorsManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\AbstractConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\BrainEditor.cs" />
@@ -192,6 +186,7 @@
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\NewSensors\MonoBehaviourSensorsManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\NewSensors\SensorsUtility.cs" />
     <Compile Include="it\unical\mat\objectsMapper\TestingAddMonobehaviour.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Utility.cs" />
     <Compile Include="it\unical\mat\Performance.cs" />
     <Compile Include="it\unical\mat\objectsMapper\FieldOrProperty.cs" />
     <Compile Include="it\unical\mat\objectsMapper\GameObjectsTracker.cs" />

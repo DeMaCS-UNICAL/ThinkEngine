@@ -12,7 +12,6 @@ using UnityEngine;
         private static Dictionary<Type, Dictionary<int, Action>> actionPerOperation;
         private static IList values;
         private static object returnValue;
-        private static string valueToTrack;
         public enum boolOperations { Newest, Oldest,Specific_Value,Conjunction,Disjunction };
         public enum stringOperations { Newest, Oldest, Specific_Value };//, Mode};
         public enum numericOperations { Newest, Oldest,  Specific_Value, Max,Min,Avg};

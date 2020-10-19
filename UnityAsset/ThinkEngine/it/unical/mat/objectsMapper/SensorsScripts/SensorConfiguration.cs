@@ -7,16 +7,23 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 
-
+[ExecuteInEditMode,Serializable]
 public class SensorConfiguration : AbstractConfiguration
 {
+    [SerializeField]
     internal List<ListOfStringIntPair> operationPerProperty;
+    [SerializeField]
     internal List<ListOfStringStringPair> specificValuePerProperty;
 
-    void Awake()
+    new void OnEnable()
     {
-        base.Awake();
-        manager = SensorsManager.GetInstance();
+        manager = FindObjectOfType<SensorsManager>();
+        if (manager is null)
+        {
+            manager = gameObject.AddComponent<SensorsManager>();
+            ((SensorsManager)manager).hideFlags = HideFlags.HideInInspector;
+        }
+        base.OnEnable();
         if (operationPerProperty is null)
         {
             operationPerProperty = new List<ListOfStringIntPair>();
@@ -26,14 +33,17 @@ public class SensorConfiguration : AbstractConfiguration
             specificValuePerProperty = new List<ListOfStringStringPair>();
         }
     }
-
+    void Reset()
+    {
+        OnEnable();
+    }
     internal override void cleanSpecificDataStructure()
     {
         operationPerProperty = new List<ListOfStringIntPair>();
         specificValuePerProperty = new List<ListOfStringStringPair>();
     }
 
-    internal override void specificConfiguration(FieldOrProperty fieldOrProperty, MyListString property)
+    internal override void specificConfiguration(FieldOrProperty fieldOrProperty, MyListString property, GameObjectsTracker tracker)
     {
         ListOfStringIntPair pair = new ListOfStringIntPair();
         pair.Key = property;
@@ -51,13 +61,24 @@ public class SensorConfiguration : AbstractConfiguration
     internal override void ASPRep()
     {
         base.ASPRep();
-        for (int i = 0; i < aspTemplate.Count; i++)
+        foreach(MyListString property in aspTemplate.Keys)
         {
-            for (int j = 0; j < aspTemplate[i].Count; j++)
+            for (int j = 0; j < aspTemplate[property].Count; j++)
             {
-                aspTemplate[i][j] = aspTemplate[i][j] + ".";
+                aspTemplate[property][j] = aspTemplate[property][j] + ".";
             }
         }
     }
+    internal override string getAspTemplate()
+    {
+        string original = base.getAspTemplate();
+        string toReturn = "";
+        foreach (string line in original.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
+        {
+            toReturn += "%"+line + "." + Environment.NewLine;
+        }
+        return toReturn;
+    }
+    
 }
 

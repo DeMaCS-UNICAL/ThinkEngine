@@ -11,11 +11,10 @@ using System.Linq;
 public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
 {
     readonly object toLock = new object();
-    bool _ready;
     public Brain brain { get; set; }
     public bool dataAvailable;
     public string sensorName { get; set; }
-    public MyListString path { get; set; }
+    public MyListString property { get; set; }
     public string propertyType { get; set; }
     public int operationType { get; set; }
     public List<string> collectionElementProperties { get; set; }
@@ -24,17 +23,13 @@ public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
     public List<IList> propertyValues { get; set; }
     public string collectionElementType { get; set; }
 
-    public bool executeRepeteadly { get; set; }
-    public float frequency { get; set; }
-    public object triggerClass { get; set; }
-    public MethodInfo updateMethod { get; set; }
-
+    internal SensorsManager myManager;
 
     // Use this for initialization
     void Awake()
     {
         //Debug.unityLogger.logEnabled = false;
-        
+        myManager = FindObjectOfType<SensorsManager>();
         propertyValues = new List<IList>();
         indexes = new List<int>();
     }
@@ -67,24 +62,15 @@ public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
         {
             return;
         }
-        if (executeRepeteadly)
+        if (SensorsManager.frameFromLastUpdate==SensorsManager.updateFrequencyInFrames)
         {
-            if(gameObject.GetComponent<MonoBehaviourSensorsManager>().brain.elapsedMS < frequency)
+            ReadProperty();
+            if (propertyValues.Count == 101)
             {
-                return;
+                propertyValues.RemoveAt(0);
             }
         }
-        else if (!(bool)updateMethod.Invoke(triggerClass, null))
-        {
-            return;
-        }
-        //MyDebugger.MyDebug("updating " + sensorName);
-        ReadProperty();
-        if (propertyValues.Count == 100)
-        {
-            propertyValues.RemoveAt(0);
-        }
-        SensorsManager.AddUpdatedSensor(brain);
+       
         
     }
 
@@ -92,14 +78,14 @@ public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
     {
         lock (toLock)
         {
-            if (path.Count==-1)
+            if (property.Count==-1)
                 {
 
-                    ReadSimplePropertyMethod(path[0], typeof(GameObject), gameObject);
+                    ReadSimplePropertyMethod(property[0], typeof(GameObject), gameObject);
                 }
                 else
                 {
-                    SensorsUtility.ReadComposedProperty(gameObject, path, path, typeof(GameObject), gameObject, ReadSimplePropertyMethod);
+                    SensorsUtility.ReadComposedProperty(gameObject, property, property, typeof(GameObject), gameObject, ReadSimplePropertyMethod);
                 }
             
             dataAvailable = true;
@@ -149,7 +135,6 @@ public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
         }
         else
         {
-            SensorsManager.GetInstance().removeSensor(brain, this);
             Destroy(this);
             return;
         }
@@ -173,8 +158,7 @@ public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
 
         else
         {
-           // MyDebugger.MyDebug("Destroing " + path);
-            SensorsManager.GetInstance().removeSensor(brain, this);
+            // MyDebugger.MyDebug("Destroing " + path);
             Destroy(this);
             return;
         }
@@ -196,7 +180,7 @@ public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
 
     public string Map()
     {
-        List<string> myTemplate = getMyTemplate();
+        List<string> myTemplate = getCorrespondingConfiguration().getTemplate(property);
         string toReturn="";
         IMapper mapperForT;
         IList currentValuesList;
@@ -238,24 +222,7 @@ public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
         return toReturn;
     }
 
-    private List<string> getMyTemplate()
-    {
-        SensorConfiguration myConfiguration = getCorrespondingConfiguration();
-        int myPropertyIndex=-1;
-        foreach(MyListString property in myConfiguration.properties)
-        {
-            if (property.SequenceEqual(path))
-            {
-                myPropertyIndex = myConfiguration.properties.IndexOf(property);
-                break;
-            }
-        }
-        if (myPropertyIndex ==-1)
-        {
-            return null;
-        }
-        return myConfiguration.aspTemplate[myPropertyIndex];
-    }
+    
 
     private SensorConfiguration getCorrespondingConfiguration()
     {

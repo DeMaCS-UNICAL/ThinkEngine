@@ -30,14 +30,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
 
 
-        protected void OnEnable()
+        protected void Reset()
         {
+            configuration = target as AbstractConfiguration;
             reset();
         }
 
         protected void reset(bool fault = false)
         {
-            configuration = target as AbstractConfiguration;
             tracker = new GameObjectsTracker();
             tracker.GO = configuration.gameObject;
             if (fault)
@@ -46,7 +46,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             }
             else
             {
-                if (!configuration.name.Equals(""))
+                if (!configuration.configurationName.Equals(""))
                 {
                     tracker.updateDataStructures(-1, configuration);
                 }
@@ -75,8 +75,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 
             }catch(Exception e)
             {
-                MyDebugger.MyDebug(e.Message);
-                MyDebugger.MyDebug(e.StackTrace);
+                Debug.LogError(e);
                 reset(true);
             }
         }
@@ -95,10 +94,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             EditorGUI.indentLevel--;
             string buttonContent;
             bool disabled=false;
-            if (configuration.manager.existsConfigurationWithName(configuration.name))
+            if (!tracker.configurationName.Equals(configuration.configurationName) && configuration.manager.existsConfigurationWithName(tracker.configurationName))
             {
                 buttonContent = "Name used for another sensor";
                 disabled = true;
+            }
+            else if(configuration.saved)
+            {
+                buttonContent = "Override Configuration";
             }
             else
             {
@@ -135,16 +138,16 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         {
             GUILayout.BeginHorizontal();
             GUILayout.Label("Choose a name for the new configuration.", EditorStyles.boldLabel);
-            configuration.name = GUILayout.TextField(configuration.name);
+            configuration.configurationName = GUILayout.TextField(configuration.configurationName);
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            if (!configuration.manager.existsConfigurationWithName(configuration.name))
+            if (!configuration.manager.existsConfigurationWithName(configuration.configurationName))
             {
                 if (GUILayout.Button("Ok"))
                 {
                     //configuration = configurator.newConfiguration(chosenName,chosenGO);
-                    tracker.configurationName = configuration.name;
+                    tracker.configurationName = configuration.configurationName;
                     tracker.updateDataStructures(-1, configuration);
                 }
             }
@@ -156,7 +159,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             }
             if (GUILayout.Button("Clean"))
             {
-                configuration.name = "";
+                configuration.configurationName = "";
             }
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();

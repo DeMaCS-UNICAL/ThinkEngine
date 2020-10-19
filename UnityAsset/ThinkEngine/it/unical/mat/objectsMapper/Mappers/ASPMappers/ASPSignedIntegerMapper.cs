@@ -11,7 +11,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
         {
             DictionaryEntry entry = (DictionaryEntry)o;
             string value =  "(" + entry.Value + ")";
-            return ASPMapperHelper.getInstance().buildMapping((string)entry.Key, '^', value);
+            return ASPMapperHelper.buildMapping((string)entry.Key, '^', value);
         }
 
         public string basicMap(object l)

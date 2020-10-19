@@ -14,74 +14,135 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
     {
         List<string> excludedProperties=new List<string>();
         List<string> methodsToShow = new List<string>();
-        List<string> methodsToShowForReasoner = new List<string>();
         Dictionary<int, List<string>> sensorsConfigurationNames = new Dictionary<int, List<string>>();
+        Dictionary<string, ActuatorConfiguration> actuatorConfigurations;
+        Dictionary<string, SensorConfiguration> sensorConfigurations;
         Dictionary<int, List<string>> actuatorsConfigurationNames = new Dictionary<int, List<string>>();
         Dictionary<int, string> gameObjectNamesPerIndex = new Dictionary<int, string>();
         Dictionary<string, bool> toggledSensorsConfigurations = new Dictionary<string, bool>();
         Dictionary<string, bool> toggledActuatorsConfigurations = new Dictionary<string, bool>();
         Dictionary<int, bool> toggledGameObjectsForSensors = new Dictionary<int, bool>();
         Dictionary<int, bool> toggledGameObjectsForActuators = new Dictionary<int, bool>();
-        public int sensorsUpdateIndex = 0;
         public int reasoningExecutionIndex = 0;
-        public int applyActuatorsIndex=0;
-        private List<string> methodsToShowForActuators=new List<string>();
         private Brain myScript;
 
-        void OnEnable()
+        void Reset()
         {
             myScript = target as Brain;
+            sensorConfigurations = new Dictionary<string, SensorConfiguration>();
+            actuatorConfigurations = new Dictionary<string, ActuatorConfiguration>();
             basicConfiguration();
-            synchWithBrain();
+            readingFromBrain();
         }
 
-        private void synchWithBrain()
+        private void readingFromBrain()
         {
-            
-            for (int i = 0; i < methodsToShowForReasoner.Count; i++)
-            {
-                if (myScript.executeReasonerOn.Equals(methodsToShowForReasoner[i]))
-                {
-                    reasoningExecutionIndex = i;
-                    break;
-                }
-            }
-            
+            reasoningExecutionIndex = Utility.getTriggerMethodIndex(myScript.executeReasonerOn);
+            MyDebugger.MyDebug("index " + reasoningExecutionIndex);
+            bool delete = false;
             foreach (SensorConfiguration sensorConf in myScript.sensorsConfigurations)
-            {
+            { 
+                if(sensorConf == null)
+                {
+                    delete = true;
+                    continue;
+                }
                 toggledGameObjectsForSensors[sensorConf.GetComponent<IndexTracker>().currentIndex] = true;
-                toggledSensorsConfigurations[sensorConf.name] = true;
+                toggledSensorsConfigurations[sensorConf.configurationName] = true;
+            }
+            if (delete)
+            {
+                myScript.removeNullSensorConfigurations();
+                delete = false;
             }
             foreach (ActuatorConfiguration actuatorConf in myScript.actuatorsConfigurations)
             {
+                if (actuatorConf == null)
+                {
+                    delete = true;
+                    continue;
+                }
                 toggledGameObjectsForActuators[actuatorConf.GetComponent<IndexTracker>().currentIndex] = true;
-                toggledActuatorsConfigurations[actuatorConf.name] = true;
+                toggledActuatorsConfigurations[actuatorConf.configurationName] = true;
+            }
+            if (delete)
+            {
+                myScript.removeNullActuatorConfigurations();
+                delete = false;
             }
         }
 
         private void basicConfiguration()
         {
-            var triggerClass = ScriptableObject.CreateInstance("Trigger");
-            MethodInfo[] methods = triggerClass.GetType().GetMethods();
+            methodsToShow = Utility.triggerMethodsToShow;
+            methodsToShow.Add("When Sensors are ready");
+            
+            removeUnexistingConfigurations();
+            addNewConfigurations();
+        }
 
-            foreach (MethodInfo mI in methods)
+        private void removeUnexistingConfigurations()
+        {
+            bool removed = false;
+            List<string> toDelete = new List<string>();
+            foreach(string sensorName in sensorConfigurations.Keys)
             {
-                if (mI.ReturnType == typeof(bool) && mI.GetParameters().Length == 0)
-                {
-                    methodsToShow.Add(mI.Name);
-                    MyDebugger.MyDebug(mI.Name);
+                if (!FindObjectOfType<SensorsManager>().existsConfigurationWithName(sensorName)){
+                    toDelete.Add(sensorName);
+                    toggledSensorsConfigurations.Remove(sensorName);
+                    removed = true;
                 }
             }
-            methodsToShowForReasoner.Add("When Sensors are ready");
-            methodsToShowForReasoner.AddRange(methodsToShow);
-
-            foreach (SensorConfiguration sensorConf in FindObjectsOfType<SensorConfiguration>())
+            if (removed)
             {
-                addConfigurationName(sensorConf, sensorsConfigurationNames, toggledGameObjectsForSensors, toggledSensorsConfigurations);
+                myScript.removeNullSensorConfigurations();
+                removed = false;
             }
-            foreach (ActuatorConfiguration actuatorConf in FindObjectsOfType<ActuatorConfiguration>())
+            foreach (string current in toDelete) {
+                sensorConfigurations.Remove(current);
+            }
+            toDelete = new List<string>();
+            foreach (string actuatorName in actuatorConfigurations.Keys)
             {
-                addConfigurationName(actuatorConf, actuatorsConfigurationNames, toggledGameObjectsForActuators, toggledActuatorsConfigurations);
+                if (!FindObjectOfType < ActuatorsManager>().existsConfigurationWithName(actuatorName))
+                {
+                    toDelete.Add(actuatorName);
+                    toggledActuatorsConfigurations.Remove(actuatorName);
+                    removed = true;
+                }
+            }
+            foreach (string current in toDelete)
+            {
+                actuatorConfigurations.Remove(current);
+            }
+            if (removed)
+            {
+                myScript.removeNullActuatorConfigurations();
+            }
+
+        }
+
+        private void addNewConfigurations()
+        {
+            if (FindObjectsOfType<SensorConfiguration>().Length > 0)
+            {
+                foreach (SensorConfiguration sensorConf in FindObjectsOfType<SensorConfiguration>())
+                {
+                    if (sensorConf.saved)
+                    {
+                        addConfigurationName(sensorConf, sensorsConfigurationNames, toggledGameObjectsForSensors, toggledSensorsConfigurations);
+                    }
+                }
+            }
+            if (FindObjectsOfType<ActuatorConfiguration>().Length > 0)
+            {
+                foreach (ActuatorConfiguration actuatorConf in FindObjectsOfType<ActuatorConfiguration>())
+                {
+                    if (actuatorConf.saved)
+                    {
+                        addConfigurationName(actuatorConf, actuatorsConfigurationNames, toggledGameObjectsForActuators, toggledActuatorsConfigurations);
+                    }
+                }
             }
         }
 
@@ -97,25 +158,44 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                     toggledGameObjects.Add(currentGameObjectIndex, false);
                 }
             }
-            configurationsNames[currentGameObjectIndex].Add(configuration.name);
-            toggledConfigurations.Add(configuration.name, false);
+            if (!configurationsNames[currentGameObjectIndex].Contains(configuration.configurationName))
+            {
+                configurationsNames[currentGameObjectIndex].Add(configuration.configurationName);
+                toggledConfigurations.Add(configuration.configurationName, false);
+                if(configuration.GetType().Equals(typeof(SensorConfiguration)))
+                {
+                    sensorConfigurations.Add(configuration.configurationName, (SensorConfiguration)configuration);
+                }
+                else
+                {
+                    actuatorConfigurations.Add(configuration.configurationName, (ActuatorConfiguration)configuration);
+                }
+            }
         }
 
         public override void OnInspectorGUI()
         {
+            basicConfiguration();
+            GUI.enabled = false;
+            EditorGUILayout.TextField("Trigger Script Path", Utility.triggerClassPath);
+            EditorGUILayout.TextField("ASP File Path", myScript.ASPFilePath);
+            EditorGUILayout.TextField("ASP Template File Path", myScript.ASPFileTemplatePath);
+            GUI.enabled = true;
             //SENSORS
+            EditorGUILayout.LabelField("GameObjects actually attached to some Sensor Configuration", EditorStyles.boldLabel);
             showConfigurations(toggledGameObjectsForSensors, sensorsConfigurationNames, toggledSensorsConfigurations);
             //ACTUATORS
-            showConfigurations(toggledGameObjectsForActuators, actuatorsConfigurationNames, toggledActuatorsConfigurations);
-            
+            EditorGUILayout.LabelField("GameObjects actually attached to some Actuator Configuration", EditorStyles.boldLabel);
+            showConfigurations(toggledGameObjectsForActuators, actuatorsConfigurationNames, toggledActuatorsConfigurations,true);
+
             excludedProperties = new List<string>();
             excludedProperties.Add("executeReasonerOn");
             DrawPropertiesExcluding(serializedObject, excludedProperties.ToArray());
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Choose when to run the reasoner");
-            reasoningExecutionIndex = EditorGUILayout.Popup(reasoningExecutionIndex, methodsToShowForReasoner.ToArray());
+            reasoningExecutionIndex = EditorGUILayout.Popup(reasoningExecutionIndex, methodsToShow.ToArray());
             EditorGUILayout.EndHorizontal();
-            myScript.executeReasonerOn = methodsToShowForReasoner[reasoningExecutionIndex];
+            myScript.executeReasonerOn = methodsToShow[reasoningExecutionIndex];
             serializedObject.ApplyModifiedProperties();//CHECK SERIALIZATION
 
             Brain current = (Brain)target;
@@ -124,22 +204,69 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 current.generateFile();
             }
             EditorGUILayout.HelpBox("Generating a new file will delete the previouse template!", MessageType.Warning);
-
+            savingInBrain();
         }
 
-        private void showConfigurations(Dictionary<int,bool> toggledGameObjects, Dictionary<int,List<string>> configurationNames, Dictionary<string, bool> toggledConfigurations)
+        
+
+        private void showConfigurations(Dictionary<int,bool> toggledGameObjects, Dictionary<int,List<string>> configurationNames, Dictionary<string, bool> toggledConfigurations, bool isActuator=false)
         {
-            foreach (int gameObjectIndex in toggledGameObjects.Keys)
+            foreach (int gameObjectIndex in gameObjectNamesPerIndex.Keys)
             {
-                toggledGameObjects[gameObjectIndex] = EditorGUILayout.Foldout(toggledGameObjects[gameObjectIndex], gameObjectNamesPerIndex[gameObjectIndex]);
-                if (toggledGameObjects[gameObjectIndex])
+                if (toggledGameObjects.ContainsKey(gameObjectIndex))
                 {
-                    foreach (string confName in configurationNames[gameObjectIndex])
+                    MyDebugger.MyDebug("index = " + gameObjectIndex + " go = " + gameObjectNamesPerIndex[gameObjectIndex]);
+                    toggledGameObjects[gameObjectIndex] = EditorGUILayout.Foldout(toggledGameObjects[gameObjectIndex], gameObjectNamesPerIndex[gameObjectIndex]);
+                    if (toggledGameObjects[gameObjectIndex])
                     {
-                        toggledConfigurations[confName] = EditorGUILayout.ToggleLeft(confName, toggledConfigurations[confName]);
+                        foreach (string confName in configurationNames[gameObjectIndex])
+                        {
+                            if (isActuator && !(actuatorConfigurations[confName].assignedTo is null) && !actuatorConfigurations[confName].assignedTo.Equals(myScript))
+                            {
+                                GUI.enabled = false;
+                            }
+                            toggledConfigurations[confName] = EditorGUILayout.ToggleLeft(confName, toggledConfigurations[confName]);
+                            GUI.enabled = true;
+
+                        }
                     }
                 }
             }
         }
+        private void savingInBrain()
+        {
+            foreach(string sensorConfigurationName in toggledSensorsConfigurations.Keys)
+            {
+                SensorConfiguration currentConfiguration = sensorConfigurations[sensorConfigurationName];
+                if (toggledSensorsConfigurations[sensorConfigurationName])
+                {
+                    if (!myScript.sensorsConfigurations.Contains(currentConfiguration))
+                    {
+                        myScript.sensorsConfigurations.Add(currentConfiguration);
+                    }
+                }else if (myScript.sensorsConfigurations.Contains(currentConfiguration))
+                {
+                    myScript.sensorsConfigurations.Remove(currentConfiguration);
+                }
+            }
+            foreach (string actuatorConfigurationName in toggledActuatorsConfigurations.Keys)
+            {
+                ActuatorConfiguration currentConfiguration = actuatorConfigurations[actuatorConfigurationName];
+                if (toggledActuatorsConfigurations[actuatorConfigurationName])
+                {
+                    if (!myScript.actuatorsConfigurations.Contains(currentConfiguration))
+                    {
+                        myScript.actuatorsConfigurations.Add(currentConfiguration);
+                        currentConfiguration.assignedTo = myScript;
+                    }
+                }
+                else if (myScript.actuatorsConfigurations.Contains(currentConfiguration))
+                {
+                    myScript.actuatorsConfigurations.Remove(currentConfiguration);
+                    currentConfiguration.assignedTo = null;
+                }
+            }
+        }
+        
     }
 }

@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
-
+[ExecuteInEditMode]
 class IndexTracker:MonoBehaviour
 {
     public int currentIndex;
 
-    void Awake()
+    void OnEnable()
     {
         currentIndex = GlobalIndexer.assignIndex();
     }

@@ -10,7 +10,7 @@ public interface IMonoBehaviourSensor
 {
     string sensorName { get; set; }
     Brain brain { get; set; }
-    MyListString path { get; set; }
+    MyListString property { get; set; }
     string propertyType { get; set; }
     int operationType { get; set; }
     List<string> collectionElementProperties { get; set; }
@@ -20,8 +20,4 @@ public interface IMonoBehaviourSensor
     List<IList> propertyValues { get; set; }
     string Map();
     void done();
-    bool executeRepeteadly { get; set; }
-    float frequency { get; set; }
-    object triggerClass { get; set; }
-    MethodInfo updateMethod { get; set; }
 }

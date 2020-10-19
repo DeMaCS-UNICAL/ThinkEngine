@@ -8,36 +8,33 @@ using UnityEngine;
 
 public class MonoBehaviourActuatorsManager:MonoBehaviour
 {
-    private int step = 0;
-    internal bool ready;
-    public List<ActuatorConfiguration> configurations;
-    private int actuatorsAddedd = 0;
+    public Dictionary<ActuatorConfiguration,List<MonoBehaviourActuator>> configurations;
 
     void Awake()
     {
-        ////MyDebugger.MyDebug("Awakening");
-        //Debug.unityLogger.logEnabled = true;
-        configurations = new List<ActuatorConfiguration>();
+        configurations = new Dictionary<ActuatorConfiguration, List<MonoBehaviourActuator>>();
     }
-    public void instantiateActuator(ActuatorConfiguration actuatorConfiguration)
+    public void instantiateActuator(ActuatorConfiguration actuatorConfiguration, Brain invoker)
     {
-        if (!configurations.Contains(actuatorConfiguration))
+        if (!configurations.Keys.Contains(actuatorConfiguration) && actuatorConfiguration.assignedTo is null)
         {
-            if (actuatorConfiguration.gameObject.Equals(gameObject))
+            if (actuatorConfiguration.gameObject.Equals(gameObject) && actuatorConfiguration.assignedTo.Equals(invoker))
             {
-                generateActuator(actuatorConfiguration);
-                configurations.Add(actuatorConfiguration);
+                configurations.Add(actuatorConfiguration, generateActuator(actuatorConfiguration));
             }
         }
     }
 
-    private void generateActuator(ActuatorConfiguration actuatorConfiguration)
+    private List<MonoBehaviourActuator> generateActuator(ActuatorConfiguration actuatorConfiguration)
     {
-        MonoBehaviourActuator newActuator = gameObject.AddComponent<MonoBehaviourActuator>();
-        foreach (List<string> currentProperty in actuatorConfiguration.properties)
+        List<MonoBehaviourActuator> generatedActuators = new List<MonoBehaviourActuator>();
+        foreach(MyListString currentProperty in actuatorConfiguration.properties)
         {
+            MonoBehaviourActuator newActuator = gameObject.AddComponent<MonoBehaviourActuator>();
             newActuator.property = currentProperty;
             newActuator.actuatorName = actuatorConfiguration.configurationName;
+            generatedActuators.Add(newActuator);
         }
+        return generatedActuators;
     }
 }

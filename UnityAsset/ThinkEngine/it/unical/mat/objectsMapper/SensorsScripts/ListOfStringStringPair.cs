@@ -9,7 +9,7 @@ using UnityEngine;
     class ListOfStringStringPair
     {
         [SerializeField]
-        public List<string> Key;
+        public MyListString Key;
         [SerializeField]
         public string Value;
     }

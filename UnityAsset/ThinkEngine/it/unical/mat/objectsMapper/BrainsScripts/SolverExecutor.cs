@@ -22,10 +22,6 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         string factsPath;
         public bool reason;
         Stopwatch stopwatch = new Stopwatch();
-        int factsSteps = 0;
-        double factsAvgTime = 0;
-        int asSteps = 0;
-        double asAvgTime = 0;
 
 
         public SolverExectuor(Brain b)
@@ -40,27 +36,22 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
             reason = true;
             while (reason)
             {
-                if (!brain.executeReasonerOn.Equals("When Sensors are ready"))
+                lock (brain.toLock)
                 {
-                    lock (brain.toLock)
-                    {
-                        MyDebugger.MyDebug("going to wait for pulse by brain");
-                        brain.solverWaiting = true;
-                        Monitor.Wait(brain.toLock);
-                    }
+                    brain.solverWaiting = true;
+                    Monitor.Wait(brain.toLock);
                 }
                 try
                 {
+                    SensorsManager.requestSensorsMapping(brain);
                     factsPath = Path.GetTempFileName();
-
                     using (StreamWriter fs = new StreamWriter(factsPath, true))
                     {
-                        string toAppend = SensorsManager.GetSensorsMapping(brain);
                         if (!reason)
                         {
                             return;
                         }
-                        fs.Write(toAppend);
+                        fs.Write(brain.sensorsMapping);
                         fs.Close();
                     }
                 }
@@ -73,39 +64,26 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 
 
                 Handler handler = new DesktopHandler(new DLV2DesktopService(@".\lib\dlv2.exe"));
-                //With DLV2DesktopService I get a Error during parsing: --> Invalid #show directive: setOnActuator/1--competition-output.
-                //With DLVDesktopService the AS, obviously, are wrongly parsed
                 InputProgram encoding = new ASPInputProgram();
-                MyDebugger.MyDebug("adding encoding");
                 encoding.AddFilesPath(Path.GetFullPath(brain.ASPFilePath));
                 InputProgram facts = new ASPInputProgram();
-                MyDebugger.MyDebug("adding facts");
                 facts.AddFilesPath(factsPath);
                 handler.AddProgram(encoding);
                 handler.AddProgram(facts);
                 handler.AddOption(new OptionDescriptor("--filter=setOnActuator/1 "));
                 stopwatch.Restart();
-                MyDebugger.MyDebug("starting sync");
                 Output o = handler.StartSync();
                 if (!o.ErrorsString.Equals(""))
                 {
-                    MyDebugger.MyDebug(o.ErrorsString + " " + o.OutputString);
+                    Debug.LogError(o.ErrorsString + " " + o.OutputString);
                 }
                 AnswerSets answers = (AnswerSets)o;
                 stopwatch.Stop();
                 brain.asSteps++;
                 brain.asTotalMS += stopwatch.ElapsedMilliseconds;
-                MyDebugger.MyDebug("num of AS " + answers.Answersets.Count);
                 if (answers.Answersets.Count > 0)
                 {
-                    lock (brain.toLock)
-                    {
-                        foreach (SimpleActuator actuator in brain.getActuators())
-                        {
-                            actuator.parse(answers.Answersets[0]);
-                        }
-                        brain.setActuatorsReady(true);
-                    }
+                    ActuatorsManager.notifyActuators(brain,answers.answersets[0]);
                 }
                 if (!brain.maintainFactFile)
                 {

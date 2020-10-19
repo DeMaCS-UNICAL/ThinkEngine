@@ -31,9 +31,9 @@ public class SensorConfiguratorEditor : AbstractConfigurationEditor
         }
     }
 
-    void OnEnable()
+    new void Reset()
     {
-        base.OnEnable();
+        base.Reset();
         typeOfConfigurator = "Sensor";        
     }
     

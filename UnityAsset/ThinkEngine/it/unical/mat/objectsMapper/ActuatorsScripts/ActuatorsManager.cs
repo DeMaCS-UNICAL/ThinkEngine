@@ -1,4 +1,5 @@
-﻿using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
+﻿using EmbASP4Unity.it.unical.mat.embasp.languages.asp;
+using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,36 +8,47 @@ using System.Linq;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
-public class ActuatorsManager : IManager
+
+[ExecuteInEditMode]
+public class ActuatorsManager : MonoBehaviour, IManager
 {
-    private List<string> configuredGameObject;
-    private List<string> configurationsNames;
-    public Dictionary<Brain,List<SimpleActuator>> instantiatedActuators;
-    public static ActuatorsManager instance;
-    public bool applyCoroutinStarted=false;
+    private static List<string> configuredGameObject;
+    private static List<string> configurationsNames;
+    public static Dictionary<Brain,List<ActuatorConfiguration>> instantiatedActuators;
+    internal static Queue<KeyValuePair<Brain, AnswerSet>> actuatorsToApply;
         
         
     public List<string> getUsedNames()
     {
         return configurationsNames;
     }
-    public static ActuatorsManager GetInstance()
+    void OnEnable()
     {
-        if (instance == null)
+        if (FindObjectsOfType<ActuatorsManager>().Length > 1)
         {
-            instance = new ActuatorsManager();
-            instance.configuredGameObject = new List<string>();
-            instance.configurationsNames = new List<string>();
-            //MyDebugger.MyDebug("instance after " + instance);
-            //MyDebugger.MyDebug("confs: " + instance.sensConfs.Count);
+            try
+            {
+                throw new Exception("Only one ActuatorsManager can be instantiated");
+            }
+            finally
+            {
+                Destroy(this);
+            }
         }
-        return instance;
+        configuredGameObject = new List<string>();
+        configurationsNames = new List<string>();
+        actuatorsToApply = new Queue<KeyValuePair<Brain, AnswerSet>>();
     }
-    public void registerActuators(Brain b, List<SimpleActuator> instantiated)
+
+    void Update()
+    {
+        applyActuators();
+    }
+    public void registerActuators(Brain b, List<ActuatorConfiguration> instantiated)
     {
         if (instantiatedActuators == null)
         {
-            instantiatedActuators = new Dictionary<Brain, List<SimpleActuator>>();
+            instantiatedActuators = new Dictionary<Brain, List<ActuatorConfiguration>>();
         }
         if (!instantiatedActuators.ContainsKey(b))
         {
@@ -48,24 +60,22 @@ public class ActuatorsManager : IManager
         }
     }
 
-    public IEnumerator applyActuators()
+    public void applyActuators()
     {
-        while (true)
+        while (actuatorsToApply.Count > 0)
         {
-            foreach (Brain brain in instantiatedActuators.Keys)
+            KeyValuePair<Brain,AnswerSet> brainAnswerSet = actuatorsToApply.Dequeue();
+            foreach(ActuatorConfiguration actuatorConf in instantiatedActuators[brainAnswerSet.Key])
             {
-                if (brain.areActuatorsReady() && brain.actuatorsUpdateCondition())
+                if (actuatorConf.checkIfApply())
                 {
-                    foreach (SimpleActuator act in instantiatedActuators[brain])
-                    {
-                        Performance.updatingActuators = true;
-                        act.UpdateProperties();
+                    List<MonoBehaviourActuator> actuators = actuatorConf.gameObject.GetComponent<MonoBehaviourActuatorsManager>().configurations[actuatorConf];
+                    Performance.updatingActuators = true;
+                    foreach (MonoBehaviourActuator act in actuators) {
+                        act.toSet = act.parse(brainAnswerSet.Value);
                     }
-                        
                 }
-                brain.setActuatorsReady(false);
             }
-            yield return null;
         }
             
     }
@@ -97,6 +107,11 @@ public class ActuatorsManager : IManager
             configurationsNames.RemoveAt(toDelete);
             configuredGameObject.RemoveAt(toDelete);
         }
+    }
+
+    internal static void notifyActuators(Brain brain, AnswerSet answerSet)
+    {
+        actuatorsToApply.Enqueue(new KeyValuePair<Brain,AnswerSet>(brain,answerSet));
     }
 }
 
