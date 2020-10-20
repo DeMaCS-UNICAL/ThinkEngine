@@ -202,7 +202,7 @@ public class MonoBehaviourSensor<T> : MonoBehaviour, IMonoBehaviourSensor
 
         else
         {
-           // MyDebugger.MyDebug("Destroing " + path);
+            MyDebugger.MyDebug("Destroing " + path);
             SensorsManager.GetInstance().removeSensor(brain, this);
             Destroy(this);
             return;
