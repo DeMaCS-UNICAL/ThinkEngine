@@ -15,7 +15,7 @@ public class TestingManager : MonoBehaviour
 {
     GameObject player; //tests are performed on this object
     object instanceTriggerConditions; // Contains the instance for calling Boolean functions of type triggerCondition
-    List<object> instanceTests = new List<object>(); // It contains the instances to recall the various dest
+    List<object> instanceTests = new List<object>(); // It contains the instances to recall the various test
 
     // Init configuration from TestingWindow.cs
     void Start()
