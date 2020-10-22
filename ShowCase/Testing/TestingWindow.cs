@@ -27,7 +27,7 @@ public class TestingWindow : EditorWindow
 
     static Vector2 scrollPos; //window scroll
 
-    // Scripts insered from user
+    // Scripts inserted from user
     static List<MonoScript> attributeScripts = new List<MonoScript>();
     static List<MonoScript> testScripts = new List<MonoScript>();
     static MonoScript levelScript, triggerConditionsScript;
