@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using EmbASP4Unity.it.unical.mat.embasp.languages.asp;
+using it.unical.mat.embasp.languages.asp;
 using UnityEngine;
 
 
@@ -29,9 +31,12 @@ public class MonoBehaviourActuator:MonoBehaviour
 
     private void applyToGameLogic()
     {
+        if(_toSet == null)
+        {
+            return;
+        }
         if (property.Count == 1)
         {
-
             updateSimpleProperty(property, property[0], typeof(GameObject), gameObject);
         }
         else
@@ -41,7 +46,7 @@ public class MonoBehaviourActuator:MonoBehaviour
 
     }
 
-    private void updateSimpleProperty(List<string> currentProperty, string lastLevelHierarchy, Type gOType, object obj)
+    private void updateSimpleProperty(MyListString currentProperty, string lastLevelHierarchy, Type gOType, object obj)
     {
         MemberInfo[] members = gOType.GetMember(lastLevelHierarchy, BindingAttr);
         if (members.Length == 0)
@@ -51,11 +56,11 @@ public class MonoBehaviourActuator:MonoBehaviour
         FieldOrProperty property = new FieldOrProperty(members[0]);
         property.SetValue(obj, Convert.ChangeType(_toSet, property.Type()));
     }
-    private void updateComposedProperty(List<string> currentProperty, List<string> partialHierarchy, Type objType, object obj)
+    private void updateComposedProperty(MyListString currentProperty, MyListString partialHierarchy, Type objType, object obj)
     {
 
         string parentName = partialHierarchy[0];
-        List<string> child = partialHierarchy.GetRange(1, partialHierarchy.Count - 1);
+        MyListString child = partialHierarchy.GetRange(1, partialHierarchy.Count - 1);
         MemberInfo[] members = objType.GetMember(parentName, BindingAttr);
         // MyDebugger.MyDebug("members with name " + parentName + " " + members.Length);
         if (members.Length == 0)
@@ -83,21 +88,32 @@ public class MonoBehaviourActuator:MonoBehaviour
 
     internal string parse(AnswerSet value)
     {
-        List<string> myTemplate = getMyConfiguration().getTemplate(property);
+        List<string> myTemplate = getMyConfiguration().GetTemplate(property);
         if (myTemplate.Count > 1)
         {
             throw new Exception("It is not expected to have more than 1 entry for actuators");
         }
         string myTemplatePrefix = myTemplate[0].Substring(0, myTemplate[0].LastIndexOf('('));
-
+        string pattern = "objectIndex\\(([0-9]+)\\)";
+        Regex regex = new Regex(@pattern);
+        int myIndex = gameObject.GetComponent<IndexTracker>().currentIndex;
+        Debug.Log("comparing " + myTemplatePrefix + ", index "+myIndex+" with ");
         foreach (string literal in value.GetAnswerSet())
         {
+            Debug.Log(literal);
             string literalPrefix = literal.Substring(0, literal.LastIndexOf('('));
-            if (literalPrefix.Equals(myTemplatePrefix))
+            Match matcher = regex.Match(literalPrefix);
+            if (int.Parse(matcher.Groups[1].Value) != myIndex)
             {
-                string literalCopy = literal;
-                literalCopy = literalCopy.Remove(literalCopy.IndexOf(')'));
-                return literalCopy.Substring(literalCopy.LastIndexOf('(') + 1);
+                break;
+            }
+            //int gameObjectIndex = literalPrefix.
+            if (literalPrefix.Equals(string.Format(myTemplatePrefix,myIndex)))
+            {
+                int startIndex = literal.LastIndexOf("(") + 1;
+                MyDebugger.MyDebug(literal +" \n found matching literal with value "+ literal.Substring(startIndex, literal.IndexOf(")", startIndex) - startIndex));
+                string partialRes = literal.Substring(startIndex, literal.IndexOf(")", startIndex)-startIndex);
+                return partialRes.Trim('\"');
             }
         }
         return null;
@@ -116,10 +132,10 @@ public class MonoBehaviourActuator:MonoBehaviour
         return null;
     }
 
-    private void updateComponent(List<string> currentProperty, List<string> partialHierarchy, Type gOType, object obj)
+    private void updateComponent(MyListString currentProperty, MyListString partialHierarchy, Type gOType, object obj)
     {
         string parentName = partialHierarchy[0];
-        List<string> child = partialHierarchy.GetRange(1, partialHierarchy.Count - 1);
+        MyListString child = partialHierarchy.GetRange(1, partialHierarchy.Count - 1);
         //MyDebugger.MyDebug("component " + entire_name + " parent " + parentName + " child " + child);
         if (gOType == typeof(GameObject))
         {

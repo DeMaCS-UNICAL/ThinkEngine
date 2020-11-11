@@ -20,7 +20,7 @@ class Performance : MonoBehaviour
     private static string sensorsUpdateRate = @"Performance\sensors.csv";
     private static string actuatorsUpdateRate = @"Performance\actuators.csv";
     private static string path;
-    public static bool updatingSensors;
+    public static bool updatedSensors;
     public static bool updatingActuators;
     static NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
     public static bool initialized;
@@ -32,7 +32,7 @@ class Performance : MonoBehaviour
         //stopwatch = new Stopwatch();
         //stopwatch.Start();
         //MyDebugger.MyDebug("starting performace");
-        Application.targetFrameRate = 60;
+        //Application.targetFrameRate = 60;
         if (!Directory.Exists("Performance"))
         {
             Directory.CreateDirectory("Performance");
@@ -42,7 +42,7 @@ class Performance : MonoBehaviour
         {
             using (StreamWriter fs = new StreamWriter(withBrainPath, false))
             {
-                fs.Write("Iteration; Rate\n");
+                fs.Write("Iteration; Rate; AvgRate\n");
                 fs.Close();
             }
             path = withBrainPath;
@@ -52,7 +52,7 @@ class Performance : MonoBehaviour
         {
             using (StreamWriter fs = new StreamWriter(withoutBrainPath, false))
             {
-                fs.Write("Iteration; Rate\n");
+                fs.Write("Iteration; Rate; AvgRate\n");
                 fs.Close();
             }
             path = withoutBrainPath;
@@ -60,7 +60,7 @@ class Performance : MonoBehaviour
         }
         using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, false))
         {
-            fs.Write("Iteration; Rate\n");
+            fs.Write("Iteration; Rate; AvgFPS; BestAvgFPS \n");
             fs.Close();
         }
         using (StreamWriter fs = new StreamWriter(actuatorsUpdateRate, false))
@@ -77,16 +77,16 @@ class Performance : MonoBehaviour
         steps++;
         using (StreamWriter fs = new StreamWriter(path, true))
         {
-            fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + "\n");
+            fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";" + SensorsManager.avgFps + ";" + "\n");
 
             fs.Close();
         }
-        if (updatingSensors)
+        if (updatedSensors)
         {
-            updatingSensors = false;
+            updatedSensors = false;
             using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, true))
             {
-                fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + "\n");
+                fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";"+SensorsManager.avgFps+";"+SensorsManager.bestAvgFps+";"+ FindObjectsOfType<MonoBehaviourSensor>().Length+"\n");
                 fs.Close();
             }
         }

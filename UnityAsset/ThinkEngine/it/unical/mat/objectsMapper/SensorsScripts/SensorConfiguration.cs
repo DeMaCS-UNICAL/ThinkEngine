@@ -17,15 +17,14 @@ public class SensorConfiguration : AbstractConfiguration
 
     new void OnEnable()
     {
-        manager = FindObjectOfType<SensorsManager>();
-        if (manager is null)
-        {
-            manager = gameObject.AddComponent<SensorsManager>();
-            ((SensorsManager)manager).hideFlags = HideFlags.HideInInspector;
-        }
-        base.OnEnable();
+        Reset();
+    }
+    new void Reset()
+    {
+        base.Reset();
         if (operationPerProperty is null)
         {
+            MyDebugger.MyDebug("Warning! Specific Configurations are not serialized");
             operationPerProperty = new List<ListOfStringIntPair>();
         }
         if (specificValuePerProperty is null)
@@ -33,17 +32,29 @@ public class SensorConfiguration : AbstractConfiguration
             specificValuePerProperty = new List<ListOfStringStringPair>();
         }
     }
-    void Reset()
+    internal override void ConfigurationSaved(GameObjectsTracker tracker)
     {
-        OnEnable();
+        if(GetComponent<MonoBehaviourSensorsManager>() == null)
+        {
+            gameObject.AddComponent<MonoBehaviourSensorsManager>();
+        }
+        GetComponent<MonoBehaviourSensorsManager>().addConfiguration(this);
     }
-    internal override void cleanSpecificDataStructure()
+    
+    internal override void DeleteConfiguration()
+    {
+        if (saved)
+        {
+            GetComponent<MonoBehaviourSensorsManager>().deleteConfiguration(this);
+        }
+    }
+    internal override void CleanSpecificDataStructure()
     {
         operationPerProperty = new List<ListOfStringIntPair>();
         specificValuePerProperty = new List<ListOfStringStringPair>();
     }
 
-    internal override void specificConfiguration(FieldOrProperty fieldOrProperty, MyListString property, GameObjectsTracker tracker)
+    internal override void SpecificConfiguration(FieldOrProperty fieldOrProperty, MyListString property, GameObjectsTracker tracker)
     {
         ListOfStringIntPair pair = new ListOfStringIntPair();
         pair.Key = property;
@@ -58,9 +69,9 @@ public class SensorConfiguration : AbstractConfiguration
         }
     }
 
-    internal override void ASPRep()
+    internal override void ASPRepresentation()
     {
-        base.ASPRep();
+        base.ASPRepresentation();
         foreach(MyListString property in aspTemplate.Keys)
         {
             for (int j = 0; j < aspTemplate[property].Count; j++)
@@ -69,13 +80,13 @@ public class SensorConfiguration : AbstractConfiguration
             }
         }
     }
-    internal override string getAspTemplate()
+    internal override string GetAspTemplate()
     {
-        string original = base.getAspTemplate();
+        string original = base.GetAspTemplate();
         string toReturn = "";
         foreach (string line in original.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
         {
-            toReturn += "%"+line + "." + Environment.NewLine;
+            toReturn += "%"+line + Environment.NewLine;
         }
         return toReturn;
     }

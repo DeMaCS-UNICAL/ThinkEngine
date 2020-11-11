@@ -14,6 +14,11 @@ public class SensorConfiguratorEditor : AbstractConfigurationEditor
 
     public override void OnInspectorGUI()
     {
+        if (Application.isPlaying)
+        {
+            DrawDefaultInspector();
+            return;
+        }
         try
         {
             if (!objectMode)
@@ -95,5 +100,9 @@ public class SensorConfiguratorEditor : AbstractConfigurationEditor
            
 
         }
+    }
+    internal override bool existsConfigurationWithName(string configurationName)
+    {
+        return Utility.sensorsManager.existsConfigurationWithName(configurationName);
     }
 }

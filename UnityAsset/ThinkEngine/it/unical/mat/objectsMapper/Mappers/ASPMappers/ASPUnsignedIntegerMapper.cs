@@ -16,7 +16,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
 
         public string basicMap(object o)
         {
-            return "(" + o + ")";
+            return "" + o + "";
         }
 
 

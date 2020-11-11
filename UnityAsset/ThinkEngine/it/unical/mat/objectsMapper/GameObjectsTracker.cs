@@ -38,13 +38,7 @@ public class GameObjectsTracker
     {
         return ReflectionExecutor.GetFieldsAndProperties(gO);
     }
-
-    public AbstractConfiguration saveConfiguration(AbstractConfiguration conf, string chosenGO)
-    {        
-        conf.SaveConfiguration(this);
-        //MyDebugger.MyDebug(conf);
-        return conf;
-    }
+    
 
     internal void updateDataStructures(int objectIndex, AbstractConfiguration configuration)
     {
@@ -104,11 +98,11 @@ public class GameObjectsTracker
                     {
                         if(IsMappable(currentFieldOrProperty) && !IsBaseType(currentFieldOrProperty))
                         {
-                            foreach (SimpleGameObjectsTracker st in configuration.advancedConf) {
-                                if (st.propertyName.Equals(currentPropertyHierarchy))
+                            foreach (SimpleGameObjectsTracker currentSimpleTracker in configuration.advancedConf) {
+                                if (currentSimpleTracker.propertyName.Equals(currentPropertyHierarchy))
                                 {
                                     //st.objType = obj.Type().GetElementType().ToString();
-                                    basicTypeCollectionsConfigurations.Add(currentFieldOrProperty, st);
+                                    basicTypeCollectionsConfigurations.Add(currentFieldOrProperty, currentSimpleTracker);
                                     //MyDebugger.MyDebug("Adding st for " + obj.Name() + " whit type " + st.objType);
                                     break;
                                 }
@@ -163,42 +157,34 @@ public class GameObjectsTracker
         }
     }
 
-    private bool checkIfPropertyIsToToggle(List<MyListString> properties, List<string> currentPropertyHierarchy, string latterLevelProperty)
+    private bool checkIfPropertyIsToToggle(List<MyListString> properties, MyListString currentPropertyHierarchy, string latterLevelProperty)
     {
-        string toDebug = "";
-        for (int i = 0; i < currentPropertyHierarchy.Count; i++)
-        {
-            toDebug += currentPropertyHierarchy[i]+"^";
-        }
-       // MyDebugger.MyDebug(configurationName+": checking: " + toDebug+latterLevelProperty);
+        
+       //MyDebugger.MyDebug(configurationName+": checking: " + currentPropertyHierarchy +"^"+ latterLevelProperty);
         if (properties is null || properties.Count == 0)
         {
             return false;
         }
-        foreach (MyListString subList in properties)
+        foreach (MyListString property in properties)
         {
-            toDebug = "";
-            for(int i=0; i<subList.Count; i++)
+
+            //MyDebugger.MyDebug("comparing with " + property);
+            if (property.Count <= currentPropertyHierarchy.Count)
             {
-                toDebug += subList[i]+"^";
-            }
-           // MyDebugger.MyDebug("comparing with " + toDebug);
-            if (subList.Count != currentPropertyHierarchy.Count+1)
-            {
-             //   MyDebugger.MyDebug("skipped");
                 continue;
             }
             bool matching = true;
-            for(int i=0; i < currentPropertyHierarchy.Count && matching; i++)
+            for(int i=0; i < currentPropertyHierarchy.Count; i++)
             {
-                if (!subList[i].Equals(currentPropertyHierarchy[i]))
+                if (!property[i].Equals(currentPropertyHierarchy[i]))
                 {
                     matching = false ;
+                    break;
                 }
             }
             if (matching)
             {
-                if (subList[subList.Count - 1].Equals(latterLevelProperty))
+                if (property[currentPropertyHierarchy.Count].Equals(latterLevelProperty))
                 {
                     return true;
                 }
@@ -214,14 +200,10 @@ public class GameObjectsTracker
             //MyDebugger.MyDebug("return");
             return false;
         }
-        foreach(List<string> subList in properties)
+        foreach(MyListString property in properties)
         {
-            //MyDebugger.MyDebug("entry "+subList[0]+"has count "+subList.Count);
-            if (subList.Count != 1)
-            {
-                continue;
-            }
-            if (subList[0].Equals(firstLevelProperty))
+           // MyDebugger.MyDebug("comparing with "+property);
+            if (property.Count>0 && property[0].Equals(firstLevelProperty))
             {
                 return true;
             }
@@ -231,7 +213,7 @@ public class GameObjectsTracker
 
     private GameObject GetGameObject(int objectIndex)
     {
-        foreach(IndexTracker gameObj in GameObject.FindObjectsOfType<IndexTracker>())
+        foreach(IndexTracker gameObj in Resources.FindObjectsOfTypeAll<IndexTracker>())
         {
             if (gameObj.currentIndex == objectIndex)
             {
@@ -301,10 +283,11 @@ public class GameObjectsTracker
             {
                 //MyDebugger.MyDebug("s contains " + parent + "^" + ob.Name());   
                 ObjectsToggled.Add(currentProperty, true);
-                currentPropertyHierarchy.Add(currentProperty.Name());
+                MyListString newLayerPropertyHierarchy = currentPropertyHierarchy.GetClone();
+                newLayerPropertyHierarchy.Add(currentProperty.Name());
                 if (!IsMappable(currentProperty) && parentObjectValueForCurrentProperty != null)
                 {
-                    updateDataStructures(parentObjectValueForCurrentProperty, configuration, currentPropertyHierarchy);
+                    updateDataStructures(parentObjectValueForCurrentProperty, configuration, newLayerPropertyHierarchy);
                 }
                 else
                 {
@@ -312,7 +295,7 @@ public class GameObjectsTracker
                     {
                         foreach (SimpleGameObjectsTracker currentSimpleTracker in configuration.advancedConf)
                         {
-                            if (currentSimpleTracker.propertyName.SequenceEqual(currentPropertyHierarchy))
+                            if (currentSimpleTracker.propertyName.Equals(newLayerPropertyHierarchy))
                             {
                                 //st.objType = ob.Type().GetElementType().ToString();
                                 //MyDebugger.MyDebug("Adding st for " + ob.Name() + " whit type " + st.objType);
@@ -325,14 +308,14 @@ public class GameObjectsTracker
                     {
                         foreach (ListOfStringIntPair currentOperationPerProperty in ((SensorConfiguration)configuration).operationPerProperty)
                         {
-                            if (currentOperationPerProperty.Key.SequenceEqual(currentPropertyHierarchy))
+                            if (currentOperationPerProperty.Key.Equals(newLayerPropertyHierarchy))
                             {
                                 operationPerProperty.Add(currentProperty, currentOperationPerProperty.Value);
                                 if (currentOperationPerProperty.Value == Operation.SPECIFIC)
                                 {
                                     foreach (ListOfStringStringPair currentSpecificValue in ((SensorConfiguration)configuration).specificValuePerProperty)
                                     {
-                                        if (currentSpecificValue.Key.SequenceEqual(currentPropertyHierarchy))
+                                        if (currentSpecificValue.Key.Equals(newLayerPropertyHierarchy))
                                         {
                                             specificValuePerProperty.Add(currentProperty, currentSpecificValue.Value);
                                             break;
@@ -364,8 +347,9 @@ public class GameObjectsTracker
                 {
                     //MyDebugger.MyDebug(obj.Name() + " found.");
                     ObjectsToggled.Add(component, true);
-                    currentPropertyHierarchy.Add(component.GetType().ToString());
-                    updateDataStructures(component, configuration, currentPropertyHierarchy);
+                    MyListString newLayerPropertyHierarchy = currentPropertyHierarchy.GetClone();
+                    newLayerPropertyHierarchy.Add(component.GetType().ToString());
+                    updateDataStructures(component, configuration, newLayerPropertyHierarchy);
 
                 }
                 else

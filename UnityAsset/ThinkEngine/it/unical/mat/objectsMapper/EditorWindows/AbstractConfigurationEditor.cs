@@ -59,9 +59,19 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
         override public void OnInspectorGUI()
         {
-            //MyDebugger.MyDebug("manager "+manager);
+            
+            if (Application.isPlaying)
+            {
+                DrawDefaultInspector();
+                return;
+            }
+                //MyDebugger.MyDebug("manager "+manager);
             try
             {
+                if (tracker is null)
+                {
+                    reset();
+                }
                 GUILayout.Label(typeOfConfigurator + " Configuration", EditorStyles.boldLabel);
 
                 if (tracker.configurationName.Equals(""))
@@ -72,8 +82,12 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 {
                     configure();
                 }
-                
-            }catch(Exception e)
+                if (GUI.changed)
+                {
+                    EditorUtility.SetDirty(configuration);
+                }
+            }
+            catch(Exception e)
             {
                 Debug.LogError(e);
                 reset(true);
@@ -83,18 +97,23 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         private void configure()
         {   
             showProperties = EditorGUILayout.Foldout(showProperties, "Show properties");
+            bool scrollView = false;
+            if (showProperties)
+            {
+                scrollView = true;
+                mainScroll = EditorGUILayout.BeginScrollView(mainScroll, GUILayout.Height(400));
+            }
             EditorGUI.indentLevel++;
 
             if (showProperties)
             {
-                addProperties();//----------------------------------
+                addProperties();
             }
-            //showProperties = EditorGUILayout.Toggle("Toggle", showProperties);
 
             EditorGUI.indentLevel--;
             string buttonContent;
             bool disabled=false;
-            if (!tracker.configurationName.Equals(configuration.configurationName) && configuration.manager.existsConfigurationWithName(tracker.configurationName))
+            if (!tracker.configurationName.Equals(configuration.configurationName) && existsConfigurationWithName(tracker.configurationName))
             {
                 buttonContent = "Name used for another sensor";
                 disabled = true;
@@ -121,18 +140,26 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             GUILayout.EndVertical();
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
+            if (scrollView)
+            {
+                EditorGUILayout.EndScrollView();
+            }
+
             if (clean)
             {
-                reset(false);
+                configuration.Clean();
             }
             if (save)
             {
                 //MyDebugger.MyDebug("saving fdgdfgdfgdfgdf");
                 // checkToggled();
                 configuration.SaveConfiguration(tracker);
+                reset(false);
             }
-            
+
         }
+
+        internal virtual bool existsConfigurationWithName(string configurationName) { return false;}
 
         private void chooseNewConfigurationName()
         {
@@ -142,7 +169,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            if (!configuration.manager.existsConfigurationWithName(configuration.configurationName))
+            if (!existsConfigurationWithName(configuration.configurationName))
             {
                 if (GUILayout.Button("Ok"))
                 {
@@ -175,68 +202,61 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
             using (var h = new EditorGUILayout.VerticalScope())
             {
-                using (var scrollView = new EditorGUILayout.ScrollViewScope(mainScroll))
+                GameObject gO = tracker.GO;
+                foreach (FieldOrProperty obj in tracker.ObjectsProperties[gO].Values)
                 {
-                    GameObject gO = tracker.GO;
-                    foreach (FieldOrProperty obj in tracker.ObjectsProperties[gO].Values)
+                    bool disabled = tracker.ObjectDerivedFromFields[gO][obj.Name()] == null;
+                    EditorGUI.BeginDisabledGroup(disabled);
+                    if (isMappable(obj))
                     {
-                        bool disabled = tracker.ObjectDerivedFromFields[gO][obj.Name()] == null;
-                        EditorGUI.BeginDisabledGroup(disabled);
-                        if (isMappable(obj))
-                        {
-                            EditorGUILayout.BeginHorizontal();
-                            tracker.ObjectsToggled[obj] = EditorGUILayout.ToggleLeft(obj.Name(), tracker.ObjectsToggled[obj]);
-                            addCustomFields(obj);
+                        EditorGUILayout.BeginHorizontal();
+                        tracker.ObjectsToggled[obj] = EditorGUILayout.ToggleLeft(obj.Name(), tracker.ObjectsToggled[obj]);
+                        addCustomFields(obj);
 
-                            if (tracker.ObjectsToggled[obj] && !tracker.IsBaseType(obj))
+                        if (tracker.ObjectsToggled[obj] && !tracker.IsBaseType(obj))
+                        {
+                            bool configure = GUILayout.Button("Configure Object");
+                            if (configure)
                             {
-                                bool configure = GUILayout.Button("Configure Object");
-                                if (configure)
+                                objectMode = true;
+                                objectToConfigure = obj;
+                                helpScroll = new Vector2(0, 0);
+                                if (!tracker.basicTypeCollectionsConfigurations.ContainsKey(obj))
                                 {
-                                    objectMode = true;
-                                    objectToConfigure = obj;
-                                    helpScroll = new Vector2(0, 0);
-                                    if (!tracker.basicTypeCollectionsConfigurations.ContainsKey(obj))
-                                    {
-                                        MyDebugger.MyDebug("adding simple tracker for " + objectToConfigure.Name() + " that is a " + objectToConfigure.Type());
-                                        tracker.basicTypeCollectionsConfigurations.Add(obj, new SimpleGameObjectsTracker(objectToConfigure.Type()));
-                                    }
-                                    tracker.basicTypeCollectionsConfigurations[obj].getBasicProperties();
-                                    drawObjectProperties();
+                                    MyDebugger.MyDebug("adding simple tracker for " + objectToConfigure.Name() + " that is a " + objectToConfigure.Type());
+                                    tracker.basicTypeCollectionsConfigurations.Add(obj, new SimpleGameObjectsTracker(objectToConfigure.Type()));
                                 }
+                                tracker.basicTypeCollectionsConfigurations[obj].getBasicProperties();
+                                drawObjectProperties();
                             }
-                            EditorGUILayout.EndHorizontal();
                         }
-                        else
-                        {
-
-                            tracker.ObjectsToggled[obj] = EditorGUILayout.Foldout(tracker.ObjectsToggled[obj], obj.Name()) && !disabled;
-                            if (tracker.ObjectsToggled[obj])
-                            {
-                                EditorGUI.indentLevel++;
-                                addSubProperties(tracker.ObjectDerivedFromFields[gO][obj.Name()], obj.Name(), gO);
-                                EditorGUI.indentLevel--;
-                            }
-
-                        }
-                        EditorGUI.EndDisabledGroup();
+                        EditorGUILayout.EndHorizontal();
                     }
-
-
-                    foreach (Component c in tracker.GOComponents[gO])
+                    else
                     {
-                        //MyDebugger.MyDebug(c);
-                        tracker.ObjectsToggled[c] = EditorGUILayout.Foldout(tracker.ObjectsToggled[c], c.GetType().ToString());
-                        if (tracker.ObjectsToggled[c])
+
+                        tracker.ObjectsToggled[obj] = EditorGUILayout.Foldout(tracker.ObjectsToggled[obj], obj.Name()) && !disabled;
+                        if (tracker.ObjectsToggled[obj])
                         {
                             EditorGUI.indentLevel++;
-                            addSubProperties(c, c.GetType().ToString(), gO);
+                            addSubProperties(tracker.ObjectDerivedFromFields[gO][obj.Name()], obj.Name(), gO);
                             EditorGUI.indentLevel--;
                         }
+
                     }
+                    EditorGUI.EndDisabledGroup();
+                }
 
-                    mainScroll = scrollView.scrollPosition;
 
+                foreach (Component c in tracker.GOComponents[gO])
+                {
+                    tracker.ObjectsToggled[c] = EditorGUILayout.Foldout(tracker.ObjectsToggled[c], c.GetType().ToString());
+                    if (tracker.ObjectsToggled[c])
+                    {
+                        EditorGUI.indentLevel++;
+                        addSubProperties(c, c.GetType().ToString(), gO);
+                        EditorGUI.indentLevel--;
+                    }
                 }
             }
         }
@@ -419,7 +439,6 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             }
 
         }
-       
         internal virtual void addCustomFields(FieldOrProperty obj) { }
     }
 }

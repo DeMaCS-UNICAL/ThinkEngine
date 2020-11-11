@@ -9,145 +9,206 @@ using UnityEditor;
 using EmbASP4Unity.it.unical.mat.objectsMapper;
 
 [ExecuteInEditMode]
-public class AbstractConfiguration :MonoBehaviour
+internal class AbstractConfiguration :MonoBehaviour
 {
-    internal IManager manager;
-    public List<MyListString> properties;
-    public List<string> propertiesNames;
-    public string configurationName;
-    public List<SimpleGameObjectsTracker> advancedConf;
-    internal Dictionary<MyListString, List<string>> aspTemplate; //the int is the position of the property in "properties"
+    private int hashCode;
+    [SerializeField]
+    private string previousGOName = "";
+
     [SerializeField]
     internal bool saved;
+    internal List<MyListString> properties;
+    internal List<string> propertiesNames;
+    internal string configurationName;
+    internal List<SimpleGameObjectsTracker> advancedConf;
+    internal Dictionary<MyListString, List<string>> aspTemplate; //the int is the position of the property in "properties"
+
+    protected bool playingMode;
+
+    #region Unity Messages
 
     protected void OnEnable()
     {
-        if(configurationName is null)
+        InitialConfiguration();
+        previousGOName = gameObject.name;
+    }
+    void Start()
+    {
+        playingMode = Application.isPlaying;
+    }
+    private void OnDestroy()
+    {
+        if (!Utility.managersDestroyed)
+        {
+            DeleteConfiguration();
+        }
+    }
+    void Update()
+    {
+        if (saved && !previousGOName.Equals(gameObject.name))
+        {
+            previousGOName = gameObject.name;
+            //Debug.Log("previous " + previousGOName+" current "+gameObject.name);
+            ASPRepresentation();
+        }
+    }
+
+    #endregion
+
+    #region Saving phase
+    internal void SaveConfiguration(GameObjectsTracker tracker)
+    {
+        //Reallocating lists and dictionaries
+        CleanDataStructures();
+        //Recovering properties and components of the current GameObject (the one to which the configuration is attached and on which the tracker is configured)
+        Dictionary<string, FieldOrProperty> gOProperties = tracker.ObjectsProperties[gameObject];
+        List<Component> gameObjectComponents = tracker.GOComponents[gameObject];
+        SaveDirectProperties(tracker, gOProperties);
+        SaveComponents(tracker, gameObjectComponents);
+        if (properties.Count == 0)//if no properties have been selected in the inspector
+        {
+            throw new Exception("No properties selected, invalid configuration to save.");
+        }
+        ASPRepresentation();//create the ASP representation
+        saved = true;
+        configurationName = tracker.configurationName;//update of the configurationName
+        ConfigurationSaved(tracker);//specific operations of the Sensor/Actuator implementation of the class
+        hashCode = configurationName.GetHashCode() * 7 + gameObject.GetHashCode() * 13;
+    }
+    private void CleanDataStructures()
+    {
+        properties = new List<MyListString>();
+        propertiesNames = new List<string>();
+        advancedConf = new List<SimpleGameObjectsTracker>();
+        CleanSpecificDataStructure();
+    }
+    private void SaveDirectProperties(GameObjectsTracker tracker, Dictionary<string, FieldOrProperty> gOProperties)
+    {
+        foreach (string directProperty in gOProperties.Keys)//foreach name of the properties
+        {
+            if (tracker.ObjectsToggled[gOProperties[directProperty]])//if the property is toggled in the inspector
+            {
+                MyListString currentProperty = new MyListString();//Creating the root of some basic property hierarchy (possibly the property itself)
+                currentProperty.Add(directProperty);
+                if (tracker.IsMappable(gOProperties[directProperty]))//If the current property is a mappable one (basic type, list of object, matrix of object)
+                {
+                    AddMappableProperty(tracker, gOProperties, directProperty, currentProperty);
+                }
+                else if (tracker.ObjectDerivedFromFields.ContainsKey(gameObject))
+                {
+                    ExpandNonMappableProperty(gameObject, gOProperties[directProperty], currentProperty, tracker);
+                }
+            }
+        }
+    }
+    private void SaveComponents(GameObjectsTracker tracker, List<Component> gameObjectComponents)
+    {
+        foreach (Component component in gameObjectComponents)//foreach component of the GameObject
+        {
+            if (tracker.ObjectsToggled[component])//if the component is toggled in the inspector
+            {
+                MyListString currentProperty = new MyListString();//Creating the root of some basic property hierarchy (possibly the property itself)
+                currentProperty.Add(component.GetType().ToString());
+                Dictionary<string, FieldOrProperty> componentProperties = tracker.ObjectsProperties[component];//Retrieving the properties of the component
+                foreach (string componentProperty in componentProperties.Keys)
+                {
+                    if (tracker.ObjectsToggled[componentProperties[componentProperty]])
+                    {
+                        MyListString propertyHierarchy = currentProperty.GetClone();
+                        propertyHierarchy.Add(componentProperty);
+                        if (tracker.IsMappable(componentProperties[componentProperty]))
+                        {
+                            AddMappableProperty(tracker, componentProperties, componentProperty, propertyHierarchy);
+                        }
+                        else if (tracker.ObjectDerivedFromFields.ContainsKey(component))
+                        {
+                            ExpandNonMappableProperty(component, componentProperties[componentProperty], propertyHierarchy, tracker);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private void AddMappableProperty(GameObjectsTracker tracker, Dictionary<string, FieldOrProperty> objectProperties, string propertyName, MyListString currentPropertyHierarchy)
+    {
+        properties.Add(currentPropertyHierarchy);//the hierarchy of the property is complete thus it is added to the monitored properties
+        if (!tracker.IsBaseType(objectProperties[propertyName]))//if it is a list or matrix
+        {
+            //retrieve and configure the GameObjectSimpleTracker for the elements of the "collection"
+            tracker.basicTypeCollectionsConfigurations[objectProperties[propertyName]].propertyName = currentPropertyHierarchy;
+            advancedConf.Add(tracker.basicTypeCollectionsConfigurations[objectProperties[propertyName]]);
+        }
+        else
+        {
+            SpecificConfiguration(objectProperties[propertyName], currentPropertyHierarchy, tracker);//save the aggregate function chosen for the property
+            advancedConf.Add(null);//note! It actually adds an empty GameObjectSimpleTracker
+        }
+    }
+    protected void ExpandNonMappableProperty(object currentObject, FieldOrProperty property, MyListString currentPropertyHierarchy, GameObjectsTracker tracker)
+    {
+        object derivedObject = tracker.ObjectDerivedFromFields[currentObject][property.Name()];//actual value of the property
+        bool derivedObjectAlreadyListed = tracker.ObjectsOwners.ContainsKey(derivedObject) && !tracker.ObjectsOwners[derivedObject].Key.Equals(currentObject);
+        derivedObjectAlreadyListed = derivedObjectAlreadyListed && !tracker.ObjectsOwners[derivedObject].Value.Equals(property.Name());
+        bool derivedObjectIsTheCurrentGO = derivedObject.Equals(tracker.GO);
+        //if the actual value of the property is not null and it is not already listed beacause is a property of some othe object or beacause is the gameobject itself
+        if (derivedObject != null && !derivedObjectAlreadyListed && !derivedObjectIsTheCurrentGO)
+        {
+            if (tracker.ObjectsProperties.ContainsKey(derivedObject))
+            {
+                Dictionary<string, FieldOrProperty> derivedObjProperties = tracker.ObjectsProperties[derivedObject];//retrieve properties of the derivedObject
+                foreach (string subProperty in derivedObjProperties.Keys)
+                {
+                    if (tracker.ObjectsToggled[derivedObjProperties[subProperty]])
+                    {
+                        MyListString newLevelPropertyHierarchy = currentPropertyHierarchy.GetClone();
+                        newLevelPropertyHierarchy.Add(subProperty);
+                        if (tracker.IsMappable(derivedObjProperties[subProperty]))
+                        {
+                            AddMappableProperty(tracker, derivedObjProperties, subProperty, newLevelPropertyHierarchy);
+                        }
+
+                        else if (tracker.ObjectDerivedFromFields.ContainsKey(derivedObject))
+                        {
+                            ExpandNonMappableProperty(derivedObject, derivedObjProperties[subProperty], newLevelPropertyHierarchy, tracker);//recurse
+                        }
+                    }
+                }
+            }
+        }
+    }
+    protected virtual void ConfigurationSaved(GameObjectsTracker tracker) { }
+    internal virtual void SpecificConfiguration(FieldOrProperty fieldOrProperty, MyListString property, GameObjectsTracker tracker) { }
+    #endregion
+    protected void InitialConfiguration()
+    {
+        if (configurationName != null)
+        {
+            hashCode = configurationName.GetHashCode() * 7 + gameObject.GetHashCode() * 13;
+        }
+        else
         {
             configurationName = "";
         }
         if (gameObject.GetComponent<IndexTracker>() is null)
         {
             IndexTracker indexTracker = gameObject.AddComponent<IndexTracker>();
-            indexTracker.hideFlags = HideFlags.HideInInspector;
         }
         if (saved)
         {
-            manager.addConfiguration(this);
-            ASPRep();
+            ASPRepresentation();
         }
     }
-
-    public void SaveConfiguration(GameObjectsTracker tr)
-    {
-        properties = new List<MyListString>();
-        propertiesNames = new List<string>();
-        advancedConf = new List<SimpleGameObjectsTracker>();
-        cleanSpecificDataStructure();
-        configurationName = tr.configurationName;
-        GameObjectsTracker tracker = tr;
-        Dictionary<string, FieldOrProperty> gOProperties = tr.ObjectsProperties[gameObject];
-        List<Component> comp = tr.GOComponents[gameObject];
-        foreach (string directProperty in gOProperties.Keys)
-        {
-                
-            if (tr.ObjectsToggled[gOProperties[directProperty]])
-            {
-                //MyDebugger.MyDebug("property " + s + " toggled");
-                MyListString currentProperty = new MyListString();
-                properties.Add(currentProperty);
-                if (tracker.IsMappable(gOProperties[directProperty]))
-                {
-                    //MyDebugger.MyDebug("adding " + gOProperties[s].Name());
-                    currentProperty.Add(directProperty);
-                    if (!tracker.IsBaseType(gOProperties[directProperty]))
-                    {
-                        tracker.basicTypeCollectionsConfigurations[gOProperties[directProperty]].propertyName = currentProperty;
-                        advancedConf.Add(tracker.basicTypeCollectionsConfigurations[gOProperties[directProperty]]);
-                    }
-                    else
-                    {
-                        specificConfiguration(gOProperties[directProperty], currentProperty, tracker);
-                        advancedConf.Add(null);
-                    }
-                }
-                else if (tracker.ObjectDerivedFromFields.ContainsKey(gameObject))
-                {
-                    //MyDebugger.MyDebug("recursing on " + gOProperties[s].Name());
-                    recursevelyAdd(gameObject, gOProperties[directProperty], currentProperty, tracker);
-                }
-            }
-        }
-        foreach (Component c in comp)
-        {
-            if (tr.ObjectsToggled[c])
-            {
-                MyListString currentProperty = new MyListString();
-                properties.Add(currentProperty);
-                currentProperty.Add(c.GetType() + "");
-                //MyDebugger.MyDebug("adding " + c.GetType().ToString());
-                // properties.Add(c.GetType().ToString());
-                Dictionary<string, FieldOrProperty> componentProperties = tr.ObjectsProperties[c];
-                foreach (string s in componentProperties.Keys)
-                {
-                    if (tr.ObjectsToggled[componentProperties[s]])
-                    {
-                        currentProperty.Add(s);
-                        if (tracker.IsMappable(componentProperties[s]))
-                        {
-                            // MyDebugger.MyDebug("adding " + c.GetType().ToString() + "^" + s);
-                            if (tracker.IsBaseType(componentProperties[s]))
-                            {
-                                specificConfiguration(componentProperties[s], currentProperty, tracker);
-                                advancedConf.Add(null);
-                            }
-                            else
-                            {
-                                tracker.basicTypeCollectionsConfigurations[componentProperties[s]].propertyName = currentProperty;
-                                advancedConf.Add(tracker.basicTypeCollectionsConfigurations[componentProperties[s]]);
-                            }
-                        }
-                        else if (tracker.ObjectDerivedFromFields.ContainsKey(c))// && !tracker.IsBaseType(componentProperties[s]))
-                        {
-                            //MyDebugger.MyDebug("recursing on " + c.name);
-                            recursevelyAdd(c, componentProperties[s], currentProperty, tracker);
-                        }
-
-                    }
-                        
-                }
-            }
-        }
-        if (properties.Count == 0)
-        {
-            throw new Exception("No properties selected, invalid configuration to save.");
-        }
-        ASPRep();
-        saved = true;
-        manager.addConfiguration(this);
-        //MyDebugger.MyDebug("success");
-        MyDebugger.MyDebug("saved " + configurationName);
-        foreach(MyListString property in properties)
-        {
-            MyDebugger.MyDebug("changing prop");
-            for(int i=0; i < property.Count; i++)
-            {
-                MyDebugger.MyDebug(property[i]);
-            }
-        }
-    }
-
-    internal virtual void ASPRep()
+    internal virtual void ASPRepresentation()
     {
         aspTemplate = new Dictionary<MyListString, List<string>>();
-        for(int i=0; i<properties.Count;i++)
+        for (int i = 0; i < properties.Count; i++)
         {
-            aspTemplate.Add(properties[i], new List<string>());
             MyListString property = properties[i];
+            aspTemplate.Add(property, new List<string>());
             string currentASPRep = "";
             string pathInASPFormat = "";
             string suffix = "";
-            for(int j=0; j<property.Count;j++)
+            for (int j = 0; j < property.Count; j++)
             {
                 pathInASPFormat += ASPMapperHelper.aspFormat(property[j]) + "(";
                 suffix += ")";
@@ -155,10 +216,10 @@ public class AbstractConfiguration :MonoBehaviour
 
             string configurationNameAspFormat = ASPMapperHelper.aspFormat(configurationName);
             string goNameNotCapital = ASPMapperHelper.aspFormat(gameObject.name);
-            currentASPRep = configurationNameAspFormat + "(" + goNameNotCapital + ", objectIndex(+" + gameObject.GetComponent<IndexTracker>().currentIndex + "),";
+            currentASPRep = configurationNameAspFormat + "(" + goNameNotCapital + ",objectIndex({0}),";
             suffix += ")";
             currentASPRep += pathInASPFormat;
-            if (advancedConf.Count > i && !(advancedConf[i] is null))
+            if (advancedConf.Count > i && !(advancedConf[i] == null) && advancedConf[i].toSave.Count > 0)
             {
                 string propertyType = advancedConf[i].propertyType;
                 if (!(propertyType is null) && (propertyType.Equals("LIST") || propertyType.Equals("ARRAY2")))
@@ -167,131 +228,98 @@ public class AbstractConfiguration :MonoBehaviour
                     string valuePlaceholder = "";
                     if (advancedConf[i].propertyType.Equals("LIST"))
                     {
-                        indexesPlaceholder = "{0}";
-                        valuePlaceholder = "{1}";
+                        indexesPlaceholder = "{1}";
+                        valuePlaceholder = "{2}";
                     }
                     else
                     {
-                        indexesPlaceholder = "{0}{1}";
-                        valuePlaceholder = "{2}";
+                        indexesPlaceholder = "{1},{2}";
+                        valuePlaceholder = "{3}";
                     }
-                    for(int j=0; j< advancedConf[i].toSave.Count; j++)
+                    for (int j = 0; j < advancedConf[i].toSave.Count; j++)
                     {
                         string localASPRep = currentASPRep;
-                        localASPRep += indexesPlaceholder+"," + ASPMapperHelper.aspFormat(Type.GetType(advancedConf[i].objType).ToString()) + "("
-                            + ASPMapperHelper.aspFormat(advancedConf[i].toSave[j]) + "("+ valuePlaceholder+")";
-                        localASPRep = ")" + suffix;
-                        aspTemplate[properties[i]].Add(localASPRep);
+                        localASPRep += indexesPlaceholder + "," + ASPMapperHelper.aspFormat(Type.GetType(advancedConf[i].objType).ToString()) + "("
+                            + ASPMapperHelper.aspFormat(advancedConf[i].toSave[j]) + "(" + valuePlaceholder + ")";
+                        localASPRep += ")" + suffix;
+                        aspTemplate[property].Add(localASPRep);
                     }
                 }
             }
             else
             {
-                currentASPRep += "{0}"+suffix;
-                aspTemplate[properties[i]].Add(currentASPRep);
+                currentASPRep += "{1}" + suffix;
+                aspTemplate[property].Add(currentASPRep);
             }
         }
     }
-
-    internal virtual string getAspTemplate()
+    internal virtual string GetAspTemplate()
     {
         string toReturn = "";
+        if (aspTemplate == null)
+        {
+            ASPRepresentation();
+        }
         for (int i = 0; i < properties.Count; i++)
         {
-            if (advancedConf.Count > i && !(advancedConf[i] is null))
+            if (advancedConf != null && advancedConf.Count > i && !(advancedConf[i] is null) && advancedConf[i].toSave.Count > 0)
             {
                 if (advancedConf[i].propertyType.Equals("LIST"))
                 {
                     for (int j = 0; j < advancedConf[i].toSave.Count; j++)
                     {
-                        toReturn += String.Format(aspTemplate[properties[i]][j], "P", "V")+Environment.NewLine;
+                        toReturn += String.Format(aspTemplate[properties[i]][j], "X", "P", "V") + Environment.NewLine;
                     }
                 }
                 else if (advancedConf[i].propertyType.Equals("ARRAY2"))
                 {
                     for (int j = 0; j < advancedConf[i].toSave.Count; j++)
                     {
-                        toReturn += String.Format(aspTemplate[properties[i]][j], "R", "C", "V")+Environment.NewLine;
+                        toReturn += String.Format(aspTemplate[properties[i]][j], "X", "R", "C", "V") + Environment.NewLine;
                     }
                 }
             }
             else
             {
-                toReturn += String.Format(aspTemplate[properties[i]][0], "V")+ Environment.NewLine;
+                toReturn += String.Format(aspTemplate[properties[i]][0], "X", "V") + Environment.NewLine;
             }
         }
         return toReturn;
     }
+    internal virtual void CleanSpecificDataStructure() { }
+    internal virtual void DeleteConfiguration() { }
 
-    protected void recursevelyAdd(object obj, FieldOrProperty fieldOrProperty, MyListString currentPropertyHierarchy, GameObjectsTracker tracker)
+    internal void Clean()
     {
-        object derivedObj = tracker.ObjectDerivedFromFields[obj][fieldOrProperty.Name()];
-        if (derivedObj == null || (tracker.ObjectsOwners.ContainsKey(derivedObj) && !tracker.ObjectsOwners[derivedObj].Key.Equals(obj)) || !tracker.ObjectsOwners[derivedObj].Value.Equals(fieldOrProperty.Name()) || derivedObj.Equals(tracker.GO))
-        {
-            // MyDebugger.MyDebug(fieldOrProperty.Name()+" returning ");
-            return;
-        }
-        if (tracker.ObjectsProperties.ContainsKey(derivedObj))
-        {
-            Dictionary<string, FieldOrProperty> derivedObjProperties = tracker.ObjectsProperties[derivedObj];
-            foreach (string s in derivedObjProperties.Keys)
-            {
-
-                if (tracker.ObjectsToggled[derivedObjProperties[s]])
-                {
-                    //MyDebugger.MyDebug(s + " is toggled");
-                    if (tracker.IsMappable(derivedObjProperties[s]))
-                    {
-
-                        //MyDebugger.MyDebug(derivedObjProperties[s].Name() + " toggled");
-                        // MyDebugger.MyDebug("adding " + parent + fieldOrProperty.Name() + "^" + s);
-                        currentPropertyHierarchy.Add(fieldOrProperty.Name());
-                        if (tracker.IsBaseType(derivedObjProperties[s]))/////CHECK
-                        {
-                            specificConfiguration(derivedObjProperties[s], currentPropertyHierarchy, tracker);
-                            advancedConf.Add(null);
-                        }
-                        else
-                        {
-                            tracker.basicTypeCollectionsConfigurations[derivedObjProperties[s]].propertyName = currentPropertyHierarchy;
-                            advancedConf.Add(tracker.basicTypeCollectionsConfigurations[derivedObjProperties[s]]);
-                        }
-                    }
-
-                    else if (tracker.ObjectDerivedFromFields.ContainsKey(derivedObj))
-                    {
-                        //MyDebugger.MyDebug("recursin on " + parent + fieldOrProperty.Name() + "^" + derivedObjProperties[s].Name());
-
-                        recursevelyAdd(derivedObj, derivedObjProperties[s], currentPropertyHierarchy, tracker);
-
-                    }
-                }
-            }
-        }
+        DeleteConfiguration();
+        saved = false;
+        properties = new List<MyListString>();
+        propertiesNames = new List<string>();
+        configurationName = "";
+        hashCode = -1;
+        advancedConf = new List<SimpleGameObjectsTracker>();
+        aspTemplate = new Dictionary<MyListString, List<string>>();
     }
-
-    internal List<string> getTemplate(MyListString searchedProperty)
+    internal List<string> GetTemplate(MyListString searchedProperty)
     {
         return aspTemplate[searchedProperty];
     }
-
-    private void OnDestroy()
-    {
-        if (saved)
-        {
-            manager.deleteConfiguration(this);
-        }
-    }
+    #region General overrides
     public override bool Equals(object other)
     {
-        return GetType().Equals(other.GetType()) && configurationName.Equals(((AbstractConfiguration)other).configurationName);
+        if (!(other is AbstractConfiguration))
+        {
+            return false;
+        }
+        AbstractConfiguration otherConf = (AbstractConfiguration)other;
+        return GetType().Equals(other.GetType()) && hashCode == otherConf.hashCode;
     }
     public override int GetHashCode()
     {
-        return configurationName.GetHashCode();
+        return hashCode;
     }
-    internal virtual void specificConfiguration(FieldOrProperty fieldOrProperty, MyListString property, GameObjectsTracker tracker) { }
-    internal virtual void cleanSpecificDataStructure() { }
+    #endregion
+
 }
-    
+
 

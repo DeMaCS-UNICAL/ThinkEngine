@@ -10,14 +10,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
         public string Map(object o)
         {
             DictionaryEntry entry = (DictionaryEntry)o;
-            string value =  ("(" + entry.Value + ")").ToLower();
+            string value =  (entry.Value + "").ToLower();
             return ASPMapperHelper.buildMapping((string)entry.Key, '^', value);
         }
 
         public string basicMap(object b)
         {
             
-            return ("(" + ((bool)b) + ")").ToLower();
+            return (((bool)b) + "").ToLower();
         }
 
         internal static IMapper getInstance()

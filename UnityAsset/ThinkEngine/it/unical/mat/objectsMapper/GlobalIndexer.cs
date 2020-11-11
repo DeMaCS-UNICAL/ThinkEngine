@@ -19,7 +19,7 @@ class GlobalIndexer
     }
     internal static GameObject find(int index)
     {
-        foreach (IndexTracker tracker in GameObject.FindObjectsOfType<IndexTracker>())
+        foreach (IndexTracker tracker in Resources.FindObjectsOfTypeAll<IndexTracker>())
         {
             if (tracker.currentIndex == index)
             {

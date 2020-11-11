@@ -9,9 +9,9 @@ using UnityEngine;
 [ExecuteInEditMode]
 class IndexTracker:MonoBehaviour
 {
-    public int currentIndex;
+    public int currentIndex=-1;
 
-    void OnEnable()
+    void Start()
     {
         currentIndex = GlobalIndexer.assignIndex();
     }

@@ -9,16 +9,40 @@ using UnityEngine;
 public class MonoBehaviourActuatorsManager:MonoBehaviour
 {
     public Dictionary<ActuatorConfiguration,List<MonoBehaviourActuator>> configurations;
-
+    internal bool ready = false;
     void Awake()
     {
-        configurations = new Dictionary<ActuatorConfiguration, List<MonoBehaviourActuator>>();
+        Reset();
     }
-    public void instantiateActuator(ActuatorConfiguration actuatorConfiguration, Brain invoker)
+    void OnEnable()
     {
-        if (!configurations.Keys.Contains(actuatorConfiguration) && actuatorConfiguration.assignedTo is null)
+        Reset();
+    }
+    void Reset()
+    {
+        configurations = new Dictionary<ActuatorConfiguration, List<MonoBehaviourActuator>>();
+        ActuatorsManager actuatorsManager = Utility.actuatorsManager;
+        actuatorsManager.configurationsChanged = true;
+    }
+    void Start()
+    {
+        if (Application.isPlaying)
         {
-            if (actuatorConfiguration.gameObject.Equals(gameObject) && actuatorConfiguration.assignedTo.Equals(invoker))
+            foreach (ActuatorConfiguration configuration in GetComponents<ActuatorConfiguration>())
+            {
+                if (configuration.saved)
+                {
+                    instantiateActuator(configuration);
+                }
+            }
+            ready = true;
+        }
+    }
+    public void instantiateActuator(ActuatorConfiguration actuatorConfiguration)
+    {
+        if (!configurations.Keys.Contains(actuatorConfiguration))
+        {
+            if (actuatorConfiguration.gameObject.Equals(gameObject))
             {
                 configurations.Add(actuatorConfiguration, generateActuator(actuatorConfiguration));
             }
@@ -37,4 +61,37 @@ public class MonoBehaviourActuatorsManager:MonoBehaviour
         }
         return generatedActuators;
     }
+    internal IEnumerable<string> GetAllConfigurationNames()
+    {
+        List<string> toReturn = new List<string>();
+        foreach (ActuatorConfiguration configuration in GetComponents<ActuatorConfiguration>())
+        {
+            toReturn.Add(configuration.configurationName);
+        }
+        return toReturn;
+    }
+    internal ActuatorConfiguration getConfiguration(string name)
+    {
+        foreach (ActuatorConfiguration configuration in GetComponents<ActuatorConfiguration>())
+        {
+            if (configuration.configurationName.Equals(name))
+            {
+                return configuration;
+            }
+        }
+        return null;
+    }
+    internal void addConfiguration(ActuatorConfiguration configuration)
+    {
+        Utility.actuatorsManager.configurationsChanged = true;
+    }
+    internal void deleteConfiguration(ActuatorConfiguration configuration)
+    {
+        Utility.actuatorsManager.configurationsChanged = true;
+        if (GetComponents<ActuatorConfiguration>() == null)
+        {
+            DestroyImmediate(this);
+        }
+    }
 }
+

@@ -7,26 +7,66 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using UnityEditor;
+using UnityEditor.Experimental.SceneManagement;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 [ExecuteInEditMode]
-public  class SensorsManager : MonoBehaviour,IManager
+public  class SensorsManager : MonoBehaviour
 {
-    [SerializeField]
-    private List<string> configuredGameObject;
-    [SerializeField]
-    private List<string> configurationsNames;
-    private static Dictionary<Brain, List<SensorConfiguration>> instantiatedSensors;
-    private static Queue<Brain> requestedMappings;
-    private static object waitOn = new object();
-
-    internal static int updateFrequencyInFrames;
-    internal static int avgFps=0;
-    internal static int frameCount=0;
+    private static Dictionary<Brain, List<string>> instantiatedSensors;
+    private static Queue<KeyValuePair<Brain,object>> _requestedMappings;
+    internal static int updateFrequencyInFrames=12;
+    internal bool _configurationsChanged;
+    internal static float avgFps = 0;
+    internal static float bestAvgFps = 0;
+    internal static int frameCount = 0;
     internal static int numberOfLiveSensor = 0;
-    internal static int frameFromLastUpdate = 0;
+    internal static int frameFromLastUpdate = 2;
     internal static float updateScaleFactor = 1;
+    internal static float lastUpdateFPS;
+    private static bool uncompletedTasks;
+    internal static bool destroyed;
+    private static Queue<KeyValuePair<Brain,object>> requestedMappings
+    {
+        get
+        {
+            if (_requestedMappings == null)
+            {
+                _requestedMappings = new Queue<KeyValuePair<Brain, object>>();
+            }
+            return _requestedMappings;
+        }
+    }
+    internal bool configurationsChanged
+    {
+        get
+        {
+            return _configurationsChanged;
+        }
+        set
+        {
+            _configurationsChanged = value;
+            if (_configurationsChanged)
+            {
+                notifyBrains();
+            }
+        }
+    }
+
+    private void notifyBrains()
+    {
+        foreach(Brain brain in Resources.FindObjectsOfTypeAll<Brain>())
+        {
+            brain.sensorsConfigurationsChanged = true;
+        }
+        configurationsChanged = false;
+    }
+
+   void OnDestroy()
+    {
+        destroyed = true;
+    }
 
     void Reset()
     {
@@ -38,98 +78,172 @@ public  class SensorsManager : MonoBehaviour,IManager
             }
             finally
             {
-                Destroy(this);
+                if (Application.isPlaying)
+                {
+                    Destroy(this);
+                }
+                else
+                {
+                    DestroyImmediate(this);
+                }
             }
-        }
-        if (requestedMappings == null)
-        {
-            requestedMappings = new Queue<Brain>();
-        }
-        if (configuredGameObject == null)
-        {
-            configuredGameObject = new List<string>();
-        }
-        if (configurationsNames == null)
-        {
-            configurationsNames = new List<string>();
         }
     }
     
-    void OnEnable()
+    void Start()
     {
-        Reset();
+        if (Application.isPlaying)
+        {
+            Reset();
+        }
     }
     void Update()
     {
         if (Application.isPlaying)
         {
-            returnSensorsMappings();// here is safe since the sensors are updated in the LateUpdate
             frameFromLastUpdate++;
             frameCount++;
-            int currentFps = (int)(1f / Time.unscaledDeltaTime);
+            float currentFps = 1f / Time.unscaledDeltaTime;
             avgFps = (avgFps * (frameCount - 1) + currentFps) / frameCount;
+            if (bestAvgFps < avgFps)
+            {
+                bestAvgFps = avgFps;
+            }
             if (frameFromLastUpdate > updateFrequencyInFrames)
             {
-                updateScaleFactor = (avgFps - currentFps) / (float)avgFps * 10;
-                frameFromLastUpdate = 1;
-                numberOfLiveSensor = FindObjectsOfType<MonoBehaviourSensor>().Length;
-                updateFrequencyInFrames = numberOfLiveSensor / avgFps;
-                updateFrequencyInFrames += (int)Math.Ceiling(updateFrequencyInFrames * updateScaleFactor);
+                frameFromLastUpdate = -1;
+                Performance.updatedSensors = true;
+                lastUpdateFPS = currentFps;
             }
+            updateScaleFactor = (bestAvgFps - avgFps) / bestAvgFps * 10;
+            numberOfLiveSensor = FindObjectsOfType<MonoBehaviourSensor>().Length;
+            updateFrequencyInFrames = (int)(numberOfLiveSensor / lastUpdateFPS);
+            updateFrequencyInFrames += (int)Math.Ceiling(updateFrequencyInFrames * updateScaleFactor);
+            updateFrequencyInFrames = Math.Max(1, updateFrequencyInFrames);
+            returnSensorsMappings();// here is safe since the sensors are updated in the LateUpdate
         }
-    }
 
-    public List<string> getConfiguredGameObject()
-    {
-        return configuredGameObject;
-    }
-    public List<string> getUsedNames()
-    {
-        return configurationsNames;
     }
     
+    internal List<SensorConfiguration> getConfigurations(List<string> chosenSensorConfigurations)
+    {
+        List<SensorConfiguration> toReturn = new List<SensorConfiguration>();
+        foreach (string confName in chosenSensorConfigurations)
+        {
+            foreach (MonoBehaviourSensorsManager manager in Resources.FindObjectsOfTypeAll<MonoBehaviourSensorsManager>())
+            {
+                if (PrefabStageUtility.GetPrefabStage(manager.gameObject)!=null)
+                {
+                    continue;
+                }
+                SensorConfiguration currentConfiguration = manager.getConfiguration(confName);
+                if (currentConfiguration != null)
+                {
+                    toReturn.Add(currentConfiguration);
+                }
+            }
+        }
+        return toReturn;
+    }
+    internal bool isSomeActiveInScene(List<string> configurationNames)
+    {
+        foreach(string configurationName in configurationNames)
+        {
+            foreach(MonoBehaviourSensorsManager manager in FindObjectsOfType<MonoBehaviourSensorsManager>())
+            {
+                if (manager.getConfiguration(configurationName) != null)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     internal static void requestSensorsMapping(Brain brain)
     {
-        lock (waitOn)
+        object toLock = new object();
+        lock (toLock)
         {
-            requestedMappings.Enqueue(brain);
-            Monitor.Wait(waitOn);
+            requestedMappings.Enqueue(new KeyValuePair<Brain,object>(brain,toLock));
+            //MyDebugger.MyDebug("requesting map");
+            Monitor.Wait(toLock);
         }
     }
 
     internal static void returnSensorsMappings()
     {
-        lock (waitOn)
+        if (frameFromLastUpdate !=-1 && !uncompletedTasks)
         {
-            while (requestedMappings.Count > 0)
+            return;
+        }
+        int count = 0;
+        while (requestedMappings.Count > 0 && count<5)
+        {
+            count++;
+            KeyValuePair<Brain,object> currentPair = requestedMappings.Dequeue();
+            Brain brain = currentPair.Key;
+            object toLock = currentPair.Value;
+            lock (toLock)
             {
-                Brain brain = requestedMappings.Dequeue();
                 string mapping = "";
                 List<MonoBehaviourSensor> sensors = new List<MonoBehaviourSensor>();
-                foreach (SensorConfiguration sensorConf in instantiatedSensors[brain])
+                foreach (string sensorConf in instantiatedSensors[brain])
                 {
-                    sensors.AddRange(sensorConf.gameObject.GetComponent<MonoBehaviourSensorsManager>().configurations[sensorConf]);
+                    foreach (MonoBehaviourSensorsManager monobehaviourManager in FindObjectsOfType<MonoBehaviourSensorsManager>())
+                    {
+                        //Debug.Log("manager in: " + monobehaviourManager.gameObject.name);
+                        if (!monobehaviourManager.ready)
+                        {
+                            continue;
+                        }
+                        SensorConfiguration currentConfiguration = monobehaviourManager.getConfiguration(sensorConf);
+                        if (currentConfiguration!=null)
+                        {
+                            //Debug.Log("has configuration " + currentConfiguration.configurationName +" with "+ monobehaviourManager.configurations[currentConfiguration].Count+" sensors");
+                            sensors.AddRange(monobehaviourManager.configurations[currentConfiguration]);
+                        }
+                    }
                 }
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
                 foreach (MonoBehaviourSensor sensor in sensors)
                 {
+                    //MyDebugger.MyDebug("asked " + sensor.sensorName + " map");
                     mapping += sensor.Map();
                 }
                 watch.Stop();
                 brain.factsStep++;
                 brain.factsMSTotal += watch.ElapsedMilliseconds;
                 brain.sensorsMapping = mapping;
+                Monitor.Pulse(toLock);
             }
         }
-        Monitor.PulseAll(waitOn);
+        if (requestedMappings.Count > 0)
+        {
+            uncompletedTasks = true;
+        }
+        else
+        {
+            uncompletedTasks = false;
+        }
     }
 
-    public void registerSensors(Brain brain, List<SensorConfiguration> instantiated)
+    internal IEnumerable<string> configurationNames()
+    {
+        List<string> availableConfigurationNames = new List<string>();
+        foreach(MonoBehaviourSensorsManager manager in Resources.FindObjectsOfTypeAll<MonoBehaviourSensorsManager>())
+        {
+            availableConfigurationNames.AddRange(manager.GetAllConfigurationNames());
+        }
+        return availableConfigurationNames;
+    }
+
+    public void registerSensors(Brain brain, List<string> instantiated)
     {
         if (instantiatedSensors == null)
         {
-            instantiatedSensors = new Dictionary<Brain, List<SensorConfiguration>>();
+            instantiatedSensors = new Dictionary<Brain, List<string>>();
         }
         if (!instantiatedSensors.ContainsKey(brain))
         {
@@ -140,29 +254,35 @@ public  class SensorsManager : MonoBehaviour,IManager
             instantiatedSensors[brain] = instantiated;
         }
     }
-
-    public void deleteConfiguration(AbstractConfiguration abstractConfiguration)
-    {
-        if (configurationsNames.Contains(abstractConfiguration.configurationName))
-        {
-            int toDelete = configurationsNames.IndexOf(abstractConfiguration.configurationName);
-            configurationsNames.RemoveAt(toDelete);
-            configuredGameObject.RemoveAt(toDelete);
-        }
-    }
-
-    public void addConfiguration(AbstractConfiguration abstractConfiguration)
-    {
-        if (!configurationsNames.Contains(abstractConfiguration.configurationName))
-        {
-            configurationsNames.Add(abstractConfiguration.configurationName);
-            configuredGameObject.Add(abstractConfiguration.gameObject.name);
-        }
-    }
     
     public bool existsConfigurationWithName(string name)
     {
-        return configurationsNames.Contains(name);
+        foreach (MonoBehaviourSensorsManager manager in Resources.FindObjectsOfTypeAll<MonoBehaviourSensorsManager>())
+        {
+            if (manager.getConfiguration(name)!=null)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    void OnApplicationQuit()
+    {
+        while (requestedMappings.Count > 0)
+        {
+            KeyValuePair<Brain,object> pair = requestedMappings.Dequeue();
+            Brain brain = pair.Key;
+            object toLock = pair.Value;
+            if (brain.embasp != null)
+            {
+                brain.embasp.reason = false;
+                ////MyDebugger.MyDebug("finalize");
+                lock (toLock)
+                {
+                    Monitor.Pulse(toLock);
+                }
+            }
+        }
     }
 }
 

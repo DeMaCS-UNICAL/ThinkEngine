@@ -13,6 +13,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
     private int step=0;
     public bool ready;
     internal Dictionary<SensorConfiguration,List<MonoBehaviourSensor>> configurations;
+    
     private string currentPropertyType;
     private List<string> currentSubProperties;
     private int sensorsAdded = 0;
@@ -21,10 +22,57 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
     private Dictionary<MyListString, List<string>> elementForCollectionProperty;
     private Dictionary<MyListString, List<int>> sizeToTrack;
 
-    // Use this for initialization
+
+    void Awake()
+    {
+        Reset();
+    }
+    void OnEnable()
+    {
+        Reset();
+    }
+    void Reset()
+    {
+        sizeToTrack = new Dictionary<MyListString, List<int>>();
+        typeForCollectionProperty = new Dictionary<MyListString, string>();
+        elementForCollectionProperty = new Dictionary<MyListString, List<string>>();
+        sensorNameForCollectionProperty = new Dictionary<MyListString, string>();
+        configurations = new Dictionary<SensorConfiguration, List<MonoBehaviourSensor>>();
+        SensorsManager sensorsManager = Utility.sensorsManager;
+        sensorsManager.configurationsChanged = true;
+
+    }
+    void Start()
+    {
+        if (Application.isPlaying)
+        {
+            foreach (SensorConfiguration configuration in GetComponents<SensorConfiguration>())
+            {
+                if (configuration.saved)
+                {
+                    instantiateSensor(configuration);
+                }
+            }
+            ready = true;
+        }
+    }
+    internal void addConfiguration(SensorConfiguration configuration)
+    {
+        Utility.sensorsManager.configurationsChanged = true;
+    }
+    
+    internal void deleteConfiguration(SensorConfiguration configuration)
+    {
+        Utility.sensorsManager.configurationsChanged = true;
+        if (GetComponent<SensorConfiguration>() == null)
+        {
+            DestroyImmediate(this);
+        }
+    }
+
     public void instantiateSensor(SensorConfiguration sensorConfiguration)
     {
-        if (!configurations.Keys.Contains(sensorConfiguration))
+        if (!configurations.ContainsKey(sensorConfiguration))
         {
             if (sensorConfiguration.gameObject.Equals(gameObject))
             {
@@ -32,34 +80,12 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
             }
         }
     }
-
-    void Awake()
-    {
-        ////MyDebugger.MyDebug("Awakening");
-        //Debug.unityLogger.logEnabled = true;
-        sizeToTrack = new Dictionary<MyListString, List<int>>();
-        typeForCollectionProperty = new Dictionary<MyListString, string>();
-        elementForCollectionProperty = new Dictionary<MyListString, List<string>>();
-        sensorNameForCollectionProperty = new Dictionary<MyListString, string>();
-        configurations = new Dictionary<SensorConfiguration, List<MonoBehaviourSensor>>();
-        if(FindObjectOfType<SensorsManager>() is null)
-        {
-            gameObject.AddComponent<SensorsManager>();
-        }
-    }
-
-    void Start()
-    {
-        //Debug.unityLogger.logEnabled = true;
-    }
-
     public List<MonoBehaviourSensor> generateSensors(SensorConfiguration sensorConfiguration)
     {
-        List<MonoBehaviourSensor> generatedSensors = null;
+        List<MonoBehaviourSensor> generatedSensors = new List<MonoBehaviourSensor>();
         
-        foreach(MyListString property in sensorConfiguration.properties.Distinct())
+        foreach(MyListString property in sensorConfiguration.properties)
         {
-            MyDebugger.MyDebug("ADDING SENSOR FOR " + property + " TO " + gameObject.name);
             object[] result=null;
             List<Type> type=null;
             currentSubProperties = new List<string>();
@@ -71,14 +97,14 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
                     currentPropertyType= tracker.propertyType;
                     currentSubProperties = tracker.toSave;
                     result = ReadProperty(property);
-                    generatedSensors.Add(configureSensor(result, type, sensorConfiguration, property, currentOperationPerProperty));
+                    generatedSensors.AddRange(configureSensor(result, type, sensorConfiguration, property, currentOperationPerProperty));
                     break;
                 }
             }
             if (currentPropertyType.Equals("VALUE"))
             {
                 result = ReadProperty(property);
-                generatedSensors.Add(configureSensor(result, type, sensorConfiguration, property, currentOperationPerProperty));
+                generatedSensors.AddRange(configureSensor(result, type, sensorConfiguration, property, currentOperationPerProperty));
                 foreach (ListOfStringIntPair pair in sensorConfiguration.operationPerProperty)
                 {
                     if (pair.Key.Equals(property))
@@ -91,17 +117,15 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
                 
         }
         
-        ready = true;
         return generatedSensors;
     }
 
-    private MonoBehaviourSensor configureSensor(object[] result, List<Type> types, SensorConfiguration conf, MyListString property, int currentOperationPerProperty)
+    private List<MonoBehaviourSensor> configureSensor(object[] result, List<Type> types, SensorConfiguration conf, MyListString property, int currentOperationPerProperty)
     {
-        //MyDebugger.MyDebug("configuring sensors for " + property);
-        MonoBehaviourSensor sensor = null;
+        List<MonoBehaviourSensor> sensors = new List<MonoBehaviourSensor>();
         if (result != null)
         {
-            if (result[0].GetType() == typeof(Type))
+            if (result[0] is Type)
             {
                 types = new List<Type>();
                 types.Add((Type)result[0]);
@@ -113,39 +137,38 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
         }
         if (types != null && currentPropertyType.Equals("VALUE"))
         {
-            sensor = addSensor(conf.configurationName, property, currentOperationPerProperty, types);
+            sensors.Add(addSensor(conf.configurationName, property, currentOperationPerProperty, types));
             //MyDebugger.MyDebug("AND IT'S VALUE");
-            sensor.done();
+            sensors[sensors.Count-1].done();
         }
         else if (types != null)
         {
             List<int> currentSize = new List<int>();
             if (currentPropertyType.Equals("LIST"))
             {
-                //MyDebugger.MyDebug("AND IT'S LIST");
                 currentSize.Add((int)result[1]);
                 for (int i = 0; i < (int)result[1]; i++)
                 {
-                    sensor = addSensor(conf.configurationName, property, currentOperationPerProperty, types);
-                    sensor.indexes.Add(i);
-                    sensor.collectionElementType = ((Type)result[2]).Name;
-                    sensor.done();
+                    sensors.Add(addSensor(conf.configurationName, property, currentOperationPerProperty, types));
+                    sensors[sensors.Count - 1].indexes.Add(i);
+                    sensors[sensors.Count - 1].collectionElementType = ((Type)result[2]).Name;
+                    sensors[sensors.Count - 1].done();
                 }
             }
             else if (currentPropertyType.Equals("ARRAY2"))
             {
-                MyDebugger.MyDebug("AND IT'S ARRAY2");
+                //MyDebugger.MyDebug("AND IT'S ARRAY2");
                 currentSize.Add((int)result[1]);
                 currentSize.Add((int)result[2]);
                 for (int i = 0; i < (int)result[1]; i++)
                 {
                     for (int j = 0; j < (int)result[2]; j++)
                     {
-                        sensor = addSensor(conf.configurationName, property, currentOperationPerProperty, types);
-                        sensor.indexes.Add(i);
-                        sensor.indexes.Add(j);
-                        sensor.collectionElementType = ((Type)result[3]).Name;
-                        sensor.done();
+                        sensors.Add(addSensor(conf.configurationName, property, currentOperationPerProperty, types));
+                        sensors[sensors.Count - 1].indexes.Add(i);
+                        sensors[sensors.Count - 1].indexes.Add(j);
+                        sensors[sensors.Count - 1].collectionElementType = ((Type)result[3]).Name;
+                        sensors[sensors.Count - 1].done();
                     }
                 }
             }
@@ -160,14 +183,50 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
             }
             elementForCollectionProperty[property].AddRange(currentSubProperties);
         }
-        return sensor;
+        return sensors;
+    }
+
+    internal IEnumerable<string> GetAllConfigurationNames()
+    {
+        List<string> toReturn = new List<string>();
+        foreach (SensorConfiguration configuration in GetComponents<SensorConfiguration>())
+        {
+            toReturn.Add(configuration.configurationName);
+        }
+        return toReturn;
+    }
+
+    internal SensorConfiguration getConfiguration(string name)
+    {
+        foreach(SensorConfiguration configuration in GetComponents<SensorConfiguration>())
+        {
+            if (configuration.configurationName.Equals(name))
+            {
+                return configuration;
+            }
+        }
+        return null;
+    }
+
+    internal void removeSensor(MonoBehaviourSensor monoBehaviourSensor)
+    {
+        SensorConfiguration currentConfiguration = null;
+        foreach (SensorConfiguration sensorConfiguration in GetComponents<SensorConfiguration>())
+        {
+            if (sensorConfiguration.configurationName.Equals(monoBehaviourSensor.sensorName))
+            {
+                currentConfiguration = sensorConfiguration;
+                break;
+            }
+        }
+        configurations[currentConfiguration].Remove(monoBehaviourSensor);
     }
 
     private MonoBehaviourSensor addSensor(string confName, MyListString property, int currentOperationPerProperty, List<Type> types)
     {
-        MyDebugger.MyDebug("ACTUALLY ADDING COMPONENT TO " + gameObject.name);
+       // MyDebugger.MyDebug("ACTUALLY ADDING COMPONENT TO " + gameObject.name);
         sensorsAdded++;
-        MyDebugger.MyDebug("Added " + sensorsAdded + "sensors to " + gameObject.name);
+        //MyDebugger.MyDebug("Added " + sensorsAdded + "sensors to " + gameObject.name);
         MonoBehaviourSensor sensor = gameObject.AddComponent<MonoBehaviourSensor>();
         //MyDebugger.MyDebug("component " + component);
         sensor.hideFlags = HideFlags.HideInInspector;
@@ -198,34 +257,34 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
         object[] toReturn = null;
         if (_path.Count==1)
         {
-            MyDebugger.MyDebug("SIMPLE PROPERTY");
+            //MyDebugger.MyDebug("SIMPLE PROPERTY");
             toReturn = new object[1];
             toReturn[0] = ReadSimpleValueProperty(_path[0], typeof(GameObject), gameObject);
         }
         else
         {
-            MyDebugger.MyDebug("COMPOSED PROPERTY");
+            //MyDebugger.MyDebug("COMPOSED PROPERTY");
             toReturn = (object[])SensorsUtility.ReadComposedProperty(gameObject, _path, _path, typeof(GameObject), gameObject, ReadSimplePropertyMethod);
         }
         return toReturn;
     }
     public object[] ReadSimplePropertyMethod(string path, Type type, object obj)
     {
-        MyDebugger.MyDebug("SWITCHING ON " + path);
+        //MyDebugger.MyDebug("SWITCHING ON " + path);
         object[] toReturn = null;
         if (currentPropertyType.Equals("VALUE"))
         {
-            MyDebugger.MyDebug("VALUE PROPERTY");
+           //MyDebugger.MyDebug("VALUE PROPERTY");
             toReturn = new object[1];
             toReturn[0] = ReadSimpleValueProperty(path, type, obj);
         }else if (currentPropertyType.Equals("ARRAY2"))
         {
-            MyDebugger.MyDebug("ARRAY2 PROPERTY");
+           //MyDebugger.MyDebug("ARRAY2 PROPERTY");
             toReturn =  ReadSimpleArrayProperty(path,currentSubProperties, type, obj,0,0);
         }
         else if (currentPropertyType.Equals("LIST"))
         {
-            MyDebugger.MyDebug("LIST PROPERTY");
+           // MyDebugger.MyDebug("LIST PROPERTY");
             toReturn =  ReadSimpleListProperty(path,currentSubProperties, type, obj,0);
         }
         return toReturn;
@@ -237,7 +296,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
         object[] toReturn = new object[4];
         if (matrixValue[0] != null && matrixValue[1] != null)
         {
-            MyDebugger.MyDebug("READING THE MATRIX!");
+         //   MyDebugger.MyDebug("READING THE MATRIX!");
             List<FieldOrProperty> toRead = (List<FieldOrProperty>)matrixValue[1];
             Array matrix = (Array)matrixValue[0];
             List<Type> typesForProperties = new List<Type>();
@@ -249,7 +308,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
             toReturn[1] = matrix.GetLength(0);
             toReturn[2] = matrix.GetLength(1);
             toReturn[3] = matrix.GetValue(x,y).GetType(); //Collection Element Type
-            MyDebugger.MyDebug("LENGTH " + toReturn[1] + " " + toReturn[2]);
+            //MyDebugger.MyDebug("LENGTH " + toReturn[1] + " " + toReturn[2]);
             return toReturn;
         }
         else if (matrixValue[0] != null)
@@ -337,7 +396,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
             currentPropertyType = typeForCollectionProperty[property];
             newSizes = new List<int>();
             currentSubProperties = elementForCollectionProperty[property];
-            MyDebugger.MyDebug("checking " + property + " sub " + currentSubProperties + " " + currentPropertyType);
+            //MyDebugger.MyDebug("checking " + property + " sub " + currentSubProperties + " " + currentPropertyType);
             object[] result = ReadProperty(property);
             //MyDebugger.MyDebug(result.Length);
             //MyDebugger.MyDebug("Collection type "+result[result.Length - 1]);
@@ -351,14 +410,23 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
                 //MyDebugger.MyDebug("new size is "+newSizes[i]+" old one is "+ sizeToTrack[property][i]);
                 if (newSizes[i] > sizeToTrack[property][i])
                 {
+                    SensorConfiguration currentConfiguration = null;
+                    foreach (SensorConfiguration sensorConfiguration in GetComponents<SensorConfiguration>())
+                    {
+                        if (sensorConfiguration.configurationName.Equals(sensorNameForCollectionProperty[property]))
+                        {
+                            currentConfiguration = sensorConfiguration;
+                            break;
+                        }
+                    }
                     if (currentPropertyType.Equals("LIST"))
                     {
-                        enlargedList(property, newSizes[i], (List<Type>)result[0], (Type)result[2]);
+                        enlargedList(property, currentConfiguration, newSizes[i], (List<Type>)result[0], (Type)result[2]);
                     }
                     else if (currentPropertyType.Equals("ARRAY2"))
                     {
 
-                        enlargedArray2(property, i, newSizes[i], (List<Type>)result[0], (Type)result[3]);
+                        enlargedArray2(property, currentConfiguration, i, newSizes[i], (List<Type>)result[0], (Type)result[3]);
                     }
                 }
                 //MyDebugger.MyDebug("Still alive at " + i);
@@ -369,33 +437,34 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
         }
     }
 
-    private void enlargedArray2(MyListString property, int increasedDimension, int newSize, List<Type> propertiesType, Type collectionElementType)
+    private void enlargedArray2(MyListString property, SensorConfiguration currentConfiguration, int increasedDimension, int newSize, List<Type> propertiesType, Type collectionElementType)
     {
-        
         for (int i = sizeToTrack[property][increasedDimension]; i < newSize; i++)
         {
             for (int j = 0; j < sizeToTrack[property][(increasedDimension + 1) % 2]; j++)
             {
-                IMonoBehaviourSensor newSensor = addSensor(sensorNameForCollectionProperty[property], property, 0, propertiesType);
+                MonoBehaviourSensor newSensor = addSensor(sensorNameForCollectionProperty[property], property, 0, propertiesType);
                 newSensor.indexes.Add(i);
                 newSensor.indexes.Add(j);
                 newSensor.collectionElementProperties = currentSubProperties;
                 newSensor.collectionElementType = collectionElementType.Name;
                 newSensor.done();
+                configurations[currentConfiguration].Add(newSensor);
             }
         }
     }
 
-    private void enlargedList(MyListString property, int newSize, List<Type> propertiesType, Type collectionElementType)
+    private void enlargedList(MyListString property, SensorConfiguration currentConfiguration, int newSize, List<Type> propertiesType, Type collectionElementType)
     {
-
+        
         for (int i = sizeToTrack[property][0]; i < newSize; i++)
         {
-            IMonoBehaviourSensor newSensor = addSensor(sensorNameForCollectionProperty[property], property, 0, propertiesType);
+            MonoBehaviourSensor newSensor = addSensor(sensorNameForCollectionProperty[property], property, 0, propertiesType);
             newSensor.indexes.Add(i);
             newSensor.collectionElementProperties = currentSubProperties;
             newSensor.collectionElementType = collectionElementType.Name;
             newSensor.done();
+            configurations[currentConfiguration].Add(newSensor);
         }
     }
                 

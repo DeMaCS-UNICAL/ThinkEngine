@@ -1,25 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace EmbASP4Unity.it.unical.mat.embasp.languages.asp
+namespace it.unical.mat.embasp.languages.asp
 {
+    using InputProgram = it.unical.mat.embasp.@base.InputProgram;
 
-	using InputProgram = it.unical.mat.embasp.@base.InputProgram;
+    public class ASPInputProgram : InputProgram
+    {
+        public ASPInputProgram() : base() { }
 
-	public class ASPInputProgram : InputProgram
-	{
-		public ASPInputProgram() : base() { }
-		
-    public ASPInputProgram(object inputObj) : base(inputObj) { }
+        public ASPInputProgram(object inputObj) : base(inputObj) { }
 
-		public ASPInputProgram(string initial_program) : base(initial_program) { }
+        public ASPInputProgram(string initial_program) : base(initial_program) { }
 
-    public override void AddObjectInput(object inputObj) => AddProgram(ASPMapper.Instance.GetString(inputObj) + ".");
+        public override void AddObjectInput(object inputObj) => AddProgram(ASPMapper.Instance.GetString(inputObj) + ".");
 
-    public override void AddObjectsInput(HashSet<object> inputObjs)
-		{
-			foreach (Object inputObj in inputObjs)
-				AddObjectInput(inputObj);
-		}
-	}
+        public override void AddObjectsInput(ISet<object> inputObjs)
+        {
+            foreach (Object inputObj in inputObjs)
+                AddObjectInput(inputObj);
+        }
+    }
 }

@@ -15,7 +15,7 @@ using Debug = UnityEngine.Debug;
 using System.ComponentModel;
 using UnityEditor;
 
-[ExecuteInEditMode]
+[ExecuteAlways]
 
 public class Brain :MonoBehaviour
 {
@@ -23,84 +23,116 @@ public class Brain :MonoBehaviour
     public bool enableBrain;
     public bool debug=true;
     public bool maintainFactFile;
-    [SerializeField]
-    internal List<SensorConfiguration> sensorsConfigurations;
-    [SerializeField]
-    internal List<ActuatorConfiguration> actuatorsConfigurations;
+    public List<string> chosenSensorConfigurations;
+    public List<string> chosenActuatorConfigurations;
     private Thread executionThread;
-    private SolverExectuor embasp;
+    internal SolverExectuor embasp;
     internal bool solverWaiting;
+    [SerializeField,HideInInspector]
     internal string ASPFilePath;
+    [SerializeField,HideInInspector]
     internal string ASPFileTemplatePath;
-    private MethodInfo reasonerMethod;
+    internal MethodInfo reasonerMethod;
     private object triggerClass;
     public string executeReasonerOn;
     internal string sensorsMapping;
+    internal string objectsIndexes;
     private Stopwatch watch;
     internal long factsMSTotal;
     internal int factsStep;
     internal long asTotalMS;
     internal int asSteps;
+    internal string dataPath;
+    internal bool sensorsConfigurationsChanged;
+    internal bool actuatorsConfigurationsChanged;
+    [SerializeField]
+    internal bool prefabBrain;
+    [SerializeField]
+    internal bool specificASPFile;
+    [SerializeField]
+    internal bool globalASPFile;
+    private string originalName;
+    internal bool missingData;
 
     void Reset()
     {
-        triggerClass = Utility.triggerClass;
-        if(sensorsConfigurations is null)
+        if (GetComponent<IndexTracker>() == null)
         {
-            sensorsConfigurations = new List<SensorConfiguration>();
-            actuatorsConfigurations = new List<ActuatorConfiguration>();
+            gameObject.AddComponent<IndexTracker>();
         }
-        if (ASPFilePath is null)
+        MyDebugger.enabled = debug;
+        triggerClass = Utility.triggerClass;
+        dataPath = Environment.CurrentDirectory;
+        if (chosenActuatorConfigurations == null)
         {
-            ASPFilePath = @".\Assets\Resources\" + gameObject.name + ".asp";
+            chosenActuatorConfigurations = new List<string>();
+            chosenSensorConfigurations = new List<string>();
+        }
+        if (ASPFileTemplatePath is null)
+        {
             ASPFileTemplatePath = @".\Assets\Resources\" + gameObject.name + "Template.asp";
         }
         if(executeReasonerOn is null)
         {
             executeReasonerOn = "";
         }
+        if (!File.Exists(ASPFileTemplatePath))
+        {
+            if (!Directory.Exists(@".\Assets\Resources"))
+            {
+                Directory.CreateDirectory(@".\Assets\Resources");
+            }
+            File.Create(ASPFileTemplatePath);
+        }
     }
     void OnEnable()
     {
+        originalName = gameObject.name;
         Reset();
-    }
-    void Awake()
-    {
-        OnEnable();
     }
     void Start()
     {
+        Utility.loadPrefabs();
         if (Application.isPlaying && enableBrain)
         {
-            initBrain2();
+            StartCoroutine("initBrain2");
         }
-        
+
     }
    
     internal void generateFile()
     {
         using (FileStream fs = File.Create(ASPFileTemplatePath))
         {
-            foreach (ActuatorConfiguration actuatorConf in actuatorsConfigurations)
+            Byte[] info = new UTF8Encoding(true).GetBytes("%For runtime instantiated GameObject, only the prefab mapping is provided. Use that one substituting the gameobject name accordingly\n");
+            fs.Write(info, 0, info.Length);
+
+            foreach (ActuatorConfiguration actuatorConf in Utility.actuatorsManager.getConfigurations(chosenActuatorConfigurations))
             {
-                Byte[] info = new UTF8Encoding(true).GetBytes(actuatorConf.getAspTemplate());
+                info = new UTF8Encoding(true).GetBytes(actuatorConf.GetAspTemplate());
                 fs.Write(info, 0, info.Length);
             }
-            foreach (SensorConfiguration sensorConf in sensorsConfigurations)
+            foreach (SensorConfiguration sensorConf in Utility.sensorsManager.getConfigurations(chosenSensorConfigurations))
             {
-                Byte[] info = new UTF8Encoding(true).GetBytes(sensorConf.getAspTemplate());
+                info = new UTF8Encoding(true).GetBytes(sensorConf.GetAspTemplate());
                 fs.Write(info, 0, info.Length);
             }
         }
     }
 
-    void initBrain2()
+    IEnumerator initBrain2()
     {
-       
+        if(specificASPFile && originalName.Equals(gameObject.name))
+        {
+            yield return new WaitUntil( () => !originalName.Equals(gameObject.name));
+        }
         embasp = new SolverExectuor(this);
-        ////MyDebugger.MyDebug("creating sensors");
         prepareSensors();
         prepareActuators();
+        if (!someConfigurationAvailable())
+        {
+            missingData = true;
+        }
         if (!executeReasonerOn.Equals("When Sensors are ready"))
         {
             reasonerMethod = Utility.getTriggerMethod(executeReasonerOn);
@@ -111,6 +143,7 @@ public class Brain :MonoBehaviour
         }
         executionThread = new Thread(() =>
         {
+            //MyDebugger.MyDebug("starting thread");
             Thread.CurrentThread.Name = "Solver executor";
             Thread.CurrentThread.IsBackground = true;
             embasp.Run();
@@ -122,72 +155,70 @@ public class Brain :MonoBehaviour
 
     internal void removeNullSensorConfigurations()
     {
-        MyDebugger.MyDebug("removing null");
-        sensorsConfigurations.RemoveAll(x => (x == null||x is null));
+        chosenSensorConfigurations.RemoveAll(x => !Utility.sensorsManager.existsConfigurationWithName(x));
     }
     internal void removeNullActuatorConfigurations()
     {
-        actuatorsConfigurations.RemoveAll(x => x == null);
+        chosenActuatorConfigurations.RemoveAll(x => !Utility.actuatorsManager.existsConfigurationWithName(x,this));
     }
 
     private void prepareActuators()
     {
-        foreach (ActuatorConfiguration actuatorConfiguration in actuatorsConfigurations)
-        {
-            GameObject currentGameObject = actuatorConfiguration.gameObject;
-            MonoBehaviourActuatorsManager currentManager = currentGameObject.GetComponent<MonoBehaviourActuatorsManager>();
-            if (currentManager is null)
-            {
-                currentManager = currentGameObject.AddComponent<MonoBehaviourActuatorsManager>();
-            }
-            currentManager.instantiateActuator(actuatorConfiguration, this);
-            ////MyDebugger.MyDebug(conf.configurationName+" added");
-        }
-        
+        Utility.actuatorsManager.registerActuators(this, chosenActuatorConfigurations);
     }
 
     private void prepareSensors()
     {
-        foreach (SensorConfiguration sensorConfiguration in sensorsConfigurations)
-        {
-            GameObject currentGameObject = sensorConfiguration.gameObject;
-            MonoBehaviourSensorsManager currentManager = currentGameObject.GetComponent<MonoBehaviourSensorsManager>();
-            if (currentManager is null)
-            {
-                currentManager = currentGameObject.AddComponent<MonoBehaviourSensorsManager>();
-            }
-            //MyDebugger.MyDebug("configuration of the manager of " + conf.gOName + " game object: " + currentManager.configurations);
-            
-            currentManager.instantiateSensor(sensorConfiguration);
-        }
-        SensorsManager sensorManager = FindObjectOfType<SensorsManager>();
-        sensorManager.registerSensors(this, sensorsConfigurations);
+        Utility.sensorsManager.registerSensors(this, chosenSensorConfigurations);
     }
     private IEnumerator pulseOn()
     {
         while (true)
         {
-            yield return new WaitUntil(() => (bool)reasonerMethod.Invoke(triggerClass, null));
+            yield return new WaitUntil(() => solverWaiting && someConfigurationAvailable() && (bool)reasonerMethod.Invoke(triggerClass, null));
             lock (toLock)
             {
                 solverWaiting = false;
-                MyDebugger.MyDebug("Pulsing in brain");
                 Monitor.Pulse(toLock);
             }
         }
     }
-    
     void Update()
     {
+        if (reasonerMethod == null)
+        {
+            lock (toLock)
+            {
+                if (!someConfigurationAvailable())
+                {
+                    missingData = true;
+                    return;
+                }
+                if (solverWaiting)
+                {
+                    solverWaiting = false;
+                    Monitor.Pulse(toLock);
+                }
+            }
+        }
+    }
+
+    private bool someConfigurationAvailable()
+    {
+        return Utility.sensorsManager.isSomeActiveInScene(chosenSensorConfigurations) && Utility.actuatorsManager.isSomeActiveInScene(chosenActuatorConfigurations);
+    }
+
+    void LateUpdate()
+    {
         MyDebugger.enabled = debug;
-        if (reasonerMethod is null && SensorsManager.frameFromLastUpdate == 1)
+        /*if (reasonerMethod is null && SensorsManager.frameFromLastUpdate == -1)
         {
             lock (toLock)
             {
                 solverWaiting = false;
                 Monitor.Pulse(toLock);
             }
-        }
+        }*/
     }
 
     void OnApplicationQuit()

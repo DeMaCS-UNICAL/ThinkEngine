@@ -36,6 +36,11 @@ public class ActuatorConfigurationEditor : AbstractConfigurationEditor
 
     public override void OnInspectorGUI()
     {
+        if (Application.isPlaying)
+        {
+            DrawDefaultInspector();
+            return;
+        }
         GUI.enabled = false;
         EditorGUILayout.TextField("Trigger Script Path", Utility.triggerClassPath);
         GUI.enabled = true;
@@ -54,5 +59,9 @@ public class ActuatorConfigurationEditor : AbstractConfigurationEditor
         serializedObject.ApplyModifiedProperties();//CHECK SERIALIZATION
         base.OnInspectorGUI();
 
+    }
+    internal override bool existsConfigurationWithName(string configurationName)
+    {
+        return Utility.actuatorsManager.existsConfigurationWithName(configurationName);
     }
 }

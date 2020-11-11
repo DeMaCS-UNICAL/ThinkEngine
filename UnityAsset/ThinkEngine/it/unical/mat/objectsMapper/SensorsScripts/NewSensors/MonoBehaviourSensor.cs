@@ -29,7 +29,7 @@ public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
     void Awake()
     {
         //Debug.unityLogger.logEnabled = false;
-        myManager = FindObjectOfType<SensorsManager>();
+        myManager = Utility.sensorsManager;
         propertyValues = new List<IList>();
         indexes = new List<int>();
     }
@@ -62,8 +62,9 @@ public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
         {
             return;
         }
-        if (SensorsManager.frameFromLastUpdate==SensorsManager.updateFrequencyInFrames)
+        if (SensorsManager.frameFromLastUpdate>=SensorsManager.updateFrequencyInFrames)
         {
+            //MyDebugger.MyDebug("Updating");
             ReadProperty();
             if (propertyValues.Count == 101)
             {
@@ -78,7 +79,7 @@ public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
     {
         lock (toLock)
         {
-            if (property.Count==-1)
+            if (property.Count==1)
                 {
 
                     ReadSimplePropertyMethod(property[0], typeof(GameObject), gameObject);
@@ -135,6 +136,7 @@ public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
         }
         else
         {
+            GetComponent<MonoBehaviourSensorsManager>().removeSensor(this);
             Destroy(this);
             return;
         }
@@ -159,6 +161,7 @@ public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
         else
         {
             // MyDebugger.MyDebug("Destroing " + path);
+            GetComponent<MonoBehaviourSensorsManager>().removeSensor(this);
             Destroy(this);
             return;
         }
@@ -180,7 +183,7 @@ public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
 
     public string Map()
     {
-        List<string> myTemplate = getCorrespondingConfiguration().getTemplate(property);
+        List<string> myTemplate = getCorrespondingConfiguration().GetTemplate(property);
         string toReturn="";
         IMapper mapperForT;
         IList currentValuesList;
@@ -191,29 +194,31 @@ public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
             currentValuesList = propertyValues[0];
             currentValuesListType = currentValuesList.GetType().GetGenericArguments()[0];
             mapperForT  = MappingManager.getInstance().getMapper(currentValuesListType);
-            value = mapperForT.basicMap(Operation.compute(operationType, propertyValues));
-            return string.Format(myTemplate[0], value);
+            value = mapperForT.basicMap(Operation.compute(operationType, currentValuesList));
+            return string.Format(myTemplate[0], gameObject.GetComponent<IndexTracker>().currentIndex, value) + Environment.NewLine;
         }
+        
         if (propertyType.Equals("LIST") || propertyType.Equals("ARRAY2"))
         {
             object[] parameters;
             if (propertyType.Equals("LIST"))
             {
-                parameters = new object[2];
-                parameters[0] = indexes[0];
+                parameters = new object[3];
+                parameters[1] = indexes[0];
             }
             else
             {
-                parameters = new object[3];
-                parameters[0] = indexes[0];
-                parameters[1] = indexes[1];
+                parameters = new object[4];
+                parameters[1] = indexes[0];
+                parameters[2] = indexes[1];
             }
+            parameters[0] = gameObject.GetComponent<IndexTracker>().currentIndex;
             for (int i = 0; i < collectionElementProperties.Count; i++)
             {
                 currentValuesList = propertyValues[i];
                 currentValuesListType = currentValuesList.GetType().GetGenericArguments()[0];
                 mapperForT = MappingManager.getInstance().getMapper(currentValuesListType);
-                value = mapperForT.basicMap(propertyValues[i][propertyValues.Count - 1]);
+                value = mapperForT.basicMap(currentValuesList[currentValuesList.Count - 1]);
                 parameters[parameters.Length - 1] = value;
                 toReturn += string.Format(myTemplate[i], parameters) + Environment.NewLine;
             }

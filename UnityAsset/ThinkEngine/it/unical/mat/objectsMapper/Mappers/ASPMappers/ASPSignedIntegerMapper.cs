@@ -16,7 +16,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
 
         public string basicMap(object l)
         {
-            return "("+l+")";
+            return ""+l+"";
         }
 
         internal static IMapper getInstance()

@@ -121,7 +121,7 @@ public static class SensorsUtility
         string parentName = partialHierarchyProperty[0];
         MyListString child = partialHierarchyProperty.GetRange(1,partialHierarchyProperty.Count-1);
         MemberInfo[] members = objType.GetMember(parentName, SensorsUtility.BindingAttr);
-        MyDebugger.MyDebug("members with name " + parentName + " " + members.Length);
+        //MyDebugger.MyDebug("members with name " + parentName + " " + members.Length);
         if (members.Length == 0)
         {
             return ReadComponent(gameObject, property, partialHierarchyProperty, objType, obj, ReadSimpleProperty);
@@ -142,18 +142,18 @@ public static class SensorsUtility
     {
         string parentName = partialHierarchyProperty[0];
         MyListString child = partialHierarchyProperty.GetRange(1,partialHierarchyProperty.Count - 1);
-        MyDebugger.MyDebug("component " + property + " parent " + parentName + " child " + child+" goType "+gOType);
+        //MyDebugger.MyDebug("component " + property + " parent " + parentName + " child " + child+" goType "+gOType);
         if (gOType == typeof(GameObject))
         {
-            MyDebugger.MyDebug(gameObject.name + " is the GO");
-            foreach(Component c in gameObject.GetComponents(typeof(MonoBehaviour)))
+            //MyDebugger.MyDebug(gameObject.name + " is the GO");
+            foreach (Component c in gameObject.GetComponents(typeof(MonoBehaviour)))
             {
                 if (c.GetType().Name.Equals(parentName))
                 {
-                    MyDebugger.MyDebug("component " + c);
+                    //MyDebugger.MyDebug("component " + c);
                     if (child.Count==1)
                     {
-                        MyDebugger.MyDebug(" of type " + c.GetType());
+                        //MyDebugger.MyDebug(" of type " + c.GetType());
                         return ReadSimpleProperty(child[0], c.GetType(), c);
                     }
                     else

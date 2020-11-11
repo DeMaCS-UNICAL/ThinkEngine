@@ -8,27 +8,42 @@ using UnityEditor;
 using System.Collections;
 using System.Reflection;
 
-[ExecuteInEditMode]
+[ExecuteInEditMode, Serializable]
 public class ActuatorConfiguration : AbstractConfiguration
 {
     public Brain assignedTo;
     private object triggerClass;
     internal MethodInfo applyMethod;
 
-    new void OnEnable()
+    new void Reset()
     {
         triggerClass = Utility.triggerClass;
-        manager = FindObjectOfType<ActuatorsManager>();
-        if (manager is null)
-        {
-            manager = gameObject.AddComponent<ActuatorsManager>();
-            ((ActuatorsManager)manager).hideFlags = HideFlags.HideInInspector;
-        }
-        base.OnEnable();
+        base.Reset();
     }
-    internal override void ASPRep()
+    new void OnEnable()
     {
-        base.ASPRep();
+        Reset();
+    }
+
+    internal override void ConfigurationSaved(GameObjectsTracker tracker)
+    {
+        if (GetComponent<MonoBehaviourActuatorsManager>() == null)
+        {
+            gameObject.AddComponent<MonoBehaviourActuatorsManager>();
+        }
+        GetComponent<MonoBehaviourActuatorsManager>().addConfiguration(this);
+    }
+    
+    internal override void DeleteConfiguration()
+    {
+        if (saved)
+        {
+            GetComponent<MonoBehaviourActuatorsManager>().deleteConfiguration(this);
+        }
+    }
+    internal override void ASPRepresentation()
+    {
+        base.ASPRepresentation();
         foreach(MyListString property in aspTemplate.Keys)
         {
             for (int j = 0; j < aspTemplate[property].Count; j++)
@@ -38,13 +53,13 @@ public class ActuatorConfiguration : AbstractConfiguration
         }
     }
 
-    internal override string getAspTemplate()
+    internal override string GetAspTemplate()
     {
-        string original = base.getAspTemplate();
+        string original = base.GetAspTemplate();
         string toReturn = "";
         foreach(string line in original.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
         {
-            toReturn += "setOnActuator(" + line + "):-"+Environment.NewLine;
+            toReturn += line + ":-objectIndex("+configurationName+",X)"+Environment.NewLine;
         }
         return toReturn;
     }

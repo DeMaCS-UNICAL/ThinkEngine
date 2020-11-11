@@ -1,13 +1,12 @@
 ﻿using System;
 
-namespace EmbASP4Unity.it.unical.mat.embasp.languages
+namespace it.unical.mat.embasp.languages
 {
-	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-	public class Id : System.Attribute
-	{
-		internal string value;
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    public class Id : System.Attribute
+    {
+        internal string value;
 
-    public Id(String value) => this.value = value;
-  }
-
+        public Id(String value) => this.value = value;
+    }
 }

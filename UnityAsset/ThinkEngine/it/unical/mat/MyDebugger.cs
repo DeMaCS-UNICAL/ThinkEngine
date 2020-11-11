@@ -15,5 +15,7 @@ using UnityEngine;
         {
             Debug.Log(message);
         }
+        //Debug.Log(message);
+
     }
 }

@@ -10,6 +10,8 @@
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,19 +43,36 @@
   <PropertyGroup>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
+    <Reference Include="Antlr4.Runtime.Standard, Version=4.8.0.0, Culture=neutral, PublicKeyToken=e78b2c5abd1fcb3f, processorArchitecture=MSIL">
+      <HintPath>packages\Antlr4.Runtime.Standard.4.8.0\lib\net35\Antlr4.Runtime.Standard.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.11.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.Immutable, Version=1.2.5.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Collections.Immutable.1.7.1\lib\net461\System.Collections.Immutable.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="UnityEditor">
@@ -114,6 +133,9 @@
     <None Include=".vs\slnx.sqlite" />
     <None Include=".vs\VSWorkspaceState.json" />
     <None Include="app.manifest" />
+    <None Include="FodyWeavers.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -131,6 +153,10 @@
     <Compile Include="it\unical\mat\embasp\languages\asp\IllegalTermException.cs" />
     <Compile Include="it\unical\mat\embasp\languages\asp\PredicateNotValidException.cs" />
     <Compile Include="it\unical\mat\embasp\languages\asp\SymbolicConstant.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\datalog\DatalogInputProgram.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\datalog\DatalogMapper.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\datalog\MinimalModel.cs" />
+    <Compile Include="it\unical\mat\embasp\languages\datalog\MinimalModels.cs" />
     <Compile Include="it\unical\mat\embasp\languages\Id.cs" />
     <Compile Include="it\unical\mat\embasp\languages\IllegalAnnotationException.cs" />
     <Compile Include="it\unical\mat\embasp\languages\Mapper.cs" />
@@ -148,18 +174,20 @@
     <Compile Include="it\unical\mat\embasp\specializations\clingo\desktop\ClingoDesktopService.cs" />
     <Compile Include="it\unical\mat\embasp\specializations\dlv2\desktop\DLV2DesktopService.cs" />
     <Compile Include="it\unical\mat\embasp\specializations\dlv2\DLV2AnswerSets.cs" />
+    <Compile Include="it\unical\mat\embasp\specializations\dlvhex\desktop\DLVHEXDesktopService.cs" />
+    <Compile Include="it\unical\mat\embasp\specializations\dlvhex\DLVHEXAnswerSets.cs" />
     <Compile Include="it\unical\mat\embasp\specializations\dlv\desktop\DLVDesktopService.cs" />
     <Compile Include="it\unical\mat\embasp\specializations\dlv\DLVAnswerSets.cs" />
     <Compile Include="it\unical\mat\embasp\specializations\dlv\DLVFilterOption.cs" />
+    <Compile Include="it\unical\mat\embasp\specializations\idlv\desktop\IDLVDesktopService.cs" />
+    <Compile Include="it\unical\mat\embasp\specializations\idlv\IDLVMinimalModels.cs" />
     <Compile Include="it\unical\mat\embasp\specializations\solver_planning_domains\desktop\SPDDesktopService.cs" />
     <Compile Include="it\unical\mat\embasp\specializations\solver_planning_domains\SPDPlan.cs" />
     <Compile Include="it\unical\mat\embasp\specializations\solver_planning_domains\SPDUtility.cs" />
-    <Compile Include="it\unical\mat\embasp\unity\AIManager.cs" />
     <Compile Include="it\unical\mat\MyDebugger.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\MonoBehaviourActuator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\MonoBehaviourActuatorsManager.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\SimpleActuator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Brain.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\SolverExecutor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\AbstractConfigurationEditor.cs" />
@@ -169,7 +197,6 @@
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\BrainEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\SensorConfiguratorEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\GlobalIndexer.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\IManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\IndexTracker.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPMapperHelper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPBoolMapper.cs" />
@@ -181,12 +208,64 @@
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPUnsignedIntegerMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\MappingManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\MyListString.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\PrefabTracker.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\NewSensors\IMonoBehaviourSensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\NewSensors\MonoBehaviourSensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\NewSensors\MonoBehaviourSensorsManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\NewSensors\SensorsUtility.cs" />
     <Compile Include="it\unical\mat\objectsMapper\TestingAddMonobehaviour.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\ASPParser.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\ASPSolversParser.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\asp_parser_base\ASPGrammarBaseVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\asp_parser_base\ASPGrammarLexer.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\asp_parser_base\ASPGrammarParser.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\asp_parser_base\ASPGrammarVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\clingo\ClingoLexer.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\clingo\ClingoParser.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\clingo\ClingoParserBaseVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\clingo\ClingoParserBaseVisitorImplementation.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\clingo\ClingoParserVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\dlv2\DLV2Lexer.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\dlv2\DLV2Parser.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\dlv2\DLV2ParserBaseVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\dlv2\DLV2ParserBaseVisitorImplementation.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\dlv2\DLV2ParserVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\dlvhex\DLVHEXLexer.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\dlvhex\DLVHEXParser.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\dlvhex\DLVHEXParserBaseVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\dlvhex\DLVHEXParserBaseVisitorImplementation.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\dlvhex\DLVHEXParserVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\dlv\DLVLexer.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\dlv\DLVParser.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\dlv\DLVParserBaseVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\dlv\DLVParserBaseVisitorImplementation.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\dlv\DLVParserVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\asp\IASPDataCollection.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\datalog\DatalogParser.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\datalog\DatalogSolversParser.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\datalog\datalog_parser_base\DatalogGrammarBaseVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\datalog\datalog_parser_base\DatalogGrammarLexer.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\datalog\datalog_parser_base\DatalogGrammarParser.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\datalog\datalog_parser_base\DatalogGrammarVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\datalog\IDatalogDataCollection.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\datalog\idlv\IDLVLexer.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\datalog\idlv\IDLVParser.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\datalog\idlv\IDLVParserBaseVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\datalog\idlv\IDLVParserBaseVisitorImplementation.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\datalog\idlv\IDLVParserVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\pddl\IPDDLDataCollection.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\pddl\PDDLParser.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\pddl\PDDLSolversParser.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\pddl\pddl_parser_base\PDDLGrammarBaseVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\pddl\pddl_parser_base\PDDLGrammarLexer.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\pddl\pddl_parser_base\PDDLGrammarParser.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\pddl\pddl_parser_base\PDDLGrammarVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\pddl\solver_planning_domains\SPDGrammarBaseVisitor.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\pddl\solver_planning_domains\SPDGrammarBaseVisitorImplementation.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\pddl\solver_planning_domains\SPDGrammarLexer.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\pddl\solver_planning_domains\SPDGrammarParser.cs" />
+    <Compile Include="it\unical\mat\embasp\parsers\pddl\solver_planning_domains\SPDGrammarVisitor.cs" />
     <Compile Include="it\unical\mat\Performance.cs" />
     <Compile Include="it\unical\mat\objectsMapper\FieldOrProperty.cs" />
     <Compile Include="it\unical\mat\objectsMapper\GameObjectsTracker.cs" />

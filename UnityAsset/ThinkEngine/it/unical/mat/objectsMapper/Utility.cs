@@ -11,10 +11,15 @@ using UnityEngine;
 
 public static class Utility
 {
+    private static bool prefabsLoaded = false;
     private static string _triggerClassPath= @".\Assets\Scripts\Trigger.cs";
     private static MethodInfo[] _triggerMethods;
     private static List<string> _triggerMethodsToShow;
     internal static object _triggerClass;
+    private static GameObject _hiddenGameObject;
+    private static bool _managersDestroyed;
+    private static SensorsManager _sensorsManager;
+    private static ActuatorsManager _actuatorsManager;
     internal static List<string> triggerMethodsToShow
     {
         get
@@ -41,7 +46,60 @@ public static class Utility
             _triggerClass = value;
         }
     }
-
+    internal static GameObject hiddenGameObject
+    {
+        get
+        {
+            if (_hiddenGameObject == null)
+            {
+                _hiddenGameObject = GameObject.Find("Utility");
+                if (_hiddenGameObject==null)
+                {
+                    _hiddenGameObject = new GameObject("Utility");
+                    //_hiddenGameObject.hideFlags = HideFlags.HideInHierarchy & HideFlags.HideInInspector;
+                }
+            }
+            return _hiddenGameObject;
+        }
+    }
+    internal static bool managersDestroyed
+    {
+        get
+        {
+            return SensorsManager.destroyed || ActuatorsManager.destroyed;
+        }
+    }
+    internal static SensorsManager sensorsManager
+    {
+        get
+        {
+            if (_sensorsManager == null)
+            {
+                _sensorsManager = hiddenGameObject.GetComponent<SensorsManager>();
+                if (_sensorsManager == null)
+                {
+                    Debug.Log("i'm trying to add a sensorsmanager");
+                    _sensorsManager = hiddenGameObject.AddComponent<SensorsManager>();
+                }
+            }
+            return _sensorsManager;
+        }
+    }
+    internal static ActuatorsManager actuatorsManager
+    {
+        get
+        {
+            if (_actuatorsManager == null)
+            {
+                _actuatorsManager = hiddenGameObject.GetComponent<ActuatorsManager>();
+                if (_actuatorsManager == null)
+                {
+                    _actuatorsManager = hiddenGameObject.AddComponent<ActuatorsManager>();
+                }
+            }
+            return _actuatorsManager;
+        }
+    }
     internal static int getTriggerMethodIndex(string name)
     {
         int index = triggerMethodsToShow.IndexOf(name);
@@ -67,7 +125,7 @@ public static class Utility
 
     private static List<string> findMethodsToShow()
     {
-        _triggerMethods = triggerClass.GetType().GetMethods(BindingFlags.DeclaredOnly);
+        _triggerMethods = triggerClass.GetType().GetMethods();
         List<string> toReturn = new List<string>();
 
         foreach (MethodInfo mI in _triggerMethods)
@@ -121,6 +179,14 @@ public static class Utility
             fs.Write(info, 0, info.Length);
         }
         AssetDatabase.Refresh();
+    }
+
+    internal static void loadPrefabs()
+    {
+        if (!prefabsLoaded)
+        {
+            Resources.LoadAll<GameObject>("Prefabs");
+        }
     }
 }
 
