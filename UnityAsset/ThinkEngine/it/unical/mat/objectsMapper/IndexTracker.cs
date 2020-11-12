@@ -10,7 +10,7 @@ using UnityEngine;
 class IndexTracker:MonoBehaviour
 {
     public int currentIndex=-1;
-
+    public List<string> testing = new List<string>();
     void Start()
     {
         currentIndex = GlobalIndexer.assignIndex();

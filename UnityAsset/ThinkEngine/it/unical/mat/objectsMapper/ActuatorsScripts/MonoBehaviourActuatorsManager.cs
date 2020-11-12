@@ -74,7 +74,7 @@ public class MonoBehaviourActuatorsManager:MonoBehaviour
     {
         foreach (ActuatorConfiguration configuration in GetComponents<ActuatorConfiguration>())
         {
-            if (configuration.configurationName.Equals(name))
+            if (configuration.saved && configuration.configurationName.Equals(name))
             {
                 return configuration;
             }

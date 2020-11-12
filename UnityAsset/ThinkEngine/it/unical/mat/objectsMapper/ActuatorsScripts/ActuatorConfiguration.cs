@@ -15,17 +15,16 @@ public class ActuatorConfiguration : AbstractConfiguration
     private object triggerClass;
     internal MethodInfo applyMethod;
 
+    void OnEnable()
+    {
+        base.Reset();
+        triggerClass = Utility.triggerClass;
+    }
     new void Reset()
     {
-        triggerClass = Utility.triggerClass;
-        base.Reset();
+        OnEnable();
     }
-    new void OnEnable()
-    {
-        Reset();
-    }
-
-    internal override void ConfigurationSaved(GameObjectsTracker tracker)
+    protected override void ConfigurationSaved(GameObjectsTracker tracker)
     {
         if (GetComponent<MonoBehaviourActuatorsManager>() == null)
         {

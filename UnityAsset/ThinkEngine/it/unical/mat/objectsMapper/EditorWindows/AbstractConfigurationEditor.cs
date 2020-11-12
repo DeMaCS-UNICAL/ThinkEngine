@@ -223,7 +223,6 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                                 helpScroll = new Vector2(0, 0);
                                 if (!tracker.basicTypeCollectionsConfigurations.ContainsKey(obj))
                                 {
-                                    MyDebugger.MyDebug("adding simple tracker for " + objectToConfigure.Name() + " that is a " + objectToConfigure.Type());
                                     tracker.basicTypeCollectionsConfigurations.Add(obj, new SimpleGameObjectsTracker(objectToConfigure.Type()));
                                 }
                                 tracker.basicTypeCollectionsConfigurations[obj].getBasicProperties();

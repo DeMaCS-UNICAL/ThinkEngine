@@ -249,12 +249,10 @@ public class GameObjectsTracker
     internal void updateDataStructures(object parentObject, AbstractConfiguration configuration, MyListString currentPropertyHierarchy)
     {
         //MyDebugger.MyDebug("updating " + parent);
-        
         List<FieldOrProperty> fieldsAndProperties = GetFieldsAndProperties(parentObject);
         ObjectsProperties.Add(parentObject, new Dictionary<string, FieldOrProperty>());
         //MyDebugger.MyDebug("Adding derived from fields entry");
         ObjectDerivedFromFields.Add(parentObject, new Dictionary<string, object>());
-        
         foreach (FieldOrProperty currentProperty in fieldsAndProperties)
         {
             //MyDebugger.MyDebug("Property " + ob.Name());
@@ -295,6 +293,8 @@ public class GameObjectsTracker
                     {
                         foreach (SimpleGameObjectsTracker currentSimpleTracker in configuration.advancedConf)
                         {
+                            Debug.Log("advanced conf has a property?");
+                            Debug.Log(currentSimpleTracker.propertyName);
                             if (currentSimpleTracker.propertyName.Equals(newLayerPropertyHierarchy))
                             {
                                 //st.objType = ob.Type().GetElementType().ToString();

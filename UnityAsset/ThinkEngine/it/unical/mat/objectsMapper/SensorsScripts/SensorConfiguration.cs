@@ -15,11 +15,7 @@ public class SensorConfiguration : AbstractConfiguration
     [SerializeField]
     internal List<ListOfStringStringPair> specificValuePerProperty;
 
-    new void OnEnable()
-    {
-        Reset();
-    }
-    new void Reset()
+    void OnEnable()
     {
         base.Reset();
         if (operationPerProperty is null)
@@ -32,7 +28,11 @@ public class SensorConfiguration : AbstractConfiguration
             specificValuePerProperty = new List<ListOfStringStringPair>();
         }
     }
-    internal override void ConfigurationSaved(GameObjectsTracker tracker)
+    new void Reset()
+    {
+        OnEnable();
+    }
+    protected override void ConfigurationSaved(GameObjectsTracker tracker)
     {
         if(GetComponent<MonoBehaviourSensorsManager>() == null)
         {

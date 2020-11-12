@@ -200,7 +200,7 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
     {
         foreach(SensorConfiguration configuration in GetComponents<SensorConfiguration>())
         {
-            if (configuration.configurationName.Equals(name))
+            if (configuration.saved && configuration.configurationName.Equals(name))
             {
                 return configuration;
             }
