@@ -3,172 +3,188 @@ using System.Collections.Generic;
 using UnityEngine;
 using EmbASP4Unity.it.unical.mat.objectsMapper;
 using System.Linq;
-
+//this class manage the logic behind the inspector graphic of a configuration
 public class GameObjectsTracker
 {
-
-     public GameObject GO { get; set; }
-     public Dictionary<object, bool> ObjectsToggled { get; set; }
-     public Dictionary<object, KeyValuePair<object,string>> ObjectsOwners { get; set; }
-     public Dictionary<object, Dictionary<string, object>> ObjectDerivedFromFields { get; set; }
-     public Dictionary<object, Dictionary<string, FieldOrProperty>> ObjectsProperties { get; set; }
-     public Dictionary<GameObject, List<Component>> GOComponents { get; set; }
-     public Dictionary<object, string> propertiesName { get; set; }
-     public string configurationName = "";
-     public Dictionary<object, SimpleGameObjectsTracker> basicTypeCollectionsConfigurations; //configuration for T type fot T[],T[,], List<T> etc.
-
-    public Dictionary<FieldOrProperty, int> operationPerProperty { get; set; }
-     public Dictionary<FieldOrProperty, string> specificValuePerProperty { get; set; }
-
-   
-
-    
+    public GameObject gameObject; //the root gameObject being tracked (the one to which a configuration is attached
+    public Dictionary<object, bool> objectsToggled; //it saves the information of being toggled in the inspector for all the fields/properties of the gameObject hierarchy
+    public Dictionary<object, KeyValuePair<object, string>> objectsOwners;//for each field/property istantiation stores the first parent property object
+    public Dictionary<object, Dictionary<string, object>> objectDerivedFromFields;//for each object instantiation of the hierarchy stores the actual istantiation of its fileds/properties
+    public Dictionary<object, Dictionary<string, FieldOrProperty>> objectsProperties;//for each object instantiation of the hierarchy stores the FieldOrProperty corresposnding to te respective field/property
+    public Dictionary<GameObject, List<Component>> gameObjectsComponents;//for each gameObject in the hierarchy of the root stores a list of its components
+    public Dictionary<object, string> propertiesName;//Feature not completed: this should store a chosen name for a specific property in the hierarchy
+    public string configurationName = "";//name of the configuration associated to the tracker
+    public Dictionary<object, SimpleGameObjectsTracker> basicTypeCollectionsConfigurations; //configuration for T type for T[],T[,], List<T> etc.
+    public Dictionary<FieldOrProperty, int> operationPerProperty;//for each property chosen, it stores which aggregate to use while generating the input facts for the ASP solver
+    public Dictionary<FieldOrProperty, string> specificValuePerProperty;//a specialization of the above one (you want to check if a specific value is present in the data series collected)
 
     public List<Component> GetComponents(GameObject gO)
     {
         return ReflectionExecutor.GetComponents(gO);
     }
-
     public bool IsBaseType(FieldOrProperty obj)
     {
         return ReflectionExecutor.IsBaseType(obj);
     }
-
     public List<FieldOrProperty> GetFieldsAndProperties(object gO)
     {
         return ReflectionExecutor.GetFieldsAndProperties(gO);
     }
-    
-
-    internal void updateDataStructures(int objectIndex, AbstractConfiguration configuration)
+    internal void UpdateDataStructures(AbstractConfiguration configuration)
     {
-        
-        if (objectIndex != -1)
+        #region Exceptions
+        if (configuration == null)
         {
-            configurationName = "";
-            GO = GetGameObject(objectIndex);
+            throw new Exception("Cannot update data structure for a null configuration.");
         }
-        else
+        if (configuration.configurationName == null || configuration.configurationName.Equals(""))
         {
-            GO = configuration.gameObject;
-            configurationName = configuration.configurationName;
-
+            throw new Exception("A configuration name cannot be null or empty.");
         }
-        cleanDataStructures();
-        List<FieldOrProperty> fieldsAndProperties = GetFieldsAndProperties(GO);
-        ObjectsProperties.Add(GO, new Dictionary<string, FieldOrProperty>());        
-        ObjectDerivedFromFields.Add(GO, new Dictionary<string, object>());
+        #endregion
+        gameObject = configuration.gameObject;
+        configurationName = configuration.configurationName;
+        CleanDataStructures();
+        objectsProperties.Add(gameObject, new Dictionary<string, FieldOrProperty>());
+        objectDerivedFromFields.Add(gameObject, new Dictionary<string, object>());
+        List<FieldOrProperty> fieldsAndProperties = GetFieldsAndProperties(gameObject);//retrieve all the field and properties of the parentObject
         foreach (FieldOrProperty currentFieldOrProperty in fieldsAndProperties)
         {
-            object gOValueForCurrentProperty;
-            try
-            {
-                gOValueForCurrentProperty = currentFieldOrProperty.GetValue(GO);
-            }
-            catch (Exception e)
-            {
-                
-                gOValueForCurrentProperty = null;
-            }
-            ObjectsProperties[GO].Add(currentFieldOrProperty.Name(), currentFieldOrProperty);
-            if (gOValueForCurrentProperty != null && !IsMappable(currentFieldOrProperty)) 
-            {
-                if (!ObjectsOwners.ContainsKey(gOValueForCurrentProperty))
-                {
-                    ObjectsOwners.Add(gOValueForCurrentProperty, new KeyValuePair<object, string>(GO,currentFieldOrProperty.Name()));
-                }
-
-            }
-
-            ObjectDerivedFromFields[GO].Add(currentFieldOrProperty.Name(), gOValueForCurrentProperty);
-            if (!ObjectsToggled.ContainsKey(currentFieldOrProperty))
-            {
-                if (configuration!= null && checkIfPropertyIsToToggle(configuration.properties, currentFieldOrProperty.Name()))
-                {
-                    //MyDebugger.MyDebug(obj.Name() + " found.");
-                    ObjectsToggled.Add(currentFieldOrProperty, true);
-                    MyListString currentPropertyHierarchy = new MyListString();
-                    currentPropertyHierarchy.Add(currentFieldOrProperty.Name());
-                    if (!IsMappable(currentFieldOrProperty) && gOValueForCurrentProperty != null)
-                    {
-                        // MyDebugger.MyDebug("calling update");
-                        updateDataStructures(gOValueForCurrentProperty, configuration, currentPropertyHierarchy);
-                    }
-                    else
-                    {
-                        if(IsMappable(currentFieldOrProperty) && !IsBaseType(currentFieldOrProperty))
-                        {
-                            foreach (SimpleGameObjectsTracker currentSimpleTracker in configuration.advancedConf) {
-                                if (currentSimpleTracker.propertyName.Equals(currentPropertyHierarchy))
-                                {
-                                    //st.objType = obj.Type().GetElementType().ToString();
-                                    basicTypeCollectionsConfigurations.Add(currentFieldOrProperty, currentSimpleTracker);
-                                    //MyDebugger.MyDebug("Adding st for " + obj.Name() + " whit type " + st.objType);
-                                    break;
-                                }
-                            }
-                        }
-                        if (configuration.GetType() == typeof(SensorConfiguration))
-                        {
-                            foreach (ListOfStringIntPair pair in ((SensorConfiguration)configuration).operationPerProperty)
-                            {
-                                if (pair.Key[0].Equals(currentFieldOrProperty.Name()))
-                                {
-                                    operationPerProperty.Add(currentFieldOrProperty, pair.Value);
-                                    if (pair.Value == Operation.SPECIFIC)
-                                    {
-                                        foreach (ListOfStringStringPair pair2 in ((SensorConfiguration)configuration).specificValuePerProperty)
-                                        {
-                                            if (pair2.Key[0].Equals(currentFieldOrProperty.Name()))
-                                            {
-                                                specificValuePerProperty.Add(currentFieldOrProperty, pair2.Value);
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    ObjectsToggled.Add(currentFieldOrProperty, false);
-                }
-            }
+            MyListString currentPropertyHierarchy = new MyListString();
+            UpdateDirectProperty(configuration, gameObject,currentFieldOrProperty, currentPropertyHierarchy);
         }
-        GOComponents.Add(GO, GetComponents(GO));
-        foreach (Component component in GOComponents[GO])
+        gameObjectsComponents.Add(gameObject, GetComponents(gameObject));
+        foreach (Component component in gameObjectsComponents[gameObject])
         {
-            if (configuration != null && checkIfPropertyIsToToggle(configuration.properties, component.GetType().ToString()))
+            MyListString currentPropertyHierarchy = new MyListString();
+            UpdateComponent(configuration, component, currentPropertyHierarchy);
+        }
+    }
+    internal void UpdateDataStructures(object parentObject, AbstractConfiguration configuration, MyListString currentPropertyHierarchy)
+    {
+        objectsProperties.Add(parentObject, new Dictionary<string, FieldOrProperty>());
+        objectDerivedFromFields.Add(parentObject, new Dictionary<string, object>());
+        List<FieldOrProperty> fieldsAndProperties = GetFieldsAndProperties(parentObject);
+        foreach (FieldOrProperty currentProperty in fieldsAndProperties)
+        {
+            MyListString newLayerPropertyHierarchy = currentPropertyHierarchy.GetClone();
+            UpdateDirectProperty(configuration, parentObject,currentProperty, newLayerPropertyHierarchy);
+        }
+        if (parentObject.GetType() == typeof(GameObject))
+        {
+            gameObjectsComponents[(GameObject)parentObject] = GetComponents((GameObject)parentObject);
+            foreach (Component component in gameObjectsComponents[(GameObject)parentObject])
             {
-                //MyDebugger.MyDebug("component "+c+" name "+c.name+" type "+c.GetType());
-                ObjectsToggled.Add(component, true);
-                MyListString currentPropertyHierarchy = new MyListString();
-                currentPropertyHierarchy.Add(component.GetType().ToString());
-                updateDataStructures(component, configuration, currentPropertyHierarchy);
-                
-            }
-            else
-            {
-                ObjectsToggled.Add(component, false);
+                MyListString newLayerPropertyHierarchy = currentPropertyHierarchy.GetClone();
+                UpdateComponent(configuration, component, newLayerPropertyHierarchy);
             }
         }
     }
-
-    private bool checkIfPropertyIsToToggle(List<MyListString> properties, MyListString currentPropertyHierarchy, string latterLevelProperty)
+    private void UpdateDirectProperty(AbstractConfiguration configuration, object parentObject, FieldOrProperty currentFieldOrProperty, MyListString currentPropertyHierarchy)
     {
-        
-       //MyDebugger.MyDebug(configurationName+": checking: " + currentPropertyHierarchy +"^"+ latterLevelProperty);
-        if (properties is null || properties.Count == 0)
+        object parentObjectValueForCurrentProperty = PropertyValueAndOwner(currentFieldOrProperty,parentObject);
+        objectDerivedFromFields[parentObject].Add(currentFieldOrProperty.Name(), parentObjectValueForCurrentProperty);
+        if (!objectsToggled.ContainsKey(currentFieldOrProperty))
+        {
+            if (configuration != null && CheckIfPropertyIsToToggle(configuration.properties, currentPropertyHierarchy, currentFieldOrProperty.Name()))
+            {
+                objectsToggled.Add(currentFieldOrProperty, true);
+                currentPropertyHierarchy.Add(currentFieldOrProperty.Name());
+                if (!IsMappable(currentFieldOrProperty) && parentObjectValueForCurrentProperty != null)
+                {
+                    UpdateDataStructures(parentObjectValueForCurrentProperty, configuration, currentPropertyHierarchy);
+                }
+                else
+                {
+                    ConfigureMappableProperty(configuration, currentFieldOrProperty, currentPropertyHierarchy);
+                }
+            }
+            else
+            {
+                objectsToggled.Add(currentFieldOrProperty, false);
+            }
+        }
+    }
+    private void UpdateComponent(AbstractConfiguration configuration, Component component, MyListString currentPropertyHierarchy)
+    {
+        if (configuration != null && CheckIfPropertyIsToToggle(configuration.properties, currentPropertyHierarchy, component.GetType().ToString()))
+        {
+            objectsToggled.Add(component, true);
+            currentPropertyHierarchy.Add(component.GetType().ToString());
+            UpdateDataStructures(component, configuration, currentPropertyHierarchy);
+        }
+        else
+        {
+            objectsToggled.Add(component, false);
+        }
+    }
+    private void ConfigureMappableProperty(AbstractConfiguration configuration, FieldOrProperty currentFieldOrProperty, MyListString currentPropertyHierarchy)
+    {
+        if (IsMappable(currentFieldOrProperty) && !IsBaseType(currentFieldOrProperty))
+        {
+            foreach (SimpleGameObjectsTracker currentSimpleTracker in configuration.advancedConf)
+            {
+                if (currentSimpleTracker.propertyName.Equals(currentPropertyHierarchy))
+                {
+                    basicTypeCollectionsConfigurations.Add(currentFieldOrProperty, currentSimpleTracker);
+                    break;
+                }
+            }
+        }
+        if (configuration.GetType() == typeof(SensorConfiguration))
+        {
+            foreach (ListOfStringIntPair currentOperationPerProperty in ((SensorConfiguration)configuration).operationPerProperty)
+            {
+                if (currentOperationPerProperty.Key[0].Equals(currentPropertyHierarchy))
+                {
+                    operationPerProperty.Add(currentFieldOrProperty, currentOperationPerProperty.Value);
+                    if (currentOperationPerProperty.Value == Operation.SPECIFIC)
+                    {
+                        foreach (ListOfStringStringPair currentSpecificValue in ((SensorConfiguration)configuration).specificValuePerProperty)
+                        {
+                            if (currentSpecificValue.Key[0].Equals(currentPropertyHierarchy))
+                            {
+                                specificValuePerProperty.Add(currentFieldOrProperty, currentSpecificValue.Value);
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    private object PropertyValueAndOwner(FieldOrProperty currentFieldOrProperty, object parentObject)
+    {
+        object parentObjectValueForCurrentProperty;
+        try
+        {
+            parentObjectValueForCurrentProperty = currentFieldOrProperty.GetValue(parentObject);//if the field/property is not istatiated, this throws an exception
+        }
+        catch
+        {
+            parentObjectValueForCurrentProperty = null;
+        }
+        objectsProperties[parentObject].Add(currentFieldOrProperty.Name(), currentFieldOrProperty);
+        if (parentObjectValueForCurrentProperty != null && !currentFieldOrProperty.Type().IsValueType) //if it is not a value type keep only the first parent that has been met.
+        {
+            if (!objectsOwners.ContainsKey(parentObjectValueForCurrentProperty))
+            {
+                objectsOwners.Add(parentObjectValueForCurrentProperty, new KeyValuePair<object, string>(parentObject, currentFieldOrProperty.Name()));
+            }
+
+        }
+
+        return parentObjectValueForCurrentProperty;
+    }
+    private bool CheckIfPropertyIsToToggle(List<MyListString> properties, MyListString currentPropertyHierarchy, string latterLevelProperty)
+    {
+        if (properties is null)
         {
             return false;
         }
         foreach (MyListString property in properties)
         {
-
-            //MyDebugger.MyDebug("comparing with " + property);
             if (property.Count <= currentPropertyHierarchy.Count)
             {
                 continue;
@@ -192,198 +208,21 @@ public class GameObjectsTracker
         }
         return false;
     }
-    private bool checkIfPropertyIsToToggle(List<MyListString> properties, string firstLevelProperty)
-    {
-        //MyDebugger.MyDebug(configurationName + ": checking: " + firstLevelProperty);
-        if (properties is null || properties.Count == 0)
-        {
-            //MyDebugger.MyDebug("return");
-            return false;
-        }
-        foreach(MyListString property in properties)
-        {
-           // MyDebugger.MyDebug("comparing with "+property);
-            if (property.Count>0 && property[0].Equals(firstLevelProperty))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private GameObject GetGameObject(int objectIndex)
-    {
-        foreach(IndexTracker gameObj in Resources.FindObjectsOfTypeAll<IndexTracker>())
-        {
-            if (gameObj.currentIndex == objectIndex)
-            {
-                return gameObj.gameObject;
-            }
-        }
-        return null;
-    }
-
     public bool IsMappable(FieldOrProperty obj)
     {
         return ReflectionExecutor.isMappable(obj); 
     }
-
-    public int IsArrayOfRank(FieldOrProperty obj)
+    public void CleanDataStructures()
     {
-        return ReflectionExecutor.isArrayOfRank(obj);
-    }
-
-    public void cleanDataStructures()
-    {
-        ObjectsProperties = new Dictionary<object, Dictionary<string, FieldOrProperty>>();
-        GOComponents = new Dictionary<GameObject, List<Component>>();
-        ObjectsOwners = new Dictionary<object, KeyValuePair<object,string>>();
-        ObjectsToggled = new Dictionary<object, bool>();
-        ObjectDerivedFromFields = new Dictionary<object, Dictionary<string, object>>();
+        objectsProperties = new Dictionary<object, Dictionary<string, FieldOrProperty>>();
+        gameObjectsComponents = new Dictionary<GameObject, List<Component>>();
+        objectsOwners = new Dictionary<object, KeyValuePair<object,string>>();
+        objectsToggled = new Dictionary<object, bool>();
+        objectDerivedFromFields = new Dictionary<object, Dictionary<string, object>>();
         propertiesName = new Dictionary<object, string>();
         specificValuePerProperty = new Dictionary<FieldOrProperty, string>();
         operationPerProperty = new Dictionary<FieldOrProperty, int>();
         basicTypeCollectionsConfigurations = new Dictionary<object, SimpleGameObjectsTracker>();
     }
-
-    internal void updateDataStructures(object parentObject, AbstractConfiguration configuration, MyListString currentPropertyHierarchy)
-    {
-        //MyDebugger.MyDebug("updating " + parent);
-        List<FieldOrProperty> fieldsAndProperties = GetFieldsAndProperties(parentObject);
-        ObjectsProperties.Add(parentObject, new Dictionary<string, FieldOrProperty>());
-        //MyDebugger.MyDebug("Adding derived from fields entry");
-        ObjectDerivedFromFields.Add(parentObject, new Dictionary<string, object>());
-        foreach (FieldOrProperty currentProperty in fieldsAndProperties)
-        {
-            //MyDebugger.MyDebug("Property " + ob.Name());
-            object parentObjectValueForCurrentProperty;
-            try
-            {
-                parentObjectValueForCurrentProperty = currentProperty.GetValue(parentObject);
-            }
-            catch (Exception e)
-            {
-                //MyDebugger.MyDebug("cannot get value for property " + ob.Name());
-                parentObjectValueForCurrentProperty = null;
-            }
-            ObjectsProperties[parentObject].Add(currentProperty.Name(), currentProperty);
-            //MyDebugger.MyDebug("complete name " + parent + "^" + ob.Name());
-            if (parentObjectValueForCurrentProperty != null) 
-            {
-                if (!ObjectsOwners.ContainsKey(parentObjectValueForCurrentProperty))
-                {
-                    ObjectsOwners.Add(parentObjectValueForCurrentProperty, new KeyValuePair<object, string>(parentObject, currentProperty.Name()));
-                }
-                //MyDebugger.MyDebug(ob.Name() + " owner is " + ObjectsOwners[objValueForOb]+"and its value is "+objValueForOb);
-
-            }
-            if (configuration!=null && checkIfPropertyIsToToggle(configuration.properties, currentPropertyHierarchy, currentProperty.Name()))
-            {
-                //MyDebugger.MyDebug("s contains " + parent + "^" + ob.Name());   
-                ObjectsToggled.Add(currentProperty, true);
-                MyListString newLayerPropertyHierarchy = currentPropertyHierarchy.GetClone();
-                newLayerPropertyHierarchy.Add(currentProperty.Name());
-                if (!IsMappable(currentProperty) && parentObjectValueForCurrentProperty != null)
-                {
-                    updateDataStructures(parentObjectValueForCurrentProperty, configuration, newLayerPropertyHierarchy);
-                }
-                else
-                {
-                    if (IsMappable(currentProperty) && !IsBaseType(currentProperty))
-                    {
-                        foreach (SimpleGameObjectsTracker currentSimpleTracker in configuration.advancedConf)
-                        {
-                            Debug.Log("advanced conf has a property?");
-                            Debug.Log(currentSimpleTracker.propertyName);
-                            if (currentSimpleTracker.propertyName.Equals(newLayerPropertyHierarchy))
-                            {
-                                //st.objType = ob.Type().GetElementType().ToString();
-                                //MyDebugger.MyDebug("Adding st for " + ob.Name() + " whit type " + st.objType);
-                                basicTypeCollectionsConfigurations.Add(currentProperty, currentSimpleTracker);
-                                break;
-                            }
-                        }
-                    }
-                    if (configuration.GetType() == typeof(SensorConfiguration))
-                    {
-                        foreach (ListOfStringIntPair currentOperationPerProperty in ((SensorConfiguration)configuration).operationPerProperty)
-                        {
-                            if (currentOperationPerProperty.Key.Equals(newLayerPropertyHierarchy))
-                            {
-                                operationPerProperty.Add(currentProperty, currentOperationPerProperty.Value);
-                                if (currentOperationPerProperty.Value == Operation.SPECIFIC)
-                                {
-                                    foreach (ListOfStringStringPair currentSpecificValue in ((SensorConfiguration)configuration).specificValuePerProperty)
-                                    {
-                                        if (currentSpecificValue.Key.Equals(newLayerPropertyHierarchy))
-                                        {
-                                            specificValuePerProperty.Add(currentProperty, currentSpecificValue.Value);
-                                            break;
-                                        }
-                                    }
-                                }
-                                break;
-                            }
-                        }
-
-                    }
-                }
-            }
-            else
-            {
-                ObjectsToggled.Add(currentProperty, false);
-            }
-            
-            ObjectDerivedFromFields[parentObject].Add(currentProperty.Name(), parentObjectValueForCurrentProperty);
-            
-            
-        }
-        if (parentObject.GetType() == typeof(GameObject))
-        {
-            GOComponents[(GameObject)parentObject] = GetComponents((GameObject)parentObject);
-            foreach (Component component in GOComponents[(GameObject)parentObject])
-            {
-                if (configuration != null && checkIfPropertyIsToToggle(configuration.properties, currentPropertyHierarchy, component.GetType().ToString()))
-                {
-                    //MyDebugger.MyDebug(obj.Name() + " found.");
-                    ObjectsToggled.Add(component, true);
-                    MyListString newLayerPropertyHierarchy = currentPropertyHierarchy.GetClone();
-                    newLayerPropertyHierarchy.Add(component.GetType().ToString());
-                    updateDataStructures(component, configuration, newLayerPropertyHierarchy);
-
-                }
-                else
-                {
-                    ObjectsToggled.Add(component, false);
-                }
-            }
-        }
-    }
-
-    public bool multipleEntriesFor(object obj)
-    {
-        object owner = ObjectsOwners[obj];
-        bool found = false;
-        Dictionary<string,object> ownerProperties = ObjectDerivedFromFields[owner];
-        foreach(object o in ownerProperties.Values)
-        {
-            if (o == obj)
-            {
-                if (found)
-                {
-                    return true;
-                }
-                else
-                {
-                    found = true;
-                }
-            }
-        }
-        return false;
-    }
-
-    internal Type TypeOf(FieldOrProperty f)
-    {
-        return ReflectionExecutor.TypeOf(f);
-    }
+   
 }

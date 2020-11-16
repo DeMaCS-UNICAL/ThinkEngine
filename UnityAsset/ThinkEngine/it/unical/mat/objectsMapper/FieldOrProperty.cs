@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using UnityEngine;
-
+//Wrapper class for a member of a class: is it a field or a property?
 public class FieldOrProperty
 {
     private FieldInfo f;

@@ -71,8 +71,8 @@ public class AbstractConfiguration : MonoBehaviour
         //Reallocating lists and dictionaries
         CleanDataStructures();
         //Recovering properties and components of the current GameObject (the one to which the configuration is attached and on which the tracker is configured)
-        Dictionary<string, FieldOrProperty> gOProperties = tracker.ObjectsProperties[gameObject];
-        List<Component> gameObjectComponents = tracker.GOComponents[gameObject];
+        Dictionary<string, FieldOrProperty> gOProperties = tracker.objectsProperties[gameObject];
+        List<Component> gameObjectComponents = tracker.gameObjectsComponents[gameObject];
         SaveDirectProperties(tracker, gOProperties);
         SaveComponents(tracker, gameObjectComponents);
         if (properties.Count == 0)//if no properties have been selected in the inspector
@@ -100,15 +100,15 @@ public class AbstractConfiguration : MonoBehaviour
         }
         foreach (string directProperty in gOProperties.Keys)//foreach name of the properties
         {
-            if(tracker.ObjectsToggled==null)
+            if(tracker.objectsToggled==null)
             {
                 throw new Exception("No objects toggled provided while saving the configuration.");
             }
-            if (!tracker.ObjectsToggled.ContainsKey(gOProperties[directProperty]))
+            if (!tracker.objectsToggled.ContainsKey(gOProperties[directProperty]))
             {
                 throw new Exception(directProperty+" is not in the toggled object while saving the configuration.");
             }
-            if (tracker.ObjectsToggled[gOProperties[directProperty]])//if the property is toggled in the inspector
+            if (tracker.objectsToggled[gOProperties[directProperty]])//if the property is toggled in the inspector
             {
                 MyListString currentProperty = new MyListString();//Creating the root of some basic property hierarchy (possibly the property itself)
                 currentProperty.Add(directProperty);
@@ -116,7 +116,7 @@ public class AbstractConfiguration : MonoBehaviour
                 {
                     AddMappableProperty(tracker, gOProperties, directProperty, currentProperty);
                 }
-                else if (tracker.ObjectDerivedFromFields.ContainsKey(gameObject))
+                else if (tracker.objectDerivedFromFields.ContainsKey(gameObject))
                 {
                     ExpandNonMappableProperty(gameObject, gOProperties[directProperty], currentProperty, tracker);
                 }
@@ -131,36 +131,36 @@ public class AbstractConfiguration : MonoBehaviour
         }
         foreach (Component component in gameObjectComponents)//foreach component of the GameObject
         {
-            if (!tracker.ObjectsToggled.ContainsKey(component))
+            if (!tracker.objectsToggled.ContainsKey(component))
             {
                 throw new Exception(component.GetType() + " is not in the toggled object while saving the configuration.");
             }
-            if (tracker.ObjectsToggled[component])//if the component is toggled in the inspector
+            if (tracker.objectsToggled[component])//if the component is toggled in the inspector
             {
                 #region Exceptions
-                if (tracker.ObjectsProperties == null)
+                if (tracker.objectsProperties == null)
                 {
                     throw new Exception("Objects' properties undefined.");
                 }
-                if (!tracker.ObjectsProperties.ContainsKey(component))
+                if (!tracker.objectsProperties.ContainsKey(component))
                 {
                     throw new Exception("Objects' properties does not contain "+component.GetType());
                 }
                 #endregion
                 MyListString currentProperty = new MyListString();//Creating the root of some basic property hierarchy (possibly the property itself)
                 currentProperty.Add(component.GetType().ToString());
-                Dictionary<string, FieldOrProperty> componentProperties = tracker.ObjectsProperties[component];//Retrieving the properties of the component
+                Dictionary<string, FieldOrProperty> componentProperties = tracker.objectsProperties[component];//Retrieving the properties of the component
                 if (componentProperties == null)
                 {
                     throw new Exception("There aren't properties for the component " + component.GetType() + " while saving the configuration.");
                 }
                 foreach (string componentProperty in componentProperties.Keys)
                 {
-                    if (!tracker.ObjectsToggled.ContainsKey(componentProperties[componentProperty]))
+                    if (!tracker.objectsToggled.ContainsKey(componentProperties[componentProperty]))
                     {
                         throw new Exception(componentProperty + " is not present in the objects toggled while saving the configuration.");
                     }
-                    if (tracker.ObjectsToggled[componentProperties[componentProperty]])
+                    if (tracker.objectsToggled[componentProperties[componentProperty]])
                     {
                         MyListString propertyHierarchy = currentProperty.GetClone();
                         propertyHierarchy.Add(componentProperty);
@@ -168,7 +168,7 @@ public class AbstractConfiguration : MonoBehaviour
                         {
                             AddMappableProperty(tracker, componentProperties, componentProperty, propertyHierarchy);
                         }
-                        else if (tracker.ObjectDerivedFromFields.ContainsKey(component))
+                        else if (tracker.objectDerivedFromFields.ContainsKey(component))
                         {
                             ExpandNonMappableProperty(component, componentProperties[componentProperty], propertyHierarchy, tracker);
                         }
@@ -199,36 +199,36 @@ public class AbstractConfiguration : MonoBehaviour
     protected void ExpandNonMappableProperty(object currentObject, FieldOrProperty property, MyListString currentPropertyHierarchy, GameObjectsTracker tracker)
     {
         #region Exceptions
-        if (tracker.ObjectDerivedFromFields == null)
+        if (tracker.objectDerivedFromFields == null)
         {
             throw new Exception("No objects are present in the tracker.");
         }
-        if (!tracker.ObjectDerivedFromFields.ContainsKey(currentObject))
+        if (!tracker.objectDerivedFromFields.ContainsKey(currentObject))
         {
             throw new Exception("The object is not present in the tracker.");
         }
-        if (!tracker.ObjectDerivedFromFields[currentObject].ContainsKey(property.Name()))
+        if (!tracker.objectDerivedFromFields[currentObject].ContainsKey(property.Name()))
         {
             throw new Exception("No istantiation available for property "+property.Name());
         }
-        if (tracker.ObjectsOwners == null)
+        if (tracker.objectsOwners == null)
         {
             throw new Exception("No objects owner defined.");
         }
         #endregion
-        object derivedObject = tracker.ObjectDerivedFromFields[currentObject][property.Name()];//actual value of the property
-        bool derivedObjectAlreadyListed = tracker.ObjectsOwners.ContainsKey(derivedObject) && !tracker.ObjectsOwners[derivedObject].Key.Equals(currentObject);
-        derivedObjectAlreadyListed = derivedObjectAlreadyListed && !tracker.ObjectsOwners[derivedObject].Value.Equals(property.Name());
-        bool derivedObjectIsTheCurrentGO = derivedObject.Equals(tracker.GO);
+        object derivedObject = tracker.objectDerivedFromFields[currentObject][property.Name()];//actual value of the property
+        bool derivedObjectAlreadyListed = tracker.objectsOwners.ContainsKey(derivedObject) && !tracker.objectsOwners[derivedObject].Key.Equals(currentObject);
+        derivedObjectAlreadyListed = derivedObjectAlreadyListed && !tracker.objectsOwners[derivedObject].Value.Equals(property.Name());
+        bool derivedObjectIsTheCurrentGO = derivedObject.Equals(tracker.gameObject);
         //if the actual value of the property is not null and it is not already listed beacause is a property of some othe object or beacause is the gameobject itself
         if (derivedObject != null && !derivedObjectAlreadyListed && !derivedObjectIsTheCurrentGO)
         {
-            if (tracker.ObjectsProperties.ContainsKey(derivedObject))
+            if (tracker.objectsProperties.ContainsKey(derivedObject))
             {
-                Dictionary<string, FieldOrProperty> derivedObjProperties = tracker.ObjectsProperties[derivedObject];//retrieve properties of the derivedObject
+                Dictionary<string, FieldOrProperty> derivedObjProperties = tracker.objectsProperties[derivedObject];//retrieve properties of the derivedObject
                 foreach (string subProperty in derivedObjProperties.Keys)
                 {
-                    if (tracker.ObjectsToggled[derivedObjProperties[subProperty]])
+                    if (tracker.objectsToggled[derivedObjProperties[subProperty]])
                     {
                         MyListString newLevelPropertyHierarchy = currentPropertyHierarchy.GetClone();
                         newLevelPropertyHierarchy.Add(subProperty);
@@ -237,7 +237,7 @@ public class AbstractConfiguration : MonoBehaviour
                             AddMappableProperty(tracker, derivedObjProperties, subProperty, newLevelPropertyHierarchy);
                         }
 
-                        else if (tracker.ObjectDerivedFromFields.ContainsKey(derivedObject))
+                        else if (tracker.objectDerivedFromFields.ContainsKey(derivedObject))
                         {
                             ExpandNonMappableProperty(derivedObject, derivedObjProperties[subProperty], newLevelPropertyHierarchy, tracker);//recurse
                         }

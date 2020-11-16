@@ -39,7 +39,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         protected void reset(bool fault = false)
         {
             tracker = new GameObjectsTracker();
-            tracker.GO = configuration.gameObject;
+            tracker.gameObject = configuration.gameObject;
             if (fault)
             {
                 objectMode = false;
@@ -48,7 +48,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             {
                 if (!configuration.configurationName.Equals(""))
                 {
-                    tracker.updateDataStructures(-1, configuration);
+                    tracker.UpdateDataStructures(configuration);
                 }
                 if (objectMode && objectToConfigure is null)
                 {
@@ -175,7 +175,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 {
                     //configuration = configurator.newConfiguration(chosenName,chosenGO);
                     tracker.configurationName = configuration.configurationName;
-                    tracker.updateDataStructures(-1, configuration);
+                    tracker.UpdateDataStructures(configuration);
                 }
             }
             else
@@ -202,18 +202,18 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
             using (var h = new EditorGUILayout.VerticalScope())
             {
-                GameObject gO = tracker.GO;
-                foreach (FieldOrProperty obj in tracker.ObjectsProperties[gO].Values)
+                GameObject gO = tracker.gameObject;
+                foreach (FieldOrProperty obj in tracker.objectsProperties[gO].Values)
                 {
-                    bool disabled = tracker.ObjectDerivedFromFields[gO][obj.Name()] == null;
+                    bool disabled = tracker.objectDerivedFromFields[gO][obj.Name()] == null;
                     EditorGUI.BeginDisabledGroup(disabled);
                     if (isMappable(obj))
                     {
                         EditorGUILayout.BeginHorizontal();
-                        tracker.ObjectsToggled[obj] = EditorGUILayout.ToggleLeft(obj.Name(), tracker.ObjectsToggled[obj]);
+                        tracker.objectsToggled[obj] = EditorGUILayout.ToggleLeft(obj.Name(), tracker.objectsToggled[obj]);
                         addCustomFields(obj);
 
-                        if (tracker.ObjectsToggled[obj] && !tracker.IsBaseType(obj))
+                        if (tracker.objectsToggled[obj] && !tracker.IsBaseType(obj))
                         {
                             bool configure = GUILayout.Button("Configure Object");
                             if (configure)
@@ -234,11 +234,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                     else
                     {
 
-                        tracker.ObjectsToggled[obj] = EditorGUILayout.Foldout(tracker.ObjectsToggled[obj], obj.Name()) && !disabled;
-                        if (tracker.ObjectsToggled[obj])
+                        tracker.objectsToggled[obj] = EditorGUILayout.Foldout(tracker.objectsToggled[obj], obj.Name()) && !disabled;
+                        if (tracker.objectsToggled[obj])
                         {
                             EditorGUI.indentLevel++;
-                            addSubProperties(tracker.ObjectDerivedFromFields[gO][obj.Name()], obj.Name(), gO);
+                            addSubProperties(tracker.objectDerivedFromFields[gO][obj.Name()], obj.Name(), gO);
                             EditorGUI.indentLevel--;
                         }
 
@@ -247,10 +247,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 }
 
 
-                foreach (Component c in tracker.GOComponents[gO])
+                foreach (Component c in tracker.gameObjectsComponents[gO])
                 {
-                    tracker.ObjectsToggled[c] = EditorGUILayout.Foldout(tracker.ObjectsToggled[c], c.GetType().ToString());
-                    if (tracker.ObjectsToggled[c])
+                    tracker.objectsToggled[c] = EditorGUILayout.Foldout(tracker.objectsToggled[c], c.GetType().ToString());
+                    if (tracker.objectsToggled[c])
                     {
                         EditorGUI.indentLevel++;
                         addSubProperties(c, c.GetType().ToString(), gO);
@@ -306,7 +306,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
             mainScroll = new Vector2(0, 0);
             //MyDebugger.MyDebug(chosenGO);
-            tracker.updateDataStructures(-1, configuration);
+            tracker.UpdateDataStructures(configuration);
 
 
         }
@@ -314,16 +314,16 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         protected void addSubProperties(object obj, string name, object objOwner)
         {
 
-            if (tracker.ObjectsOwners.ContainsKey(obj) && !obj.GetType().IsValueType && (!tracker.ObjectsOwners[obj].Key.Equals(objOwner) || !tracker.ObjectsOwners[obj].Value.Equals(name)) || obj.Equals(tracker.GO))
+            if (tracker.objectsOwners.ContainsKey(obj) && (!tracker.objectsOwners[obj].Key.Equals(objOwner) || !tracker.objectsOwners[obj].Value.Equals(name)) || obj.Equals(tracker.gameObject))
             {
                 EditorGUI.BeginDisabledGroup(true);
-                if (obj.Equals(tracker.GO))
+                if (obj.Equals(tracker.gameObject))
                 {
                     EditorGUILayout.ToggleLeft("This is " + configuration.gameObject + " object", true);
                 }
-                else if (!tracker.ObjectsOwners[obj].Value.Equals(name))
+                else if (!tracker.objectsOwners[obj].Value.Equals(name))
                 {
-                    EditorGUILayout.ToggleLeft("object already listed as " + tracker.ObjectsOwners[obj].Value, true);
+                    EditorGUILayout.ToggleLeft("object already listed as " + tracker.objectsOwners[obj].Value, true);
                 }
                 else
                 {
@@ -333,24 +333,24 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
                 return;
             }
-            if (!tracker.ObjectsToggled.ContainsKey(obj))
+            if (!tracker.objectsToggled.ContainsKey(obj))
             {
-                tracker.ObjectsToggled.Add(obj, false);
+                tracker.objectsToggled.Add(obj, false);
             }
-            if (!tracker.ObjectsProperties.ContainsKey(obj))
+            if (!tracker.objectsProperties.ContainsKey(obj))
             {
-                tracker.updateDataStructures(obj, null, null);
+                tracker.UpdateDataStructures(obj, null, new MyListString());
             }
-            foreach (FieldOrProperty f in tracker.ObjectsProperties[obj].Values)
+            foreach (FieldOrProperty f in tracker.objectsProperties[obj].Values)
             {
-                bool disabled = tracker.ObjectDerivedFromFields[obj][f.Name()] == null;
+                bool disabled = tracker.objectDerivedFromFields[obj][f.Name()] == null;
                 EditorGUI.BeginDisabledGroup(disabled);
                 if (isMappable(f))
                 {
                     EditorGUILayout.BeginHorizontal();
-                    tracker.ObjectsToggled[f] = EditorGUILayout.ToggleLeft(f.Name(), tracker.ObjectsToggled[f]);
+                    tracker.objectsToggled[f] = EditorGUILayout.ToggleLeft(f.Name(), tracker.objectsToggled[f]);
                     addCustomFields(f);
-                    if (tracker.ObjectsToggled[f] && !tracker.IsBaseType(f))
+                    if (tracker.objectsToggled[f] && !tracker.IsBaseType(f))
                     {
                         bool configure = GUILayout.Button("Configure Object");
                         if (configure)
@@ -375,11 +375,11 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 }
                 else
                 {
-                    tracker.ObjectsToggled[f] = EditorGUILayout.Foldout(tracker.ObjectsToggled[f], f.Name()) && !disabled;
-                    if (tracker.ObjectsToggled[f])
+                    tracker.objectsToggled[f] = EditorGUILayout.Foldout(tracker.objectsToggled[f], f.Name()) && !disabled;
+                    if (tracker.objectsToggled[f])
                     {
                         EditorGUI.indentLevel++;
-                        addSubProperties(tracker.ObjectDerivedFromFields[obj][f.Name()], f.Name(), obj);
+                        addSubProperties(tracker.objectDerivedFromFields[obj][f.Name()], f.Name(), obj);
                         EditorGUI.indentLevel--;
                     }
                 }
@@ -422,7 +422,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 if (st.toSave.Count == 0)
                 {
                     tracker.basicTypeCollectionsConfigurations.Remove(objectToConfigure);
-                    tracker.ObjectsToggled[objectToConfigure] = false;
+                    tracker.objectsToggled[objectToConfigure] = false;
                 }
                 objectMode = false;
             }
@@ -432,7 +432,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 if (st.toSave.Count == 0)
                 {
                     tracker.basicTypeCollectionsConfigurations.Remove(objectToConfigure);
-                    tracker.ObjectsToggled[objectToConfigure] = false;
+                    tracker.objectsToggled[objectToConfigure] = false;
                 }
                 objectMode = false;
             }

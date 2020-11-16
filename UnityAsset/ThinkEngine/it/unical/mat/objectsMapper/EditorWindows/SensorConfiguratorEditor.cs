@@ -81,7 +81,7 @@ public class SensorConfiguratorEditor : AbstractConfigurationEditor
     internal override void addCustomFields(FieldOrProperty obj)
     {
         
-        if (tracker.ObjectsToggled[obj])
+        if (tracker.objectsToggled[obj])
         {
             if (!tracker.operationPerProperty.ContainsKey(obj))
             {
