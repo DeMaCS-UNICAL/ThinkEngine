@@ -360,7 +360,10 @@ public class MonoBehaviourSensorsManager : MonoBehaviour
         
 
     }
-
+    void LateUpdate()
+    {
+        SensorsManager.pulseBrainsIfNeeded();
+    }
     private void enlargedArray2(string property, int increasedDimension, int newSize, Type propertyType, Type collectionElementType)
     {
         

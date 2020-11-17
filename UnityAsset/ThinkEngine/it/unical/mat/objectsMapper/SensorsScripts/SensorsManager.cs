@@ -40,7 +40,22 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             }
             return null;
         }
-
+        internal static void pulseBrainsIfNeeded()
+        {
+            foreach (Brain brain in sensorsUpdated.Keys)
+            {
+                object lockOn = getLock(brain);
+                if (sensorsUpdated[brain] >= instantiatedSensors[brain].Count)
+                {
+                    //MyDebugger.MyDebug("pulsing on sensor updated");
+                    if (sensorsUpdated[brain] == instantiatedSensors[brain].Count)
+                    {
+                        Monitor.Pulse(lockOn);
+                    }
+                    sensorsUpdated[brain] = 0;
+                }
+            }
+        }
         public List<string> getConfiguredGameObject()
         {
             return configuredGameObject;
@@ -187,15 +202,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                 sensorsUpdated[brain]++;
                 //MyDebugger.MyDebug("sensor instantiated: " + instantiatedSensors[brain].Count + " updated: " + sensorsUpdated[brain]);
                 //Debug.Break();
-                if (sensorsUpdated[brain] >= instantiatedSensors[brain].Count)
-                {
-                    //MyDebugger.MyDebug("pulsing on sensor updated");
-                    if (sensorsUpdated[brain] == instantiatedSensors[brain].Count)
-                    {
-                        Monitor.Pulse(lockOn);
-                    }
-                    sensorsUpdated[brain] = 0;
-                }
+                
             }
         }
         /*public void updateSensors(Brain brain)
