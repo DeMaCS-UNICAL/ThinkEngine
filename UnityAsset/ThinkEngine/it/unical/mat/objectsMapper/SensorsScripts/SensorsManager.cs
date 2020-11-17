@@ -42,8 +42,16 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
         }
         internal static void pulseBrainsIfNeeded()
         {
+            if(sensorsUpdated==null || instantiatedSensors == null)
+            {
+                return;
+            }
             foreach (Brain brain in sensorsUpdated.Keys)
             {
+                if (!instantiatedSensors.ContainsKey(brain))
+                {
+                    continue;
+                }
                 object lockOn = getLock(brain);
                 if (sensorsUpdated[brain] >= instantiatedSensors[brain].Count)
                 {
