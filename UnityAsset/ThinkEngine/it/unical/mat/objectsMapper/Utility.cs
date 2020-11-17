@@ -11,15 +11,15 @@ using UnityEngine;
 
 public static class Utility
 {
-    private static bool prefabsLoaded = false;
-    private static string _triggerClassPath= @".\Assets\Scripts\Trigger.cs";
-    private static MethodInfo[] _triggerMethods;
     private static List<string> _triggerMethodsToShow;
     internal static object _triggerClass;
     private static GameObject _hiddenGameObject;
-    private static bool _managersDestroyed;
     private static SensorsManager _sensorsManager;
     private static ActuatorsManager _actuatorsManager;
+    private static string _triggerClassPath= @".\Assets\Scripts\Trigger.cs";
+    private static bool prefabsLoaded = false;
+    private static MethodInfo[] _triggerMethods;
+    #region Properties
     internal static List<string> triggerMethodsToShow
     {
         get
@@ -100,16 +100,6 @@ public static class Utility
             return _actuatorsManager;
         }
     }
-    internal static int getTriggerMethodIndex(string name)
-    {
-        int index = triggerMethodsToShow.IndexOf(name);
-        if (index != -1)
-        {
-            return index;
-        }
-        return triggerMethodsToShow.Count;
-    }
-
     internal static string triggerClassPath
     {
         get
@@ -122,7 +112,7 @@ public static class Utility
             _triggerClassPath = value;
         }
     }
-
+    #endregion
     private static List<string> findMethodsToShow()
     {
         _triggerMethods = triggerClass.GetType().GetMethods();
@@ -137,7 +127,15 @@ public static class Utility
         }
         return toReturn;
     }
-
+    internal static int getTriggerMethodIndex(string name)
+    {
+        int index = triggerMethodsToShow.IndexOf(name);
+        if (index != -1)
+        {
+            return index;
+        }
+        return triggerMethodsToShow.Count;
+    }
     internal static MethodInfo getTriggerMethod(int chosenMethod)
     {
         if(chosenMethod>_triggerMethods.Length || chosenMethod < 0)
@@ -154,7 +152,6 @@ public static class Utility
         }
         return _triggerMethods[triggerMethodsToShow.IndexOf(chosenMethod)];
     }
-
     internal static void checkTriggerClass()
     {
         if (!Directory.Exists(@"Assets\Scripts"))
@@ -180,7 +177,6 @@ public static class Utility
         }
         AssetDatabase.Refresh();
     }
-
     internal static void loadPrefabs()
     {
         if (!prefabsLoaded)

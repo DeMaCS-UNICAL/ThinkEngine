@@ -31,7 +31,7 @@ public class SensorConfiguratorEditor : AbstractConfigurationEditor
             }
         }catch(Exception e)
         {
-            MyDebugger.MyDebug(e.StackTrace);
+            Debug.Log(e.StackTrace);
             reset(true);
         }
     }

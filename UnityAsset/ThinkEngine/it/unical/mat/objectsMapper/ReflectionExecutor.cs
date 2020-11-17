@@ -7,26 +7,11 @@ using System.Linq;
 using System.IO;
 
 
-public static class ReflectionExecutor
+internal static class ReflectionExecutor
 {
-    public const BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
+    private const BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
 
-    public static List<string> GetGameObjects()
-    {
-        object[] go = GameObject.FindObjectsOfType(typeof(GameObject));
-        List<string> objectsNames = new List<string>();
-        foreach(object o in go)
-        {
-          
-            objectsNames.Add(((GameObject)o).name);
-            
-        }
-        return objectsNames;
-    }
-
-   
-
-    public static bool IsBaseType(FieldOrProperty obj)
+    internal static bool IsBaseType(FieldOrProperty obj)
     {
         List<Type> signedInteger = SignedIntegerTypes();
         List<Type> unsignedInteger = UnsignedIntegerTypes();
@@ -38,40 +23,17 @@ public static class ReflectionExecutor
         return  isBase ;
     }
 
-    public static List<Type> GetAvailableBasicTypes()
-    {
-        List<Type> toReturn = SignedIntegerTypes();
-        toReturn.AddRange(UnsignedIntegerTypes());
-        toReturn.AddRange(FloatingPointTypes());
-        toReturn.Add(typeof(char));
-        toReturn.Add(typeof(string));
-        toReturn.Add(typeof(Enum));
-        toReturn.Add(typeof(bool));
-        return toReturn;
-    }
-
-    public static Type GetCorrespondingBaseType(Type t)
-    {
-        List<Type> signedInteger = SignedIntegerTypes();
-        List<Type> unsignedInteger = UnsignedIntegerTypes();
-        List<Type> floatingPoint = FloatingPointTypes();
-        //MyDebugger.MyDebug(" level " + level);
-        return signedInteger.Contains(t) ? typeof(long) : unsignedInteger.Contains(t) ? typeof(ulong) : floatingPoint.Contains(t) ? typeof(float) :
-            t == typeof(char) ? typeof(char): t == typeof(bool)? typeof(bool) : t== typeof(Enum)? typeof(Enum): t == typeof(string)? typeof(string):null;
-
-    }
-
-    public static int isArrayOfRank(FieldOrProperty obj)
+    internal static int IsArrayOfRank(FieldOrProperty obj)
     {
         Type objType = obj.Type();
         return objType.IsArray? objType.GetArrayRank():-1;
     }
-    public static Type isList(FieldOrProperty obj)
+    internal static Type IsList(FieldOrProperty obj)
     {
         Type objType = obj.Type();
-        return isListOfType(objType);
+        return IsListOfType(objType);
     }
-    public static Type isListOfType(Type type)
+    internal static Type IsListOfType(Type type)
     {
         if (type.IsGenericType && type.GetGenericTypeDefinition()==typeof(List<>))
         {
@@ -83,41 +45,28 @@ public static class ReflectionExecutor
         }
         return null;
     }
-
-    public static List<Type> FloatingPointTypes()
+    internal static List<Type> FloatingPointTypes()
     {
         return new List<Type> { typeof(double), typeof(float) };
     }
-
-    public static List<Type> UnsignedIntegerTypes()
+    internal static List<Type> UnsignedIntegerTypes()
     {
         return new List<Type> { typeof(byte), typeof(ushort), typeof(uint), typeof(ulong) };
     }
-
-    public static List<Type> SignedIntegerTypes()
+    internal static List<Type> SignedIntegerTypes()
     {
         return new List<Type> { typeof(sbyte), typeof(short), typeof(int), typeof(long) };
     }
-
-    
-
-    internal static bool isMappable(FieldOrProperty obj)
+    internal static bool IsMappable(FieldOrProperty obj)
     {
-        return IsBaseType(obj) || isMatrix(obj) || isList(obj)!=null;
+        return IsBaseType(obj) || IsMatrix(obj) || IsList(obj)!=null;
     }
-
-    private static bool isMatrix(FieldOrProperty obj)
+    private static bool IsMatrix(FieldOrProperty obj)
     {
        
-        return isArrayOfRank(obj)==2;
+        return IsArrayOfRank(obj)==2;
     }
- 
-    internal static Type TypeOf(FieldOrProperty f)
-    {
-        return f.Type();
-    }
-
-    public static List<FieldOrProperty> GetFieldsAndProperties(object go)
+    internal static List<FieldOrProperty> GetFieldsAndProperties(object go)
     {
         List<FieldOrProperty> propertiesList = new List<FieldOrProperty>();
         Type t =go.GetType();
@@ -135,13 +84,7 @@ public static class ReflectionExecutor
         
             return propertiesList;
     }
-
-    public static GameObject GetGameObjectWithName(string name)
-    {
-        return GameObject.Find(name);
-    }
-
-    public static List<Component> GetComponents(GameObject go)
+    internal static List<Component> GetComponents(GameObject go)
     {
         List<Component> components = new List<Component>();
         foreach (Component c in go.GetComponents(typeof(Component)))

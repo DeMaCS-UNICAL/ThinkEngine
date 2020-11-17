@@ -145,7 +145,6 @@ public class ActuatorsManager : MonoBehaviour
     }
     public void registerActuators(Brain b, List<string> instantiated)
     {
-        //MyDebugger.MyDebug("adding "+instantiated.Count+" actuators to the manager");
         if (instantiatedActuators == null)
         {
             instantiatedActuators = new Dictionary<Brain, List<string>>();
@@ -155,7 +154,6 @@ public class ActuatorsManager : MonoBehaviour
             instantiatedActuators.Add(b, new List<string>());
         }
         instantiatedActuators[b].AddRange(instantiated);
-        MyDebugger.MyDebug("there are "+ instantiatedActuators[b].Count+" actuators for brain "+b.name);
     }
     internal static void requestObjectIndexes(Brain brain)
     {
@@ -163,7 +161,6 @@ public class ActuatorsManager : MonoBehaviour
         lock (toLock)
         {
             requestedObjectIndexes.Enqueue(new KeyValuePair<Brain, object>(brain, toLock));
-            //MyDebugger.MyDebug("requesting map");
             Monitor.Wait(toLock);
         }
     }

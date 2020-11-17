@@ -208,12 +208,10 @@
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPUnsignedIntegerMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\MappingManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\MyListString.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\PrefabTracker.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\NewSensors\IMonoBehaviourSensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\NewSensors\MonoBehaviourSensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\NewSensors\MonoBehaviourSensorsManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\NewSensors\SensorsUtility.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\TestingAddMonobehaviour.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility.cs" />
     <Compile Include="it\unical\mat\embasp\parsers\asp\ASPParser.cs" />
     <Compile Include="it\unical\mat\embasp\parsers\asp\ASPSolversParser.cs" />

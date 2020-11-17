@@ -358,14 +358,9 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                             objectMode = true;
                             objectToConfigure = f;
                             helpScroll = new Vector2(0, 0);
-                            //MyDebugger.MyDebug("num: "+tracker.basicTypeCollectionsConfigurations.Count);
                             if (!tracker.basicTypeCollectionsConfigurations.ContainsKey(f))
                             {
-                                //MyDebugger.MyDebug("f " + tracker.basicTypeCollectionsConfigurations[f]);
-                                MyDebugger.MyDebug("adding simple tracker for " + objectToConfigure.Name() + " that is a " + objectToConfigure.Type());
-
                                 tracker.basicTypeCollectionsConfigurations.Add(f, new SimpleGameObjectsTracker(objectToConfigure.Type()));
-
                             }
                             tracker.basicTypeCollectionsConfigurations[f].getBasicProperties();
                             drawObjectProperties();

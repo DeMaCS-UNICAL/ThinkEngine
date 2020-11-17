@@ -111,7 +111,6 @@ public class MonoBehaviourActuator:MonoBehaviour
             if (literalPrefix.Equals(string.Format(myTemplatePrefix,myIndex)))
             {
                 int startIndex = literal.LastIndexOf("(") + 1;
-                MyDebugger.MyDebug(literal +" \n found matching literal with value "+ literal.Substring(startIndex, literal.IndexOf(")", startIndex) - startIndex));
                 string partialRes = literal.Substring(startIndex, literal.IndexOf(")", startIndex)-startIndex);
                 return partialRes.Trim('\"');
             }

@@ -20,7 +20,6 @@ public class SensorConfiguration : AbstractConfiguration
         base.Reset();
         if (operationPerProperty is null)
         {
-            MyDebugger.MyDebug("Warning! Specific Configurations are not serialized");
             operationPerProperty = new List<ListOfStringIntPair>();
         }
         if (specificValuePerProperty is null)

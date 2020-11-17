@@ -37,25 +37,21 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
             reason = true;
             while (reason)
             {
-                //MyDebugger.MyDebug("aquiring the lock");
                 lock (brain.toLock)
                 {
                     if (brain.reasonerMethod!=null)
                     {
                         brain.solverWaiting = true;
-                        //MyDebugger.MyDebug("going to wait");
                         Monitor.Wait(brain.toLock);
                     }
                 }
                 try
                 {
-                    //MyDebugger.MyDebug("awake");
                     lock (brain.toLock)
                     {
                         if (brain.missingData)
                         {
                             brain.solverWaiting = true;
-                            //MyDebugger.MyDebug("going to wait");
                             Monitor.Wait(brain.toLock);
                         }
                     }
@@ -75,10 +71,10 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 }
                 catch (Exception e)
                 {
-                   MyDebugger.MyDebug("CAUGHT EXECPTION!!!!");
-                    MyDebugger.MyDebug(e.Source);
-                    MyDebugger.MyDebug(e.Message);
-                    MyDebugger.MyDebug(e.StackTrace);
+                    Debug.LogError("CAUGHT EXECPTION!!!!");
+                    Debug.LogError(e.Source);
+                    Debug.LogError(e.Message);
+                    Debug.LogError(e.StackTrace);
                 }
 
                 Handler handler = new DesktopHandler(new DLV2DesktopService(brain.dataPath+@"\lib\dlv2.exe"));

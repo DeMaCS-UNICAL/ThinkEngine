@@ -133,8 +133,8 @@ namespace it.unical.mat.embasp.platforms.desktop
             {
                 Console.Error.WriteLine(e2.ToString());
                 Console.Error.Write(e2.StackTrace);
-                MyDebugger.MyDebug(e2.ToString());
-                MyDebugger.MyDebug(e2.StackTrace);
+                UnityEngine.Debug.LogError(e2.ToString());
+                UnityEngine.Debug.LogError(e2.StackTrace);
             }
 
             return GetOutput("", "");

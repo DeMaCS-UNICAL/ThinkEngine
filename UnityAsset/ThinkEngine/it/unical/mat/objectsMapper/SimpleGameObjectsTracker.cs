@@ -13,11 +13,9 @@ public class SimpleGameObjectsTracker
     public MyListString propertyName;
     public string name;
     public string propertyType; //ARRAY2, LIST
-
     public SimpleGameObjectsTracker(Type type)
     {
-        Type listType = ReflectionExecutor.isListOfType(type);
-        //MyDebugger.MyDebug("is of type " + listType);
+        Type listType = ReflectionExecutor.IsListOfType(type);
         if (!(listType is null))
         {
             propertyType = "LIST";
@@ -30,37 +28,22 @@ public class SimpleGameObjectsTracker
             objType = type.GetElementType().AssemblyQualifiedName;
             name = type.GetElementType().ToString();
         }
-        //MyDebugger.MyDebug("to string " + objType);
         toSave = new List<string>();
         propertiesToggled = new Dictionary<string, bool>();
-        
     }
-
-  
-    
     public void getBasicProperties()
     {
-        Type local = Type.GetType(objType);
-        MyDebugger.MyDebug("obtained type from " + objType + " is " + local);
-        List<FieldOrProperty> all = ReflectionExecutor.GetFieldsAndProperties(local);
+        Type localType = Type.GetType(objType);
+        List<FieldOrProperty> all = ReflectionExecutor.GetFieldsAndProperties(localType);
         propertiesToggled = new Dictionary<string, bool>();
-        
         foreach (FieldOrProperty f in all)
         {
             if (ReflectionExecutor.IsBaseType(f) && !propertiesToggled.ContainsKey(f.Name()))
             {
-                bool toggled = false;
-                if (toSave.Contains(f.Name()))
-                {
-                    toggled = true;
-                }
-                propertiesToggled.Add(f.Name(), toggled);
+                propertiesToggled.Add(f.Name(), toSave.Contains(f.Name()));
             }
         }
-        
-        
     }
-
     public void save()
     {
         toSave = new List<string>();

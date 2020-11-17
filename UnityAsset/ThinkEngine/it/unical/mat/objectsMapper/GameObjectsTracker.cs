@@ -210,7 +210,7 @@ public class GameObjectsTracker
     }
     public bool IsMappable(FieldOrProperty obj)
     {
-        return ReflectionExecutor.isMappable(obj); 
+        return ReflectionExecutor.IsMappable(obj); 
     }
     public void CleanDataStructures()
     {

@@ -60,7 +60,6 @@ public class Brain :MonoBehaviour
         {
             gameObject.AddComponent<IndexTracker>();
         }
-        MyDebugger.enabled = debug;
         triggerClass = Utility.triggerClass;
         dataPath = Environment.CurrentDirectory;
         if (chosenActuatorConfigurations == null)
@@ -208,18 +207,6 @@ public class Brain :MonoBehaviour
         return Utility.sensorsManager.isSomeActiveInScene(chosenSensorConfigurations) && Utility.actuatorsManager.isSomeActiveInScene(chosenActuatorConfigurations);
     }
 
-    void LateUpdate()
-    {
-        MyDebugger.enabled = debug;
-        /*if (reasonerMethod is null && SensorsManager.frameFromLastUpdate == -1)
-        {
-            lock (toLock)
-            {
-                solverWaiting = false;
-                Monitor.Pulse(toLock);
-            }
-        }*/
-    }
 
     void OnApplicationQuit()
     {
