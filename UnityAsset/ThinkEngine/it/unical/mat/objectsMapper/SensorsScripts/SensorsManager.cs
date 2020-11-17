@@ -46,9 +46,9 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
             {
                 return;
             }
-            foreach (Brain brain in sensorsUpdated.Keys)
+            foreach (Brain brain in instantiatedSensors.Keys)
             {
-                if (!instantiatedSensors.ContainsKey(brain))
+                if (!sensorsUpdated.ContainsKey(brain))
                 {
                     continue;
                 }
