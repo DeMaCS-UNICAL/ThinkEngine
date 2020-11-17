@@ -53,14 +53,17 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.SensorsScripts
                     continue;
                 }
                 object lockOn = getLock(brain);
-                if (sensorsUpdated[brain] >= instantiatedSensors[brain].Count)
+                lock (lockOn)
                 {
-                    //MyDebugger.MyDebug("pulsing on sensor updated");
-                    if (sensorsUpdated[brain] == instantiatedSensors[brain].Count)
+                    if (sensorsUpdated[brain] >= instantiatedSensors[brain].Count)
                     {
-                        Monitor.Pulse(lockOn);
+                        //MyDebugger.MyDebug("pulsing on sensor updated");
+                        if (sensorsUpdated[brain] == instantiatedSensors[brain].Count)
+                        {
+                            Monitor.Pulse(lockOn);
+                        }
+                        sensorsUpdated[brain] = 0;
                     }
-                    sensorsUpdated[brain] = 0;
                 }
             }
         }
