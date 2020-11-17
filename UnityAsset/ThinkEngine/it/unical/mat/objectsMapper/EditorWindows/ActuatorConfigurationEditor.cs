@@ -62,6 +62,6 @@ public class ActuatorConfigurationEditor : AbstractConfigurationEditor
     }
     internal override bool existsConfigurationWithName(string configurationName)
     {
-        return Utility.actuatorsManager.existsConfigurationWithName(configurationName);
+        return Utility.actuatorsManager.ExistsConfigurationWithName(configurationName);
     }
 }

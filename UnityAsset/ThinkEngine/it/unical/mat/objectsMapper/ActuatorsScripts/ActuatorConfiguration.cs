@@ -15,6 +15,7 @@ public class ActuatorConfiguration : AbstractConfiguration
     private object triggerClass;
     internal MethodInfo applyMethod;
 
+    #region Unity Messages
     void OnEnable()
     {
         base.Reset();
@@ -24,6 +25,7 @@ public class ActuatorConfiguration : AbstractConfiguration
     {
         OnEnable();
     }
+    #endregion
     protected override void ConfigurationSaved(GameObjectsTracker tracker)
     {
         if (GetComponent<MonoBehaviourActuatorsManager>() == null)
@@ -32,7 +34,6 @@ public class ActuatorConfiguration : AbstractConfiguration
         }
         GetComponent<MonoBehaviourActuatorsManager>().addConfiguration(this);
     }
-    
     internal override void DeleteConfiguration()
     {
         if (saved)
@@ -51,7 +52,6 @@ public class ActuatorConfiguration : AbstractConfiguration
             }
         }
     }
-
     internal override string GetAspTemplate()
     {
         string original = base.GetAspTemplate();
@@ -62,8 +62,7 @@ public class ActuatorConfiguration : AbstractConfiguration
         }
         return toReturn;
     }
-
-    internal bool checkIfApply()
+    internal bool CheckIfApply()
     {
         if(applyMethod is null)
         {

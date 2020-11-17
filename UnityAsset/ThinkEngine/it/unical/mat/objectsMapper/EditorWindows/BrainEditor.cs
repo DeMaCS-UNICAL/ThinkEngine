@@ -64,7 +64,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             }
             foreach (string actuatorConfName in myScript.chosenActuatorConfigurations)
             {
-                if (!Utility.actuatorsManager.existsConfigurationWithName(actuatorConfName,myScript))
+                if (!Utility.actuatorsManager.ExistsConfigurationWithName(actuatorConfName,myScript))
                 {
                     delete = true;
                     continue;
@@ -96,7 +96,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             bool removed = false;
             foreach (string actuatorName in actuatorsConfigurationNames)
             {
-                if (!Utility.actuatorsManager.existsConfigurationWithName(actuatorName, myScript))
+                if (!Utility.actuatorsManager.ExistsConfigurationWithName(actuatorName, myScript))
                 {
                     toDelete.Add(actuatorName);
                     toggledActuatorsConfigurations.Remove(actuatorName);
@@ -141,7 +141,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
 
         private void addNewActuatorsConfigurations()
         {
-            IEnumerable<string> configurations = Utility.actuatorsManager.configurationNames(myScript);
+            IEnumerable<string> configurations = Utility.actuatorsManager.AvailableConfigurationNames(myScript);
             foreach (string actuatorConfName in configurations)
             {
                 addConfigurationName(actuatorConfName, actuatorsConfigurationNames, toggledActuatorsConfigurations);
@@ -310,7 +310,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             {
                 if (isActuator)
                 {
-                    Brain assignedTo = Utility.actuatorsManager.assignedTo(confName);
+                    Brain assignedTo = Utility.actuatorsManager.AssignedTo(confName);
                     if (assignedTo != null && !myScript.chosenActuatorConfigurations.Contains(confName))
                     {
                         GUI.enabled = false;

@@ -8,7 +8,7 @@ using System.Diagnostics;
 using Debug = UnityEngine.Debug;
 using System.Linq;
 
-public class MonoBehaviourSensor : MonoBehaviour, IMonoBehaviourSensor
+public class MonoBehaviourSensor : MonoBehaviour
 {
     readonly object toLock = new object();
     public Brain brain { get; set; }

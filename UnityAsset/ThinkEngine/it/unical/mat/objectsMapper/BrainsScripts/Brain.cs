@@ -106,7 +106,7 @@ public class Brain :MonoBehaviour
             Byte[] info = new UTF8Encoding(true).GetBytes("%For runtime instantiated GameObject, only the prefab mapping is provided. Use that one substituting the gameobject name accordingly\n");
             fs.Write(info, 0, info.Length);
 
-            foreach (ActuatorConfiguration actuatorConf in Utility.actuatorsManager.getConfigurations(chosenActuatorConfigurations))
+            foreach (ActuatorConfiguration actuatorConf in Utility.actuatorsManager.GetCorrespondingConfigurations(chosenActuatorConfigurations))
             {
                 info = new UTF8Encoding(true).GetBytes(actuatorConf.GetAspTemplate());
                 fs.Write(info, 0, info.Length);
@@ -158,12 +158,12 @@ public class Brain :MonoBehaviour
     }
     internal void removeNullActuatorConfigurations()
     {
-        chosenActuatorConfigurations.RemoveAll(x => !Utility.actuatorsManager.existsConfigurationWithName(x,this));
+        chosenActuatorConfigurations.RemoveAll(x => !Utility.actuatorsManager.ExistsConfigurationWithName(x,this));
     }
 
     private void prepareActuators()
     {
-        Utility.actuatorsManager.registerActuators(this, chosenActuatorConfigurations);
+        Utility.actuatorsManager.RegisterActuators(this, chosenActuatorConfigurations);
     }
 
     private void prepareSensors()
@@ -204,7 +204,7 @@ public class Brain :MonoBehaviour
 
     private bool someConfigurationAvailable()
     {
-        return Utility.sensorsManager.isSomeActiveInScene(chosenSensorConfigurations) && Utility.actuatorsManager.isSomeActiveInScene(chosenActuatorConfigurations);
+        return Utility.sensorsManager.isSomeActiveInScene(chosenSensorConfigurations) && Utility.actuatorsManager.IsSomeActiveInScene(chosenActuatorConfigurations);
     }
 
 

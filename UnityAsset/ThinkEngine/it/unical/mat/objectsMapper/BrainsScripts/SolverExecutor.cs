@@ -55,7 +55,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                             Monitor.Wait(brain.toLock);
                         }
                     }
-                    ActuatorsManager.requestObjectIndexes(brain);
+                    ActuatorsManager.RequestObjectIndexes(brain);
                     SensorsManager.requestSensorsMapping(brain);
                     factsPath = Path.GetTempPath() + @"ThinkEngineFacts\" + Path.GetRandomFileName()+".txt";
                     using (StreamWriter fs = new StreamWriter(factsPath, true))
@@ -98,7 +98,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 brain.asTotalMS += stopwatch.ElapsedMilliseconds;
                 if (answers.Answersets.Count > 0)
                 {
-                    ActuatorsManager.notifyActuators(brain,answers.answersets[0]);
+                    ActuatorsManager.NotifyActuators(brain,answers.answersets[0]);
                 }
                 if (!brain.maintainFactFile)
                 {

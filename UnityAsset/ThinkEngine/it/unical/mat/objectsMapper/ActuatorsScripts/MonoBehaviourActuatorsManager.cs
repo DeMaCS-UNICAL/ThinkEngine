@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class MonoBehaviourActuatorsManager:MonoBehaviour
 {
-    public Dictionary<ActuatorConfiguration,List<MonoBehaviourActuator>> configurations;
+    public Dictionary<ActuatorConfiguration,List<MonoBehaviourActuator>> actuators;
     internal bool ready = false;
     void Awake()
     {
@@ -20,7 +20,7 @@ public class MonoBehaviourActuatorsManager:MonoBehaviour
     }
     void Reset()
     {
-        configurations = new Dictionary<ActuatorConfiguration, List<MonoBehaviourActuator>>();
+        actuators = new Dictionary<ActuatorConfiguration, List<MonoBehaviourActuator>>();
         ActuatorsManager actuatorsManager = Utility.actuatorsManager;
         actuatorsManager.configurationsChanged = true;
     }
@@ -40,11 +40,11 @@ public class MonoBehaviourActuatorsManager:MonoBehaviour
     }
     public void instantiateActuator(ActuatorConfiguration actuatorConfiguration)
     {
-        if (!configurations.Keys.Contains(actuatorConfiguration))
+        if (!actuators.Keys.Contains(actuatorConfiguration))
         {
             if (actuatorConfiguration.gameObject.Equals(gameObject))
             {
-                configurations.Add(actuatorConfiguration, generateActuator(actuatorConfiguration));
+                actuators.Add(actuatorConfiguration, generateActuator(actuatorConfiguration));
             }
         }
     }
