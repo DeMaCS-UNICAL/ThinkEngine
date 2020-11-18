@@ -32,13 +32,13 @@ public class ActuatorConfiguration : AbstractConfiguration
         {
             gameObject.AddComponent<MonoBehaviourActuatorsManager>();
         }
-        GetComponent<MonoBehaviourActuatorsManager>().addConfiguration(this);
+        GetComponent<MonoBehaviourActuatorsManager>().AddConfiguration(this);
     }
     internal override void DeleteConfiguration()
     {
         if (saved)
         {
-            GetComponent<MonoBehaviourActuatorsManager>().deleteConfiguration(this);
+            GetComponent<MonoBehaviourActuatorsManager>().DeleteConfiguration(this);
         }
     }
     internal override void ASPRepresentation()

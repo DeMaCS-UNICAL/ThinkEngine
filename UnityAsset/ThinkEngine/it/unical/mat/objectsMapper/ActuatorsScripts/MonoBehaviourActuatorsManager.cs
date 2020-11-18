@@ -8,19 +8,27 @@ using UnityEngine;
 
 public class MonoBehaviourActuatorsManager:MonoBehaviour
 {
-    public Dictionary<ActuatorConfiguration,List<MonoBehaviourActuator>> actuators;
+    internal Dictionary<ActuatorConfiguration,List<MonoBehaviourActuator>> _actuators;
     internal bool ready = false;
-    void Awake()
+
+    internal Dictionary<ActuatorConfiguration, List<MonoBehaviourActuator>> actuators
     {
-        Reset();
+        get
+        {
+            if (_actuators == null)
+            {
+                _actuators = new Dictionary<ActuatorConfiguration, List<MonoBehaviourActuator>>();
+            }
+            return _actuators;
+        }
     }
+    #region Unity Messages
     void OnEnable()
     {
         Reset();
     }
     void Reset()
     {
-        actuators = new Dictionary<ActuatorConfiguration, List<MonoBehaviourActuator>>();
         ActuatorsManager actuatorsManager = Utility.actuatorsManager;
         actuatorsManager.configurationsChanged = true;
     }
@@ -28,28 +36,34 @@ public class MonoBehaviourActuatorsManager:MonoBehaviour
     {
         if (Application.isPlaying)
         {
-            foreach (ActuatorConfiguration configuration in GetComponents<ActuatorConfiguration>())
+            ActuatorConfiguration[] configurations = GetComponents<ActuatorConfiguration>();
+            if (configurations == null)
+            {
+                Destroy(this);
+                return;
+            }
+            foreach (ActuatorConfiguration configuration in configurations)
             {
                 if (configuration.saved)
                 {
-                    instantiateActuator(configuration);
+                    InstantiateActuator(configuration);
                 }
             }
             ready = true;
         }
     }
-    public void instantiateActuator(ActuatorConfiguration actuatorConfiguration)
+    #endregion
+    public void InstantiateActuator(ActuatorConfiguration actuatorConfiguration)
     {
         if (!actuators.Keys.Contains(actuatorConfiguration))
         {
             if (actuatorConfiguration.gameObject.Equals(gameObject))
             {
-                actuators.Add(actuatorConfiguration, generateActuator(actuatorConfiguration));
+                actuators.Add(actuatorConfiguration, GenerateActuator(actuatorConfiguration));
             }
         }
     }
-
-    private List<MonoBehaviourActuator> generateActuator(ActuatorConfiguration actuatorConfiguration)
+    private List<MonoBehaviourActuator> GenerateActuator(ActuatorConfiguration actuatorConfiguration)
     {
         List<MonoBehaviourActuator> generatedActuators = new List<MonoBehaviourActuator>();
         foreach(MyListString currentProperty in actuatorConfiguration.properties)
@@ -64,15 +78,27 @@ public class MonoBehaviourActuatorsManager:MonoBehaviour
     internal IEnumerable<string> GetAllConfigurationNames()
     {
         List<string> toReturn = new List<string>();
-        foreach (ActuatorConfiguration configuration in GetComponents<ActuatorConfiguration>())
+        ActuatorConfiguration[] configurations = GetComponents<ActuatorConfiguration>();
+        if (configurations == null)
+        {
+            Destroy(this);
+            return toReturn;
+        }
+        foreach (ActuatorConfiguration configuration in configurations)
         {
             toReturn.Add(configuration.configurationName);
         }
         return toReturn;
     }
-    internal ActuatorConfiguration getConfiguration(string name)
+    internal ActuatorConfiguration GetConfiguration(string name)
     {
-        foreach (ActuatorConfiguration configuration in GetComponents<ActuatorConfiguration>())
+        ActuatorConfiguration[] configurations = GetComponents<ActuatorConfiguration>();
+        if (configurations == null)
+        {
+            Destroy(this);
+            return null;
+        }
+        foreach (ActuatorConfiguration configuration in configurations)
         {
             if (configuration.saved && configuration.configurationName.Equals(name))
             {
@@ -81,16 +107,23 @@ public class MonoBehaviourActuatorsManager:MonoBehaviour
         }
         return null;
     }
-    internal void addConfiguration(ActuatorConfiguration configuration)
+    internal void AddConfiguration(ActuatorConfiguration configuration)
     {
         Utility.actuatorsManager.configurationsChanged = true;
     }
-    internal void deleteConfiguration(ActuatorConfiguration configuration)
+    internal void DeleteConfiguration(ActuatorConfiguration configuration)
     {
         Utility.actuatorsManager.configurationsChanged = true;
-        if (GetComponents<ActuatorConfiguration>() == null)
+        if (GetComponents<ActuatorConfiguration>().Length==1)
         {
-            DestroyImmediate(this);
+            if (Application.isPlaying)
+            {
+                Destroy(this);
+            }
+            else
+            {
+                DestroyImmediate(this);
+            }
         }
     }
 }

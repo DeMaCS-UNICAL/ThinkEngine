@@ -11,9 +11,9 @@ using it.unical.mat.embasp.languages.asp;
 using UnityEngine;
 
 
-public class MonoBehaviourActuator:MonoBehaviour
+internal class MonoBehaviourActuator:MonoBehaviour
 {
-    public const BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
+    private const BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
 
     internal MyListString property;
     internal string actuatorName;
@@ -25,28 +25,26 @@ public class MonoBehaviourActuator:MonoBehaviour
         }
         set {
             _toSet = value;
-            applyToGameLogic();
+            ApplyToGameLogic();
         }
     }
-
-    private void applyToGameLogic()
+    private void ApplyToGameLogic()
     {
         if(_toSet == null)
         {
             return;
         }
-        if (property.Count == 1)
+        if (property.Count == 1)//if the property is a direct one (i.e. a "field" of the gameobject)
         {
-            updateSimpleProperty(property, property[0], typeof(GameObject), gameObject);
+            UpdateSimpleProperty(property, property[0], typeof(GameObject), gameObject);
         }
         else
         {
-            updateComposedProperty(property, property, typeof(GameObject), gameObject);
+            UpdateComposedProperty(property, property, typeof(GameObject), gameObject);
         }
 
     }
-
-    private void updateSimpleProperty(MyListString currentProperty, string lastLevelHierarchy, Type gOType, object obj)
+    private void UpdateSimpleProperty(MyListString currentProperty, string lastLevelHierarchy, Type gOType, object obj)//set the value of the tracked property with the one stored in _toSet 
     {
         MemberInfo[] members = gOType.GetMember(lastLevelHierarchy, BindingAttr);
         if (members.Length == 0)
@@ -56,39 +54,55 @@ public class MonoBehaviourActuator:MonoBehaviour
         FieldOrProperty property = new FieldOrProperty(members[0]);
         property.SetValue(obj, Convert.ChangeType(_toSet, property.Type()));
     }
-    private void updateComposedProperty(MyListString currentProperty, MyListString partialHierarchy, Type objType, object obj)
+    private void UpdateComposedProperty(MyListString currentProperty, MyListString partialHierarchy, Type objType, object obj)
     {
-
         string parentName = partialHierarchy[0];
         MyListString child = partialHierarchy.GetRange(1, partialHierarchy.Count - 1);
         MemberInfo[] members = objType.GetMember(parentName, BindingAttr);
-        // MyDebugger.MyDebug("members with name " + parentName + " " + members.Length);
         if (members.Length == 0)
         {
-            updateComponent(currentProperty, partialHierarchy, objType, obj);
+            UpdateComponent(currentProperty, partialHierarchy, objType, obj);
             return;
         }
         FieldOrProperty parentProperty = new FieldOrProperty(objType.GetMember(parentName)[0]);
-        //MyDebugger.MyDebug(parentProperty.Name());
         object parent = parentProperty.GetValue(obj);
+        if(parent == null)
+        {
+            return;
+        }
         Type parentType = parent.GetType();
         if (child.Count == 1)
         {
-
-            updateSimpleProperty(currentProperty, child[0], parentType, parent);
-
+            UpdateSimpleProperty(currentProperty, child[0], parentType, parent);
         }
         else
         {
-            updateComposedProperty(currentProperty, child, parentType, parent);
+            UpdateComposedProperty(currentProperty, child, parentType, parent);
         }
-
-
     }
-
-    internal string parse(AnswerSet value)
+    private void UpdateComponent(MyListString currentProperty, MyListString partialHierarchy, Type gOType, object obj)
     {
-        List<string> myTemplate = getMyConfiguration().GetTemplate(property);
+        string parentName = partialHierarchy[0];
+        MyListString child = partialHierarchy.GetRange(1, partialHierarchy.Count - 1);
+        if (gOType == typeof(GameObject))
+        {
+            Component c = ((GameObject)obj).GetComponent(parentName);
+            if (c != null)
+            {
+                if (child.Count == 1)
+                {
+                    UpdateSimpleProperty(currentProperty, child[0], c.GetType(), c);
+                }
+                else
+                {
+                    UpdateComposedProperty(currentProperty, child, c.GetType(), c);
+                }
+            }
+        }
+    }
+    internal string Parse(AnswerSet value)//parses an AnswerSet looking for a literal matching its property
+    {
+        List<string> myTemplate = GetMyConfiguration().GetTemplate(property);
         if (myTemplate.Count > 1)
         {
             throw new Exception("It is not expected to have more than 1 entry for actuators");
@@ -97,63 +111,37 @@ public class MonoBehaviourActuator:MonoBehaviour
         string pattern = "objectIndex\\(([0-9]+)\\)";
         Regex regex = new Regex(@pattern);
         int myIndex = gameObject.GetComponent<IndexTracker>().currentIndex;
-        Debug.Log("comparing " + myTemplatePrefix + ", index "+myIndex+" with ");
         foreach (string literal in value.GetAnswerSet())
         {
-            Debug.Log(literal);
             string literalPrefix = literal.Substring(0, literal.LastIndexOf('('));
             Match matcher = regex.Match(literalPrefix);
-            if (int.Parse(matcher.Groups[1].Value) != myIndex)
+            if (matcher.Success && int.Parse(matcher.Groups[1].Value) == myIndex)//if the index of the object associated to the actuator is different from the one of the literal
             {
-                break;
-            }
-            //int gameObjectIndex = literalPrefix.
-            if (literalPrefix.Equals(string.Format(myTemplatePrefix,myIndex)))
-            {
-                int startIndex = literal.LastIndexOf("(") + 1;
-                string partialRes = literal.Substring(startIndex, literal.IndexOf(")", startIndex)-startIndex);
-                return partialRes.Trim('\"');
+                if (literalPrefix.Equals(string.Format(myTemplatePrefix, myIndex)))
+                {
+                    int startIndex = literal.LastIndexOf("(") + 1;//the value to assign to the property is wrapped in the inner pair of ()
+                    string partialRes = literal.Substring(startIndex, literal.IndexOf(")", startIndex) - startIndex);
+                    return partialRes.Trim('\"');//trim " to avoid conversion problems
+                }
             }
         }
         return null;
     }
-    
-
-    private ActuatorConfiguration getMyConfiguration()
+    private ActuatorConfiguration GetMyConfiguration()//retrieves the configuration underlying the actuator
     {
-        foreach(ActuatorConfiguration actuatorConf in gameObject.GetComponents<ActuatorConfiguration>())
+        ActuatorConfiguration[] actuatorConfs = gameObject.GetComponents<ActuatorConfiguration>();
+        if(actuatorConfs==null)
+        {
+            throw new Exception("ActuatorConfiguration missing for "+actuatorName);
+        }
+        foreach (ActuatorConfiguration actuatorConf in actuatorConfs)
         {
             if (actuatorConf.configurationName.Equals(actuatorName))
             {
                 return actuatorConf;
             }
         }
-        return null;
-    }
-
-    private void updateComponent(MyListString currentProperty, MyListString partialHierarchy, Type gOType, object obj)
-    {
-        string parentName = partialHierarchy[0];
-        MyListString child = partialHierarchy.GetRange(1, partialHierarchy.Count - 1);
-        //MyDebugger.MyDebug("component " + entire_name + " parent " + parentName + " child " + child);
-        if (gOType == typeof(GameObject))
-        {
-            Component c = ((GameObject)obj).GetComponent(parentName);
-            if (c != null)
-            {
-                //MyDebugger.MyDebug(c);
-                if (child.Count == 1)
-                {
-                    //MyDebugger.MyDebug(c.GetType());
-                    updateSimpleProperty(currentProperty, child[0], c.GetType(), c);
-
-                }
-                else
-                {
-                    updateComposedProperty(currentProperty, child, c.GetType(), c);
-                }
-            }
-        }
+        throw new Exception("ActuatorConfiguration missing for " + actuatorName);
     }
 }
 

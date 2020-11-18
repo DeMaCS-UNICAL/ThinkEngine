@@ -155,7 +155,7 @@ public class ActuatorsManager : MonoBehaviour
         {
             foreach (MonoBehaviourActuatorsManager manager in FindObjectsOfType<MonoBehaviourActuatorsManager>())
             {
-                if (manager.getConfiguration(configurationName) != null)
+                if (manager.GetConfiguration(configurationName) != null)
                 {
                     return true;
                 }
@@ -253,7 +253,7 @@ public class ActuatorsManager : MonoBehaviour
                 {
                     continue;
                 }
-                ActuatorConfiguration currentConfiguration = manager.getConfiguration(confName);
+                ActuatorConfiguration currentConfiguration = manager.GetConfiguration(confName);
                 if (currentConfiguration != null)
                 {
                     toReturn.Add(currentConfiguration);
@@ -287,14 +287,14 @@ public class ActuatorsManager : MonoBehaviour
             {
                 foreach (string actuatorConf in instantiatedActuators[brain])
                 {
-                    ActuatorConfiguration currentConfiguration = monobehaviourManager.getConfiguration(actuatorConf);
+                    ActuatorConfiguration currentConfiguration = monobehaviourManager.GetConfiguration(actuatorConf);
                     if (currentConfiguration!=null && currentConfiguration.CheckIfApply())
                     {
                         List<MonoBehaviourActuator> actuators = monobehaviourManager.actuators[currentConfiguration];
                         Performance.updatingActuators = true;
                         foreach (MonoBehaviourActuator act in actuators)
                         {
-                            act.toSet = act.parse(answerSet);
+                            act.toSet = act.Parse(answerSet);
                         }
                     }
                 }
@@ -310,14 +310,14 @@ public class ActuatorsManager : MonoBehaviour
         }
         foreach (string actuatorConf in instantiatedActuators[brain])
         {
-            ActuatorConfiguration currentConfiguration = monoBehaviourActuatorsManager.getConfiguration(actuatorConf);
+            ActuatorConfiguration currentConfiguration = monoBehaviourActuatorsManager.GetConfiguration(actuatorConf);
             if (currentConfiguration != null && currentConfiguration.CheckIfApply())
             {
                 List<MonoBehaviourActuator> actuators = monoBehaviourActuatorsManager.actuators[currentConfiguration];
                 Performance.updatingActuators = true;
                 foreach (MonoBehaviourActuator act in actuators)
                 {
-                    act.toSet = act.parse(answerSet);
+                    act.toSet = act.Parse(answerSet);
                 }
             }
         }
@@ -336,7 +336,7 @@ public class ActuatorsManager : MonoBehaviour
         }
         foreach (MonoBehaviourActuatorsManager manager in managers)
         {
-            if (manager.getConfiguration(name)!=null)
+            if (manager.GetConfiguration(name)!=null)
             {
                 return true;
             }
@@ -348,7 +348,7 @@ public class ActuatorsManager : MonoBehaviour
         MonoBehaviourActuatorsManager monoBehaviourActuatorsManager = brain.GetComponent<MonoBehaviourActuatorsManager>();
         if (monoBehaviourActuatorsManager != null)
         {
-            if (monoBehaviourActuatorsManager.getConfiguration(name) != null)
+            if (monoBehaviourActuatorsManager.GetConfiguration(name) != null)
             {
                 return true;
             }
