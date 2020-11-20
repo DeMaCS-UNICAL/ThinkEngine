@@ -1,59 +1,110 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using UnityEngine;
 using System.IO;
-using EmbASP4Unity.it.unical.mat.objectsMapper.Mappers;
 using System.Threading;
-using System.Timers;
 using System.Reflection;
 using System.Collections;
 using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
-using System.Diagnostics;
-using Debug = UnityEngine.Debug;
-using System.ComponentModel;
-using UnityEditor;
 
 [ExecuteAlways]
-
 public class Brain :MonoBehaviour
 {
-    public readonly object toLock = new object();
+    #region Serialized Fieds
     public bool enableBrain;
     public bool debug=true;
     public bool maintainFactFile;
-    public List<string> chosenSensorConfigurations;
-    public List<string> chosenActuatorConfigurations;
-    private Thread executionThread;
-    internal SolverExectuor embasp;
-    internal bool solverWaiting;
+    [SerializeField, HideInInspector]
+    private List<string> _chosenSensorConfigurations;
+    [SerializeField, HideInInspector]
+    private List<string> _chosenActuatorConfigurations;
     [SerializeField,HideInInspector]
     internal string ASPFilePath;
     [SerializeField,HideInInspector]
-    internal string ASPFileTemplatePath;
-    internal MethodInfo reasonerMethod;
+    private string _ASPFileTemplatePath;
+    [SerializeField, HideInInspector]
+    private string _executeReasonerOn;
+    [SerializeField, HideInInspector]
+    internal bool prefabBrain;
+    [SerializeField, HideInInspector]
+    internal bool specificASPFile;
+    [SerializeField, HideInInspector]
+    internal bool globalASPFile;
+    #endregion
     private object triggerClass;
-    public string executeReasonerOn;
+    internal List<string> chosenSensorConfigurations
+    {
+        get
+        {
+            if (_chosenSensorConfigurations == null)
+            {
+                _chosenSensorConfigurations = new List<string>();
+            }
+            return _chosenSensorConfigurations;
+        }
+    }
+    internal List<string> chosenActuatorConfigurations
+    {
+        get
+        {
+            if (_chosenActuatorConfigurations == null)
+            {
+                _chosenActuatorConfigurations = new List<string>();
+            }
+            return _chosenActuatorConfigurations;
+        }
+    }
+    internal string ASPFileTemplatePath
+    {
+        get
+        {
+            if (_ASPFileTemplatePath == null)
+            {
+                _ASPFileTemplatePath = @".\Assets\Resources\" + gameObject.name + "Template.asp";
+                if (!File.Exists(_ASPFileTemplatePath))
+                {
+                    if (!Directory.Exists(@".\Assets\Resources"))
+                    {
+                        Directory.CreateDirectory(@".\Assets\Resources");
+                    }
+                    File.Create(_ASPFileTemplatePath);
+                }
+            }
+            return _ASPFileTemplatePath;
+        }
+    }
+    internal string executeReasonerOn
+    {
+        get
+        {
+            if (_executeReasonerOn == null)
+            {
+                _executeReasonerOn = "";
+            }
+            return _executeReasonerOn;
+        }
+        set
+        {
+            _executeReasonerOn = value;
+        }
+    }
+
+    #region Runtime Fields
+    internal readonly object toLock = new object();
     internal string sensorsMapping;
     internal string objectsIndexes;
-    private Stopwatch watch;
-    internal long factsMSTotal;
-    internal int factsStep;
-    internal long asTotalMS;
-    internal int asSteps;
-    internal string dataPath;
     internal bool sensorsConfigurationsChanged;
     internal bool actuatorsConfigurationsChanged;
-    [SerializeField]
-    internal bool prefabBrain;
-    [SerializeField]
-    internal bool specificASPFile;
-    [SerializeField]
-    internal bool globalASPFile;
     private string originalName;
+    internal MethodInfo reasonerMethod;
     internal bool missingData;
+    private Thread executionThread;
+    internal SolverExectuor embasp;
+    internal bool solverWaiting;
+    #endregion
 
+    #region Unity Messages
     void Reset()
     {
         if (GetComponent<IndexTracker>() == null)
@@ -61,28 +112,6 @@ public class Brain :MonoBehaviour
             gameObject.AddComponent<IndexTracker>();
         }
         triggerClass = Utility.triggerClass;
-        dataPath = Environment.CurrentDirectory;
-        if (chosenActuatorConfigurations == null)
-        {
-            chosenActuatorConfigurations = new List<string>();
-            chosenSensorConfigurations = new List<string>();
-        }
-        if (ASPFileTemplatePath is null)
-        {
-            ASPFileTemplatePath = @".\Assets\Resources\" + gameObject.name + "Template.asp";
-        }
-        if(executeReasonerOn is null)
-        {
-            executeReasonerOn = "";
-        }
-        if (!File.Exists(ASPFileTemplatePath))
-        {
-            if (!Directory.Exists(@".\Assets\Resources"))
-            {
-                Directory.CreateDirectory(@".\Assets\Resources");
-            }
-            File.Create(ASPFileTemplatePath);
-        }
     }
     void OnEnable()
     {
@@ -94,12 +123,41 @@ public class Brain :MonoBehaviour
         Utility.loadPrefabs();
         if (Application.isPlaying && enableBrain)
         {
-            StartCoroutine("initBrain2");
+            StartCoroutine(InitBrain2());
         }
-
     }
-   
-    internal void generateFile()
+    void Update()
+    {
+        if (reasonerMethod == null)
+        {
+            lock (toLock)
+            {
+                if (!SomeConfigurationAvailable())
+                {
+                    missingData = true;
+                    return;
+                }
+                if (solverWaiting)
+                {
+                    solverWaiting = false;
+                    Monitor.Pulse(toLock);
+                }
+            }
+        }
+    }
+    void OnApplicationQuit()
+    {
+        if (embasp != null)
+        {
+            embasp.reason = false;
+            lock (toLock)
+            {
+                Monitor.Pulse(toLock);
+            }
+        }
+    }
+    #endregion
+    internal void GenerateFile()
     {
         using (FileStream fs = File.Create(ASPFileTemplatePath))
         {
@@ -118,63 +176,56 @@ public class Brain :MonoBehaviour
             }
         }
     }
-
-    IEnumerator initBrain2()
+    IEnumerator InitBrain2()
     {
         if(specificASPFile && originalName.Equals(gameObject.name))
         {
             yield return new WaitUntil( () => !originalName.Equals(gameObject.name));
         }
         embasp = new SolverExectuor(this);
-        prepareSensors();
-        prepareActuators();
-        if (!someConfigurationAvailable())
+        PrepareSensors();
+        PrepareActuators();
+        if (!SomeConfigurationAvailable())
         {
             missingData = true;
         }
         if (!executeReasonerOn.Equals("When Sensors are ready"))
         {
             reasonerMethod = Utility.getTriggerMethod(executeReasonerOn);
-            if (!(reasonerMethod is null))
+            if (reasonerMethod != null)
             {
-                StartCoroutine("pulseOn");
+                StartCoroutine(PulseOn());
             }
         }
         executionThread = new Thread(() =>
         {
-            //MyDebugger.MyDebug("starting thread");
             Thread.CurrentThread.Name = "Solver executor";
             Thread.CurrentThread.IsBackground = true;
             embasp.Run();
         });
         executionThread.Start();
-        watch = new Stopwatch();
-        watch.Start();
     }
-
-    internal void removeNullSensorConfigurations()
+    internal void RemoveNullSensorConfigurations()
     {
         chosenSensorConfigurations.RemoveAll(x => !Utility.sensorsManager.existsConfigurationWithName(x));
     }
-    internal void removeNullActuatorConfigurations()
+    internal void RemoveNullActuatorConfigurations()
     {
         chosenActuatorConfigurations.RemoveAll(x => !Utility.actuatorsManager.ExistsConfigurationWithName(x,this));
     }
-
-    private void prepareActuators()
+    private void PrepareActuators()
     {
         Utility.actuatorsManager.RegisterActuators(this, chosenActuatorConfigurations);
     }
-
-    private void prepareSensors()
+    private void PrepareSensors()
     {
         Utility.sensorsManager.registerSensors(this, chosenSensorConfigurations);
     }
-    private IEnumerator pulseOn()
+    private IEnumerator PulseOn()
     {
         while (true)
         {
-            yield return new WaitUntil(() => solverWaiting && someConfigurationAvailable() && (bool)reasonerMethod.Invoke(triggerClass, null));
+            yield return new WaitUntil(() => solverWaiting && SomeConfigurationAvailable() && (bool)reasonerMethod.Invoke(triggerClass, null));
             lock (toLock)
             {
                 solverWaiting = false;
@@ -182,51 +233,9 @@ public class Brain :MonoBehaviour
             }
         }
     }
-    void Update()
-    {
-        if (reasonerMethod == null)
-        {
-            lock (toLock)
-            {
-                if (!someConfigurationAvailable())
-                {
-                    missingData = true;
-                    return;
-                }
-                if (solverWaiting)
-                {
-                    solverWaiting = false;
-                    Monitor.Pulse(toLock);
-                }
-            }
-        }
-    }
-
-    private bool someConfigurationAvailable()
+    private bool SomeConfigurationAvailable()
     {
         return Utility.sensorsManager.isSomeActiveInScene(chosenSensorConfigurations) && Utility.actuatorsManager.IsSomeActiveInScene(chosenActuatorConfigurations);
     }
-
-
-    void OnApplicationQuit()
-    {
-        if (embasp != null) {
-            embasp.reason = false;
-            ////MyDebugger.MyDebug("finalize");
-            lock (toLock)
-            {
-                Monitor.Pulse(toLock);
-            }
-            finalize();
-        }
-    }
-
-
-    public void finalize()
-    {
-        //Performance.writeOnFile("facts", factsMSTotal / factsStep, true);
-        //Performance.writeOnFile("answer set", asTotalMS / asSteps);
-    }
-
 }
 

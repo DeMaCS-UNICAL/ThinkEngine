@@ -1,12 +1,7 @@
 ﻿using it.unical.mat.embasp.languages.asp;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEngine;
 
@@ -285,6 +280,10 @@ public class ActuatorsManager : MonoBehaviour
             }
             foreach (MonoBehaviourActuatorsManager monobehaviourManager in monobehaviourManagers)
             {
+                if (!monobehaviourManager.ready)
+                {
+                    continue;
+                }
                 foreach (string actuatorConf in instantiatedActuators[brain])
                 {
                     ActuatorConfiguration currentConfiguration = monobehaviourManager.GetConfiguration(actuatorConf);

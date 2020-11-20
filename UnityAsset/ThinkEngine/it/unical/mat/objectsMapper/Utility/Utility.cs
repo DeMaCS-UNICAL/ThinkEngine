@@ -182,6 +182,7 @@ public static class Utility
         if (!prefabsLoaded)
         {
             Resources.LoadAll<GameObject>("Prefabs");
+            prefabsLoaded = true;
         }
     }
 }

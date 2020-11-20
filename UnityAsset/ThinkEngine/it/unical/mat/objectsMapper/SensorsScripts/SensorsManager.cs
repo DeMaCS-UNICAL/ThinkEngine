@@ -213,8 +213,6 @@ public  class SensorsManager : MonoBehaviour
                     mapping += sensor.Map();
                 }
                 watch.Stop();
-                brain.factsStep++;
-                brain.factsMSTotal += watch.ElapsedMilliseconds;
                 brain.sensorsMapping = mapping;
                 Monitor.Pulse(toLock);
             }

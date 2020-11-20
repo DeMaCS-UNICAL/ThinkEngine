@@ -15,11 +15,11 @@ using it.unical.mat.embasp.languages.asp;
 
 namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 {
-    public class SolverExectuor
+    internal class SolverExectuor
     {
-        public Brain brain;
+        Brain brain;
         string factsPath;
-        public bool reason;
+        internal bool reason;
         Stopwatch stopwatch = new Stopwatch();
 
 
@@ -77,7 +77,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                     Debug.LogError(e.StackTrace);
                 }
 
-                Handler handler = new DesktopHandler(new DLV2DesktopService(brain.dataPath+@"\lib\dlv2.exe"));
+                Handler handler = new DesktopHandler(new DLV2DesktopService(@".\lib\dlv2.exe"));
                 InputProgram encoding = new ASPInputProgram();
                 encoding.AddFilesPath(Path.GetFullPath(brain.ASPFilePath));
                 InputProgram facts = new ASPInputProgram();
@@ -94,8 +94,6 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 }
                 AnswerSets answers = (AnswerSets)o;
                 stopwatch.Stop();
-                brain.asSteps++;
-                brain.asTotalMS += stopwatch.ElapsedMilliseconds;
                 if (answers.Answersets.Count > 0)
                 {
                     ActuatorsManager.NotifyActuators(brain,answers.answersets[0]);

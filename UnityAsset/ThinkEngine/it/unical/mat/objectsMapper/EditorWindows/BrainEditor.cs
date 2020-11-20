@@ -59,7 +59,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             }
             if (delete)
             {
-                myScript.removeNullSensorConfigurations();
+                myScript.RemoveNullSensorConfigurations();
                 delete = false;
             }
             foreach (string actuatorConfName in myScript.chosenActuatorConfigurations)
@@ -74,7 +74,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             }
             if (delete)
             {
-                myScript.removeNullActuatorConfigurations();
+                myScript.RemoveNullActuatorConfigurations();
                 delete = false;
             }
         }
@@ -109,7 +109,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             }
             if (removed)
             {
-                myScript.removeNullActuatorConfigurations();
+                myScript.RemoveNullActuatorConfigurations();
             }
             
         }
@@ -129,7 +129,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             }
             if (removed)
             {
-                myScript.removeNullSensorConfigurations();
+                myScript.RemoveNullSensorConfigurations();
                 removed = false;
             }
             foreach (string current in toDelete)
@@ -228,7 +228,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             Brain current = (Brain)target;
             if (GUILayout.Button("Generate ASP file template", GUILayout.Width(300)))
             {
-                current.generateFile();
+                current.GenerateFile();
             }
             EditorGUILayout.HelpBox("Generating a new file will delete the previouse template!", MessageType.Warning);
             savingInBrain();
