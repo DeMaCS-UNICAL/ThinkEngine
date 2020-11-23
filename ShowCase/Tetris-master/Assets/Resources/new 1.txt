@@ -1,3 +1,0 @@
-prepare a pre-implemented player
-actuators should be more complex, map reasoner decisions to Action
-planner executors
