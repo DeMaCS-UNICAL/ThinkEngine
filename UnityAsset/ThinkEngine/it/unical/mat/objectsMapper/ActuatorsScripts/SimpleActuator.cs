@@ -183,14 +183,18 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.ActuatorsScripts
             {
                 IDictionary dic = dictionaryPerType[property.Type()];
                 Type propertyInDictionaryType = dic.GetType().GetGenericArguments()[1];
+                string toSetValue = "0";
+                if(propertyInDictionaryType == typeof(bool)){
+                    toSetValue="False";
+                }
                 if (!dic.Contains(entire_name))
                 {
                     //MyDebugger.MyDebug("Adding " + entire_name);
-                    dic.Add(entire_name, Convert.ChangeType("0", propertyInDictionaryType));
+                    dic.Add(entire_name, Convert.ChangeType(toSetValue, propertyInDictionaryType));
                 }
                 else
                 {
-                    dic[entire_name] = Convert.ChangeType("0", propertyInDictionaryType);
+                    dic[entire_name] = Convert.ChangeType(toSetValue, propertyInDictionaryType);
                 }
 
             }
