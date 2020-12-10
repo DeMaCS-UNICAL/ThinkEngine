@@ -6,7 +6,7 @@ Indeed, multiple problems arising from the integration have been solved, for exa
 
 The asset is released as a bunch of .dll files collecting a number of C# scripts. 
 
-### General Architecture
+## General Architecture
 
 ![ThinkEngine's Architecture](ThinkEngine_Architecture.JPG)
 
@@ -25,3 +25,11 @@ Both sensors and actuators managers run in the main Unity thread.
 When a Solver Executor (running in an auxiliary thread) needs input facts, it requests these information first to the sensors manager and later to the actuators one. 
 At each request it WAITS on a queue to receive what it needs. The two managers reply to these requests in the *Update* event. 
 Since sensors are updated in the *LateUpdate* event while the Sensors Manager retrieves the sensors’ mapping in the *Update* one, there is an automatic synchronization of the main thread and the auxiliary ones.
+
+## Reflection Layer
+This layer is in charge of translating back and forth from object data structure to logical assertion.
+### Sensors
+Principal involved class: SensorConfiguration, MonoBehaviourSensorsManager, MonoBehaviourSensor
+
+### Actuators
+Principal involved class: ActuatorConfiguration, MonoBehaviourActuatorsManager, MonoBehaviourActuator
