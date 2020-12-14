@@ -35,11 +35,12 @@ Principal involved class: SensorConfiguration, MonoBehaviourSensorsManager, Mono
 When some information of a GameObject are needed as input facts of an ASP program, you need to add, at design-time, a SensorConfiguration component to the GameObject. Once you choose the name of the configuration (that HAS to be UNIQUE in the game), you can graphically explore the properties hierarchy of the GameObject and you can choose the properties you want to feed in input of the solver. For each property, the ThinkEngine stores the last 100 read values. While configuring the sensor, you can choose which aggregation function has to be applied when generating the logical assertion (e.g. min, max, avg, newest value, oldest value). For what concerns complex data structures, at the moment, we support only **List** and **Bidimensional Arrays** of (non basic but non generics) objects.
 
 #### MonoBehaviourSensorsManager
-At design-time, when a sensor configuration is saved, a **MonoBehaviourSensorsManager** is automatically added to the GameObject. 
+At design-time, when a sensor configuration is saved, a **MonoBehaviourSensorsManager** component is automatically added to the GameObject. 
 At design-time, the manager is in charge of notifing the active brains of all the updates the occurs to the configuration of it owner GameObject.
 At run-time, instead, it manages the actual instantiation of the sensors. For each configuration, it instantiates a sensor for each simple property and a sensor for each element of a complex data structure. During the game, if the size of a complex data structure increases, the manager instantiates as many sensors as many new elements are added to the data structure. 
 
 #### MonoBehaviourSensor
+Sensors are implemented as MonoBehaviour. In the *LateUpdate* event, each sensor checks if it has to read the current value of the property to which it is attached. If it is a sensor attached to an element of a complex data structure and if when it is going to read the current value the corresponding data structure has less elements than the exepected, the sensor destroys itself.
 
 ### Actuators
 Principal involved class: ActuatorConfiguration, MonoBehaviourActuatorsManager, MonoBehaviourActuator
