@@ -20,7 +20,9 @@ public class Brain :MonoBehaviour
     [SerializeField, HideInInspector]
     private List<string> _chosenActuatorConfigurations;
     [SerializeField,HideInInspector]
-    internal string ASPFilePath;
+    internal string ASPFilesPath;
+    [SerializeField, HideInInspector]
+    internal string ASPFilesPrefix;
     [SerializeField,HideInInspector]
     private string _ASPFileTemplatePath;
     [SerializeField, HideInInspector]
@@ -61,7 +63,7 @@ public class Brain :MonoBehaviour
         {
             if (_ASPFileTemplatePath == null)
             {
-                _ASPFileTemplatePath = @".\Assets\Resources\" + gameObject.name + "Template.asp";
+                _ASPFileTemplatePath = @".\Assets\Resources\" + "Template"+gameObject.name + ".asp";
                 if (!File.Exists(_ASPFileTemplatePath))
                 {
                     if (!Directory.Exists(@".\Assets\Resources"))

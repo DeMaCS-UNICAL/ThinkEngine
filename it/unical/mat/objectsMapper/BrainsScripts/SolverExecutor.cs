@@ -27,6 +27,15 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 Directory.CreateDirectory(Path.GetTempPath() + @"ThinkEngineFacts\");
             }
             reason = true;
+            InputProgram encoding = new ASPInputProgram();
+            foreach (string fileName in Directory.GetFiles(Path.GetFullPath(brain.ASPFilesPath)))
+            {
+                string actualFileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
+                if (actualFileName.StartsWith(brain.ASPFilesPrefix) && actualFileName.EndsWith(".asp"))
+                {
+                    encoding.AddFilesPath( fileName);
+                }
+            }
             while (reason)
             {
                 lock (brain.toLock)
@@ -60,45 +69,45 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                         fs.Write(brain.sensorsMapping);
                         fs.Close();
                     }
+                    Handler handler = new DesktopHandler(new DLV2DesktopService(@".\lib\dlv2.exe"));
+                    InputProgram facts = new ASPInputProgram();
+                    facts.AddFilesPath(factsPath);
+                    handler.AddProgram(encoding);
+                    handler.AddProgram(facts);
+                    handler.AddOption(new OptionDescriptor("--filter=setOnActuator/1 "));
+                    stopwatch.Restart();
+                    if (!reason)
+                    {
+                        return;
+                    }
+                    Output o = handler.StartSync();
+                
+                    if (!o.ErrorsString.Equals(""))
+                    {
+                        Debug.LogError(o.ErrorsString + " " + o.OutputString);
+                    }
+                    AnswerSets answers = (AnswerSets)o;
+                    stopwatch.Stop();
+                    if (answers.Answersets.Count > 0)
+                    {
+                        ActuatorsManager.NotifyActuators(brain,answers.answersets[0]);
+                    }
+                    if (!brain.maintainFactFile)
+                    {
+                        File.Delete(factsPath);
+                    }
                 }
                 catch (Exception e)
                 {
+                    reason = false;
                     Debug.LogError("CAUGHT EXECPTION!!!!");
                     Debug.LogError(e.Source);
                     Debug.LogError(e.Message);
                     Debug.LogError(e.StackTrace);
                 }
 
-                Handler handler = new DesktopHandler(new DLV2DesktopService(@".\lib\dlv2.exe"));
-                InputProgram encoding = new ASPInputProgram();
-                encoding.AddFilesPath(Path.GetFullPath(brain.ASPFilePath));
-                InputProgram facts = new ASPInputProgram();
-                facts.AddFilesPath(factsPath);
-                handler.AddProgram(encoding);
-                handler.AddProgram(facts);
-                handler.AddOption(new OptionDescriptor("--filter=setOnActuator/1 "));
-                stopwatch.Restart();
-                if (!reason)
-                {
-                    return;
-                }
-                Output o = handler.StartSync();
-                
-                if (!o.ErrorsString.Equals(""))
-                {
-                    Debug.LogError(o.ErrorsString + " " + o.OutputString);
-                }
-                AnswerSets answers = (AnswerSets)o;
-                stopwatch.Stop();
-                if (answers.Answersets.Count > 0)
-                {
-                    ActuatorsManager.NotifyActuators(brain,answers.answersets[0]);
-                }
-                if (!brain.maintainFactFile)
-                {
-                    File.Delete(factsPath);
-                }
             }
+
         }
 
     

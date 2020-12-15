@@ -284,12 +284,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             GUI.enabled = false;
             EditorGUILayout.TextField("Trigger Script Path", Utility.triggerClassPath);
             EditorGUILayout.TextField("ASP Template File Path", myScript.ASPFileTemplatePath);
+            EditorGUILayout.TextField("ASP Files Path", myScript.ASPFilesPath);
+            myScript.ASPFilesPath = @".\Assets\Resources\";
             GUI.enabled = true;
             if (!myScript.prefabBrain)
             {
                 GUI.enabled = false;
-                myScript.ASPFilePath = @".\Assets\Resources\" + myScript.gameObject.name + ".asp";
-                EditorGUILayout.TextField("ASP File Path", myScript.ASPFilePath);
+                myScript.ASPFilesPrefix = myScript.gameObject.name;
+                EditorGUILayout.TextField("ASP Files Pattern", myScript.ASPFilesPrefix+"*.asp");
                 GUI.enabled = true;
             }
             else
@@ -319,19 +321,19 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             ExclusiveTogglesCheck(currentTrue);
             if (myScript.specificASPFile)
             {
-                EditorGUILayout.HelpBox("At runtime the system will look for the following file \n" +
+                EditorGUILayout.HelpBox("At runtime the system will look for the following files pattern \n" +
                     "in which \" nameOfTheInstantiation will be the name of the GameObject instantiated at runtime.", MessageType.Warning,true);
                 GUI.enabled = false;
-                myScript.ASPFilePath = @".\Assets\Resources\nameOfTheInstantiation.asp";
-                EditorGUILayout.TextField("ASP File Path", myScript.ASPFilePath);
+                myScript.ASPFilesPrefix = @"nameOfTheInstantiation";
+                EditorGUILayout.TextField("ASP Files Pattern", myScript.ASPFilesPrefix + "*.asp");
                 GUI.enabled = true;
                 EditorGUILayout.HelpBox("DO NOT use the default GameObject name when instantiating.", MessageType.Warning, true);
             }
             if (myScript.globalASPFile)
             {
                 GUI.enabled = false;
-                myScript.ASPFilePath = @".\Assets\Resources\" + myScript.gameObject.name + ".asp";
-                EditorGUILayout.TextField("ASP File Path", myScript.ASPFilePath);
+                myScript.ASPFilesPrefix = myScript.gameObject.name;
+                EditorGUILayout.TextField("ASP File Path", myScript.ASPFilesPrefix);
                 GUI.enabled = true;
             }
 
