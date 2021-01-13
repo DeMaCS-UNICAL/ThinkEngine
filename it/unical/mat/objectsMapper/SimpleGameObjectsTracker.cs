@@ -5,7 +5,18 @@ using UnityEngine;
 [Serializable]
 public class SimpleGameObjectsTracker
 {
-    public Dictionary<string, bool> propertiesToggled { get; set; }
+    public Dictionary<string, bool> _propertiesToggled;
+    public Dictionary<string, bool> propertiesToggled
+    {
+        get
+        {
+            if (_propertiesToggled == null)
+            {
+                _propertiesToggled = new Dictionary<string, bool>();
+            }
+            return _propertiesToggled;
+        }
+    }
     public string objType;
     [SerializeField]
     public List<string> toSave;
@@ -15,8 +26,8 @@ public class SimpleGameObjectsTracker
     public string propertyType; //ARRAY2, LIST
     public SimpleGameObjectsTracker(Type type)
     {
-        Type listType = ReflectionExecutor.IsListOfType(type);
-        if (!(listType is null))
+        Type listType = ReflectionExecutor.ListOfType(type);
+        if (!(listType == null))
         {
             propertyType = "LIST";
             objType = listType.AssemblyQualifiedName;
@@ -29,13 +40,11 @@ public class SimpleGameObjectsTracker
             name = type.GetElementType().ToString();
         }
         toSave = new List<string>();
-        propertiesToggled = new Dictionary<string, bool>();
     }
-    public void getBasicProperties()
+    public void GetBasicProperties()
     {
         Type localType = Type.GetType(objType);
         List<FieldOrProperty> all = ReflectionExecutor.GetFieldsAndProperties(localType);
-        propertiesToggled = new Dictionary<string, bool>();
         foreach (FieldOrProperty f in all)
         {
             if (ReflectionExecutor.IsBaseType(f) && !propertiesToggled.ContainsKey(f.Name()))

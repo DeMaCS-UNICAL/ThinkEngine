@@ -59,7 +59,7 @@ internal class MonoBehaviourSensorHider
                 SensorsUtility.ReadComposedProperty(gameObject, property, property, typeof(GameObject), gameObject, ReadSimplePropertyMethod);
             }
         }
-        private object ReadSimplePropertyMethod(string path, Type type, object obj)
+        private MyPropertyInfo ReadSimplePropertyMethod(string path, Type type, object obj)
         {
             if (propertyType.Equals("VALUE"))
             {
@@ -68,24 +68,40 @@ internal class MonoBehaviourSensorHider
             }
             if (propertyType.Equals("LIST"))
             {
-                ReadSimpleListProperty(path, type, obj);
+                ReadListProperty(path, type, obj);
                 return null;
             }
             if (propertyType.Equals("ARRAY2"))
             {
-                ReadSimpleArrayProperty(path, type, obj);
+                ReadArrayProperty(path, type, obj);
                 return null;
             }
             return null;
         }
-        private void ReadSimpleArrayProperty(string propertyPath, Type type, object currentObject)
+        private void ReadArrayProperty(string propertyPath, Type type, object currentObject)
         {
-            object[] matrixValue = SensorsUtility.GetArrayProperty(propertyPath, collectionElementProperties, type, currentObject, indexes[0], indexes[1]);
+            ArrayInfo matrixValue;
+            if (collectionElementProperties.Count == 1 && collectionElementProperties[0].Equals("")) 
+            {
+                matrixValue = SensorsUtility.GetArrayProperty(propertyPath, type, currentObject, indexes[0], indexes[1]);
+            }
+            else
+            {
+                matrixValue = SensorsUtility.GetArrayProperty(propertyPath, type, currentObject, indexes[0], indexes[1], collectionElementProperties);
+            }
             RetrieveCollectionValue(matrixValue);
         }
-        private void ReadSimpleListProperty(string path, Type type, object obj)
+        private void ReadListProperty(string path, Type type, object obj)
         {
-            object[] listValue = SensorsUtility.GetListProperty(path, collectionElementProperties, type, obj, indexes[0]);
+            ListInfo listValue;
+            if (collectionElementProperties.Count == 1 && collectionElementProperties[0].Equals(""))
+            {
+                listValue = SensorsUtility.GetListProperty(path, type, obj, indexes[0]);
+            }
+            else
+            {
+                listValue = SensorsUtility.GetListProperty(path, type, obj, indexes[0], collectionElementProperties);
+            }
             RetrieveCollectionValue(listValue);
         }
         public void ReadSimpleValueProperty(string path, Type gOType, object obj)
@@ -98,18 +114,28 @@ internal class MonoBehaviourSensorHider
             FieldOrProperty property = new FieldOrProperty(members[0]);
             RetrieveSinglePropertyValue(property, 0, obj);
         }
-        private void RetrieveCollectionValue(object[] collectionValue)
+        private void RetrieveCollectionValue(MyPropertyInfo collectionValue)
         {
-            if (collectionValue[0] != null && collectionValue[1] != null)
+            if (!collectionValue.IsNull())
             {
-                List<FieldOrProperty> toRead = (List<FieldOrProperty>)collectionValue[1];
-                RetrievePropertiesValues(toRead, collectionValue[0]);
+                if (!collectionValue.isBasic && collectionValue.properties != null)
+                {
+                    List<FieldOrProperty> toRead = collectionValue.properties;
+                    RetrievePropertiesValues(toRead, collectionValue.Collection());
+                }
+                else if (collectionValue.isBasic && collectionValue.value != null)
+                {
+                    IList currentValuesList = propertyValues[0];
+                    Type currentValuesListType = currentValuesList.GetType().GetGenericArguments()[0];
+                    currentValuesList.Add(Convert.ChangeType(collectionValue.value, currentValuesListType));
+                }
+                else
+                {
+                    CollectionShrank();
+                    return;
+                }
             }
-            else
-            {
-                CollectionShrank();
-                return;
-            }
+            
         }
         private void RetrievePropertiesValues(List<FieldOrProperty> toRead, object collection)
         {

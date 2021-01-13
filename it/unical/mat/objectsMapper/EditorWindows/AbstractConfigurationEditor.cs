@@ -235,24 +235,49 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             EditorGUILayout.BeginHorizontal();
             tracker.objectsToggled[currentGOProperty] = EditorGUILayout.ToggleLeft(currentGOProperty.Name(), tracker.objectsToggled[currentGOProperty]);
             AddCustomFields(currentGOProperty);
-            if (tracker.objectsToggled[currentGOProperty] && !tracker.IsBaseType(currentGOProperty))
+            if (!tracker.IsBaseType(currentGOProperty))
             {
-                bool configure = GUILayout.Button("Configure Object");
-                if (configure)
+                if (tracker.objectsToggled[currentGOProperty])
                 {
-                    objectMode = true;
-                    objectToConfigure = currentGOProperty;
-                    helpScroll = new Vector2(0, 0);
-                    if (!tracker.basicTypeCollectionsConfigurations.ContainsKey(currentGOProperty))
+                    if (tracker.HasBasicGenericArgument(currentGOProperty))
                     {
-                        tracker.basicTypeCollectionsConfigurations.Add(currentGOProperty, new SimpleGameObjectsTracker(objectToConfigure.Type()));
+                        AddBasicComplexDataStructure(currentGOProperty);
                     }
-                    tracker.basicTypeCollectionsConfigurations[currentGOProperty].getBasicProperties();
-                    DrawObjectProperties();
+                    else
+                    {
+                        ConfigureNonBasicComplexDataStructure(currentGOProperty);
+                    }
+                }
+                else
+                {
+                    if (tracker.HasBasicGenericArgument(currentGOProperty))
+                    {
+                        tracker.RemoveSimpleTracker(currentGOProperty);
+                    }
                 }
             }
             EditorGUILayout.EndHorizontal();
         }
+
+        private void AddBasicComplexDataStructure(FieldOrProperty currentGOProperty)
+        {
+            tracker.TogglePropertySimpleTracker(currentGOProperty,"",true);
+            tracker.SaveSimpleTracker(currentGOProperty);
+        }
+
+        private void ConfigureNonBasicComplexDataStructure(FieldOrProperty currentGOProperty)
+        {
+            bool configure = GUILayout.Button("Configure Object");
+            if (configure)
+            {
+                objectMode = true;
+                objectToConfigure = currentGOProperty;
+                helpScroll = new Vector2(0, 0);
+                tracker.LoadBasicPropertiesSimpleTracker(currentGOProperty);
+                DrawObjectProperties();
+            }
+        }
+
         protected virtual bool IsMappable(FieldOrProperty obj)
         {
             return tracker.IsMappable(obj);//for actuators a property is mappable iff it's a basic type
@@ -316,10 +341,9 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         }
         protected void DrawObjectProperties()
         {
-            SimpleGameObjectsTracker simpleTracker = tracker.basicTypeCollectionsConfigurations[objectToConfigure];
-            GUILayout.Label("Configure " + simpleTracker.objType + " object for " + objectToConfigure.Name() + " property ", EditorStyles.boldLabel);
+            GUILayout.Label("Configure " + tracker.GetSimpleTracker(objectToConfigure).objType + " object for " + objectToConfigure.Name() + " property ", EditorStyles.boldLabel);
             List<string> propertiesNames = new List<string>();
-            foreach (string currentProperty in simpleTracker.propertiesToggled.Keys)
+            foreach (string currentProperty in tracker.GetSimpleTracker(objectToConfigure).propertiesToggled.Keys)
             {
                 propertiesNames.Add(currentProperty);
             }
@@ -329,7 +353,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 {
                     foreach (string currentPropertyName in propertiesNames)
                     {
-                        simpleTracker.propertiesToggled[currentPropertyName] = EditorGUILayout.ToggleLeft(currentPropertyName, simpleTracker.propertiesToggled[currentPropertyName]);
+                        tracker.TogglePropertySimpleTracker(objectToConfigure,currentPropertyName, EditorGUILayout.ToggleLeft(currentPropertyName, tracker.IsPropertySimpleTrackerToggled(objectToConfigure, currentPropertyName)));
                     }
                     helpScroll = scrollView.scrollPosition;
                 }
@@ -342,19 +366,19 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             EditorGUILayout.EndHorizontal();
             if (cancel)
             {
-                if (simpleTracker.toSave.Count == 0)
+                if (tracker.SimpleTrackerToSaveCount(objectToConfigure) == 0)
                 {
-                    tracker.basicTypeCollectionsConfigurations.Remove(objectToConfigure);
+                    tracker.RemoveSimpleTracker(objectToConfigure);
                     tracker.objectsToggled[objectToConfigure] = false;
                 }
                 objectMode = false;
             }
             if (save)
             {
-                simpleTracker.save();
-                if (simpleTracker.toSave.Count == 0)
+                tracker.SaveSimpleTracker(objectToConfigure);
+                if (tracker.SimpleTrackerToSaveCount(objectToConfigure) == 0)
                 {
-                    tracker.basicTypeCollectionsConfigurations.Remove(objectToConfigure);
+                    tracker.RemoveSimpleTracker(objectToConfigure);
                     tracker.objectsToggled[objectToConfigure] = false;
                 }
                 objectMode = false;

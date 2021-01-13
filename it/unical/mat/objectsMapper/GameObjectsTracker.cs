@@ -14,10 +14,18 @@ public class GameObjectsTracker
     public Dictionary<GameObject, List<Component>> gameObjectsComponents;//for each gameObject in the hierarchy of the root stores a list of its components
     public Dictionary<object, string> propertiesName;//Feature not completed: this should store a chosen name for a specific property in the hierarchy
     public string configurationName = "";//name of the configuration associated to the tracker
-    public Dictionary<object, SimpleGameObjectsTracker> basicTypeCollectionsConfigurations; //configuration for T type for T[],T[,], List<T> etc.
+    private Dictionary<FieldOrProperty, SimpleGameObjectsTracker> basicTypeCollectionsConfigurations; //configuration for T type for T[],T[,], List<T> etc.
     public Dictionary<FieldOrProperty, int> operationPerProperty;//for each property chosen, it stores which aggregate to use while generating the input facts for the ASP solver
     public Dictionary<FieldOrProperty, string> specificValuePerProperty;//a specialization of the above one (you want to check if a specific value is present in the data series collected)
 
+    internal SimpleGameObjectsTracker GetSimpleTracker(FieldOrProperty key)
+    {
+        if (!basicTypeCollectionsConfigurations.ContainsKey(key))
+        {
+            basicTypeCollectionsConfigurations.Add(key, new SimpleGameObjectsTracker(key.Type()));
+        }
+        return basicTypeCollectionsConfigurations[key];
+    }
     public List<Component> GetComponents(GameObject gO)
     {
         return ReflectionExecutor.GetComponents(gO);
@@ -154,6 +162,22 @@ public class GameObjectsTracker
             }
         }
     }
+
+    internal void SetSimpleTrackerName(FieldOrProperty fieldOrProperty, MyListString currentPropertyHierarchy)
+    {
+        basicTypeCollectionsConfigurations[fieldOrProperty].propertyName = currentPropertyHierarchy;
+    }
+
+    internal bool ExistsSimpleTrackerFor(FieldOrProperty fieldOrProperty)
+    {
+        return basicTypeCollectionsConfigurations != null && basicTypeCollectionsConfigurations.ContainsKey(fieldOrProperty);
+    }
+
+    internal bool HasBasicGenericArgument(FieldOrProperty fieldOrProperty)
+    {
+        return ReflectionExecutor.HasBasicGenericArgument(fieldOrProperty);
+    }
+
     private object PropertyValueAndOwner(FieldOrProperty currentFieldOrProperty, object parentObject)
     {
         object parentObjectValueForCurrentProperty;
@@ -177,6 +201,16 @@ public class GameObjectsTracker
 
         return parentObjectValueForCurrentProperty;
     }
+
+    internal void LoadBasicPropertiesSimpleTracker(FieldOrProperty currentGOProperty)
+    {
+        if (!basicTypeCollectionsConfigurations.ContainsKey(currentGOProperty))
+        {
+            basicTypeCollectionsConfigurations.Add(currentGOProperty, new SimpleGameObjectsTracker(currentGOProperty.Type()));
+        }
+        basicTypeCollectionsConfigurations[currentGOProperty].GetBasicProperties();
+    }
+
     private bool CheckIfPropertyIsToToggle(List<MyListString> properties, MyListString currentPropertyHierarchy, string latterLevelProperty)
     {
         if (properties is null)
@@ -222,7 +256,41 @@ public class GameObjectsTracker
         propertiesName = new Dictionary<object, string>();
         specificValuePerProperty = new Dictionary<FieldOrProperty, string>();
         operationPerProperty = new Dictionary<FieldOrProperty, int>();
-        basicTypeCollectionsConfigurations = new Dictionary<object, SimpleGameObjectsTracker>();
+        basicTypeCollectionsConfigurations = new Dictionary<FieldOrProperty, SimpleGameObjectsTracker>();
     }
-   
+
+    internal void RemoveSimpleTracker(FieldOrProperty objectToConfigure)
+    {
+        if (basicTypeCollectionsConfigurations.ContainsKey(objectToConfigure))
+        {
+            basicTypeCollectionsConfigurations.Remove(objectToConfigure);
+        }
+    }
+
+    internal void TogglePropertySimpleTracker(FieldOrProperty objectToConfigure, string currentPropertyName, bool v)
+    {
+        if (!basicTypeCollectionsConfigurations.ContainsKey(objectToConfigure))
+        {
+            basicTypeCollectionsConfigurations.Add(objectToConfigure, new SimpleGameObjectsTracker(objectToConfigure.Type()));
+        }
+        if (!basicTypeCollectionsConfigurations[objectToConfigure].propertiesToggled.ContainsKey(currentPropertyName))
+        {
+            basicTypeCollectionsConfigurations[objectToConfigure].propertiesToggled.Add(currentPropertyName, false);
+        }
+        basicTypeCollectionsConfigurations[objectToConfigure].propertiesToggled[currentPropertyName] = v;
+    }
+
+    internal bool IsPropertySimpleTrackerToggled(FieldOrProperty objectToConfigure, string currentPropertyName)
+    {
+        return basicTypeCollectionsConfigurations[objectToConfigure].propertiesToggled[currentPropertyName];
+    }
+
+    internal int SimpleTrackerToSaveCount(FieldOrProperty objectToConfigure)
+    {
+        return basicTypeCollectionsConfigurations[objectToConfigure].toSave.Count;
+    }
+    internal void SaveSimpleTracker(FieldOrProperty objectToConfigure)
+    {
+        basicTypeCollectionsConfigurations[objectToConfigure].save();
+    }
 }

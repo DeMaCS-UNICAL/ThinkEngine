@@ -13,27 +13,37 @@ internal static class ReflectionExecutor
 
     internal static bool IsBaseType(FieldOrProperty obj)
     {
+        Type objType = obj.Type();
+        return IsBaseType(objType);
+    }
+
+    private static bool IsBaseType(Type objType)
+    {
         List<Type> signedInteger = SignedIntegerTypes();
         List<Type> unsignedInteger = UnsignedIntegerTypes();
         List<Type> floatingPoint = FloatingPointTypes();
-        //MyDebugger.MyDebug(" level " + level);
-        Type objType = obj.Type();
         bool isBase = signedInteger.Contains(objType) || unsignedInteger.Contains(objType) || floatingPoint.Contains(objType);
         isBase |= objType == typeof(char) || objType == typeof(bool) || objType == typeof(Enum) || objType == typeof(string);
-        return  isBase ;
+        return isBase;
     }
 
     internal static int IsArrayOfRank(FieldOrProperty obj)
     {
         Type objType = obj.Type();
-        return objType.IsArray? objType.GetArrayRank():-1;
+        return IsArrayOfRank(objType);
     }
-    internal static Type IsList(FieldOrProperty obj)
+
+    private static int IsArrayOfRank(Type objType)
+    {
+        return objType.IsArray ? objType.GetArrayRank() : -1;
+    }
+
+    internal static bool IsList(FieldOrProperty obj)
     {
         Type objType = obj.Type();
-        return IsListOfType(objType);
+        return ListOfType(objType)!=null;
     }
-    internal static Type IsListOfType(Type type)
+    internal static Type ListOfType(Type type)
     {
         if (type.IsGenericType && type.GetGenericTypeDefinition()==typeof(List<>))
         {
@@ -59,12 +69,15 @@ internal static class ReflectionExecutor
     }
     internal static bool IsMappable(FieldOrProperty obj)
     {
-        return IsBaseType(obj) || IsMatrix(obj) || IsList(obj)!=null;
+        return IsBaseType(obj) || IsMatrix(obj) || IsList(obj);
     }
     private static bool IsMatrix(FieldOrProperty obj)
     {
-       
-        return IsArrayOfRank(obj)==2;
+        return IsArrayOfRank(obj) == 2;
+    }
+    private static bool IsMatrix(Type type)
+    {
+        return IsArrayOfRank(type) == 2;
     }
     internal static List<FieldOrProperty> GetFieldsAndProperties(object go)
     {
@@ -95,5 +108,19 @@ internal static class ReflectionExecutor
             }
         }
         return components;
+    }
+
+    internal static bool HasBasicGenericArgument(FieldOrProperty fieldOrProperty)
+    {
+        Type objType = fieldOrProperty.Type();
+        if (IsMatrix(objType))
+        {
+            return IsBaseType(objType.GetElementType());
+        }
+        if (IsList(fieldOrProperty))
+        {
+            return IsBaseType(ListOfType(objType));
+        }
+        return false;
     }
 }

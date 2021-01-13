@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.Serialization;
 using UnityEngine;
-using UnityEditor;
-using EmbASP4Unity.it.unical.mat.objectsMapper;
 
 [ExecuteInEditMode]
 public class AbstractConfiguration : MonoBehaviour
@@ -182,12 +176,12 @@ public class AbstractConfiguration : MonoBehaviour
         if (!tracker.IsBaseType(objectProperties[propertyName]))//if it is a list or matrix
         {
             //retrieve and configure the GameObjectSimpleTracker for the elements of the "collection"
-            if (tracker.basicTypeCollectionsConfigurations == null || !tracker.basicTypeCollectionsConfigurations.ContainsKey(objectProperties[propertyName]))
+            if (!tracker.ExistsSimpleTrackerFor(objectProperties[propertyName]))
             {
-                throw new Exception("No advanced configuration provided for property " + currentPropertyHierarchy+"^"+propertyName);
+                throw new Exception("No advanced configuration provided for property " + currentPropertyHierarchy);
             }
-            tracker.basicTypeCollectionsConfigurations[objectProperties[propertyName]].propertyName = currentPropertyHierarchy;
-            advancedConf.Add(tracker.basicTypeCollectionsConfigurations[objectProperties[propertyName]]);
+            tracker.SetSimpleTrackerName(objectProperties[propertyName], currentPropertyHierarchy);
+            advancedConf.Add(tracker.GetSimpleTracker(objectProperties[propertyName]));
         }
         else
         {
@@ -235,7 +229,6 @@ public class AbstractConfiguration : MonoBehaviour
                         {
                             AddMappableProperty(tracker, derivedObjProperties, subProperty, newLevelPropertyHierarchy);
                         }
-
                         else if (tracker.objectDerivedFromFields.ContainsKey(derivedObject))
                         {
                             ExpandNonMappableProperty(derivedObject, derivedObjProperties[subProperty], newLevelPropertyHierarchy, tracker);//recurse
@@ -283,7 +276,7 @@ public class AbstractConfiguration : MonoBehaviour
             {
                 throw new Exception("Advanced configurations have some problems.");
             }
-            if (advancedConf.Count > i && !(advancedConf[i] == null) && advancedConf[i].toSave.Count > 0)//these conditions are true iff the property is a "collection"
+            if (!(advancedConf[i] == null) && advancedConf[i].toSave.Count > 0)//these conditions are true iff the property is a "collection"
             {
                 string propertyType = advancedConf[i].propertyType;
                 if (propertyType!=null && (propertyType.Equals("LIST") || propertyType.Equals("ARRAY2")))

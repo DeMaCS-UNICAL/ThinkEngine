@@ -196,6 +196,7 @@
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\BrainEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\SensorConfigurationEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\GlobalIndexer.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\MyPropertyInfo.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\IndexTracker.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPMapperHelper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPBoolMapper.cs" />

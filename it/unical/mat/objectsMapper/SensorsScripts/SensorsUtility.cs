@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-public delegate object ReadSimpleProperty(string path, Type type, object obj);
+public delegate MyPropertyInfo ReadSimpleProperty(string path, Type type, object obj);
 public static class SensorsUtility
 {
     public const BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
@@ -42,36 +42,44 @@ public static class SensorsUtility
     }
     // Both GetArrayProperty  And  GetListProperty return an object[] that contains the object itself (the array or the list) and a list of FieldOrProperty
     // that contains one FieldOrProperty for each collectionElementProperty
-    public static object[] GetArrayProperty(string path, List<string> collectionElementProperties,  Type type, object obj, int x, int y)
+    public static ArrayInfo GetArrayProperty(string path,  Type type, object obj, int x, int y, List<string> collectionElementProperties = null)
     {
+        ArrayInfo toReturn = new ArrayInfo();
         MemberInfo[] members = type.GetMember(path, BindingAttr);
-        object[] toReturn = new object[2];
         if (members.Length == 0)
         {
             return toReturn;
         }
         FieldOrProperty property = new FieldOrProperty(members[0]);
         Array matrix = property.GetValue(obj) as Array;
-        toReturn[0] = matrix;
-        if (matrix!=null && matrix.GetLength(0) > x && matrix.GetLength(1) > y)
+        toReturn.array = matrix;
+        if (matrix != null && matrix.GetLength(0) > x && matrix.GetLength(1) > y)
         {
-            List<FieldOrProperty> listOfField = new List<FieldOrProperty>();
-            for (int i = 0; i < collectionElementProperties.Count; i++)
+            if (collectionElementProperties == null)
             {
-                MemberInfo[] m = matrix.GetValue(i, y).GetType().GetMember(collectionElementProperties[i], BindingAttr);
-                AddFieldOrProperty(m,listOfField);
+                toReturn.value = matrix.GetValue(x, y);
+                toReturn.isBasic = true;
             }
-            if (listOfField.Count == 0)
+            else
             {
-                return toReturn;
+                List<FieldOrProperty> listOfField = new List<FieldOrProperty>();
+                for (int i = 0; i < collectionElementProperties.Count; i++)
+                {
+                    MemberInfo[] m = matrix.GetValue(x, y).GetType().GetMember(collectionElementProperties[i], BindingAttr);
+                    AddFieldOrProperty(m, listOfField);
+                }
+                if (listOfField.Count == 0)
+                {
+                    return toReturn;
+                }
+                toReturn.properties = listOfField;
             }
-            toReturn[1] = listOfField;
         }
         return toReturn;
     }
-    public static object[] GetListProperty(string path, List<string> collectionElementProperties, Type type, object obj, int x)
+    public static ListInfo GetListProperty(string path, Type type, object obj, int x, List<string> collectionElementProperties=null)
     {
-        object[] toReturn = new object[2];
+        ListInfo toReturn = new ListInfo();
         MemberInfo[] members = type.GetMember(path, BindingAttr);
         if (members.Length == 0)
         {
@@ -79,20 +87,28 @@ public static class SensorsUtility
         }
         FieldOrProperty property = new FieldOrProperty(members[0]);
         IList list = property.GetValue(obj) as IList;
-        toReturn[0] = list;
+        toReturn.list = list;
         if (list.Count > x)
         {
-            List<FieldOrProperty> listOfField = new List<FieldOrProperty>();
-            for (int i = 0; i < collectionElementProperties.Count; i++)
+            if (collectionElementProperties == null)
             {
-                MemberInfo[] m = list[x].GetType().GetMember(collectionElementProperties[i], BindingAttr);
-                AddFieldOrProperty(m, listOfField);
+                toReturn.value = list[x];
+                toReturn.isBasic = true;
             }
-            if (listOfField.Count == 0)
+            else
             {
-                return toReturn;
+                List<FieldOrProperty> listOfField = new List<FieldOrProperty>();
+                for (int i = 0; i < collectionElementProperties.Count; i++)
+                {
+                    MemberInfo[] m = list[x].GetType().GetMember(collectionElementProperties[i], BindingAttr);
+                    AddFieldOrProperty(m, listOfField);
+                }
+                if (listOfField.Count == 0)
+                {
+                    return toReturn;
+                }
+                toReturn.properties = listOfField;
             }
-            toReturn[1] = listOfField;
         }
         return toReturn;
     }
@@ -107,7 +123,7 @@ public static class SensorsUtility
             listOfField.Add(new FieldOrProperty(m[0]));
         }
     }
-    public static object ReadComposedProperty(GameObject gameObject, MyListString property, MyListString partialHierarchyProperty, Type objType, object obj, ReadSimpleProperty ReadSimpleProperty)
+    public static MyPropertyInfo ReadComposedProperty(GameObject gameObject, MyListString property, MyListString partialHierarchyProperty, Type objType, object obj, ReadSimpleProperty ReadSimpleProperty)
     {
         string parentName = partialHierarchyProperty[0];
         MyListString child = partialHierarchyProperty.GetRange(1,partialHierarchyProperty.Count-1);
@@ -128,7 +144,7 @@ public static class SensorsUtility
             return ReadComposedProperty(gameObject, property, child, parentType, parent, ReadSimpleProperty);
         }
     }
-    public static object ReadComponent(GameObject gameObject, MyListString property, MyListString partialHierarchyProperty, Type gOType, object obj, ReadSimpleProperty ReadSimpleProperty)
+    public static MyPropertyInfo ReadComponent(GameObject gameObject, MyListString property, MyListString partialHierarchyProperty, Type gOType, object obj, ReadSimpleProperty ReadSimpleProperty)
     {
         string parentName = partialHierarchyProperty[0];
         MyListString child = partialHierarchyProperty.GetRange(1,partialHierarchyProperty.Count - 1);

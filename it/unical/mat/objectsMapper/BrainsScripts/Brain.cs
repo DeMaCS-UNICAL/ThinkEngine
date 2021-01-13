@@ -61,7 +61,7 @@ public class Brain :MonoBehaviour
     {
         get
         {
-            if (_ASPFileTemplatePath == null)
+            if (_ASPFileTemplatePath == null || !_ASPFileTemplatePath.Equals("Template" + gameObject.name + ".asp"))
             {
                 _ASPFileTemplatePath = @".\Assets\Resources\" + "Template"+gameObject.name + ".asp";
                 if (!File.Exists(_ASPFileTemplatePath))
