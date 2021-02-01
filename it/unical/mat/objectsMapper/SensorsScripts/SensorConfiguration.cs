@@ -31,7 +31,7 @@ public class SensorConfiguration : AbstractConfiguration
     {
         if(GetComponent<MonoBehaviourSensorsManager>() == null)
         {
-            gameObject.AddComponent<MonoBehaviourSensorsManager>().hideFlags=HideFlags.HideInInspector;
+            gameObject.AddComponent<MonoBehaviourSensorsManager>();//.hideFlags=HideFlags.HideInInspector;
         }
         GetComponent<MonoBehaviourSensorsManager>().AddConfiguration(this);
     }

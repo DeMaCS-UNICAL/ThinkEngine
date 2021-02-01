@@ -30,7 +30,7 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
     }
     void Reset()
     {
-        hideFlags = HideFlags.HideInInspector;
+        //hideFlags = HideFlags.HideInInspector;
         sizeToTrack = new Dictionary<MyListString, List<int>>();
         typeForCollectionProperty = new Dictionary<MyListString, string>();
         elementForCollectionProperty = new Dictionary<MyListString, List<string>>();

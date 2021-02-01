@@ -274,6 +274,7 @@
     <Compile Include="it\unical\mat\objectsMapper\Utility\ListOfMyListStringIntPair.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\ListOfMyListStringStringPair.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SimpleGameObjectsTracker.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include=".git\objects\info\" />
@@ -284,4 +285,8 @@
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
+  <PropertyGroup>
+    <PostBuildEvent>call "C:\Users\Denise\Uni\ThinkEngine\bin\Debug\dllCopy.bat"
+call "C:\Users\Denise\Uni\ThinkEngine\ThinkEngine_Installer.bat"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

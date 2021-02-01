@@ -24,7 +24,7 @@ public class ActuatorConfiguration : AbstractConfiguration
     {
         if (GetComponent<MonoBehaviourActuatorsManager>() == null)
         {
-            gameObject.AddComponent<MonoBehaviourActuatorsManager>().hideFlags = HideFlags.HideInInspector;
+            gameObject.AddComponent<MonoBehaviourActuatorsManager>();//.hideFlags = HideFlags.HideInInspector;
         }
         GetComponent<MonoBehaviourActuatorsManager>().AddConfiguration(this);
     }

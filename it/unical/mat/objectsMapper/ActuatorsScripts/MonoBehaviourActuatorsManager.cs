@@ -29,7 +29,7 @@ internal class MonoBehaviourActuatorsManager : MonoBehaviour
     }
     void Reset()
     {
-        hideFlags = HideFlags.HideInInspector;
+        //hideFlags = HideFlags.HideInInspector;
         ActuatorsManager.configurationsChanged = true;
     }
     void Start()
