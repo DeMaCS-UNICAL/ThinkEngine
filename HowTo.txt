@@ -1,15 +1,14 @@
 Assume you are working on a Unity project stored in the *UnityGameProject* folder.
 
--Open EmbASP4Unity.sln with Visual Studio and compile the solution. You should get new binary files in the ./bin folder
-
-- Copy the EmbASP4Unity.dll file from bin\Debug to *UnityGameProject*\Assets\Plugins  [create the folder if not existing]
-- Copy the Newtonsoft.Json.dll file from bin\Debug to *UnityGameProject*\Assets\Plugins
-- Copy the dlv2.exe binary from bin\Debug to *UnityGameProject*\lib
-- Make sure that dlv.exe has executability access rights.
+- Extract the ThinkEnginePlugin.rar in the root folder of you Unity project (the one containing the Assets folder).
+- Make sure that dlv2.exe in the "lib" folder has executability access rights.
 
 From now on you can use ThinkEngine for adding AI capabilities to your gameobject.
 
-- The Sensor/Actuator configurator can be added as a (script) component to a GameObject to configure
-- Add a script component to a GO choosing as script the "Brain" (you can find it after choosing EmbASP4Unity.it.unical.mat.objectMapper)
+- The Sensor/Actuator configurator can be added as a (script) component to a GameObject (or Prefab) to configure
+- Add a script component to a GO (or Prefab) choosing as script the "Brain" 
+
+N.B. Prefabs should be located in "Assets/Resources/Prefabs". 
+If you want to check the ASP facts files, check the box "Maintain facts file" in the Brain component and look for the folder "ThinkEngineFacts" in you "Temp" system folder.
 
 For further clarification, send an email to angilica[at]mat.unical.it
