@@ -70,7 +70,8 @@ public class AbstractConfiguration : MonoBehaviour
         SaveComponents(tracker, gameObjectComponents);
         if (properties.Count == 0)//if no properties have been selected in the inspector
         {
-            throw new Exception("No properties selected, invalid configuration to save.");
+            Debug.Log("<color =#0000ffff>No properties selected, invalid configuration to save.</color>");
+            return;
         }
         ASPRepresentation();//create the ASP representation
         saved = true;

@@ -12,7 +12,7 @@ using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
 public class Brain :MonoBehaviour
 {
     #region Serialized Fieds
-    public bool enableBrain;
+    public bool enableBrain=true;
     public bool debug=true;
     public bool maintainFactFile;
     [SerializeField, HideInInspector]

@@ -19,6 +19,14 @@ public static class Utility
     private static bool prefabsLoaded = false;
     private static MethodInfo[] _triggerMethods;
     #region Properties
+
+    public static bool updatingSensors
+    {
+        get
+        {
+            return SensorsManager.frameFromLastUpdate >= SensorsManager.updateFrequencyInFrames;
+        }
+    }
     internal static List<string> triggerMethodsToShow
     {
         get
