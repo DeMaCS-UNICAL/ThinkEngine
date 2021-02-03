@@ -56,7 +56,7 @@ public class ActuatorConfiguration : AbstractConfiguration
         string toReturn = "";
         foreach(string line in original.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
         {
-            toReturn += line + ":-objectIndex("+configurationName+",X)"+Environment.NewLine;
+            toReturn += line + ":-objectIndex("+ ASPMapperHelper.aspFormat(configurationName) + ",X)"+Environment.NewLine;
         }
         return toReturn;
     }
