@@ -165,14 +165,25 @@ public class Brain :MonoBehaviour
         {
             Byte[] info = new UTF8Encoding(true).GetBytes("%For runtime instantiated GameObject, only the prefab mapping is provided. Use that one substituting the gameobject name accordingly\n");
             fs.Write(info, 0, info.Length);
-
+            HashSet<string> seenActuatorConfNames = new HashSet<string>();
+            HashSet<string> seenSensorConfNames = new HashSet<string>();
             foreach (ActuatorConfiguration actuatorConf in Utility.actuatorsManager.GetCorrespondingConfigurations(chosenActuatorConfigurations))
             {
+                if (seenActuatorConfNames.Contains(actuatorConf.configurationName))
+                {
+                    continue;
+                }
+                seenActuatorConfNames.Add(actuatorConf.configurationName);
                 info = new UTF8Encoding(true).GetBytes(actuatorConf.GetAspTemplate());
                 fs.Write(info, 0, info.Length);
             }
             foreach (SensorConfiguration sensorConf in Utility.sensorsManager.GetConfigurations(chosenSensorConfigurations))
             {
+                if (seenSensorConfNames.Contains(sensorConf.configurationName))
+                {
+                    continue;
+                }
+                seenSensorConfNames.Add(sensorConf.configurationName);
                 info = new UTF8Encoding(true).GetBytes(sensorConf.GetAspTemplate());
                 fs.Write(info, 0, info.Length);
             }
