@@ -1,13 +1,7 @@
-﻿using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using UnityEditor;
-using UnityEditor.Experimental.SceneManagement;
 using UnityEngine;
 using static MonoBehaviourSensorHider;
 
@@ -167,10 +161,12 @@ public  class SensorsManager : MonoBehaviour
         {
             foreach (MonoBehaviourSensorsManager manager in Resources.FindObjectsOfTypeAll<MonoBehaviourSensorsManager>())
             {
-                if (PrefabStageUtility.GetPrefabStage(manager.gameObject)!=null)
+#if UNITY_EDITOR
+                if (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(manager.gameObject)!=null)
                 {
                     continue;
                 }
+#endif
                 SensorConfiguration currentConfiguration = manager.GetConfiguration(confName);
                 if (currentConfiguration != null)
                 {
@@ -191,8 +187,8 @@ public  class SensorsManager : MonoBehaviour
         }
         return false;
     }
-    #endregion
-    #region Run-time methods
+#endregion
+#region Run-time methods
     internal bool IsSomeActiveInScene(List<string> configurationNames)
     {
         foreach(string configurationName in configurationNames)
@@ -284,6 +280,6 @@ public  class SensorsManager : MonoBehaviour
             instantiatedSensors[brain] = instantiated;
         }
     }
-    #endregion
+#endregion
 }
 

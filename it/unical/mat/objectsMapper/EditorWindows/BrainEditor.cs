@@ -1,9 +1,5 @@
-﻿using EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts;
-using System;
+﻿#if UNITY_EDITOR
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEngine;
@@ -400,3 +396,4 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         }
     }
 }
+#endif

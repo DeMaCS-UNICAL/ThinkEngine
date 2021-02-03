@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using UnityEditor.Experimental.SceneManagement;
 using UnityEngine;
 using static MonoBehaviourActuatorHider;
 
@@ -167,10 +166,12 @@ internal class ActuatorsManager : MonoBehaviour
             }
             foreach (MonoBehaviourActuatorsManager manager in managers)
             {
-                if (PrefabStageUtility.GetPrefabStage(manager.gameObject) != null)
+#if UNITY_EDITOR
+                if (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(manager.gameObject) != null)
                 {
                     continue;
                 }
+#endif
                 ActuatorConfiguration currentConfiguration = manager.GetConfiguration(confName);
                 if (currentConfiguration != null)
                 {
@@ -229,8 +230,8 @@ internal class ActuatorsManager : MonoBehaviour
         }
         return null;
     }
-    #endregion
-    #region Run-time methods
+#endregion
+#region Run-time methods
     internal bool IsSomeActiveInScene(List<string> configurationNames)//returns true iff there is at least a gameobject in the scene for any of requested configuration
     {
         foreach (string configurationName in configurationNames)
@@ -378,6 +379,6 @@ internal class ActuatorsManager : MonoBehaviour
     {
         actuatorsToApply.Enqueue(new KeyValuePair<Brain, AnswerSet>(brain, answerSet));
     }
-    #endregion
+#endregion
 }
 

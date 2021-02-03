@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-using UnityEditor;
 using UnityEngine;
 
 public static class Utility
@@ -182,7 +179,9 @@ public static class Utility
             Byte[] info = new UTF8Encoding(true).GetBytes(triggerClassContent);
             fs.Write(info, 0, info.Length);
         }
-        AssetDatabase.Refresh();
+#if UNITY_EDITOR
+        UnityEditor.AssetDatabase.Refresh();
+#endif
     }
     internal static void loadPrefabs()
     {

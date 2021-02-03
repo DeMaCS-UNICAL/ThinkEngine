@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -24,7 +25,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         protected FieldOrProperty objectToConfigure;
 
         private AbstractConfiguration configuration;
-        #region Unity Messages
+#region Unity Messages
         protected void Reset()
         {
             configuration = target as AbstractConfiguration;
@@ -63,7 +64,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 MyReset(true);
             }
         }
-        #endregion
+#endregion
         protected void MyReset(bool fault = false)
         {
             tracker = new GameObjectsTracker();
@@ -387,3 +388,4 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         internal virtual void AddCustomFields(FieldOrProperty obj) { }
     }
 }
+#endif
