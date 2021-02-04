@@ -33,7 +33,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                 string actualFileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
                 if (actualFileName.StartsWith(brain.ASPFilesPrefix) && actualFileName.EndsWith(".asp"))
                 {
-                    encoding.AddFilesPath( fileName);
+                    encoding.AddFilesPath( "\""+fileName+"\"");
                 }
             }
             while (reason)
