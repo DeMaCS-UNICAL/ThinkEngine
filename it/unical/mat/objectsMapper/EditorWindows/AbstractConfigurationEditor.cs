@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+﻿//#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -10,6 +10,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
     [CustomEditor(typeof(AbstractConfiguration))]
     public abstract class AbstractConfigurationEditor : Editor
     {
+        static int cont = 0;
         protected GameObjectsTracker tracker;
         
         [SerializeField]
@@ -215,102 +216,126 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
             if (tracker.objectsToggled[currentComponent])
             {
                 EditorGUI.indentLevel++;
-                AddSubProperties(currentComponent, currentComponent.GetType().ToString(), gameObject);
+                AddSubProperties(currentComponent, currentComponent.GetType().ToString(), gameObject, currentComponent);
                 EditorGUI.indentLevel--;
             }
         }
-        private void AddExpandableProperty(object gameObject, FieldOrProperty currentGOProperty, bool disabled)
+        private void AddExpandableProperty(object currentObject, FieldOrProperty currentProperty, bool disabled)
         {
             EditorGUI.indentLevel++;//need to add an indent level because foldout are misplaced wrt toggle
-            tracker.objectsToggled[currentGOProperty] = EditorGUILayout.Foldout(tracker.objectsToggled[currentGOProperty], currentGOProperty.Name()) && !disabled;
+            tracker.objectsToggled[currentProperty] = EditorGUILayout.Foldout(tracker.objectsToggled[currentProperty], currentProperty.Name()) && !disabled;
             EditorGUI.indentLevel--;
-            if (tracker.objectsToggled[currentGOProperty])
+            if (tracker.objectsToggled[currentProperty])
             {
                 EditorGUI.indentLevel++;
-                AddSubProperties(tracker.objectDerivedFromFields[gameObject][currentGOProperty.Name()], currentGOProperty.Name(), gameObject);
+                if (currentObject is FieldOrProperty || currentObject.GetType().IsValueType)
+                {
+                    AddValueTypeSubProperties(currentProperty);
+                }
+                else
+                {
+                    AddSubProperties(tracker.objectDerivedFromFields[currentObject][currentProperty.Name()], currentProperty.Name(), currentObject, currentProperty);
+                }
                 EditorGUI.indentLevel--;
             }
         }
-        private void AddMappableProperty(FieldOrProperty currentGOProperty)
+        private void AddMappableProperty(FieldOrProperty currentProperty)
         {
             EditorGUILayout.BeginHorizontal();
-            tracker.objectsToggled[currentGOProperty] = EditorGUILayout.ToggleLeft(currentGOProperty.Name(), tracker.objectsToggled[currentGOProperty]);
-            AddCustomFields(currentGOProperty);
-            if (!tracker.IsBaseType(currentGOProperty))
+            tracker.objectsToggled[currentProperty] = EditorGUILayout.ToggleLeft(currentProperty.Name(), tracker.objectsToggled[currentProperty]);
+            AddCustomFields(currentProperty);
+            if (!tracker.IsBaseType(currentProperty))
             {
-                if (tracker.objectsToggled[currentGOProperty])
+                if (tracker.objectsToggled[currentProperty])
                 {
-                    if (tracker.HasBasicGenericArgument(currentGOProperty))
+                    if (tracker.HasBasicGenericArgument(currentProperty))
                     {
-                        AddBasicComplexDataStructure(currentGOProperty);
+                        AddBasicComplexDataStructure(currentProperty);
                     }
                     else
                     {
-                        ConfigureNonBasicComplexDataStructure(currentGOProperty);
+                        ConfigureNonBasicComplexDataStructure(currentProperty);
                     }
                 }
                 else
                 {
-                    if (tracker.HasBasicGenericArgument(currentGOProperty))
+                    if (tracker.HasBasicGenericArgument(currentProperty))
                     {
-                        tracker.RemoveSimpleTracker(currentGOProperty);
+                        tracker.RemoveSimpleTracker(currentProperty);
                     }
                 }
             }
             EditorGUILayout.EndHorizontal();
         }
 
-        private void AddBasicComplexDataStructure(FieldOrProperty currentGOProperty)
+        private void AddBasicComplexDataStructure(FieldOrProperty currentProperty)
         {
-            tracker.TogglePropertySimpleTracker(currentGOProperty,"",true);
-            tracker.SaveSimpleTracker(currentGOProperty);
+            tracker.TogglePropertySimpleTracker(currentProperty,"",true);
+            tracker.SaveSimpleTracker(currentProperty);
         }
 
-        private void ConfigureNonBasicComplexDataStructure(FieldOrProperty currentGOProperty)
+        private void ConfigureNonBasicComplexDataStructure(FieldOrProperty currentProperty)
         {
             bool configure = GUILayout.Button("Configure Object");
             if (configure)
             {
                 objectMode = true;
-                objectToConfigure = currentGOProperty;
+                objectToConfigure = currentProperty;
                 helpScroll = new Vector2(0, 0);
-                tracker.LoadBasicPropertiesSimpleTracker(currentGOProperty);
+                tracker.LoadBasicPropertiesSimpleTracker(currentProperty);
                 DrawObjectProperties();
             }
         }
 
-        protected virtual bool IsMappable(FieldOrProperty obj)
+        protected virtual bool IsMappable(FieldOrProperty currentProperty)
         {
-            return tracker.IsMappable(obj);//for actuators a property is mappable iff it's a basic type
+            return tracker.IsMappable(currentProperty);//for actuators a property is mappable iff it's a basic type
         }
-        public void AddPropertyName(object obj)
+        public void AddPropertyName(object currentObject)
         {
-            if (!tracker.propertiesName.ContainsKey(obj))
+            if (!tracker.propertiesName.ContainsKey(currentObject))
             {
-                tracker.propertiesName.Add(obj, "Choose a name");
+                tracker.propertiesName.Add(currentObject, "Choose a name");
             }
-            tracker.propertiesName[obj] = EditorGUILayout.TextField(tracker.propertiesName[obj]);
+            tracker.propertiesName[currentObject] = EditorGUILayout.TextField(tracker.propertiesName[currentObject]);
         }
-        protected void AddSubProperties(object currentObject, string name, object objectOwner)
+        protected void AddSubProperties(object currentObject, string currentPropertyName, object objectOwner,object currentPropertyOrComponent)
         {
             bool objectOwnerAvailable = tracker.objectsOwners.ContainsKey(currentObject);
-            bool objectOwnerMatches = objectOwnerAvailable && (tracker.objectsOwners[currentObject].Key.Equals(objectOwner) && tracker.objectsOwners[currentObject].Value.Equals(name));
+            bool objectOwnerMatches = objectOwnerAvailable && (tracker.objectsOwners[currentObject].Key.Equals(objectOwner) && tracker.objectsOwners[currentObject].Value.Equals(currentPropertyName));
             if (objectOwnerAvailable && !objectOwnerMatches || currentObject.Equals(tracker.gameObject))
             {
-                AddNotExpandableProperty(currentObject, name);
+                AddNotExpandableProperty(currentObject, currentPropertyName);
                 return;
             }
-            if (!tracker.objectsToggled.ContainsKey(currentObject))
+            if (!tracker.objectsToggled.ContainsKey(currentPropertyOrComponent))
             {
-                tracker.objectsToggled.Add(currentObject, false);
+                tracker.objectsToggled.Add(currentPropertyOrComponent, false);
             }
             if (!tracker.objectsProperties.ContainsKey(currentObject))
             {
                 tracker.UpdateDataStructures(currentObject, null, new MyListString());
             }
-            foreach (FieldOrProperty currentSubProperty in tracker.objectsProperties[currentObject].Values)
+            Expand(currentObject);
+        }
+        protected void AddValueTypeSubProperties(FieldOrProperty currentProperty)
+        {
+            if (!tracker.objectsToggled.ContainsKey(currentProperty))
             {
-                bool disabled = tracker.objectDerivedFromFields[currentObject][currentSubProperty.Name()] == null;
+                tracker.objectsToggled.Add(currentProperty, false);
+            }
+            if (!tracker.objectsProperties.ContainsKey(currentProperty))
+            {
+                tracker.UpdateValueTypeDataStructures(currentProperty, null, new MyListString());//if it is a value type, currentObject can match with tons of others objects
+            }
+            Expand(currentProperty);
+        }
+
+        private void Expand(object currentObjectOrProperty)
+        {
+            foreach (FieldOrProperty currentSubProperty in tracker.objectsProperties[currentObjectOrProperty].Values)
+            {
+                bool disabled = tracker.objectDerivedFromFields[currentObjectOrProperty][currentSubProperty.Name()] == null;
                 EditorGUI.BeginDisabledGroup(disabled);
                 if (IsMappable(currentSubProperty))
                 {
@@ -318,19 +343,20 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
                 }
                 else
                 {
-                    AddExpandableProperty(currentObject, currentSubProperty, disabled);
+                    AddExpandableProperty(currentObjectOrProperty, currentSubProperty, disabled);
                 }
                 EditorGUI.EndDisabledGroup();
             }
         }
-        private void AddNotExpandableProperty(object currentObject, string name)
+
+        private void AddNotExpandableProperty(object currentObject, string currentPropertyName)
         {
             EditorGUI.BeginDisabledGroup(true);
             if (currentObject.Equals(tracker.gameObject))
             {
                 EditorGUILayout.ToggleLeft("This is " + configuration.gameObject + " object", true);
             }
-            else if (!tracker.objectsOwners[currentObject].Value.Equals(name))
+            else if (!tracker.objectsOwners[currentObject].Value.Equals(currentPropertyName))
             {
                 EditorGUILayout.ToggleLeft("object already listed as " + tracker.objectsOwners[currentObject].Value, true);
             }
@@ -388,4 +414,4 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         internal virtual void AddCustomFields(FieldOrProperty obj) { }
     }
 }
-#endif
+//#endif

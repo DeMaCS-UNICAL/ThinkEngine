@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+﻿//#if UNITY_EDITOR
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -64,4 +64,4 @@ public class ActuatorConfigurationEditor : AbstractConfigurationEditor
         return Utility.actuatorsManager.ExistsConfigurationWithName(configurationName);
     }
 }
-#endif
+//#endif

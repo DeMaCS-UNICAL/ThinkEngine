@@ -79,13 +79,13 @@ internal static class ReflectionExecutor
     {
         return IsArrayOfRank(type) == 2;
     }
-    internal static List<FieldOrProperty> GetFieldsAndProperties(object go)
+    internal static List<FieldOrProperty> GetFieldsAndProperties(object currentObject)
     {
         List<FieldOrProperty> propertiesList = new List<FieldOrProperty>();
-        Type t =go.GetType();
-        if(go is Type)
+        Type t =currentObject.GetType();
+        if(currentObject is Type)
         {
-            t = (Type)go;
+            t = (Type)currentObject;
         }
         MemberInfo[] fields = t.GetFields(BindingAttr);
         MemberInfo[] properties = t.GetProperties();

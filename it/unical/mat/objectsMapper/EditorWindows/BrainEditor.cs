@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+﻿//#if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
@@ -396,4 +396,4 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         }
     }
 }
-#endif
+//#endif

@@ -7,7 +7,7 @@ using System.Linq;
 public class GameObjectsTracker
 {
     public GameObject gameObject; //the root gameObject being tracked (the one to which a configuration is attached
-    public Dictionary<object, bool> objectsToggled; //it saves the information of being toggled in the inspector for all the fields/properties of the gameObject hierarchy
+    public Dictionary<object, bool> objectsToggled; //it saves the information of being toggled in the inspector for all the fields/properties/component (NOT A GENERIC OBJECT) of the gameObject hierarchy
     public Dictionary<object, KeyValuePair<object, string>> objectsOwners;//for each field/property istantiation stores the first parent property object
     public Dictionary<object, Dictionary<string, object>> objectDerivedFromFields;//for each object instantiation of the hierarchy stores the actual istantiation of its fileds/properties
     public Dictionary<object, Dictionary<string, FieldOrProperty>> objectsProperties;//for each object instantiation of the hierarchy stores the FieldOrProperty corresposnding to te respective field/property
@@ -34,9 +34,9 @@ public class GameObjectsTracker
     {
         return ReflectionExecutor.IsBaseType(obj);
     }
-    public List<FieldOrProperty> GetFieldsAndProperties(object gO)
+    public List<FieldOrProperty> GetFieldsAndProperties(object currentObject)
     {
-        return ReflectionExecutor.GetFieldsAndProperties(gO);
+        return ReflectionExecutor.GetFieldsAndProperties(currentObject);
     }
     internal void UpdateDataStructures(AbstractConfiguration configuration)
     {
@@ -88,10 +88,57 @@ public class GameObjectsTracker
             }
         }
     }
+    internal void UpdateValueTypeDataStructures(FieldOrProperty parentProperty, AbstractConfiguration configuration, MyListString currentPropertyHierarchy)
+    {
+        objectsProperties.Add(parentProperty, new Dictionary<string, FieldOrProperty>());
+        objectDerivedFromFields.Add(parentProperty, new Dictionary<string, object>());
+        List<FieldOrProperty> fieldsAndProperties = GetFieldsAndProperties(parentProperty.Type());
+        foreach (FieldOrProperty currentSubProperty in fieldsAndProperties)
+        {
+            MyListString newLayerPropertyHierarchy = currentPropertyHierarchy.GetClone();
+            UpdateValueTypeDirectProperty(configuration, parentProperty, currentSubProperty, newLayerPropertyHierarchy);
+        }
+    }
+    private void UpdateValueTypeDirectProperty(AbstractConfiguration configuration, FieldOrProperty parentProperty, FieldOrProperty currentProperty, MyListString currentPropertyHierarchy)
+    {
+        Debug.Log(parentProperty.Name() + "^" + currentProperty.Name()+" is value type?  "+currentProperty.Type().IsValueType);
+        if (!objectsProperties[parentProperty].ContainsKey(currentProperty.Name()))
+        {
+            objectsProperties[parentProperty].Add(currentProperty.Name(), currentProperty);
+        }
+        if (!objectDerivedFromFields[parentProperty].ContainsKey(currentProperty.Name()))
+        {
+            objectDerivedFromFields[parentProperty].Add(currentProperty.Name(), currentProperty);
+        }
+        if (!objectsToggled.ContainsKey(currentProperty))
+        {
+            if (configuration != null && CheckIfPropertyIsToToggle(configuration.properties, currentPropertyHierarchy, currentProperty.Name()))
+            {
+                objectsToggled.Add(currentProperty, true);
+                currentPropertyHierarchy.Add(currentProperty.Name());
+                if (!IsMappable(currentProperty))
+                {
+                    UpdateValueTypeDataStructures(currentProperty, configuration, currentPropertyHierarchy);
+                }
+                else
+                {
+                    ConfigureMappableProperty(configuration, currentProperty, currentPropertyHierarchy);
+                }
+            }
+            else
+            {
+                objectsToggled.Add(currentProperty, false);
+            }
+        }
+    }
+
     private void UpdateDirectProperty(AbstractConfiguration configuration, object parentObject, FieldOrProperty currentFieldOrProperty, MyListString currentPropertyHierarchy)
     {
         object parentObjectValueForCurrentProperty = PropertyValueAndOwner(currentFieldOrProperty,parentObject);
-        objectDerivedFromFields[parentObject].Add(currentFieldOrProperty.Name(), parentObjectValueForCurrentProperty);
+        if (!objectDerivedFromFields[parentObject].ContainsKey(currentFieldOrProperty.Name()))
+        {
+            objectDerivedFromFields[parentObject].Add(currentFieldOrProperty.Name(), parentObjectValueForCurrentProperty);
+        }
         if (!objectsToggled.ContainsKey(currentFieldOrProperty))
         {
             if (configuration != null && CheckIfPropertyIsToToggle(configuration.properties, currentPropertyHierarchy, currentFieldOrProperty.Name()))
@@ -189,13 +236,22 @@ public class GameObjectsTracker
         {
             parentObjectValueForCurrentProperty = null;
         }
-        objectsProperties[parentObject].Add(currentFieldOrProperty.Name(), currentFieldOrProperty);
-        if (parentObjectValueForCurrentProperty != null && !currentFieldOrProperty.Type().IsValueType) //if it is not a value type keep only the first parent that has been met.
+        if (!objectsProperties[parentObject].ContainsKey(currentFieldOrProperty.Name())){
+            objectsProperties[parentObject].Add(currentFieldOrProperty.Name(), currentFieldOrProperty);
+        }
+        if (parentObjectValueForCurrentProperty != null) //if it is not a value type keep only the first parent that has been met.
         {
-            if (!objectsOwners.ContainsKey(parentObjectValueForCurrentProperty))
+            if (!currentFieldOrProperty.Type().IsValueType)
+            {
+                if (!objectsOwners.ContainsKey(parentObjectValueForCurrentProperty))
+                {
+                    objectsOwners.Add(parentObjectValueForCurrentProperty, new KeyValuePair<object, string>(parentObject, currentFieldOrProperty.Name()));
+                }
+            }
+            /*else
             {
                 objectsOwners.Add(parentObjectValueForCurrentProperty, new KeyValuePair<object, string>(parentObject, currentFieldOrProperty.Name()));
-            }
+            }*/
 
         }
 
@@ -242,6 +298,8 @@ public class GameObjectsTracker
         }
         return false;
     }
+
+
     public bool IsMappable(FieldOrProperty obj)
     {
         return ReflectionExecutor.IsMappable(obj); 
