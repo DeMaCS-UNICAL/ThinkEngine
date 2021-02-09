@@ -45,7 +45,7 @@ namespace it.unical.mat.embasp.platforms.desktop
                     option += o.Separator;
                 }
                 else
-                    Console.Error.WriteLine("Warning : wrong " + typeof(OptionDescriptor).FullName);
+                    UnityEngine.Debug.Log("Warning : wrong " + typeof(OptionDescriptor).FullName);
             }
 
             string files_paths = "";
@@ -61,15 +61,15 @@ namespace it.unical.mat.embasp.platforms.desktop
                         FileAttributes f = File.GetAttributes(@program_file);
                         if (File.Exists(program_file) && !f.HasFlag(FileAttributes.Directory))
                         {
-                            files_paths += program_file;
+                            files_paths += "\""+program_file+"\"";
                             files_paths += " ";
                         }
                         else
-                            Console.Error.WriteLine("Warning : the file " + Path.GetFullPath(@program_file) + " does not exists.");
+                            UnityEngine.Debug.Log("Warning : the file " + Path.GetFullPath(@program_file) + " does not exists.");
                     }
                 }
                 else
-                    Console.Error.WriteLine("Warning : wrong " + typeof(InputProgram).FullName);
+                    UnityEngine.Debug.Log("Warning : wrong " + typeof(InputProgram).FullName);
             }
 
             string solverOutput = "EMPTY_OUTPUT";
@@ -97,7 +97,7 @@ namespace it.unical.mat.embasp.platforms.desktop
                     stringBuffer.Append(this.load_from_STDIN_option);
                 }
 
-                Console.Error.WriteLine(stringBuffer.ToString());
+                //UnityEngine.Debug.Log(stringBuffer.ToString());
                 solver_process.EnableRaisingEvents = true;
                 solver_process.StartInfo.Arguments = options_string.ToString();
                 solver_process.StartInfo.UseShellExecute = false;
@@ -125,14 +125,14 @@ namespace it.unical.mat.embasp.platforms.desktop
 
                 watch.Stop();
 
-                Console.Error.WriteLine("Total time : " + watch.ElapsedMilliseconds);
+                //UnityEngine.Debug.Log("Total time : " + watch.ElapsedMilliseconds);
 
                 return GetOutput(solverOutput.ToString(), solverError.ToString());
             }
             catch (Win32Exception e2)
             {
-                Console.Error.WriteLine(e2.ToString());
-                Console.Error.Write(e2.StackTrace);
+                UnityEngine.Debug.Log(e2.ToString());
+                UnityEngine.Debug.Log(e2.StackTrace);
                 UnityEngine.Debug.LogError(e2.ToString());
                 UnityEngine.Debug.LogError(e2.StackTrace);
             }

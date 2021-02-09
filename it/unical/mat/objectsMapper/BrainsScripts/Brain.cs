@@ -122,6 +122,7 @@ public class Brain :MonoBehaviour
     }
     void Start()
     {
+        Debug.Log("DLL success");
         Utility.loadPrefabs();
         if (Application.isPlaying && enableBrain)
         {

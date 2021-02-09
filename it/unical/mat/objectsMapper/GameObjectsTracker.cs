@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using EmbASP4Unity.it.unical.mat.objectsMapper;
-using System.Linq;
 //this class manage the logic behind the inspector graphic of a configuration
 public class GameObjectsTracker
 {
@@ -101,7 +99,6 @@ public class GameObjectsTracker
     }
     private void UpdateValueTypeDirectProperty(AbstractConfiguration configuration, FieldOrProperty parentProperty, FieldOrProperty currentProperty, MyListString currentPropertyHierarchy)
     {
-        Debug.Log(parentProperty.Name() + "^" + currentProperty.Name()+" is value type?  "+currentProperty.Type().IsValueType);
         if (!objectsProperties[parentProperty].ContainsKey(currentProperty.Name()))
         {
             objectsProperties[parentProperty].Add(currentProperty.Name(), currentProperty);

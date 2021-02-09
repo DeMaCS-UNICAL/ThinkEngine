@@ -1,4 +1,4 @@
-﻿//#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -414,4 +414,4 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
         internal virtual void AddCustomFields(FieldOrProperty obj) { }
     }
 }
-//#endif
+#endif

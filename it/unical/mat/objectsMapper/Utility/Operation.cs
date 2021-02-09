@@ -231,10 +231,18 @@ static class Operation
     }
     internal static void Oldest()
     {
+        if (values.Count == 0)
+        {
+            return;
+        }
         returnValue = values[0];
     }
     internal static void Newest()
     {
+        if (values.Count == 0)
+        {
+            return;
+        }
         returnValue = values[values.Count-1];
     }
     internal static void Specific_Value()

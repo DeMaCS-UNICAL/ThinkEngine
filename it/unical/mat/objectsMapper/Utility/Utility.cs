@@ -13,7 +13,7 @@ public static class Utility
     private static SensorsManager _sensorsManager;
     private static ActuatorsManager _actuatorsManager;
     private static string _triggerClassPath= @".\Assets\Scripts\Trigger.cs";
-    private static bool prefabsLoaded = false;
+    internal static bool prefabsLoaded = false;
     private static MethodInfo[] _triggerMethods;
     #region Properties
 
@@ -56,10 +56,11 @@ public static class Utility
         {
             if (_hiddenGameObject == null)
             {
-                _hiddenGameObject = GameObject.Find("Utility");
+                _hiddenGameObject = GameObject.Find("ThinkEngineUtility");
                 if (_hiddenGameObject==null)
                 {
-                    _hiddenGameObject = new GameObject("Utility");
+                    _hiddenGameObject = new GameObject("ThinkEngineUtility");
+                    _hiddenGameObject.AddComponent<MonoUtility>();
                     //_hiddenGameObject.hideFlags = HideFlags.HideInHierarchy & HideFlags.HideInInspector;
                 }
             }
@@ -82,7 +83,6 @@ public static class Utility
                 _sensorsManager = hiddenGameObject.GetComponent<SensorsManager>();
                 if (_sensorsManager == null)
                 {
-                    Debug.Log("i'm trying to add a sensorsmanager");
                     _sensorsManager = hiddenGameObject.AddComponent<SensorsManager>();
                 }
             }
@@ -169,6 +169,7 @@ public static class Utility
     }
     private static void createTriggerScript()
     {
+#if UNITY_EDITOR
         using (FileStream fs = File.Create(_triggerClassPath))
         {
             string triggerClassContent = "using System;\n";
@@ -179,7 +180,7 @@ public static class Utility
             Byte[] info = new UTF8Encoding(true).GetBytes(triggerClassContent);
             fs.Write(info, 0, info.Length);
         }
-#if UNITY_EDITOR
+
         UnityEditor.AssetDatabase.Refresh();
 #endif
     }
@@ -187,7 +188,8 @@ public static class Utility
     {
         if (!prefabsLoaded)
         {
-            Resources.LoadAll<GameObject>("Prefabs");
+            //Resources.LoadAll<GameObject>("Prefabs");//check HERE
+            Resources.LoadAll("");
             prefabsLoaded = true;
         }
     }

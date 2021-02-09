@@ -9,16 +9,26 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86
+		Editor|Any CPU = Editor|Any CPU
+		Editor|x86 = Editor|x86
 		Release|Any CPU = Release|Any CPU
 		Release|x86 = Release|x86
+		Standalone|Any CPU = Standalone|Any CPU
+		Standalone|x86 = Standalone|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{4AA77F3E-F274-4520-B54F-0D98DF5DA92A}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{4AA77F3E-F274-4520-B54F-0D98DF5DA92A}.Debug|x86.ActiveCfg = Debug|x86
 		{4AA77F3E-F274-4520-B54F-0D98DF5DA92A}.Debug|x86.Build.0 = Debug|x86
+		{4AA77F3E-F274-4520-B54F-0D98DF5DA92A}.Editor|Any CPU.ActiveCfg = Editor|x86
+		{4AA77F3E-F274-4520-B54F-0D98DF5DA92A}.Editor|x86.ActiveCfg = Editor|x86
+		{4AA77F3E-F274-4520-B54F-0D98DF5DA92A}.Editor|x86.Build.0 = Editor|x86
 		{4AA77F3E-F274-4520-B54F-0D98DF5DA92A}.Release|Any CPU.ActiveCfg = Release|x86
 		{4AA77F3E-F274-4520-B54F-0D98DF5DA92A}.Release|x86.ActiveCfg = Release|x86
 		{4AA77F3E-F274-4520-B54F-0D98DF5DA92A}.Release|x86.Build.0 = Release|x86
+		{4AA77F3E-F274-4520-B54F-0D98DF5DA92A}.Standalone|Any CPU.ActiveCfg = Standalone|x86
+		{4AA77F3E-F274-4520-B54F-0D98DF5DA92A}.Standalone|x86.ActiveCfg = Standalone|x86
+		{4AA77F3E-F274-4520-B54F-0D98DF5DA92A}.Standalone|x86.Build.0 = Standalone|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

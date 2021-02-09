@@ -347,7 +347,7 @@ public class AbstractConfiguration : MonoBehaviour
             {
                 throw new Exception("Advanced configurations have some problems.");
             }
-            if ( advancedConf[i] != null && advancedConf[i].toSave.Count > 0)
+            if ( advancedConf[i] != null && advancedConf[i].toSave!=null && advancedConf[i].toSave.Count > 0)
             {
                 if (advancedConf[i].propertyType.Equals("LIST"))
                 {

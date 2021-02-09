@@ -7,6 +7,7 @@ using it.unical.mat.embasp.specializations.dlv2.desktop;
 using it.unical.mat.embasp.platforms.desktop;
 using it.unical.mat.embasp.@base;
 using it.unical.mat.embasp.languages.asp;
+using UnityEngine;
 
 namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
 {
@@ -22,18 +23,18 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
         }
         internal void Run()
         {
-            if(!Directory.Exists(Path.GetTempPath() + @"ThinkEngineFacts\"))
+            if (!Directory.Exists(Path.GetTempPath() + @"ThinkEngineFacts\"))
             {
                 Directory.CreateDirectory(Path.GetTempPath() + @"ThinkEngineFacts\");
             }
             reason = true;
             InputProgram encoding = new ASPInputProgram();
-            foreach (string fileName in Directory.GetFiles(Path.GetFullPath(brain.ASPFilesPath)))
+            foreach (string fileName in Directory.GetFiles(Application.streamingAssetsPath))
             {
                 string actualFileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
                 if (actualFileName.StartsWith(brain.ASPFilesPrefix) && actualFileName.EndsWith(".asp"))
                 {
-                    encoding.AddFilesPath( "\""+fileName+"\"");
+                    encoding.AddFilesPath( fileName);
                 }
             }
             while (reason)
@@ -69,7 +70,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                         fs.Write(brain.sensorsMapping);
                         fs.Close();
                     }
-                    Handler handler = new DesktopHandler(new DLV2DesktopService(@".\lib\dlv2.exe"));
+                    Handler handler = new DesktopHandler(new DLV2DesktopService(Path.Combine(Application.streamingAssetsPath,@"lib\dlv2.exe")));
                     InputProgram facts = new ASPInputProgram();
                     facts.AddFilesPath(factsPath);
                     handler.AddProgram(encoding);
@@ -90,6 +91,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                     stopwatch.Stop();
                     if (answers.Answersets.Count > 0)
                     {
+                        Debug.Log(answers.answersets[0].GetAnswerSet().Count);
                         ActuatorsManager.NotifyActuators(brain,answers.answersets[0]);
                     }
                     if (!brain.maintainFactFile)
