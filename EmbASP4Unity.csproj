@@ -305,7 +305,8 @@
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Editor ren EmbASP4Unity.dll EmbASP4Unity_Editor.dll
+    <PostBuildEvent>if $(ConfigurationName) == Editor del EmbASP4Unity_Editor.dll
+if $(ConfigurationName) == Editor ren EmbASP4Unity.dll EmbASP4Unity_Editor.dll
 if $(ConfigurationName) == Editor call "C:\Users\Denise\Uni\ThinkEngine\bin\Debug\dllCopy.bat"
 if $(ConfigurationName) == Editor call "C:\Users\Denise\Uni\ThinkEngine\ThinkEngine_Installer.bat"</PostBuildEvent>
   </PropertyGroup>
