@@ -59,7 +59,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                     }
                     ActuatorsManager.RequestObjectIndexes(brain);
                     SensorsManager.RequestSensorsMapping(brain);
-                    factsPath = Path.GetTempPath() + @"ThinkEngineFacts\" + Path.GetRandomFileName()+".txt";
+                    factsPath = Path.GetTempPath() + @"ThinkEngineFacts\" + Path.GetRandomFileName() + ".txt";
                     using (StreamWriter fs = new StreamWriter(factsPath, true))
                     {
                         if (!reason)
@@ -70,7 +70,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                         fs.Write(brain.sensorsMapping);
                         fs.Close();
                     }
-                    Handler handler = new DesktopHandler(new DLV2DesktopService(Path.Combine(Application.streamingAssetsPath,@"lib\dlv2.exe")));
+                    Handler handler = new DesktopHandler(new DLV2DesktopService(Path.Combine(Application.streamingAssetsPath, @"lib\dlv2.exe")));
                     InputProgram facts = new ASPInputProgram();
                     facts.AddFilesPath(factsPath);
                     handler.AddProgram(encoding);
@@ -82,7 +82,7 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                         return;
                     }
                     Output o = handler.StartSync();
-                
+
                     if (!o.ErrorsString.Equals(""))
                     {
                         Debug.LogError(o.ErrorsString + " " + o.OutputString);
@@ -91,8 +91,14 @@ namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
                     stopwatch.Stop();
                     if (answers.Answersets.Count > 0)
                     {
-                        Debug.Log(answers.answersets[0].GetAnswerSet().Count);
-                        ActuatorsManager.NotifyActuators(brain,answers.answersets[0]);
+                        if (answers.GetOptimalAnswerSets().Count > 0)
+                        {
+                            ActuatorsManager.NotifyActuators(brain, answers.GetOptimalAnswerSets()[0]);
+                        }
+                        else
+                        {
+                            ActuatorsManager.NotifyActuators(brain, answers.answersets[0]);
+                        }
                     }
                     if (!brain.maintainFactFile)
                     {
