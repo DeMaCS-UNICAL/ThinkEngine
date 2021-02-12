@@ -5,4 +5,4 @@ ThinkEngine’s goal is to make transparent the integration of a declarative for
 
 The asset is released as a bunch of .dll files collecting a number of C# scripts. We currently support only Windows videogames.
 
-More information is available on our [wiki page](https://github.com/DeMaCS-UNICAL/ThinkEngine/wiki)
+More information, installation instructions and downloads are available from our [wiki page](https://github.com/DeMaCS-UNICAL/ThinkEngine/wiki).
