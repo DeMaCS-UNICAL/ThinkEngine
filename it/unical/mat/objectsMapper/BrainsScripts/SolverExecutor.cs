@@ -9,7 +9,7 @@ using it.unical.mat.embasp.@base;
 using it.unical.mat.embasp.languages.asp;
 using UnityEngine;
 
-namespace EmbASP4Unity.it.unical.mat.objectsMapper.BrainsScripts
+namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 {
     internal class SolverExectuor
     {

@@ -4,9 +4,9 @@ xcopy /f "./System.Memory.dll" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineD
 xcopy /f "./System.Collections.Immutable.dll" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
 xcopy /f "./System.Buffers.dll" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
 xcopy /f "./NewtonSoft.Json.dll" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
-xcopy /f "./EmbASP4Unity.dll" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
-xcopy /f "../Standalone/EmbASP4Unity.dll" "../ThinkEnginePlugin/Assets/Plugins/" /Y
+xcopy /f "./ThinkEngine.dll" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
+xcopy /f "../Standalone/ThinkEngine.dll" "../ThinkEnginePlugin/Assets/Plugins/" /Y
 xcopy /f "./Antlr4.Runtime.Standard.dll" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
 xcopy /f "../dlv2.exe" "../ThinkEnginePlugin/Assets/StreamingAssets/lib/" /Y
-xcopy /f "./EmbASP4Unity.dll.meta" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
-xcopy /f "../Standalone/EmbASP4Unity.dll.meta" "../ThinkEnginePlugin/Assets/Plugins/" /Y
+xcopy /f "./ThinkEngine.dll.meta" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
+xcopy /f "../Standalone/ThinkEngine.dll.meta" "../ThinkEnginePlugin/Assets/Plugins/" /Y

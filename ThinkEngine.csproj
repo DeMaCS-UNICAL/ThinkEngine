@@ -5,7 +5,7 @@
     <ProjectGuid>{4AA77F3E-F274-4520-B54F-0D98DF5DA92A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <NoStandardLibraries>false</NoStandardLibraries>
-    <AssemblyName>EmbASP4Unity</AssemblyName>
+    <AssemblyName>ThinkEngine</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -35,7 +35,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <RootNamespace>EmbASP4Unity</RootNamespace>
+    <RootNamespace>ThinkEngine</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -305,7 +305,7 @@
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Editor call "C:\Users\Denise\Uni\ThinkEngine\bin\Debug\dllCopy.bat"
-if $(ConfigurationName) == Editor call "C:\Users\Denise\Uni\ThinkEngine\ThinkEngine_Installer.bat"</PostBuildEvent>
+    <PostBuildEvent>if $(ConfigurationName) == Editor call "C:\Users\Denise\Uni\Assegno\ThinkEngine\bin\Debug\dllCopy.bat"
+if $(ConfigurationName) == Editor call "C:\Users\Denise\Uni\Assegno\ThinkEngine\ThinkEngine_Installer.bat"</PostBuildEvent>
   </PropertyGroup>
 </Project>

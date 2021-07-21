@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 
 
-namespace EmbASP4Unity.it.unical.mat.objectsMapper.EditorWindows
+namespace ThinkEngine.it.unical.mat.objectsMapper.EditorWindows
 {
     [CustomEditor(typeof(AbstractConfiguration))]
     public abstract class AbstractConfigurationEditor : Editor

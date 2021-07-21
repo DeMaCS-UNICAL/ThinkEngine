@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace EmbASP4Unity.it.unical.mat.objectsMapper.Mappers
+namespace ThinkEngine.it.unical.mat.objectsMapper.Mappers
 {
     internal class ASPBoolMapper :  IMapper
     {
