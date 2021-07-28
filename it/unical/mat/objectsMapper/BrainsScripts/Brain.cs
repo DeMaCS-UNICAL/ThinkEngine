@@ -122,7 +122,7 @@ public class Brain :MonoBehaviour
     }
     void Start()
     {
-        Debug.Log("DLL success");
+        //Debug.Log("DLL success");
         Utility.loadPrefabs();
         if (Application.isPlaying && enableBrain)
         {
@@ -211,9 +211,10 @@ public class Brain :MonoBehaviour
                 StartCoroutine(PulseOn());
             }
         }
+        string GOname = gameObject.name;
         executionThread = new Thread(() =>
         {
-            Thread.CurrentThread.Name = "Solver executor";
+            Thread.CurrentThread.Name = "Solver executor "+ GOname;
             Thread.CurrentThread.IsBackground = true;
             embasp.Run();
         });

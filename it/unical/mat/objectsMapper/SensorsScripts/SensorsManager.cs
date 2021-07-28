@@ -233,6 +233,7 @@ public  class SensorsManager : MonoBehaviour
                 watch.Start();
                 foreach (MonoBehaviourSensor sensor in sensors)
                 {
+                    //UnityEngine.Debug.Log(sensor +" "+ sensor.Map());
                     mapping += sensor.Map();
                 }
                 watch.Stop();
@@ -254,15 +255,20 @@ public  class SensorsManager : MonoBehaviour
         List<MonoBehaviourSensor> sensors = new List<MonoBehaviourSensor>();
         foreach (string sensorConf in instantiatedSensors[brain])
         {
+                //UnityEngine.Debug.Log(sensorConf);
             foreach (MonoBehaviourSensorsManager monobehaviourManager in FindObjectsOfType<MonoBehaviourSensorsManager>())
             {
+                //UnityEngine.Debug.Log(monobehaviourManager);
+                //UnityEngine.Debug.Log(monobehaviourManager.ready);
                 if (!monobehaviourManager.ready)
                 {
                     continue;
                 }
                 SensorConfiguration currentConfiguration = monobehaviourManager.GetConfiguration(sensorConf);
+                //UnityEngine.Debug.Log(currentConfiguration);
                 if (currentConfiguration != null)
                 {
+                    //UnityEngine.Debug.Log(monobehaviourManager.configurations[currentConfiguration].Count);
                     sensors.AddRange(monobehaviourManager.configurations[currentConfiguration]);
                 }
             }

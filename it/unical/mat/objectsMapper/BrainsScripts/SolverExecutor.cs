@@ -108,8 +108,8 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 catch (Exception e)
                 {
                     reason = false;
-                    Debug.LogError("CAUGHT EXECPTION!!!!");
-                    Debug.LogError(e.Source);
+                    Debug.LogError("CAUGHT EXECPTION!!!! from "+Thread.CurrentThread.Name);
+                    //Debug.LogError(e.Source);
                     Debug.LogError(e.Message);
                     Debug.LogError(e.StackTrace);
                 }
