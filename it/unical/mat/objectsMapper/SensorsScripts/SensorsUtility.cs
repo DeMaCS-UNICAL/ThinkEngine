@@ -152,7 +152,7 @@ public static class SensorsUtility
         {
             foreach (Component c in gameObject.GetComponents(typeof(MonoBehaviour)))
             {
-                if (c.GetType().Name.Equals(parentName))
+                if (c.GetType().ToString().Equals(parentName))
                 {
                     if (child.Count==1)
                     {
