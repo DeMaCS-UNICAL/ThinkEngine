@@ -38,9 +38,9 @@ namespace it.unical.mat.embasp.languages.asp
 
             foreach (AnswerSet answerSet in answerSets)
             {
-                if (answerSet.LevelWeight.Count == 0)
+                if (answerSet.LevelWeight.Count == 0)//ADDED BY DENISE
                 {
-                    return new List<AnswerSet>(0);
+                    return answerSets;
                 }
                 int maxLevel = answerSet.LevelWeight.Keys.Max();
 
