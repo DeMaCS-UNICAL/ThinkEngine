@@ -274,8 +274,16 @@ internal class ActuatorsManager : MonoBehaviour
             object toLock = currentPair.Value;
             lock (toLock)
             {
-                brain.objectsIndexes = GetObjectIndexes(brain);
-                Monitor.Pulse(toLock);
+                string objectIndexes = GetObjectIndexes(brain);
+                if (objectIndexes.Equals(""))
+                {
+                    requestedObjectIndexes.Enqueue(currentPair);
+                }
+                else
+                {
+                    brain.objectsIndexes = objectIndexes;
+                    Monitor.Pulse(toLock);
+                }
             }
         }
     }
