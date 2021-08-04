@@ -7,6 +7,7 @@ using UnityEngine;
 
 public static class Utility
 {
+    public static const BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
     private static List<string> _triggerMethodsToShow;
     internal static object _triggerClass;
     private static GameObject _hiddenGameObject;

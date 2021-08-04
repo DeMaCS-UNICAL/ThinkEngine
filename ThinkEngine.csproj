@@ -50,7 +50,6 @@
     <DefineConstants>TRACE;DEBUG;UNITY_EDITOR</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Standalone|x86'">
@@ -214,7 +213,13 @@
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\BrainEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\SensorConfigurationEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\GlobalIndexer.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewMappers\ASPMappers\ASPSignedIntegerMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewMappers\DataMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewMappers\MapperManager.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewMappers\MapperCollector.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewMappers\BaseMappers\SignedIntegerMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\MyPropertyInfo.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Test.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\IndexTracker.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPMapperHelper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPBoolMapper.cs" />
