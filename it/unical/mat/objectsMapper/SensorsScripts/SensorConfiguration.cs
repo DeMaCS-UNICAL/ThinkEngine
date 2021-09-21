@@ -6,20 +6,20 @@ using UnityEngine;
 public class SensorConfiguration : AbstractConfiguration
 {
     [SerializeField]
-    internal List<ListOfMyListStringIntPair> operationPerProperty;
+    internal List<MyListStringIntPair> operationPerProperty;
     [SerializeField]
-    internal List<ListOfMyListStringStringPair> specificValuePerProperty;
+    internal List<MyListStringStringPair> specificValuePerProperty;
     #region Unity Messages
     void OnEnable()
     {
         base.Reset();
         if (operationPerProperty is null)
         {
-            operationPerProperty = new List<ListOfMyListStringIntPair>();
+            operationPerProperty = new List<MyListStringIntPair>();
         }
         if (specificValuePerProperty is null)
         {
-            specificValuePerProperty = new List<ListOfMyListStringStringPair>();
+            specificValuePerProperty = new List<MyListStringStringPair>();
         }
     }
     new void Reset()
@@ -48,19 +48,19 @@ public class SensorConfiguration : AbstractConfiguration
     }
     internal override void CleanSpecificDataStructure()
     {
-        operationPerProperty = new List<ListOfMyListStringIntPair>();
-        specificValuePerProperty = new List<ListOfMyListStringStringPair>();
+        operationPerProperty = new List<MyListStringIntPair>();
+        specificValuePerProperty = new List<MyListStringStringPair>();
     }
 
     internal override void SpecificConfiguration(FieldOrProperty fieldOrProperty, MyListString property, GameObjectsTracker tracker)
     {
-        ListOfMyListStringIntPair pair = new ListOfMyListStringIntPair();
+        MyListStringIntPair pair = new MyListStringIntPair();
         pair.Key = property;
         pair.Value = tracker.operationPerProperty[fieldOrProperty];
         operationPerProperty.Add(pair);
         if (tracker.specificValuePerProperty.ContainsKey(fieldOrProperty))
         {
-            ListOfMyListStringStringPair pair2 = new ListOfMyListStringStringPair();
+            MyListStringStringPair pair2 = new MyListStringStringPair();
             pair2.Key = property;
             pair2.Value = tracker.specificValuePerProperty[fieldOrProperty];
             specificValuePerProperty.Add(pair2);

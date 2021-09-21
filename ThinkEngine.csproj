@@ -92,11 +92,13 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="UnityEditor">
-      <HintPath>..\..\..\..\..\..\..\Program Files\Unity\Editor\Data\Managed\UnityEditor.dll</HintPath>
+    <Reference Include="UnityEditor, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files\Unity\Hub\Editor\2020.3.14f1\Editor\Data\Managed\UnityEditor.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\..\..\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll</HintPath>
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files\Unity\Hub\Editor\2020.3.14f1\Editor\Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -213,11 +215,38 @@
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\BrainEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\SensorConfigurationEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\GlobalIndexer.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\NewMappers\ASPMappers\ASPSignedIntegerMapper.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\NewMappers\DataMapper.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\NewMappers\MapperManager.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\NewMappers\MapperCollector.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\NewMappers\BaseMappers\SignedIntegerMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\InfoAndValue.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\Editors\NewAbstractConfigurationEditor.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\Editors\NewSensorsConfigurationEditor.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewAbstractConfiguration.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\ASPMappers\ASPAdvancedArray2Mapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\ASPMappers\ASPBasicTypeMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\BaseMappers\ActuatorMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\ASPMappers\ASPBasicArray2Mapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\ASPMappers\ASPBoolMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\ASPMappers\ASPCharMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\ASPMappers\ASPEnumMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\ASPMappers\ASPFloatingPointMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\ASPMappers\NewASPMapperHelper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\ASPMappers\ASPSignedIntegerMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\ASPMappers\ASPStringMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\ASPMappers\ASPUnsignedIntegerMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\BaseMappers\Array2Mapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\BaseMappers\NeedingAggregatesMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\BaseMappers\SensorMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\BaseMappers\DataMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\IntermediateMappers\ActuatorDataMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\IntermediateMappers\SensorDataMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\IntermediateMappers\SensorDataMapperWithAggregates.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\MapperManager.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\MapperCollector.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\BaseMappers\BasicTypeMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\NewOperationContainer.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMonoBehaviourSensor.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMonoBehaviourSensorsManager.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewSensorConfiguration.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\ObjectTracker.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\Sensors.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\MyPropertyInfo.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Test.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\IndexTracker.cs" />
@@ -230,6 +259,8 @@
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPStringMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPUnsignedIntegerMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\MappingManager.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Utility\IntIntPair.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Utility\IntStringPair.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\MonoUtility.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\MyListString.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\MonoBehaviourSensor.cs" />
@@ -295,8 +326,8 @@
     <Compile Include="it\unical\mat\objectsMapper\ReflectionExecutor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SensorConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SensorsManager.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\Utility\ListOfMyListStringIntPair.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\Utility\ListOfMyListStringStringPair.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Utility\MyListStringIntPair.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Utility\MyListStringStringPair.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SimpleGameObjectsTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

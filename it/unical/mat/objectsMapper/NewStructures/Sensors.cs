@@ -1,0 +1,6 @@
+﻿namespace NewStructures
+{
+    interface Sensors
+    {
+    }
+}

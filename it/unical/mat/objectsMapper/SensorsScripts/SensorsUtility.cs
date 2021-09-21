@@ -58,7 +58,7 @@ public static class SensorsUtility
             if (collectionElementProperties == null)
             {
                 toReturn.value = matrix.GetValue(x, y);
-                toReturn.isBasic = true;
+                toReturn.isPrimitive = true;
             }
             else
             {
@@ -93,7 +93,7 @@ public static class SensorsUtility
             if (collectionElementProperties == null)
             {
                 toReturn.value = list[x];
-                toReturn.isBasic = true;
+                toReturn.isPrimitive = true;
             }
             else
             {

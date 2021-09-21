@@ -6,10 +6,11 @@ using UnityEngine;
 
 
 [Serializable]
-class ListOfMyListStringIntPair
+class MyListStringStringPair
 {
     [SerializeField]
     public MyListString Key;
     [SerializeField]
-    public int Value;
+    public string Value;
 }
+

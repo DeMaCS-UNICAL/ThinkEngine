@@ -9,12 +9,12 @@ public class FieldOrProperty
 
     public FieldOrProperty(MemberInfo m)
     {
-        //MyDebugger.MyDebug(m.MemberType);
+        //Debug.Log(m.Name+" "+ m.MemberType);
         if(m.MemberType == MemberTypes.Field)
         {
             f = (FieldInfo)m;
         }
-        else
+        else if(m.MemberType == MemberTypes.Property)
         {
             p = (PropertyInfo)m;
         }

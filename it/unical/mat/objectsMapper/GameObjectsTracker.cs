@@ -4,7 +4,7 @@ using UnityEngine;
 //this class manage the logic behind the inspector graphic of a configuration
 public class GameObjectsTracker
 {
-    public GameObject gameObject; //the root gameObject being tracked (the one to which a configuration is attached
+    public GameObject gameObject; //the root gameObject being tracked (the one to which a configuration is attached)
     public Dictionary<object, bool> objectsToggled; //it saves the information of being toggled in the inspector for all the fields/properties/component (NOT A GENERIC OBJECT) of the gameObject hierarchy
     public Dictionary<object, KeyValuePair<object, string>> objectsOwners;//for each field/property istantiation stores the first parent property object
     public Dictionary<object, Dictionary<string, object>> objectDerivedFromFields;//for each object instantiation of the hierarchy stores the actual istantiation of its fileds/properties
@@ -186,14 +186,14 @@ public class GameObjectsTracker
         }
         if (configuration.GetType() == typeof(SensorConfiguration))
         {
-            foreach (ListOfMyListStringIntPair currentOperationPerProperty in ((SensorConfiguration)configuration).operationPerProperty)
+            foreach (MyListStringIntPair currentOperationPerProperty in ((SensorConfiguration)configuration).operationPerProperty)
             {
                 if (currentOperationPerProperty.Key[0].Equals(currentPropertyHierarchy))
                 {
                     operationPerProperty.Add(currentFieldOrProperty, currentOperationPerProperty.Value);
                     if (currentOperationPerProperty.Value == Operation.SPECIFIC)
                     {
-                        foreach (ListOfMyListStringStringPair currentSpecificValue in ((SensorConfiguration)configuration).specificValuePerProperty)
+                        foreach (MyListStringStringPair currentSpecificValue in ((SensorConfiguration)configuration).specificValuePerProperty)
                         {
                             if (currentSpecificValue.Key[0].Equals(currentPropertyHierarchy))
                             {

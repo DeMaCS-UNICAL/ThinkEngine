@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NewStructures;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -32,6 +33,24 @@ public  class SensorsManager : MonoBehaviour
             return _instantiatedSensors;
         }
     }
+
+    internal bool IsConfigurationNameValid(string name, NewSensorConfiguration newSensorConfiguration)
+    {
+        if (name.Equals(""))
+        {
+            return false;
+        }
+        foreach (NewMonoBehaviourSensorsManager manager in Resources.FindObjectsOfTypeAll<NewMonoBehaviourSensorsManager>())
+        {
+            if (manager.ExistsConfigurationOtherThan(name, newSensorConfiguration))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
     private static Queue<KeyValuePair<Brain,object>> requestedMappings
     {
         get

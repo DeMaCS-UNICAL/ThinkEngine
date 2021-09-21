@@ -313,7 +313,7 @@ internal class ActuatorsManager : MonoBehaviour
             {
                 if (instantiatedActuators[brain].Contains(configuration.configurationName))
                 {
-                    toReturn += "objectIndex(" + ASPMapperHelper.aspFormat(configuration.configurationName) + "," + configuration.GetComponent<IndexTracker>().currentIndex + ")." + Environment.NewLine;
+                    toReturn += "objectIndex(" + ASPMapperHelper.AspFormat(configuration.configurationName) + "," + configuration.GetComponent<IndexTracker>().currentIndex + ")." + Environment.NewLine;
                 }
             }
         }

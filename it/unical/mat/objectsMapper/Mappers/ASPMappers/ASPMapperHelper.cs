@@ -1,6 +1,6 @@
 ﻿public static class ASPMapperHelper
 {
-    internal static string aspFormat(string hierarchyLevel)
+    internal static string AspFormat(string hierarchyLevel)
     {
         if (hierarchyLevel.Equals(""))
         {

@@ -5,8 +5,9 @@ using System;
 using System.Reflection;
 using System.Linq;
 using static MonoBehaviourSensorHider;
+using NewStructures;
 
-[ExecuteInEditMode]
+[ExecuteInEditMode, DisallowMultipleComponent]
 internal class MonoBehaviourSensorsManager : MonoBehaviour
 {
     internal bool ready;
@@ -52,6 +53,8 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
             ready = true;
         }
     }
+
+
     void Update()
     {
         if (!ready || !Application.isPlaying)
@@ -171,7 +174,7 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
                     return generatedSensors;
                 }
                 generatedSensors.AddRange(ConfigureSensor(result, sensorConfiguration, property, currentOperationPerProperty));
-                foreach (ListOfMyListStringIntPair pair in sensorConfiguration.operationPerProperty)
+                foreach (MyListStringIntPair pair in sensorConfiguration.operationPerProperty)
                 {
                     if (pair.Key.Equals(property))
                     {
@@ -199,7 +202,7 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
                 currentSize.Add(result.Size(0));
                 for (int i = 0; i < result.Size(0); i++)
                 {
-                    if (!result.isBasic)
+                    if (!result.isPrimitive)
                     {
                         sensors.Add(AddSensor(conf.configurationName, property, currentOperationPerProperty, result.propertiesType));
                     }
@@ -220,7 +223,7 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
                 {
                     for (int j = 0; j < result.Size(1); j++)
                     {
-                        if (!result.isBasic)
+                        if (!result.isPrimitive)
                         {
                             sensors.Add(AddSensor(conf.configurationName, property, currentOperationPerProperty, result.propertiesType));
                         }
@@ -268,6 +271,29 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
             }
         }
         return null;
+    }
+    internal NewSensorConfiguration GetNewConfiguration(string name)
+    {
+        foreach (NewSensorConfiguration configuration in GetComponents<NewSensorConfiguration>())
+        {
+            if (configuration.configurationName.Equals(name))
+            {
+                return configuration;
+            }
+        }
+        return null;
+    }
+
+    internal bool ExistsConfigurationOtherThan(string name, NewSensorConfiguration newSensorConfiguration)
+    {
+        foreach (NewSensorConfiguration configuration in GetComponents<NewSensorConfiguration>())
+        {
+            if (configuration!=newSensorConfiguration && configuration.configurationName.Equals(name))
+            {
+                return true;
+            }
+        }
+        return false;
     }
     internal void RemoveSensor(MonoBehaviourSensor monoBehaviourSensor)
     {
@@ -358,7 +384,7 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
     private ArrayInfo ReadBasicArrayProperty(string path, Type type, object obj, int x, int y)
     {
         ArrayInfo matrixValue = SensorsUtility.GetArrayProperty(path, type, obj, x, y);
-        if (matrixValue.array != null && matrixValue.isBasic)
+        if (matrixValue.array != null && matrixValue.isPrimitive)
         {
             matrixValue.size[0] = matrixValue.array.GetLength(0);
             matrixValue.size[1] = matrixValue.array.GetLength(1);
@@ -370,7 +396,7 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
     private ArrayInfo ReadArrayProperty(string path, List<string> collectionElementProperties, Type type, object obj, int x, int y)
     {
         ArrayInfo matrixValue = SensorsUtility.GetArrayProperty(path, type, obj, x, y, collectionElementProperties);//matrixValue[0] is the actual matrix, matrixValue[1] is a list of Properties
-        if (matrixValue.array != null && !matrixValue.isBasic)
+        if (matrixValue.array != null && !matrixValue.isPrimitive)
         {
             if (matrixValue.properties != null)
             {
@@ -411,7 +437,7 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
     private ListInfo ReadBasicListProperty(string path, Type type, object obj, int x)
     {
         ListInfo listValue = SensorsUtility.GetListProperty(path, type, obj, x);
-        if (listValue.list != null && listValue.isBasic)
+        if (listValue.list != null && listValue.isPrimitive)
         {
             listValue.elementType = listValue.list.GetType().GetGenericArguments()[0];
             listValue.count = listValue.list.Count;
@@ -424,7 +450,7 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
         ListInfo listValue = SensorsUtility.GetListProperty(path, type, obj, x, collectionElementProperties);
         List<Type> typesForProperties = new List<Type>();
         listValue.propertiesType = typesForProperties;
-        if (listValue.list != null && !listValue.isBasic)
+        if (listValue.list != null && !listValue.isPrimitive)
         {
             if (listValue.properties != null)
             {
@@ -478,7 +504,7 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
             for (int j = 0; j < sizeToTrack[property][(increasedDimension + 1) % 2]; j++)
             {
                 MonoBehaviourSensor newSensor;
-                if (!propertyInfo.isBasic)
+                if (!propertyInfo.isPrimitive)
                 {
                     newSensor = AddSensor(sensorNameForCollectionProperty[property], property, 0, propertyInfo.propertiesType);
                 }
@@ -501,7 +527,7 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
         for (int i = sizeToTrack[property][0]; i < newSize; i++)
         {
             MonoBehaviourSensor newSensor;
-            if (!propertyInfo.isBasic)
+            if (!propertyInfo.isPrimitive)
             {
                 newSensor = AddSensor(sensorNameForCollectionProperty[property], property, 0, propertyInfo.propertiesType);
             }

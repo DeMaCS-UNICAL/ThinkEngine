@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class MyPropertyInfo
 {
-    public bool isBasic;
+    public bool isPrimitive;
     public List<FieldOrProperty> properties;
     public object value;
     public List<Type> propertiesType;

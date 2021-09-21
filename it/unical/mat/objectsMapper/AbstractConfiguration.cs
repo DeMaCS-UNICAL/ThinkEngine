@@ -19,7 +19,7 @@ public class AbstractConfiguration : MonoBehaviour
     internal string configurationName;
     [SerializeField]
     internal List<SimpleGameObjectsTracker> advancedConf;
-    internal Dictionary<MyListString, List<string>> aspTemplate; //the int is the position of the property in "properties"
+    internal Dictionary<MyListString, List<string>> aspTemplate;
 
     protected bool playingMode;
 
@@ -312,8 +312,8 @@ public class AbstractConfiguration : MonoBehaviour
         for (int j = 0; j < advancedConf.toSave.Count; j++)//add an entry for each sub-property in the template
         {
             string localASPRep = currentASPRep;
-            localASPRep += indexesPlaceholder + "," + ASPMapperHelper.aspFormat(Type.GetType(advancedConf.objType).ToString()) + "("
-                + ASPMapperHelper.aspFormat(advancedConf.toSave[j]) + "(" + valuePlaceholder + ")";
+            localASPRep += indexesPlaceholder + "," + ASPMapperHelper.AspFormat(Type.GetType(advancedConf.objType).ToString()) + "("
+                + ASPMapperHelper.AspFormat(advancedConf.toSave[j]) + "(" + valuePlaceholder + ")";
             localASPRep += ")" + suffix;
             aspTemplate[property].Add(localASPRep);
         }
@@ -324,11 +324,11 @@ public class AbstractConfiguration : MonoBehaviour
         string currentASPRep;
         for (int j = 0; j < property.Count; j++)
         {
-            pathInASPFormat += ASPMapperHelper.aspFormat(property[j]) + "(";//leave only character and letters in the property hierarchy, starts with lowercase
+            pathInASPFormat += ASPMapperHelper.AspFormat(property[j]) + "(";//leave only character and letters in the property hierarchy, starts with lowercase
             suffix += ")";
         }
-        string configurationNameAspFormat = ASPMapperHelper.aspFormat(configurationName);//leave only character and letters in the configuration name, starts with lowercase
-        string goNameNotCapital = ASPMapperHelper.aspFormat(gameObject.name);//leave only character and letters in the GO name, starts with lowercase
+        string configurationNameAspFormat = ASPMapperHelper.AspFormat(configurationName);//leave only character and letters in the configuration name, starts with lowercase
+        string goNameNotCapital = ASPMapperHelper.AspFormat(gameObject.name);//leave only character and letters in the GO name, starts with lowercase
         currentASPRep = configurationNameAspFormat + "(" + goNameNotCapital + ",objectIndex({0}),"; //add IndexTracker placeholder 
         suffix += ")";
         currentASPRep += pathInASPFormat;

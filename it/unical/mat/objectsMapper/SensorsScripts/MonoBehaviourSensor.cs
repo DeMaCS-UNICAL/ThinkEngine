@@ -118,12 +118,12 @@ internal class MonoBehaviourSensorHider
         {
             if (!collectionValue.IsNull())
             {
-                if (!collectionValue.isBasic && collectionValue.properties != null)
+                if (!collectionValue.isPrimitive && collectionValue.properties != null)
                 {
                     List<FieldOrProperty> toRead = collectionValue.properties;
                     RetrievePropertiesValues(toRead, collectionValue.Collection());
                 }
-                else if (collectionValue.isBasic && collectionValue.value != null)
+                else if (collectionValue.isPrimitive && collectionValue.value != null)
                 {
                     IList currentValuesList = propertyValues[0];
                     Type currentValuesListType = currentValuesList.GetType().GetGenericArguments()[0];
