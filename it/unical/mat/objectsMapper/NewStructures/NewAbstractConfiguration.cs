@@ -11,19 +11,19 @@ namespace NewStructures
     internal abstract class NewAbstractConfiguration : MonoBehaviour
     {
         internal ObjectTracker _objectTracker;
-        internal ObjectTracker objectTracker {
+        internal ObjectTracker ObjectTracker {
             get
             {
                 if(_objectTracker == null)
                 {
-                    _objectTracker = new ObjectTracker(this, IsSensor(), gameObject);
+                    _objectTracker = new ObjectTracker(IsSensor(), gameObject);
                 }
                 return _objectTracker;
             }
         }
         [SerializeField, HideInInspector]
         internal List<MyListString> _savedProperties;
-        internal  List<MyListString> savedProperties
+        internal  List<MyListString> SavedProperties
         {
             get
             {
@@ -39,8 +39,25 @@ namespace NewStructures
             }
         }
         [SerializeField, HideInInspector]
+        internal List<MyListString> _toMapProperties;
+        internal List<MyListString> ToMapProperties
+        {
+            get
+            {
+                if (_toMapProperties == null)
+                {
+                    _toMapProperties = new List<MyListString>();
+                }
+                return _toMapProperties;
+            }
+            set
+            {
+                _toMapProperties = value;
+            }
+        }
+        [SerializeField, HideInInspector]
         internal string _configurationName;
-        internal virtual string configurationName { 
+        internal virtual string ConfigurationName { 
             get
             {
                 if (_configurationName == null)
@@ -54,32 +71,40 @@ namespace NewStructures
 
         internal void RefreshObjectTracker()
         {
-            _objectTracker = new ObjectTracker(this, IsSensor(), gameObject);
+            _objectTracker = new ObjectTracker(IsSensor(), gameObject);
         }
         internal abstract bool IsSensor();
         internal abstract string GetAutoConfigurationName();
 
         internal virtual void Clear()
         {
-            _objectTracker = new ObjectTracker(this,IsSensor(), gameObject);
-            configurationName = GetAutoConfigurationName();
-            savedProperties = new List<MyListString>();
+            _objectTracker = new ObjectTracker(IsSensor(), gameObject);
+            ConfigurationName = GetAutoConfigurationName();
+            SavedProperties = new List<MyListString>();
         }
         internal bool IsPropertySelected(MyListString property)
         {
-            return savedProperties.Contains(property);
+            return SavedProperties.Contains(property);
         }
         internal void ToggleProperty(MyListString property, bool isActive)
         {
             if (isActive)
             {
-                savedProperties.Add(property);
+                SavedProperties.Add(property);
                 PropertySelected(property);
+                if (ObjectTracker.IsFinal(property))
+                {
+                    ToMapProperties.Add(property);
+                }
             }
             else
             {
                 PropertyDeleted(property);
-                savedProperties.Remove(property);
+                SavedProperties.Remove(property);
+                if (ToMapProperties.Contains(property))
+                {
+                    ToMapProperties.Remove(property);
+                }
             }
         }
 

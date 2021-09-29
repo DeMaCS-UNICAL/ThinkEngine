@@ -4,10 +4,18 @@ using UnityEngine;
 [ExecuteInEditMode]
 class IndexTracker:MonoBehaviour
 {
-    public int currentIndex=-1;
-    void Start()
+    private int _currentIndex=-1;
+    internal int CurrentIndex
     {
-        currentIndex = GlobalIndexer.assignIndex();
+        get
+        {
+            if (_currentIndex == -1)
+            {
+                _currentIndex = GlobalIndexer.assignIndex();
+            }
+            return _currentIndex;
+        }
     }
+
 }
 

@@ -19,7 +19,7 @@ namespace NewStructures
         [SerializeField, HideInInspector]
         internal List<string> specificValuePerPropertyValues;
         internal Dictionary<int,int> _operationPerProperty;
-        internal Dictionary<int,int> operationPerProperty
+        internal Dictionary<int,int> OperationPerProperty
         {
             get
             {
@@ -36,7 +36,7 @@ namespace NewStructures
         }
         [SerializeField,HideInInspector]
         internal Dictionary<int,string> _specificValuePerProperty;
-        internal Dictionary<int,string> specificValuePerProperty
+        internal Dictionary<int,string> SpecificValuePerProperty
         {
             get
             {
@@ -51,7 +51,7 @@ namespace NewStructures
                 _specificValuePerProperty = value;
             }
         }
-        internal override string configurationName {
+        internal override string ConfigurationName {
             set {
                 if (!Utility.sensorsManager.IsConfigurationNameValid(value, this))
                 {
@@ -64,8 +64,8 @@ namespace NewStructures
         internal override void Clear()
         {
             base.Clear();
-            operationPerProperty = new Dictionary<int, int>();
-            specificValuePerProperty = new Dictionary<int, string>();
+            OperationPerProperty = new Dictionary<int, int>();
+            SpecificValuePerProperty = new Dictionary<int, string>();
         }
         internal override string GetAutoConfigurationName()
         {
@@ -86,19 +86,19 @@ namespace NewStructures
         }
         internal void SetOperationPerProperty(MyListString property, int operation)
         {
-            if (!savedProperties.Contains(property))
+            if (!SavedProperties.Contains(property))
             {
                 throw new Exception("Property not selected");
             }
-            operationPerProperty[property.GetHashCode()] = operation;
+            OperationPerProperty[property.GetHashCode()] = operation;
         }
         internal void SetSpecificValuePerProperty(MyListString property, string value)
         {
-            if (!savedProperties.Contains(property))
+            if (!SavedProperties.Contains(property))
             {
                 throw new Exception("Property not selected");
             }
-            specificValuePerProperty[property.GetHashCode()] = value;
+            SpecificValuePerProperty[property.GetHashCode()] = value;
 
         }
         internal override bool IsSensor()
@@ -107,13 +107,13 @@ namespace NewStructures
         }
         protected override void PropertySelected(MyListString property)
         {
-            operationPerProperty[property.GetHashCode()] =0;
-            specificValuePerProperty[property.GetHashCode()] ="";
+            OperationPerProperty[property.GetHashCode()] =0;
+            SpecificValuePerProperty[property.GetHashCode()] ="";
         }
         protected override void PropertyDeleted(MyListString property)
         {
-            operationPerProperty.Remove(property.GetHashCode());
-            specificValuePerProperty.Remove(property.GetHashCode());
+            OperationPerProperty.Remove(property.GetHashCode());
+            SpecificValuePerProperty.Remove(property.GetHashCode());
         }
        
         public void OnBeforeSerialize()
@@ -122,29 +122,29 @@ namespace NewStructures
             operationPerPropertyOperations = new List<int>();
             specificValuePerPropertyIndexes = new List<int>();
             specificValuePerPropertyValues = new List<string>();
-            foreach(int key in operationPerProperty.Keys)
+            foreach(int key in OperationPerProperty.Keys)
             {
                 operationPerPropertyIndexes.Add(key);
-                operationPerPropertyOperations.Add(operationPerProperty[key]);
+                operationPerPropertyOperations.Add(OperationPerProperty[key]);
             }
-            foreach (int key in specificValuePerProperty.Keys)
+            foreach (int key in SpecificValuePerProperty.Keys)
             {
                 specificValuePerPropertyIndexes.Add(key);
-                specificValuePerPropertyValues.Add(specificValuePerProperty[key]);
+                specificValuePerPropertyValues.Add(SpecificValuePerProperty[key]);
             }
         }
 
         public void OnAfterDeserialize()
         {
-            operationPerProperty = new Dictionary<int, int>();
-            specificValuePerProperty = new Dictionary<int, string>();
+            OperationPerProperty = new Dictionary<int, int>();
+            SpecificValuePerProperty = new Dictionary<int, string>();
             for(int i=0; i < operationPerPropertyIndexes.Count; i++)
             {
-                operationPerProperty.Add(operationPerPropertyIndexes[i], operationPerPropertyOperations[i]);
+                OperationPerProperty.Add(operationPerPropertyIndexes[i], operationPerPropertyOperations[i]);
             }
             for (int i = 0; i < specificValuePerPropertyIndexes.Count; i++)
             {
-                specificValuePerProperty.Add(specificValuePerPropertyIndexes[i], specificValuePerPropertyValues[i]);
+                SpecificValuePerProperty.Add(specificValuePerPropertyIndexes[i], specificValuePerPropertyValues[i]);
             }
         }
 

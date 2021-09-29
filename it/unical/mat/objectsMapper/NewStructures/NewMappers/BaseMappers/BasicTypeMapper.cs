@@ -1,6 +1,7 @@
-﻿using NewMappers;
-using NewMappers.IntermediateMappers;
+﻿using newMappers;
+using NewMappers;
 using NewStructures;
+using NewStructures.NewMappers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,27 +12,30 @@ using System.Threading.Tasks;
 using UnityEngine;
 using static NewMappers.NewOperationContainer;
 
-internal abstract class BasicTypeMapper : SensorDataMapperWithAggregates,ActuatorMapper
+internal abstract class BasicTypeMapper : IDataMapper
 {
     #region SUPPORT CLASSES
-    internal class BasicTypeInfoAndValue : InfoAndValue
+    private class BasicTypeInfoAndValue : IInfoAndValue
     {
         internal NewOperation operation;
         internal string specificValue;
         internal List<object> values;
-        internal string mapping;
         internal BasicTypeInfoAndValue()
         {
             values = new List<object>();
-            mapping = "";
         }
     }
-    internal class BasicTypeSensor : Sensors
+    private class BasicTypeSensor : ISensors
     {
         internal NewMonoBehaviourSensor sensor;
         internal BasicTypeSensor(NewMonoBehaviourSensor sensor)
         {
             this.sensor = sensor;
+        }
+
+        public bool IsEmpty()
+        {
+            return sensor == null;
         }
     }
     #endregion
@@ -42,14 +46,14 @@ internal abstract class BasicTypeMapper : SensorDataMapperWithAggregates,Actuato
     #endregion
 
     internal Type _convertingType;
-    internal Type convertingType {
+    internal Type ConvertingType {
         get
         {
             return _convertingType;
         }
     }
     internal List<Type> _supportedTypes;
-    internal List<Type> supportedTypes
+    internal List<Type> SupportedTypes
     {
         get
         {
@@ -81,9 +85,14 @@ internal abstract class BasicTypeMapper : SensorDataMapperWithAggregates,Actuato
     {
         throw new NotImplementedException();
     }
+
+    public bool IsFinal(Type t)
+    {
+        return true;
+    }
     public bool Supports(Type type)
     {
-        return supportedTypes.Contains(type);
+        return SupportedTypes.Contains(type);
     }
     public void SetPropertyValue(object actualObject, MyListString propertyHierarchy, object value)
     {
@@ -91,14 +100,12 @@ internal abstract class BasicTypeMapper : SensorDataMapperWithAggregates,Actuato
         {
             throw new Exception("Value to set can not be null.");
         }
-        object secondLastPropertyValue;
-        FieldOrProperty property;
-        RetrieveProperty(actualObject, propertyHierarchy, out secondLastPropertyValue, out property);
+        RetrieveProperty(actualObject, propertyHierarchy, out object secondLastPropertyValue, out FieldOrProperty property);
         property.SetValue(secondLastPropertyValue, Convert.ChangeType(value, property.Type()));
     }
     private void RetrieveProperty(object actualObject, MyListString property, out object currentPropertyValue, out FieldOrProperty currentProperty)
     {
-        if (actualObject == null || property.Count == 0 || !supportedTypes.Contains(actualObject.GetType()))
+        if (actualObject == null || property.Count == 0 || !SupportedTypes.Contains(actualObject.GetType()))
         {
             throw new Exception("Invalid arguments.");
         }
@@ -128,87 +135,131 @@ internal abstract class BasicTypeMapper : SensorDataMapperWithAggregates,Actuato
             }
         }
     }
-    public void UpdateSensor(NewMonoBehaviourSensor sensor, object actualValue)
+    public void UpdateSensor(NewMonoBehaviourSensor sensor, object actualValue, MyListString property, int hierarchyLevel)
     {
         if (!Supports(actualValue.GetType()))
         {
-            throw new Exception("Wrong mapper for property " + sensor.property);
+            throw new Exception("Wrong mapper for property " + property);
         }
 
-        List<object> values = ((BasicTypeInfoAndValue)sensor.propertyInfo).values;
+        List<object> values = ((BasicTypeInfoAndValue)sensor.propertyInfo[hierarchyLevel]).values;
         if (values.Count == 200)
         {
             values.RemoveAt(0);
         }
-        values.Add(Convert.ChangeType(actualValue,convertingType));
+        values.Add(Convert.ChangeType(actualValue,ConvertingType));
     }
-    public int GetAggregationSpecificIndex()
+
+    public string SensorBasicMap(NewMonoBehaviourSensor sensor, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceholders)
+    {
+        if (!SupportedTypes.Contains(currentObject.GetType()) || residualPropertyHierarchy.Count>1)
+        {
+            throw new Exception("Type " + currentObject.GetType() + " is not supported as Sensor");
+        }
+        BasicTypeInfoAndValue infoAndValue = (BasicTypeInfoAndValue)sensor.propertyInfo[hierarchyLevel];
+        string value = BasicMap(infoAndValue.operation(infoAndValue.values));
+        valuesForPlaceholders.Add(value);
+        return string.Format(sensor.Mapping, valuesForPlaceholders.ToArray());
+    }
+    public ISensors InstantiateSensors(InstantiationInformation information)
+    {
+        if (!SupportedTypes.Contains(information.currentObjectOfTheHierarchy.GetType()) || information.residualPropertyHierarchy.Count > 1)
+        {
+            throw new Exception("Wrong mapper for property " + information.propertyHierarchy);
+        }
+        
+        BasicTypeInfoAndValue additionalInfo = new BasicTypeInfoAndValue();
+        int operationIndex = ((NewSensorConfiguration)information.configuration).OperationPerProperty[information.propertyHierarchy.GetHashCode()];
+        additionalInfo.operation = OperationList()[operationIndex];
+        if (operationIndex == GetAggregationSpecificIndex())
+        {
+            additionalInfo.specificValue = ((NewSensorConfiguration)information.configuration).SpecificValuePerProperty[information.propertyHierarchy.GetHashCode()];
+        }
+        BasicTypeSensor sensor = new BasicTypeSensor(information.instantiateOn.AddComponent<NewMonoBehaviourSensor>());
+        additionalInfo.values.Add(Convert.ChangeType(information.currentObjectOfTheHierarchy, ConvertingType));
+        information.hierarchyInfo.Add(additionalInfo);
+        sensor.sensor.Configure(information, GenerateMapping(information));
+        return sensor;
+    }
+    public ISensors ManageSensors(InstantiationInformation information, ISensors instantiatedSensors)
+    {
+        if (!(instantiatedSensors is BasicTypeSensor))
+        {
+            throw new Exception("Wrong mapper for property " + information.propertyHierarchy);
+        }
+        if (((BasicTypeSensor)instantiatedSensors).sensor == null)
+        {
+            return InstantiateSensors(information);
+        }
+        return instantiatedSensors;
+    }
+    public int GetAggregationSpecificIndex(Type type=null)
     {
         return 2;
     }
-    public bool IsTypeExpandable()
+    public bool IsTypeExpandable(Type type)
     {
         return false;
     }
-    public Sensors InstantiateSensors(GameObject gameobject, object actualObject, MyListString propertyHierarchy, MyListString property, NewSensorConfiguration configuration)
-    {
-        if(!supportedTypes.Contains(actualObject.GetType()) || property.Count != 1)
-        {
-            throw new Exception("Wrong mapper for property " + propertyHierarchy);
-        }
-        BasicTypeInfoAndValue additionalInfo = new BasicTypeInfoAndValue();
-        int operationIndex = configuration.operationPerProperty[propertyHierarchy.GetHashCode()];
-        additionalInfo.operation = OperationList()[operationIndex];
-        if(operationIndex == GetAggregationSpecificIndex())
-        {
-            additionalInfo.specificValue = configuration.specificValuePerProperty[propertyHierarchy.GetHashCode()];
-        }
-        BasicTypeSensor sensor = new BasicTypeSensor(gameobject.AddComponent<NewMonoBehaviourSensor>());
-        additionalInfo.values.Add(Convert.ChangeType( actualObject,convertingType));
-        additionalInfo.mapping = GenerateMapping(propertyHierarchy);
-        sensor.sensor.Configure(configuration.configurationName, propertyHierarchy, actualObject.GetType(),additionalInfo);
-        return sensor;
-    }
+    
     public void InstantiateActuators(object actualObject, MyListString propertyHierarchy)
     {
         throw new NotImplementedException();
     }
-    public Sensors ManageSensors(GameObject gameobject, object actualObject, MyListString propertyHierarchy, MyListString residualPropertyHierarchy, NewSensorConfiguration configuration, Sensors instantiatedSensors)
-    {
-        if(!(instantiatedSensors is BasicTypeSensor))
-        {
-            throw new Exception("Wrong mapper for property " + propertyHierarchy);
-        }
-        if (((BasicTypeSensor)instantiatedSensors).sensor == null)
-        {
-            return InstantiateSensors(gameobject, actualObject, propertyHierarchy, residualPropertyHierarchy, configuration);
-        }
-        return instantiatedSensors;
-    }
+   
     public void ManageActuators(object actualObject, MyListString propertyHierarchy, List<MonoBehaviourActuatorHider.MonoBehaviourActuator> instantiatedActuators)
     {
         throw new NotImplementedException();
     }
     public Dictionary<MyListString, KeyValuePair<Type, object>> RetrieveProperties(Type objectType, MyListString currentObjectPropertyHierarchy, object currentObject)
     {
-        if (!supportedTypes.Contains(objectType))
+        if (!SupportedTypes.Contains(objectType))
         {
             throw new Exception("Type " + objectType + " is not supported by " + this.GetType());
         }
         return new Dictionary<MyListString, KeyValuePair<Type, object>>();
     }
-    public bool NeedsSpecifications()
+    public bool NeedsSpecifications(Type type)
     {
         return true;
     }
+    public bool NeedsAggregates(Type type)
+    {
+        return true;
+    }
+    protected string GenerateMapping(InstantiationInformation information)
+    {
+        if (!information.mappingDone)
+        {
+            string prepend = "";
+            string append = "";
+            for (int i = 0; i < information.residualPropertyHierarchy.Count; i++)
+            {
+                prepend += NewASPMapperHelper.AspFormat(information.residualPropertyHierarchy[i]) + "(";
+                append = ")" + append;
+
+            }
+            append += ")";//in order to close the brachets of confName(gameObjectName, objectindex(X),
+            prepend += "{" + information.firstPlaceholder + "}";
+            information.prependMapping.Add(prepend);
+            information.appendMapping.Insert(0, append);
+            information.mappingDone = true;
+        }
+        return information.Mapping();
+    }
     #region ABSTRACT METHODS
 
-    public abstract Type GetAggregationTypes();
-    public abstract string SensorBasicMap(NewMonoBehaviourSensor sensor);
-    public abstract string ActuatorBasicMap(object obj);
-    protected abstract string GenerateMapping(MyListString propertyHierarchy);
+    public abstract Type GetAggregationTypes(Type type=null);
+    public  string ActuatorBasicMap(object obj)
+    {
+        throw new NotImplementedException();
+    }
+    
 
     public abstract string BasicMap(object value);
+
+
+
 
 
 

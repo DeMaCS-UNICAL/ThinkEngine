@@ -1,17 +1,16 @@
-﻿using NewMappers.ASPMappers;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using static NewMappers.NewOperationContainer;
 
 namespace newMappers
 {
-    internal class ASPBoolMapper : ASPBasicTypeMapper
+    internal class ASPBoolMapper : BasicTypeMapper
     {
         #region SINGLETON FEATURES
         
-        private static DataMapper _instance;
-        public static DataMapper instance
+        private static IDataMapper _instance;
+        public static IDataMapper Instance
         {
             get
             {
@@ -53,14 +52,14 @@ namespace newMappers
         }
         public override string BasicMap(object currentObject)
         {
-            if (!supportedTypes.Contains(currentObject.GetType()))
+            if (!SupportedTypes.Contains(currentObject.GetType()))
             {
                 throw new Exception("Type " + currentObject.GetType() + " is not supported as Sensor");
             }
             return (((bool)currentObject) + "").ToLower();
         }
 
-        public override Type GetAggregationTypes()
+        public override Type GetAggregationTypes(Type type)
         {
             return typeof(BoolOperations);
         }

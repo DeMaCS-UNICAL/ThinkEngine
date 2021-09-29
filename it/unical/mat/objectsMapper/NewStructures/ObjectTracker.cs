@@ -7,10 +7,12 @@ internal class ObjectTracker
 {
     public delegate Dictionary<MyListString, KeyValuePair<Type,object>> RetrieveProperties(Type t, MyListString currentHierarchy, object currentObject = null);
 
-    NewAbstractConfiguration configuration;
     bool isSensor;
     Dictionary<MyListString, int> propertiesIndex;
     Dictionary<int, List<MyListString>> derivedProperties; //for each property index, there is the list of the properties of the property; 
+
+    Dictionary<int, object> propertiesValue; //for each property index, there is the actual instantiation of the property (if not null)
+    Dictionary<int, Type> propertiesType;//for each property index, there is the type of the property
 
     internal Type PropertyType(MyListString property)
     {
@@ -18,18 +20,8 @@ internal class ObjectTracker
         return propertiesType[propertiesIndex[property]];
     }
 
-    Dictionary<int, object> propertiesValue; //for each property index, there is the actual instantiation of the property (if not null)
-    Dictionary<int, Type> propertiesType;//for each property index, there is the type of the property
-    static Dictionary<bool, RetrieveProperties> retrievingPropertyMethods;
-    static ObjectTracker()
+    public ObjectTracker(bool isSensorTracker, object root, bool nullObject = false)
     {
-        retrievingPropertyMethods = new Dictionary<bool, RetrieveProperties>();
-        retrievingPropertyMethods.Add(true, MapperManager.RetrieveSensorProperties);
-        retrievingPropertyMethods.Add(false, MapperManager.RetrieveActuatorProperties);
-    }
-    public ObjectTracker(NewAbstractConfiguration conf, bool isSensorTracker, object root, bool nullObject=false)
-    {
-        configuration = conf;
         propertiesIndex = new Dictionary<MyListString, int>();
         derivedProperties = new Dictionary<int, List<MyListString>>();
         propertiesValue = new Dictionary<int, object>();
@@ -48,6 +40,10 @@ internal class ObjectTracker
         {
             RetrieveTypeProperties((Type)root);
         }
+    }
+    internal bool IsFinal(MyListString property)
+    {
+        return MapperManager.IsFinal(PropertyType(property));
     }
     private List<MyListString> GetRootObjectProperties()
     {
@@ -117,8 +113,8 @@ internal class ObjectTracker
             throw new Exception("Actual object type differs from declared one.");
         }
         List<MyListString> toReturn = new List<MyListString>();
-        MyListString baseMember = fatherMember != null ? fatherMember : new MyListString();
-        Dictionary<MyListString, KeyValuePair<Type, object>> retrievedProperties = retrievingPropertyMethods[isSensor](type, baseMember, currentObject);
+        MyListString baseMember = fatherMember ?? new MyListString();
+        Dictionary<MyListString, KeyValuePair<Type, object>> retrievedProperties = MapperManager.RetrieveProperties(type, baseMember, currentObject);
         foreach (MyListString property in retrievedProperties.Keys)
         {
             if (!propertiesIndex.ContainsKey(property))

@@ -3,8 +3,7 @@ using static NewMappers.NewOperationContainer;
 
 namespace NewStructures
 {
-    interface InfoAndValue
+    interface IInfoAndValue
     {
-        
     }
 }

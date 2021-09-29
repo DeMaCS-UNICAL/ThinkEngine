@@ -21,7 +21,7 @@ class GlobalIndexer
     {
         foreach (IndexTracker tracker in Resources.FindObjectsOfTypeAll<IndexTracker>())
         {
-            if (tracker.currentIndex == index)
+            if (tracker.CurrentIndex == index)
             {
                 return tracker.gameObject;
             }

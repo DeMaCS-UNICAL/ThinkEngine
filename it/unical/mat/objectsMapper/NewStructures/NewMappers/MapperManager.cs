@@ -1,7 +1,8 @@
-﻿using NewMappers;
-using NewMappers.IntermediateMappers;
+﻿using newMappers;
 using NewStructures;
+using NewStructures.NewMappers;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -9,68 +10,102 @@ using UnityEngine;
 internal class MapperManager
 {
 
-    static Dictionary<Type, SensorDataMapper> metSensorMappers; //each type that is supported for sensors is associated with the actual data mapper 
+    static readonly Dictionary<Type, IDataMapper> metMappers; //each type that is supported for sensors is associated with the actual data mapper 
                                                         //that is a derived class of DataMapper. The derived class register itself to this dictionary
-    static Dictionary<Type, ActuatorDataMapper> metActuatorMappers; //each type that is supported for actuators is associated with the actual data mapper
-                                                            //that is a derived class of DataMapper. The derived class register itself to this dictionary
-    static List<SensorDataMapper> sensorMappers;
-    static List<ActuatorDataMapper> actuatorMappers;
+    static readonly List<Type> unsupportedTypes;
+    static readonly List<IDataMapper> mappers;
     static MapperManager()
     {
-        metSensorMappers = new Dictionary<Type, SensorDataMapper>();
-        metActuatorMappers = new Dictionary<Type, ActuatorDataMapper>();
-        sensorMappers = new List<SensorDataMapper>();
-        actuatorMappers = new List<ActuatorDataMapper>();
+        metMappers = new Dictionary<Type, IDataMapper>();
+        mappers = new List<IDataMapper>();
+        unsupportedTypes = new List<Type>();
         RegisterMappers();
     }
 
     #region PUBLIC STATIC METHODS
-    internal static SensorDataMapper GetMapper(Type type)
-    {
-        if (ExistsSensorMapper(type))
-        {
-            return metSensorMappers[type];
-        }
-        return null;
-    }
 
-    internal static Sensors InstantiateSensors(GameObject gameobject, MyListString propertyHierarchy, NewSensorConfiguration configuration)
+    internal static bool IsFinal(Type type)
     {
-        MyListString residualPropertyHierarchy = propertyHierarchy.GetClone();
-        object currentObject = gameobject;
-        bool found = false ;
-        Type currentType = RetrieveMapper(ref residualPropertyHierarchy, ref currentObject, out found);
-        if (found)
+        if (ExistsMapper(type))
         {
-            return metSensorMappers[currentType].InstantiateSensors(gameobject, currentObject, propertyHierarchy, residualPropertyHierarchy, configuration);
+            return metMappers[type].IsFinal(type);
         }
-        return null;
+        return false;
     }
-    internal static Type RetrieveMapper(ref MyListString residualPropertyHierarchy, ref object currentObject, out bool found)
+    internal static ISensors InstantiateSensors(InstantiationInformation information)
     {
-        Type currentType;
+        IDataMapper mapper = RetrieveAdditionalInformation(ref information,!information.mappingDone);
+        return mapper?.InstantiateSensors(information);
+    }
+    internal static ISensors ManageSensors(InstantiationInformation information, ISensors sensors)
+    {
+        IDataMapper mapper = RetrieveAdditionalInformation(ref information, !information.mappingDone);
+        return mapper?.ManageSensors(information, sensors);
+    }
+    private static IDataMapper RetrieveAdditionalInformation(ref InstantiationInformation information, bool generateMapping=false)
+    {
+        object currentObject = information.currentObjectOfTheHierarchy;
+        IDataMapper mapper = RetrieveMapper(ref information.residualPropertyHierarchy, ref currentObject);
+        if (mapper != null)
+        {
+            information.currentObjectOfTheHierarchy = currentObject;
+            if (generateMapping)
+            {
+                GenerateMapping(ref information);
+            }
+        }
+        else
+        {
+            information.prependMapping.Clear();
+            information.appendMapping.Clear();
+        }
+
+        return mapper;
+    }
+    private static void GenerateMapping(ref InstantiationInformation information)
+    {
+        int upTo = information.propertyHierarchy.Count - information.residualPropertyHierarchy.Count;
+        string prepend = "";
+        string append = "";
+        for (int i = information.prependMapping.Count; i < upTo; i++)
+        {
+            prepend += NewASPMapperHelper.AspFormat(information.propertyHierarchy[i]) + "(";
+            append = ")"+append;
+        }
+        information.prependMapping.Add(prepend);
+        information.appendMapping.Add(append);
+    }
+    
+    internal static IDataMapper RetrieveMapper(ref MyListString residualPropertyHierarchy, ref object currentObject)
+    {
+        if(residualPropertyHierarchy.Count==0 && currentObject != null)
+        {
+            if (ExistsMapper(currentObject.GetType()))
+            {
+                return metMappers[currentObject.GetType()];
+            }
+        }
         while (residualPropertyHierarchy.Count > 0)
         {
             string currentProperty = residualPropertyHierarchy[0];
-            currentObject = RetrieveProperty(currentObject, currentProperty, out currentType);
-            if (currentType!= null && ExistsSensorMapper(currentType))
+            currentObject = RetrieveProperty(currentObject, currentProperty, out Type currentType);
+            if (currentType != null && ExistsMapper(currentType))
             {
-                found = true;
-                return currentType;
+                return metMappers[currentType];
             }
             else
             {
                 if (currentObject == null)
                 {
-                    found = false;
-                    return currentType; 
+                    return null;
                 }
             }
             residualPropertyHierarchy.RemoveAt(0);
         }
-        found = false;
         return null;
     }
+
+
     internal static object RetrieveProperty(object currentObject, string currentProperty, out Type currentType)
     {
         MemberInfo[] members = currentObject.GetType().GetMember(currentProperty,Utility.BindingAttr);
@@ -81,9 +116,9 @@ internal class MapperManager
             currentType = fieldOrProperty.Type();
             return currentObject;
         }
-        if (currentObject is GameObject)
+        if (currentObject is GameObject @object)
         {
-            foreach (Component component in ((GameObject)currentObject).GetComponents<Component>())
+            foreach (Component component in @object.GetComponents<Component>())
             {
                 if (component != null)
                 {
@@ -99,106 +134,85 @@ internal class MapperManager
         currentType = null;
         return null;
     }
-    internal static Sensors ManageSensors(GameObject gameobject, MyListString propertyHierarchy, NewSensorConfiguration configuration,Sensors sensors)
+    
+    internal static string GetSensorBasicMap(NewMonoBehaviourSensor sensor, object currentObject, MyListString residualPropertyHierarchy, List<object> values, int level)
     {
-        MyListString residualPropertyHierarchy = propertyHierarchy.GetClone();
-        object currentObject = gameobject;
-        bool found = false;
-        Type currentType = RetrieveMapper(ref residualPropertyHierarchy, ref currentObject, out found);
-        if (found)
+        IDataMapper mapper = RetrieveMapper(ref residualPropertyHierarchy, ref currentObject);
+        if (mapper != null)
         {
-            return metSensorMappers[currentType].ManageSensors(gameobject, currentObject, propertyHierarchy, residualPropertyHierarchy, configuration, sensors);
+            return mapper.SensorBasicMap(sensor, currentObject, level, residualPropertyHierarchy, values);
         }
-        return null;
-    }
-    internal static string GetSensorBasicMap(NewMonoBehaviourSensor sensor)
-    {
-        if (!ExistsSensorMapper(sensor.currentPropertyType))
+        else
         {
-            throw new Exception("Type " + sensor.currentPropertyType + " is not supported as Sensor");
+            return "";
         }
-        return metSensorMappers[sensor.currentPropertyType].SensorBasicMap(sensor);
     }
-    internal static void UpdateSensor(NewMonoBehaviourSensor sensor)
+    internal static void UpdateSensor(NewMonoBehaviourSensor sensor, object currentObject, MyListString residualPropertyHierarchy, int level)
     {
-        MyListString residualPropertyHierarchy = sensor.property.GetClone();
-        object currentObject = sensor.gameObject;
-        bool found = false;
-        Type currentType = RetrieveMapper(ref residualPropertyHierarchy, ref currentObject, out found);
-        if (found)
+        IDataMapper mapper = RetrieveMapper(ref residualPropertyHierarchy, ref currentObject);
+        if (mapper!=null)
         {
-            metSensorMappers[currentType].UpdateSensor(sensor,currentObject);
+            mapper.UpdateSensor(sensor,currentObject,residualPropertyHierarchy, level);
         }
     }
     internal static string GetActuatorBasicMap(object currentObject)
     {
-        if (!ExistsActuatorMapper(currentObject.GetType()))
+        if (!ExistsMapper(currentObject.GetType()))
         {
             throw new Exception("Type " + currentObject.GetType() + " is not supported as Actuator");
         }
-        return metActuatorMappers[currentObject.GetType()].ActuatorBasicMap(currentObject);
+        return metMappers[currentObject.GetType()].ActuatorBasicMap(currentObject);
     }
-    internal static Dictionary<MyListString,KeyValuePair<Type,object>> RetrieveSensorProperties(Type objectType, MyListString currentObjectPropertyHierarchy, object currentObject)
+    internal static Dictionary<MyListString,KeyValuePair<Type,object>> RetrieveProperties(Type objectType, MyListString currentObjectPropertyHierarchy, object currentObject)
     {
-        if (ExistsSensorMapper(objectType))
+        if (ExistsMapper(objectType))
         {
-            return metSensorMappers[objectType].RetrieveProperties(objectType, currentObjectPropertyHierarchy, currentObject);
+            return metMappers[objectType].RetrieveProperties(objectType, currentObjectPropertyHierarchy, currentObject);
         }
         else
         {
-            return RetrieveProperties(objectType, currentObjectPropertyHierarchy, currentObject);
-        }
-    }
-    internal static Dictionary<MyListString, KeyValuePair<Type, object>> RetrieveActuatorProperties(Type objectType, MyListString currentObjectPropertyHierarchy, object currentObject)
-    {
-        if (ExistsActuatorMapper(objectType))
-        {
-            return metActuatorMappers[currentObject.GetType()].RetrieveProperties(objectType, currentObjectPropertyHierarchy, currentObject);
-        }
-        else
-        {
-            return RetrieveProperties(objectType, currentObjectPropertyHierarchy, currentObject);
+            return RetrieveGeneralProperties(objectType, currentObjectPropertyHierarchy, currentObject);
         }
     }
     internal static bool NeedsAggregates(Type type)
     {
-        if (ExistsSensorMapper(type))
+        if (ExistsMapper(type))
         {
-            return metSensorMappers[type] is NeedingAggregatesMapper;
+            return metMappers[type].NeedsAggregates(type);
         }
         return false;
     }
     internal static bool NeedsSpecifications(Type type)
     {
-        if (ExistsSensorMapper(type))
+        if (ExistsMapper(type))
         {
-            return metSensorMappers[type].NeedsSpecifications();
+            return metMappers[type].NeedsSpecifications(type);
         }
         return true;
     }
     internal static Type GetAggregationTypes(Type type)
     {
-        if (ExistsSensorMapper(type))
+        if (ExistsMapper(type))
         {
-            if (metSensorMappers[type] is NeedingAggregatesMapper)
+            if (metMappers[type].NeedsAggregates(type))
             {
-                return ((NeedingAggregatesMapper) metSensorMappers[type]).GetAggregationTypes();
+                return metMappers[type].GetAggregationTypes(type);
             }
         }
         return null;
     }
     internal static int GetAggregationSpecificIndex(Type type)
     {
-        if (ExistsSensorMapper(type))
+        if (ExistsMapper(type))
         {
-            if (metSensorMappers[type] is NeedingAggregatesMapper)
+            if (metMappers[type].NeedsAggregates(type))
             {
-                return ((NeedingAggregatesMapper)metSensorMappers[type]).GetAggregationSpecificIndex();
+                return metMappers[type].GetAggregationSpecificIndex(type);
             }
         }
         return -1;
     }
-    private static Dictionary<MyListString, KeyValuePair<Type, object>> RetrieveProperties(Type objectType, MyListString currentObjectPropertyHierarchy, object currentObject)
+    private static Dictionary<MyListString, KeyValuePair<Type, object>> RetrieveGeneralProperties(Type objectType, MyListString currentObjectPropertyHierarchy, object currentObject)
     {
         if(currentObject != null && !currentObject.GetType().Equals( objectType))
         {
@@ -227,9 +241,9 @@ internal class MapperManager
                 toReturn.Add(toAdd, propertyPair);
             }
         }
-        if(currentObject is GameObject)
+        if(currentObject is GameObject @object)
         {
-            foreach(Component component in ((GameObject)currentObject).GetComponents(typeof(Component))){
+            foreach(Component component in @object.GetComponents(typeof(Component))){
                 if(component != null)
                 {
                     MyListString toAdd = new MyListString(currentObjectPropertyHierarchy.myStrings);
@@ -247,60 +261,51 @@ internal class MapperManager
     }
     internal static void RegisterMappers()
     {
-        foreach (Type mapper in typeof(DataMapper).Assembly.GetTypes())
+        foreach (Type type in typeof(IDataMapper).Assembly.GetTypes())
         {
-            if(mapper.IsSubclassOf(typeof(SensorDataMapper)))
+            CheckAndRegister(type,mappers);
+        }
+    }
+
+    private static void CheckAndRegister(Type derivedType, IList mappers)
+    {
+        if (typeof(IDataMapper).IsAssignableFrom(derivedType))
+        {
+            PropertyInfo instanceProperty = derivedType.GetProperty("Instance", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+            if (instanceProperty != null)
             {
-                sensorMappers.Add((SensorDataMapper)mapper);
-            }
-            else if(mapper.IsSubclassOf(typeof(ActuatorDataMapper)))
-            {
-                actuatorMappers.Add((ActuatorDataMapper)mapper);
+                object instance = instanceProperty.GetValue(null);
+                if (instance != null)
+                {
+                    mappers.Add(instance);
+                }
             }
         }
     }
+
     internal static bool IsTypeExpandable(Type type)
     {
-        if (ExistsSensorMapper(type))
+        if (ExistsMapper(type))
         {
-            return metSensorMappers[type].IsTypeExpandable();
-        }
-        if (ExistsActuatorMapper(type))
-        {
-            return metActuatorMappers[type].IsTypeExpandable();
+            return metMappers[type].IsTypeExpandable(type);
         }
         return true;
     }
-    private static bool ExistsActuatorMapper(Type type)
+    private static bool ExistsMapper(Type type)
     {
-        return metActuatorMappers.ContainsKey(type) || IsSupportedByActuatorMapper(type);
+        return !unsupportedTypes.Contains(type) && ( metMappers.ContainsKey(type) || IsSupportedByMapper(type));
     }
-    private static bool ExistsSensorMapper(Type type)
+    private static bool IsSupportedByMapper(Type type)
     {
-        return metSensorMappers.ContainsKey(type) || IsSupportedBySensorMapper(type);
-    }
-    private static bool IsSupportedByActuatorMapper(Type type)
-    {
-        foreach(ActuatorDataMapper mapper in actuatorMappers)
+        foreach (IDataMapper mapper in mappers)
         {
             if (mapper.Supports(type))
             {
-                metActuatorMappers.Add(type, mapper);
+                metMappers.Add(type, mapper);
                 return true;
             }
         }
-        return false;
-    }
-    private static bool IsSupportedBySensorMapper(Type type)
-    {
-        foreach (SensorDataMapper mapper in sensorMappers)
-        {
-            if (mapper.Supports(type))
-            {
-                metSensorMappers.Add(type, mapper);
-                return true;
-            }
-        }
+        unsupportedTypes.Add(type);
         return false;
     }
     #endregion
@@ -308,7 +313,7 @@ internal class MapperManager
     #region UNIMPLEMENTED
     internal static void SetPropertyValue(object actualObject, MyListString property, object value)
     {
-        if (!ExistsActuatorMapper(value.GetType()))
+        if (!ExistsMapper(value.GetType()))
         {
             throw new Exception("Type " + value.GetType() + " is not supported as Actuator");
         }

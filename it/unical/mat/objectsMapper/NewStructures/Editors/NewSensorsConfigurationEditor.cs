@@ -22,11 +22,11 @@ namespace NewStructures.Editors
         protected override void SpecificFields(MyListString property)
         {
             sensorConfiguration = configuration as NewSensorConfiguration;
-            if (MapperManager.NeedsAggregates(configuration.objectTracker.PropertyType(property)))
+            if (MapperManager.NeedsAggregates(configuration.ObjectTracker.PropertyType(property)))
             {
                 int propertyIndex = property.GetHashCode();
-                int oldOperation = sensorConfiguration.operationPerProperty[propertyIndex];
-                Type propertyType = sensorConfiguration.objectTracker.PropertyType(property);
+                int oldOperation = sensorConfiguration.OperationPerProperty[propertyIndex];
+                Type propertyType = sensorConfiguration.ObjectTracker.PropertyType(property);
                 string[] displayedOptions = Enum.GetNames(MapperManager.GetAggregationTypes(propertyType));
                 int newOperation = EditorGUILayout.Popup(oldOperation, displayedOptions);
                 if (newOperation != oldOperation)
@@ -34,7 +34,7 @@ namespace NewStructures.Editors
                     sensorConfiguration.SetOperationPerProperty(property, newOperation);
                     if(newOperation == MapperManager.GetAggregationSpecificIndex(propertyType))
                     {
-                        string oldValue = sensorConfiguration.specificValuePerProperty[propertyIndex];
+                        string oldValue = sensorConfiguration.SpecificValuePerProperty[propertyIndex];
                         string newValue = EditorGUILayout.TextField("Value to track", oldValue);
                         if (!oldValue.Equals(newValue))
                         {

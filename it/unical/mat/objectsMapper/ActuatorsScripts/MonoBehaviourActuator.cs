@@ -117,7 +117,7 @@ internal class MonoBehaviourActuatorHider
             string myTemplatePrefix = myTemplate[0].Substring(0, myTemplate[0].LastIndexOf('('));
             string pattern = "objectIndex\\(([0-9]+)\\)";
             Regex regex = new Regex(@pattern);
-            int myIndex = gameObject.GetComponent<IndexTracker>().currentIndex;
+            int myIndex = gameObject.GetComponent<IndexTracker>().CurrentIndex;
             foreach (string literal in value.GetAnswerSet())
             {
                 string literalPrefix = literal.Substring(0, literal.LastIndexOf('('));

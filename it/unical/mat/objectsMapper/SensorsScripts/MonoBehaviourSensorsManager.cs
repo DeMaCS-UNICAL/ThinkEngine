@@ -109,11 +109,11 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
         destroyed = true;
     }
     #endregion
-    internal void AddConfiguration(SensorConfiguration configuration)
+    internal void AddConfiguration()
     {
         SensorsManager.configurationsChanged = true;
     }
-    internal void DeleteConfiguration(SensorConfiguration configuration)
+    internal void DeleteConfiguration()
     {
         if (destroyed)
         {
@@ -276,7 +276,7 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
     {
         foreach (NewSensorConfiguration configuration in GetComponents<NewSensorConfiguration>())
         {
-            if (configuration.configurationName.Equals(name))
+            if (configuration.ConfigurationName.Equals(name))
             {
                 return configuration;
             }
@@ -288,7 +288,7 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
     {
         foreach (NewSensorConfiguration configuration in GetComponents<NewSensorConfiguration>())
         {
-            if (configuration!=newSensorConfiguration && configuration.configurationName.Equals(name))
+            if (configuration!=newSensorConfiguration && configuration.ConfigurationName.Equals(name))
             {
                 return true;
             }
@@ -313,9 +313,9 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
         MonoBehaviourSensor sensor = gameObject.AddComponent<MonoBehaviourSensor>();
         sensor.hideFlags = HideFlags.HideInInspector;
         List<Type> typesCopy = new List<Type>();
-        if(types is Type)
+        if(types is Type type)
         {
-            typesCopy.Add((Type)types);
+            typesCopy.Add(type);
         }
         else
         {
@@ -493,8 +493,10 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
             return null;
         }
         FieldOrProperty property = new FieldOrProperty(members[0]);
-        MyPropertyInfo toReturn = new MyPropertyInfo();
-        toReturn.elementType = property.GetValue(obj).GetType();
+        MyPropertyInfo toReturn = new MyPropertyInfo
+        {
+            elementType = property.GetValue(obj).GetType()
+        };
         return toReturn;
     }
     private void EnlargedArray2(MyListString property, SensorConfiguration currentConfiguration, int increasedDimension, int newSize, MyPropertyInfo propertyInfo)

@@ -1,5 +1,4 @@
-﻿using NewMappers.ASPMappers;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +8,7 @@ using static NewMappers.NewOperationContainer;
 
 namespace newMappers
 {
-    internal class ASPSignedIntegerMapper : ASPBasicTypeMapper
+    internal class ASPSignedIntegerMapper : BasicTypeMapper
     {
         private static object Avg(IList values)
         {
@@ -51,8 +50,8 @@ namespace newMappers
         }
         #region SINGLETON FEATURES
 
-        private static DataMapper _instance;
-        public static DataMapper instance
+        private static IDataMapper _instance;
+        public static IDataMapper Instance
         {
             get
             {
@@ -74,14 +73,14 @@ namespace newMappers
 
         public override string BasicMap(object currentObject)
         {
-            if (!supportedTypes.Contains(currentObject.GetType()))
+            if (!SupportedTypes.Contains(currentObject.GetType()))
             {
                 throw new Exception("Type " + currentObject.GetType() + " is not supported as Sensor");
             }
             return "" + currentObject + "";
         }
 
-        public override Type GetAggregationTypes()
+        public override Type GetAggregationTypes(Type type)
         {
             return typeof(NumericOperations);
         }

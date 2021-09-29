@@ -33,7 +33,7 @@ public class SensorConfiguration : AbstractConfiguration
         {
             gameObject.AddComponent<MonoBehaviourSensorsManager>();//.hideFlags=HideFlags.HideInInspector;
         }
-        GetComponent<MonoBehaviourSensorsManager>().AddConfiguration(this);
+        GetComponent<MonoBehaviourSensorsManager>().AddConfiguration();
     }
     internal override void DeleteConfiguration()
     {
@@ -42,7 +42,7 @@ public class SensorConfiguration : AbstractConfiguration
             MonoBehaviourSensorsManager monoBehaviourSensorsManager = GetComponent<MonoBehaviourSensorsManager>();
             if (monoBehaviourSensorsManager != null)
             {
-                monoBehaviourSensorsManager.DeleteConfiguration(this);
+                monoBehaviourSensorsManager.DeleteConfiguration();
             }
         }
     }

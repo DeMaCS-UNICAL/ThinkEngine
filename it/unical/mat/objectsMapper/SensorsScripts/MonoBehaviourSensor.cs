@@ -186,7 +186,7 @@ internal class MonoBehaviourSensorHider
                 currentValuesListType = currentValuesList.GetType().GetGenericArguments()[0];
                 mapperForT = MappingManager.GetMapper(currentValuesListType);
                 value = mapperForT.BasicMap(Operation.Compute(operationType, currentValuesList));
-                return string.Format(myTemplate[0], gameObject.GetComponent<IndexTracker>().currentIndex, value) + Environment.NewLine;
+                return string.Format(myTemplate[0], gameObject.GetComponent<IndexTracker>().CurrentIndex, value) + Environment.NewLine;
             }
             if (propertyType.Equals("LIST") || propertyType.Equals("ARRAY2"))
             {
@@ -202,7 +202,7 @@ internal class MonoBehaviourSensorHider
                     parameters[1] = indexes[0];
                     parameters[2] = indexes[1];
                 }
-                parameters[0] = gameObject.GetComponent<IndexTracker>().currentIndex;
+                parameters[0] = gameObject.GetComponent<IndexTracker>().CurrentIndex;
                 for (int i = 0; i < collectionElementProperties.Count; i++)
                 {
                     currentValuesList = propertyValues[i];

@@ -14,7 +14,7 @@ namespace NewStructures.Editors
     {
         string temporaryName;
         protected NewAbstractConfiguration configuration;
-        static Dictionary<bool, ToggleType> toggleType;
+        static readonly Dictionary<bool, ToggleType> toggleType;
         protected GameObject go;
         static GUIStyle redText;
         static GUIStyle toUse;
@@ -23,14 +23,16 @@ namespace NewStructures.Editors
         {
             configuration = target as NewAbstractConfiguration;
             go = configuration.gameObject;
-            temporaryName = configuration.configurationName;
+            temporaryName = configuration.ConfigurationName;
         }
        
         static NewAbstractConfigurationEditor()
         {
-            toggleType = new Dictionary<bool, ToggleType>();
-            toggleType[true] = ToggleAsFoldout;
-            toggleType[false] = ToggleAsToggleLeft;
+            toggleType = new Dictionary<bool, ToggleType>
+            {
+                [true] = ToggleAsFoldout,
+                [false] = ToggleAsToggleLeft
+            };
         }
 
         private static bool ToggleAsToggleLeft(string property, bool value)
@@ -81,7 +83,7 @@ namespace NewStructures.Editors
                 if (clear)
                 {
                     configuration.Clear();
-                    temporaryName = configuration.configurationName;
+                    temporaryName = configuration.ConfigurationName;
                 }
             }
             catch (Exception e)
@@ -112,7 +114,7 @@ namespace NewStructures.Editors
             {
                 if (save)
                 {
-                    configuration.configurationName = temporaryName;
+                    configuration.ConfigurationName = temporaryName;
                 }
             }
             catch
@@ -121,12 +123,12 @@ namespace NewStructures.Editors
                 {
                     if (EditorUtility.DisplayDialog("Error", "Configuration name can not be empty.", "Ok."))
                     {
-                        temporaryName = configuration.configurationName;
+                        temporaryName = configuration.ConfigurationName;
                         GUI.FocusControl(null);
                     }
                 }else if (EditorUtility.DisplayDialog("Error", "Another configuration named " + temporaryName + " exists. Please, choose a different name.", "Ok."))
                 {
-                    temporaryName = configuration.configurationName;
+                    temporaryName = configuration.ConfigurationName;
                     GUI.FocusControl(null);
                 }
             }
@@ -152,7 +154,7 @@ namespace NewStructures.Editors
                 if (isActive && IsExpandable(property))
                 {
                     EditorGUI.indentLevel++;
-                    bool willNeedSpecifications = MapperManager.NeedsSpecifications(configuration.objectTracker.PropertyType(property));
+                    bool willNeedSpecifications = MapperManager.NeedsSpecifications(configuration.ObjectTracker.PropertyType(property));
                     bool hasToAddSpecification = needsSpecifications && willNeedSpecifications;
                     ListProperties(property, hasToAddSpecification);
                     EditorGUI.indentLevel--;
@@ -162,7 +164,7 @@ namespace NewStructures.Editors
         
         List<MyListString> GetProperties(MyListString startingPoint = null)
         {
-            return configuration.objectTracker.GetMemberProperties(startingPoint);
+            return configuration.ObjectTracker.GetMemberProperties(startingPoint);
         }
         bool IsActive(MyListString property)
         {
@@ -170,7 +172,7 @@ namespace NewStructures.Editors
         }
         bool IsExpandable(MyListString property)
         {
-            return configuration.objectTracker.IsPropertyExpandable(property);
+            return configuration.ObjectTracker.IsPropertyExpandable(property);
         }
         protected abstract void SpecificFields(MyListString property);
 
