@@ -206,6 +206,8 @@
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\MonoBehaviourActuator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\MonoBehaviourActuatorsManager.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\Editors\NewActuatorConfigurationEditor.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMonoBehaviourActuatorsManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Brain.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\SolverExecutor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\AbstractConfigurationEditor.cs" />
@@ -215,7 +217,8 @@
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\BrainEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\EditorWindows\SensorConfigurationEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\GlobalIndexer.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\NewStructures\IInfoAndValue.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewActuatorConfiguration.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\IInfoAndValue.cs" />
     <Compile Include="it\unical\mat\objectsMapper\NewStructures\Editors\NewAbstractConfigurationEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\NewStructures\Editors\NewSensorsConfigurationEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewAbstractConfiguration.cs" />
@@ -230,15 +233,17 @@
     <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\ASPMappers\ASPUnsignedIntegerMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\ASPMappers\ASPArray2Mapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\BaseMappers\IDataMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\IActuators.cs" />
     <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\InstantiationInformation.cs" />
     <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\MapperManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\BaseMappers\BasicTypeMapper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMonoBehaviourActuator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\NewOperationContainer.cs" />
     <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMonoBehaviourSensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMonoBehaviourSensorsManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewSensorConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\NewStructures\ObjectTracker.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\NewStructures\ISensors.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\NewStructures\NewMappers\ISensors.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\MyPropertyInfo.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Test.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\IndexTracker.cs" />

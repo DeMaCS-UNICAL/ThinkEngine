@@ -17,7 +17,6 @@ interface IDataMapper
     bool IsTypeExpandable(Type type);
     bool Supports(Type type);
     bool IsFinal(Type t);
-    List<NewOperation> OperationList();
     Type GetAggregationTypes(Type type = null);
     int GetAggregationSpecificIndex(Type type);
 
@@ -26,8 +25,8 @@ interface IDataMapper
     void UpdateSensor(NewMonoBehaviourSensor sensor, object currentObject, MyListString residualPropertyHierarchy, int level);
     ISensors ManageSensors(InstantiationInformation information, ISensors sensors);
     string SensorBasicMap(NewMonoBehaviourSensor sensor, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceholders);//The translation from the C# syntax to the external solver one for a sensor mapper
-    void InstantiateActuators(object actualObject, MyListString propertyHierarchy);
-    void ManageActuators(object actualObject, MyListString propertyHierarchy, List<MonoBehaviourActuator> instantiatedActuators);
-    string ActuatorBasicMap(object currentObject); //The back translation from the external solver to C# syntax for an actuator mapper
-    void SetPropertyValue(object actualObject, MyListString propertyHierarchy, object value);// Set the value of the property or field (propertyHierarchy) for the object actualObject
+    IActuators InstantiateActuators(InstantiationInformation information);
+    IActuators ManageActuators(InstantiationInformation information, IActuators actuators);
+    string ActuatorBasicMap(NewMonoBehaviourActuator actuator, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceHolders); //The back translation from the external solver to C# syntax for an actuator mapper
+    void SetPropertyValue(NewMonoBehaviourActuator actuator, MyListString propertyHierarchy, ref object currentObject, object valueToSet, int level);// Set the value of the property or field (propertyHierarchy) for the object actualObject
 }

@@ -35,6 +35,19 @@ namespace NewMappers.ASPMappers
                 return sensorsList.Count == 0;
             }
         }
+        private class ListActuators : IActuators
+        {
+            internal List<IActuators> actuatorsList;
+            internal ListActuators()
+            {
+                actuatorsList = new List<IActuators>();
+            }
+
+            public bool IsEmpty()
+            {
+                return actuatorsList.Count == 0;
+            }
+        }
         #endregion
         private static ASPListMapper _instance;
         internal static ASPListMapper Instance
@@ -123,9 +136,7 @@ namespace NewMappers.ASPMappers
 
         private ISensors InstantiateSensorsForElement(InstantiationInformation information, IList actualList, int i)
         {
-            InstantiationInformation localInformation = new InstantiationInformation(information);
-            localInformation.hierarchyInfo.Add(new ListInfoAndValue(i));
-            localInformation.currentObjectOfTheHierarchy = actualList[i];
+            InstantiationInformation localInformation = AddLocalInformation(information, actualList, i);
             return MapperManager.InstantiateSensors(localInformation);
         }
 
@@ -179,7 +190,7 @@ namespace NewMappers.ASPMappers
         public void UpdateSensor(NewMonoBehaviourSensor sensor, object currentObject, MyListString residualPropertyHierarchy, int hierarchyLevel)
         {
             IList list = (IList)currentObject;
-            ListInfoAndValue info = (ListInfoAndValue)sensor.propertyInfo[hierarchyLevel];
+            ListInfoAndValue info = (ListInfoAndValue)sensor.PropertyInfo[hierarchyLevel];
             if (list.Count > info.index)
             {
                 UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
@@ -192,30 +203,120 @@ namespace NewMappers.ASPMappers
         }
         public string SensorBasicMap(NewMonoBehaviourSensor sensor, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceholders)
         {
-            ListInfoAndValue info = (ListInfoAndValue)sensor.propertyInfo[hierarchyLevel];
+            ListInfoAndValue info = (ListInfoAndValue)sensor.PropertyInfo[hierarchyLevel];
             valuesForPlaceholders.Add(info.index);
             IList list = (IList)currentObject;
             UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
             return MapperManager.GetSensorBasicMap(sensor, list[info.index], residualPropertyHierarchy, valuesForPlaceholders, hierarchyLevel + 1);
         }
-        public void InstantiateActuators(object actualObject, MyListString propertyHierarchy)
+        public IActuators InstantiateActuators(InstantiationInformation information)
         {
-            throw new NotImplementedException();
+            if (information.currentObjectOfTheHierarchy == null)
+            {
+                return new ListActuators();
+            }
+            IList actualList = (IList)information.currentObjectOfTheHierarchy;
+            int x = actualList.Count;
+            ListActuators actuators = new ListActuators();
+            GenerateMapping(ref information);
+            information.firstPlaceholder += 1;
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            for (int i = 0; i < x; i++)
+            {
+                actuators.actuatorsList.Add(InstantiateActuatorsForElement(information, actualList, i));
+            }
+            return actuators;
         }
-        public void ManageActuators(object actualObject, MyListString propertyHierarchy, List<MonoBehaviourActuatorHider.MonoBehaviourActuator> instantiatedActuators)
+        private IActuators InstantiateActuatorsForElement(InstantiationInformation information, IList actualList, int i)
         {
-            throw new NotImplementedException();
+            InstantiationInformation localInformation = AddLocalInformation(information, actualList, i);
+            return MapperManager.InstantiateActuators(localInformation);
         }
 
-        public string ActuatorBasicMap(object currentObject)
+        public IActuators ManageActuators(InstantiationInformation information, IActuators instantiatedActuators)
         {
-            throw new NotImplementedException();
+            if (instantiatedActuators == null)
+            {
+                return InstantiateActuators(information);
+            }
+            if (!(instantiatedActuators is ListActuators))
+            {
+                throw new Exception("Error in sensors generation.");
+            }
+            ListActuators actuators = (ListActuators)instantiatedActuators;
+            if (actuators.actuatorsList.Count == 0)
+            {
+                return InstantiateActuators(information);
+            }
+            if (information.currentObjectOfTheHierarchy == null && actuators.actuatorsList.Count > 0)
+            {
+                return new ListActuators();
+            }
+            IList actualList = (IList)information.currentObjectOfTheHierarchy;
+            int x = actualList.Count;
+            if (x == actuators.actuatorsList.Count)
+            {
+                return instantiatedActuators;
+            }
+            return GenerateUpdateActuators(information, actuators, actualList, x);
         }
-        public void SetPropertyValue(object actualObject, MyListString propertyHierarchy, object value)
+
+        private IActuators GenerateUpdateActuators(InstantiationInformation information, ListActuators actuators, IList actualList, int x)
         {
-            throw new NotImplementedException();
+            ListActuators toReturn = new ListActuators();
+            information.firstPlaceholder += 1;
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            for (int i = 0; i < x; i++)
+            {
+                if (actuators.actuatorsList.Count > i)
+                {
+                    toReturn.actuatorsList.Add(actuators.actuatorsList[i]);
+                }
+                else
+                {
+                    toReturn.actuatorsList.Add(InstantiateActuatorsForElement(information, actualList, i));
+                }
+            }
+            return toReturn;
         }
-        
+
+        public string ActuatorBasicMap(NewMonoBehaviourActuator actuator, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceholders)
+        {
+            ListInfoAndValue info = (ListInfoAndValue)actuator.PropertyInfo[hierarchyLevel];
+            valuesForPlaceholders.Add(info.index);
+            IList list = (IList)currentObject;
+            UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
+            return MapperManager.GetActuatorBasicMap(actuator, list[info.index], residualPropertyHierarchy, valuesForPlaceholders, hierarchyLevel + 1);
+        }
+        public void SetPropertyValue(NewMonoBehaviourActuator actuator, MyListString residualPropertyHierarchy, ref object currentObject, object valueToSet, int hierarchyLevel)
+        {
+            IList list = (IList)currentObject;
+            ListInfoAndValue info = (ListInfoAndValue)actuator.PropertyInfo[hierarchyLevel];
+            if (list.Count > info.index)
+            {
+                UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
+                if (MapperManager.IsBasic(list.GetType().GenericTypeArguments[0]))
+                {
+                    list[info.index]= Convert.ChangeType(valueToSet, list.GetType().GenericTypeArguments[0]);
+                    return;
+                }
+                currentObject = list[info.index];
+                MapperManager.SetPropertyValue(actuator, residualPropertyHierarchy, ref currentObject, valueToSet, hierarchyLevel + 1);
+            }
+            else
+            {
+                UnityEngine.Object.Destroy(actuator);
+            }
+        }
+
+        private static InstantiationInformation AddLocalInformation(InstantiationInformation information, IList actualList, int i)
+        {
+            InstantiationInformation localInformation = new InstantiationInformation(information);
+            localInformation.hierarchyInfo.Add(new ListInfoAndValue(i));
+            localInformation.currentObjectOfTheHierarchy = actualList[i];
+            return localInformation;
+        }
+
         private void GenerateMapping(ref InstantiationInformation information)
         {
             if (information.mappingDone)
@@ -230,11 +331,15 @@ namespace NewMappers.ASPMappers
         }
         private static void UpdateResidualPropertyHierarchy(MyListString residualPropertyHierarchy)
         {
-            residualPropertyHierarchy.RemoveAt(0);
-            if (residualPropertyHierarchy.Count > 0)//if it's not a primitive type array
+            if (residualPropertyHierarchy.Count > 0)
             {
                 residualPropertyHierarchy.RemoveAt(0);
+                if (residualPropertyHierarchy.Count > 0)//if it's not a primitive type array
+                {
+                    residualPropertyHierarchy.RemoveAt(0);
+                }
             }
+        
         }
     }
 }

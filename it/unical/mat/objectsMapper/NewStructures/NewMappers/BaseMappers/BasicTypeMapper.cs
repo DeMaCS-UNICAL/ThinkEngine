@@ -38,6 +38,19 @@ internal abstract class BasicTypeMapper : IDataMapper
             return sensor == null;
         }
     }
+    private class BasicTypeActuator : IActuators
+    {
+        internal NewMonoBehaviourActuator actuator;
+        internal BasicTypeActuator(NewMonoBehaviourActuator actuator)
+        {
+            this.actuator = actuator;
+        }
+
+        public bool IsEmpty()
+        {
+            return actuator == null;
+        }
+    }
     #endregion
     #region ENUMS
     internal enum NumericOperations { Newest, Oldest, Specific_Value, Max, Min, Avg };
@@ -94,47 +107,6 @@ internal abstract class BasicTypeMapper : IDataMapper
     {
         return SupportedTypes.Contains(type);
     }
-    public void SetPropertyValue(object actualObject, MyListString propertyHierarchy, object value)
-    {
-        if (value == null)
-        {
-            throw new Exception("Value to set can not be null.");
-        }
-        RetrieveProperty(actualObject, propertyHierarchy, out object secondLastPropertyValue, out FieldOrProperty property);
-        property.SetValue(secondLastPropertyValue, Convert.ChangeType(value, property.Type()));
-    }
-    private void RetrieveProperty(object actualObject, MyListString property, out object currentPropertyValue, out FieldOrProperty currentProperty)
-    {
-        if (actualObject == null || property.Count == 0 || !SupportedTypes.Contains(actualObject.GetType()))
-        {
-            throw new Exception("Invalid arguments.");
-        }
-        currentPropertyValue = actualObject;
-        int currentHierarchyPosition = 0;
-        string currentPropertyName;
-        currentProperty = null;
-        while (property.Count > currentHierarchyPosition)
-        {
-            if (currentPropertyValue == null)
-            {
-                throw new Exception("Impossibile to retrieve property " + property + ". Null value at level " + currentHierarchyPosition + " of the hierarchy.");
-            }
-            currentPropertyName = property[currentHierarchyPosition++];
-            MemberInfo[] members = currentPropertyValue.GetType().GetMember(currentPropertyName);
-            if (members.Length > 0)
-            {
-                currentProperty = new FieldOrProperty(members[0]);
-                if (property.Count > currentHierarchyPosition + 1)//at the end, i'm interested in the second-last value
-                {
-                    currentPropertyValue = currentProperty.GetValue(currentPropertyValue);
-                }
-            }
-            else
-            {
-                throw new Exception("Impossibile to retrieve property " + property + ". Property in position " + (currentHierarchyPosition - 1) + " of the hierarchy does not exist.");
-            }
-        }
-    }
     public void UpdateSensor(NewMonoBehaviourSensor sensor, object actualValue, MyListString property, int hierarchyLevel)
     {
         if (!Supports(actualValue.GetType()))
@@ -142,7 +114,7 @@ internal abstract class BasicTypeMapper : IDataMapper
             throw new Exception("Wrong mapper for property " + property);
         }
 
-        List<object> values = ((BasicTypeInfoAndValue)sensor.propertyInfo[hierarchyLevel]).values;
+        List<object> values = ((BasicTypeInfoAndValue)sensor.PropertyInfo[hierarchyLevel]).values;
         if (values.Count == 200)
         {
             values.RemoveAt(0);
@@ -156,7 +128,7 @@ internal abstract class BasicTypeMapper : IDataMapper
         {
             throw new Exception("Type " + currentObject.GetType() + " is not supported as Sensor");
         }
-        BasicTypeInfoAndValue infoAndValue = (BasicTypeInfoAndValue)sensor.propertyInfo[hierarchyLevel];
+        BasicTypeInfoAndValue infoAndValue = (BasicTypeInfoAndValue)sensor.PropertyInfo[hierarchyLevel];
         string value = BasicMap(infoAndValue.operation(infoAndValue.values));
         valuesForPlaceholders.Add(value);
         return string.Format(sensor.Mapping, valuesForPlaceholders.ToArray());
@@ -183,13 +155,13 @@ internal abstract class BasicTypeMapper : IDataMapper
     }
     public ISensors ManageSensors(InstantiationInformation information, ISensors instantiatedSensors)
     {
+        if (instantiatedSensors == null)
+        {
+            return InstantiateSensors(information);
+        }
         if (!(instantiatedSensors is BasicTypeSensor))
         {
             throw new Exception("Wrong mapper for property " + information.propertyHierarchy);
-        }
-        if (((BasicTypeSensor)instantiatedSensors).sensor == null)
-        {
-            return InstantiateSensors(information);
         }
         return instantiatedSensors;
     }
@@ -202,14 +174,45 @@ internal abstract class BasicTypeMapper : IDataMapper
         return false;
     }
     
-    public void InstantiateActuators(object actualObject, MyListString propertyHierarchy)
+    public IActuators InstantiateActuators(InstantiationInformation information)
+    {
+        if (!SupportedTypes.Contains(information.currentObjectOfTheHierarchy.GetType()) || information.residualPropertyHierarchy.Count > 1)
+        {
+            throw new Exception("Wrong mapper for property " + information.propertyHierarchy);
+        }
+        BasicTypeActuator actuator = new BasicTypeActuator(information.instantiateOn.AddComponent<NewMonoBehaviourActuator>());
+        actuator.actuator.Configure(information, GenerateMapping(information));
+        return actuator;
+    }
+
+    public IActuators ManageActuators(InstantiationInformation information, IActuators actuators)
+    {
+        if (actuators == null)
+        {
+            return InstantiateActuators(information);
+        }
+        if (!(actuators is BasicTypeActuator))
+        {
+            throw new Exception("Wrong mapper for property " + information.propertyHierarchy);
+        }
+        return actuators;
+    }
+    public string ActuatorBasicMap(NewMonoBehaviourActuator actuator, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceholders)
+    {
+        if (!SupportedTypes.Contains(currentObject.GetType()) || residualPropertyHierarchy.Count > 1)
+        {
+            throw new Exception("Type " + currentObject.GetType() + " is not supported as Sensor");
+        }
+        valuesForPlaceholders.Add(currentObject);
+        return string.Format(actuator.Mapping, valuesForPlaceholders.ToArray()); 
+    }
+    public void SetPropertyValue(NewMonoBehaviourActuator actuator, MyListString propertyHierarchy, ref object currentObject, object valueToSet, int level)
     {
         throw new NotImplementedException();
     }
-   
-    public void ManageActuators(object actualObject, MyListString propertyHierarchy, List<MonoBehaviourActuatorHider.MonoBehaviourActuator> instantiatedActuators)
+    internal object GetConvertedValue(object valueToSet)
     {
-        throw new NotImplementedException();
+        return Convert.ChangeType(valueToSet, ConvertingType);
     }
     public Dictionary<MyListString, KeyValuePair<Type, object>> RetrieveProperties(Type objectType, MyListString currentObjectPropertyHierarchy, object currentObject)
     {
@@ -239,7 +242,6 @@ internal abstract class BasicTypeMapper : IDataMapper
                 append = ")" + append;
 
             }
-            append += ")";//in order to close the brachets of confName(gameObjectName, objectindex(X),
             prepend += "{" + information.firstPlaceholder + "}";
             information.prependMapping.Add(prepend);
             information.appendMapping.Insert(0, append);
@@ -250,13 +252,12 @@ internal abstract class BasicTypeMapper : IDataMapper
     #region ABSTRACT METHODS
 
     public abstract Type GetAggregationTypes(Type type=null);
-    public  string ActuatorBasicMap(object obj)
-    {
-        throw new NotImplementedException();
-    }
+   
     
 
     public abstract string BasicMap(object value);
+
+  
 
 
 

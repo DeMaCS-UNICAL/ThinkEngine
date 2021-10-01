@@ -1,4 +1,5 @@
 ﻿using it.unical.mat.embasp.languages.asp;
+using NewStructures;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -36,6 +37,23 @@ internal class ActuatorsManager : MonoBehaviour
             return _actuatorsToApply;
         }
     }
+
+    internal bool IsConfigurationNameValid(string temporaryName, NewActuatorConfiguration newActuatorConfiguration)
+    {
+        if (name.Equals(""))
+        {
+            return false;
+        }
+        foreach (NewMonoBehaviourActuatorsManager manager in Resources.FindObjectsOfTypeAll<NewMonoBehaviourActuatorsManager>())
+        {
+            if (manager.ExistsConfigurationOtherThan(name, newActuatorConfiguration))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     internal static Queue<KeyValuePair<Brain, object>> requestedObjectIndexes
     {
         get

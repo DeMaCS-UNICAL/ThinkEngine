@@ -14,7 +14,18 @@ namespace NewStructures
     {
         internal string configurationName;
         private MyListString property;
-        internal List<IInfoAndValue> propertyInfo;
+        private List<IInfoAndValue> _propertyInfo;
+        internal List<IInfoAndValue> PropertyInfo
+        {
+            get
+            {
+                if (_propertyInfo == null)
+                {
+                    _propertyInfo = new List<IInfoAndValue>();
+                }
+                return _propertyInfo;
+            }
+        }
         private string _mapping;
         internal string Mapping
         {
@@ -25,15 +36,11 @@ namespace NewStructures
         }
         public int count = 0;
 
-        void OnEnable()
-        {
-            propertyInfo = new List<IInfoAndValue>();
-        }
         public void Configure(InstantiationInformation  information, string mapping)
         {
             configurationName = information.configuration.name;
             property = new MyListString(information.propertyHierarchy.myStrings);
-            propertyInfo.AddRange(information.hierarchyInfo);
+            PropertyInfo.AddRange(information.hierarchyInfo);
             int index = GetComponent<IndexTracker>().CurrentIndex;
             this._mapping = NewASPMapperHelper.AspFormat(configurationName)+"("+NewASPMapperHelper.AspFormat(gameObject.name)+", objectIndex("+index+"),"+mapping;
         }

@@ -72,9 +72,6 @@ namespace NewStructures
             string name;
             string toAppend = "";
             int count = 0;
-            int[,] test = new int[2, 2];
-            Debug.Log(test.GetType().Equals(typeof(Array)));
-            Debug.Log(test is Array);
             do
             {
                 name = char.ToLower(gameObject.name[0]).ToString() + gameObject.name.Substring(1) + "Sensor"+ toAppend;
