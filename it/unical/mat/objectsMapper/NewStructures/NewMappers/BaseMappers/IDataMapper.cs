@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static MonoBehaviourActuatorHider;
-using static MonoBehaviourSensorHider;
 using static NewMappers.NewOperationContainer;
 
 interface IDataMapper
@@ -28,5 +26,6 @@ interface IDataMapper
     IActuators InstantiateActuators(InstantiationInformation information);
     IActuators ManageActuators(InstantiationInformation information, IActuators actuators);
     string ActuatorBasicMap(NewMonoBehaviourActuator actuator, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceHolders); //The back translation from the external solver to C# syntax for an actuator mapper
-    void SetPropertyValue(NewMonoBehaviourActuator actuator, MyListString propertyHierarchy, ref object currentObject, object valueToSet, int level);// Set the value of the property or field (propertyHierarchy) for the object actualObject
+    void SetPropertyValue(NewMonoBehaviourActuator actuator, MyListString propertyHierarchy, object currentObject, object valueToSet, int level);// Set the value of the property or field (propertyHierarchy) for the object actualObject
+    string GetASPTemplate(ref InstantiationInformation information, List<string> variables);
 }

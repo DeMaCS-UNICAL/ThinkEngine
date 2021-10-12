@@ -9,20 +9,20 @@ using System.IO;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 using System.Globalization;
 using Debug = UnityEngine.Debug;
-using static MonoBehaviourSensorHider;
+using NewStructures;
 
 class Performance : MonoBehaviour
 {
     private int steps;
-    private static string withBrainPath = @"Performance\withBrain.csv";
-    private static string withoutBrainPath = @"Performance\withoutBrain.csv";
-    private static string factsAndASPath = @"Performance\factsAndAS.csv";
-    private static string sensorsUpdateRate = @"Performance\sensors.csv";
-    private static string actuatorsUpdateRate = @"Performance\actuators.csv";
+    private static readonly string withBrainPath = @"Performance\withBrain.csv";
+    private static readonly string withoutBrainPath = @"Performance\withoutBrain.csv";
+    private static readonly string factsAndASPath = @"Performance\factsAndAS.csv";
+    private static readonly string sensorsUpdateRate = @"Performance\sensors.csv";
+    private static readonly string actuatorsUpdateRate = @"Performance\actuators.csv";
     private static string path;
     public static bool updatedSensors;
     public static bool updatingActuators;
-    static NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
+    static readonly NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
     public static bool initialized;
 
 
@@ -86,7 +86,7 @@ class Performance : MonoBehaviour
             updatedSensors = false;
             using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, true))
             {
-                fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";"+SensorsManager.avgFps+";"+SensorsManager.bestAvgFps+";"+ FindObjectsOfType<MonoBehaviourSensor>().Length+"\n");
+                fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";"+SensorsManager.avgFps+";"+SensorsManager.bestAvgFps+";"+ FindObjectsOfType<NewMonoBehaviourSensor>().Length+"\n");
                 fs.Close();
             }
         }
@@ -124,7 +124,7 @@ class Performance : MonoBehaviour
         }*/
     }
 
-    public static void writeOnFile(string s, double d, bool printDate=false)
+    public static void WriteOnFile(string s, double d, bool printDate=false)
     {
         if (!initialized)
         {

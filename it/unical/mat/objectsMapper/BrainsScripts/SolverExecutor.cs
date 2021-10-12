@@ -13,10 +13,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 {
     internal class SolverExectuor
     {
-        Brain brain;
+        readonly Brain brain;
         string factsPath;
         internal bool reason;
-        Stopwatch stopwatch = new Stopwatch();
+        readonly Stopwatch stopwatch = new Stopwatch();
         internal SolverExectuor(Brain b)
         {
             brain = b;

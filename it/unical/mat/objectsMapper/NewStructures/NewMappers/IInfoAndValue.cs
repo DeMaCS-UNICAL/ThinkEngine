@@ -5,5 +5,6 @@ namespace NewStructures
 {
     interface IInfoAndValue
     {
+        object GetValuesForPlaceholders();
     }
 }

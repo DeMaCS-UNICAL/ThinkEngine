@@ -9,6 +9,20 @@ internal class NewMonoBehaviourActuatorsManager : MonoBehaviour
     Dictionary<MyListString, int> propertiesIndex;
     Dictionary<int, InstantiationInformation> instantiationInformationForProperty;
     Dictionary<int, IActuators> monoBehaviourActuatorsForProperty;
+    internal bool ready;
+    internal Dictionary<NewActuatorConfiguration,List<NewMonoBehaviourActuator>> _actuators;
+    internal Dictionary<NewActuatorConfiguration,List<NewMonoBehaviourActuator>> Actuators
+    {
+        get
+        {
+            if (_actuators == null)
+            {
+                _actuators = new Dictionary<NewActuatorConfiguration, List<NewMonoBehaviourActuator>>();
+            }
+            return _actuators;
+        }
+    }
+
     void Start()
     {
         propertiesIndex = new Dictionary<MyListString, int>();
@@ -16,6 +30,7 @@ internal class NewMonoBehaviourActuatorsManager : MonoBehaviour
         monoBehaviourActuatorsForProperty = new Dictionary<int, IActuators>();
         foreach (NewActuatorConfiguration configuration in GetComponents<NewActuatorConfiguration>())
         {
+            Actuators[configuration] = new List<NewMonoBehaviourActuator>();
             foreach (MyListString property in configuration.ToMapProperties)
             {
                 int propertyIndex = property.GetHashCode();
@@ -31,8 +46,10 @@ internal class NewMonoBehaviourActuatorsManager : MonoBehaviour
                 };
                 instantiationInformationForProperty[propertyIndex] = information;
                 monoBehaviourActuatorsForProperty[propertyIndex] = MapperManager.InstantiateActuators(information);
+                Actuators[configuration].AddRange(monoBehaviourActuatorsForProperty[propertyIndex].GetActuatorsList());
             }
         }
+        ready = true;
     }
     void Update()
     {
@@ -42,6 +59,7 @@ internal class NewMonoBehaviourActuatorsManager : MonoBehaviour
             IActuators actuators = monoBehaviourActuatorsForProperty[propertyIndex];
             InformationRefresh(propertyIndex);
             monoBehaviourActuatorsForProperty[propertyIndex] = MapperManager.ManageActuators(instantiationInformationForProperty[propertyIndex], actuators);
+            Actuators[(NewActuatorConfiguration) instantiationInformationForProperty[propertyIndex].configuration] = monoBehaviourActuatorsForProperty[propertyIndex].GetActuatorsList();
         }
     }
 
@@ -61,5 +79,39 @@ internal class NewMonoBehaviourActuatorsManager : MonoBehaviour
             }
         }
         return false;
+    }
+
+    internal IEnumerable<string> GetAllConfigurationNames()
+    {
+        List<string> toReturn = new List<string>();
+        NewActuatorConfiguration[] configurations = GetComponents<NewActuatorConfiguration>();
+        if (configurations == null || configurations.Length==0)
+        {
+            Destroy(this);
+            return toReturn;
+        }
+        foreach (NewActuatorConfiguration configuration in configurations)
+        {
+            toReturn.Add(configuration.ConfigurationName);
+        }
+        return toReturn;
+    }
+
+    internal NewActuatorConfiguration GetConfiguration(string confName)
+    {
+        NewActuatorConfiguration[] configurations = GetComponents<NewActuatorConfiguration>();
+        if (configurations == null || configurations.Length==0)
+        {
+            Destroy(this);
+            return null;
+        }
+        foreach (NewActuatorConfiguration configuration in configurations)
+        {
+            if (configuration.ConfigurationName.Equals(confName))
+            {
+                return configuration;
+            }
+        }
+        return null;
     }
 }

@@ -15,6 +15,7 @@ namespace NewStructures
         internal string configurationName;
         private MyListString property;
         private List<IInfoAndValue> _propertyInfo;
+        private bool ready;
         internal List<IInfoAndValue> PropertyInfo
         {
             get
@@ -38,11 +39,12 @@ namespace NewStructures
 
         public void Configure(InstantiationInformation  information, string mapping)
         {
-            configurationName = information.configuration.name;
+            configurationName = information.configuration.ConfigurationName;
             property = new MyListString(information.propertyHierarchy.myStrings);
             PropertyInfo.AddRange(information.hierarchyInfo);
             int index = GetComponent<IndexTracker>().CurrentIndex;
-            this._mapping = NewASPMapperHelper.AspFormat(configurationName)+"("+NewASPMapperHelper.AspFormat(gameObject.name)+", objectIndex("+index+"),"+mapping;
+            this._mapping = NewASPMapperHelper.AspFormat(configurationName)+"("+NewASPMapperHelper.AspFormat(gameObject.name)+", objectIndex("+index+"),"+mapping+")."+Environment.NewLine;
+            ready = true;
         }
         void Update()
         {
@@ -50,15 +52,28 @@ namespace NewStructures
 
             if (count % 1000 == 0)
             {
-                Debug.Log(MapperManager.GetSensorBasicMap(this,gameObject,new MyListString(property.myStrings),new List<object>(), 0));
+                Debug.Log(Map());
             }
         }
         void LateUpdate()
         {
-            if (count % 100 == 0)
+            if (!ready)
+            {
+                return;
+            }
+            if (SensorsManager.frameFromLastUpdate >= SensorsManager.updateFrequencyInFrames)
             {
                 MapperManager.UpdateSensor(this, gameObject, new MyListString(property.myStrings), 0);
             }
+        }
+
+        internal string Map()
+        {
+            return MapperManager.GetSensorBasicMap(this, gameObject, new MyListString(property.myStrings), new List<object>(), 0);
+        }
+        void OnDisable()
+        {
+            Destroy(this);
         }
     }
 }

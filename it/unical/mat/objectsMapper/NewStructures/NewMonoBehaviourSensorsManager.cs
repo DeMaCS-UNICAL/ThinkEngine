@@ -13,6 +13,20 @@ namespace NewStructures
         Dictionary<MyListString,int> propertiesIndex;
         Dictionary<int, InstantiationInformation> instantiationInformationForProperty;
         Dictionary<int, ISensors> monoBehaviourSensorsForProperty;
+        internal bool ready;
+        internal Dictionary<NewSensorConfiguration,List<NewMonoBehaviourSensor>> _configurations;
+        internal Dictionary<NewSensorConfiguration,List<NewMonoBehaviourSensor>> Sensors
+        {
+            get
+            {
+                if (_configurations == null)
+                {
+                    _configurations = new Dictionary<NewSensorConfiguration, List<NewMonoBehaviourSensor>>();
+                }
+                return _configurations;
+            }
+        }
+
         void Start()
         {
             propertiesIndex = new Dictionary<MyListString, int>();
@@ -20,6 +34,7 @@ namespace NewStructures
             monoBehaviourSensorsForProperty = new Dictionary<int, ISensors>();
             foreach(NewSensorConfiguration configuration in GetComponents<NewSensorConfiguration>())
             {
+                Sensors[configuration] = new List<NewMonoBehaviourSensor>();
                 foreach(MyListString property in configuration.ToMapProperties)
                 {
                     int propertyIndex = property.GetHashCode();
@@ -35,8 +50,10 @@ namespace NewStructures
                     };
                     instantiationInformationForProperty[propertyIndex]= information;
                     monoBehaviourSensorsForProperty[propertyIndex] = MapperManager.InstantiateSensors(information);
+                    Sensors[configuration].AddRange(monoBehaviourSensorsForProperty[propertyIndex].GetSensorsList());
                 }
             }
+            ready = true;
         }
         void Update()
         {
@@ -46,6 +63,7 @@ namespace NewStructures
                 ISensors sensors = monoBehaviourSensorsForProperty[propertyIndex];
                 InformationRefresh(propertyIndex);
                 monoBehaviourSensorsForProperty[propertyIndex] = MapperManager.ManageSensors(instantiationInformationForProperty[propertyIndex], sensors);
+                Sensors[(NewSensorConfiguration) instantiationInformationForProperty[propertyIndex].configuration] = monoBehaviourSensorsForProperty[propertyIndex].GetSensorsList();
             }
         }
 
@@ -66,6 +84,40 @@ namespace NewStructures
                 }
             }
             return false;
+        }
+
+        internal NewSensorConfiguration GetConfiguration(string confName)
+        {
+            NewSensorConfiguration[] configurations = GetComponents<NewSensorConfiguration>();
+            if (configurations == null || configurations.Length == 0)
+            {
+                Destroy(this);
+                return null;
+            }
+            foreach (NewSensorConfiguration configuration in configurations)
+            {
+                if (configuration.ConfigurationName.Equals(confName))
+                {
+                    return configuration;
+                }
+            }
+            return null;
+        }
+
+        internal IEnumerable<string> GetAllConfigurationNames()
+        {
+            List<string> toReturn = new List<string>();
+            NewSensorConfiguration[] configurations = GetComponents<NewSensorConfiguration>();
+            if(configurations==null || configurations.Length == 0)
+            {
+                Destroy(this);
+                return toReturn;
+            }
+            foreach (NewSensorConfiguration configuration in configurations)
+            {
+                toReturn.Add(configuration.ConfigurationName);
+            }
+            return toReturn;
         }
     }
 }

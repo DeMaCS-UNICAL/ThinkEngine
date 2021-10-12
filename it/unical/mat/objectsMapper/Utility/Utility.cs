@@ -38,7 +38,7 @@ public static class Utility
             _triggerMethodsToShow = value;
         }
     }
-    internal static object triggerClass
+    internal static object TriggerClass
     {
         get
         {
@@ -120,7 +120,7 @@ public static class Utility
     #endregion
     private static List<string> findMethodsToShow()
     {
-        _triggerMethods = triggerClass.GetType().GetMethods();
+        _triggerMethods = TriggerClass.GetType().GetMethods();
         List<string> toReturn = new List<string>();
 
         foreach (MethodInfo mI in _triggerMethods)

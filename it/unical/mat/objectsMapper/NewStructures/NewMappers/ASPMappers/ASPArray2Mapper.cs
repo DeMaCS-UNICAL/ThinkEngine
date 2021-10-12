@@ -17,6 +17,11 @@ namespace NewMappers.BaseMappers
             {
                 indexes = new int[2] { i, j };
             }
+
+            public object GetValuesForPlaceholders()
+            {
+                return indexes;
+            }
         }
         private class Array2Sensors : ISensors
         {
@@ -26,6 +31,15 @@ namespace NewMappers.BaseMappers
                 sensorsMatrix = new ISensors[i, j];
             }
 
+            public List<NewMonoBehaviourSensor> GetSensorsList()
+            {
+                List<NewMonoBehaviourSensor> toReturn = new List<NewMonoBehaviourSensor>();
+                foreach(ISensors isensors in sensorsMatrix)
+                {
+                    toReturn.AddRange(isensors.GetSensorsList());
+                }
+                return toReturn;
+            }
 
             public bool IsEmpty()
             {
@@ -40,6 +54,15 @@ namespace NewMappers.BaseMappers
                 actuatorsMatrix = new IActuators[i, j];
             }
 
+            public List<NewMonoBehaviourActuator> GetActuatorsList()
+            {
+                List<NewMonoBehaviourActuator> toReturn = new List<NewMonoBehaviourActuator>();
+                foreach (IActuators iactuators in actuatorsMatrix)
+                {
+                    toReturn.AddRange(iactuators.GetActuatorsList());
+                }
+                return toReturn;
+            }
 
             public bool IsEmpty()
             {
@@ -314,7 +337,7 @@ namespace NewMappers.BaseMappers
             return MapperManager.GetActuatorBasicMap(actuator, matrix.GetValue(info.indexes[0], info.indexes[1]), residualPropertyHierarchy, valuesForPlaceholders, hierarchyLevel + 1);
 
         }
-        public void SetPropertyValue(NewMonoBehaviourActuator actuator, MyListString residualPropertyHierarchy, ref object currentObject, object valueToSet, int hierarchyLevel)
+        public void SetPropertyValue(NewMonoBehaviourActuator actuator, MyListString residualPropertyHierarchy,  object currentObject, object valueToSet, int hierarchyLevel)
         {
             Array matrix = (Array)currentObject;
             Array2InfoAndValue info = (Array2InfoAndValue)actuator.PropertyInfo[hierarchyLevel];
@@ -327,7 +350,7 @@ namespace NewMappers.BaseMappers
                     return;
                 }
                 currentObject = matrix.GetValue(info.indexes[0], info.indexes[1]);
-                MapperManager.SetPropertyValue(actuator, residualPropertyHierarchy, ref currentObject, valueToSet, hierarchyLevel + 1);
+                MapperManager.SetPropertyValue(actuator, residualPropertyHierarchy,  currentObject, valueToSet, hierarchyLevel + 1);
             }
             else
             {
@@ -355,10 +378,27 @@ namespace NewMappers.BaseMappers
             information.appendMapping.Insert(0, append);
         }
 
-
-
-
-
-
+        public string GetASPTemplate(ref InstantiationInformation information, List<string> variables)
+        {
+            variables.Add("Index" + (information.firstPlaceholder+1));
+            variables.Add("Index" + (information.firstPlaceholder+2));
+            GenerateMapping(ref information);
+            information.firstPlaceholder+=2;
+            information.currentType = information.currentType.GetElementType();
+            if (information.currentObjectOfTheHierarchy != null)
+            {
+                Array matrix = (Array)information.currentObjectOfTheHierarchy;
+                if (matrix.Length > 0)
+                {
+                    information.currentObjectOfTheHierarchy = matrix.GetValue(0, 0);
+                }
+                else
+                {
+                    information.currentObjectOfTheHierarchy = null;
+                }
+            }
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            return MapperManager.GetASPTemplate(ref information, variables);
+        }
     }
 }

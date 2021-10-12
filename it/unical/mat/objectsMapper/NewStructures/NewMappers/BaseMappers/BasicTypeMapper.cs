@@ -24,6 +24,11 @@ internal abstract class BasicTypeMapper : IDataMapper
         {
             values = new List<object>();
         }
+
+        public object GetValuesForPlaceholders()
+        {
+            return null;
+        }
     }
     private class BasicTypeSensor : ISensors
     {
@@ -31,6 +36,11 @@ internal abstract class BasicTypeMapper : IDataMapper
         internal BasicTypeSensor(NewMonoBehaviourSensor sensor)
         {
             this.sensor = sensor;
+        }
+
+        public List<NewMonoBehaviourSensor> GetSensorsList()
+        {
+            return new List<NewMonoBehaviourSensor> { sensor };
         }
 
         public bool IsEmpty()
@@ -49,6 +59,10 @@ internal abstract class BasicTypeMapper : IDataMapper
         public bool IsEmpty()
         {
             return actuator == null;
+        }
+        public List<NewMonoBehaviourActuator> GetActuatorsList()
+        {
+            return new List<NewMonoBehaviourActuator> { actuator };
         }
     }
     #endregion
@@ -96,7 +110,7 @@ internal abstract class BasicTypeMapper : IDataMapper
     }
     internal static object Specific_Value(IList values)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public bool IsFinal(Type t)
@@ -206,9 +220,17 @@ internal abstract class BasicTypeMapper : IDataMapper
         valuesForPlaceholders.Add(currentObject);
         return string.Format(actuator.Mapping, valuesForPlaceholders.ToArray()); 
     }
-    public void SetPropertyValue(NewMonoBehaviourActuator actuator, MyListString propertyHierarchy, ref object currentObject, object valueToSet, int level)
+
+    public string GetASPTemplate(ref InstantiationInformation information, List<string> variables)
     {
-        throw new NotImplementedException();
+        variables.Add("Value");
+        string mapping = GenerateMapping(information);
+        Debug.Log(mapping);
+        return string.Format(mapping, variables.ToArray());
+    }
+    public void SetPropertyValue(NewMonoBehaviourActuator actuator, MyListString propertyHierarchy, object currentObject, object valueToSet, int level)
+    {
+        throw new NotSupportedException();
     }
     internal object GetConvertedValue(object valueToSet)
     {
@@ -257,7 +279,8 @@ internal abstract class BasicTypeMapper : IDataMapper
 
     public abstract string BasicMap(object value);
 
-  
+
+
 
 
 

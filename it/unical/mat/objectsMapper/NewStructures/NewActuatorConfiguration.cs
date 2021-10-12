@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -10,6 +11,20 @@ namespace NewStructures
     [ExecuteInEditMode, Serializable, RequireComponent(typeof(NewMonoBehaviourActuatorsManager))]
     class NewActuatorConfiguration : NewAbstractConfiguration
     {
+        public Brain assignedTo;
+        private object _triggerClass;
+        private object TriggerClass
+        {
+            get
+            {
+                if (_triggerClass == null)
+                {
+                    _triggerClass = Utility.TriggerClass;
+                }
+                return _triggerClass;
+            }
+        }
+        internal MethodInfo applyMethod;
         protected override void PropertyDeleted(MyListString property)
         {
             
@@ -43,6 +58,15 @@ namespace NewStructures
         internal override bool IsSensor()
         {
             return false;
+        }
+
+        internal bool CheckIfApply()
+        {
+            if (applyMethod is null)
+            {
+                return true;
+            }
+            return (bool)applyMethod.Invoke(TriggerClass, null);
         }
     }
 }

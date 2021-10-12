@@ -11,6 +11,7 @@ namespace NewStructures.NewMappers
     {
         internal GameObject instantiateOn;
         internal object currentObjectOfTheHierarchy;
+        internal Type currentType;
         internal MyListString propertyHierarchy;
         internal MyListString residualPropertyHierarchy;
         internal int firstPlaceholder;
@@ -37,6 +38,7 @@ namespace NewStructures.NewMappers
             appendMapping = new List<string>(original.appendMapping);
             configuration = original.configuration;
             hierarchyInfo = new List<IInfoAndValue>(original.hierarchyInfo);
+            currentType = original.currentType;
         }
 
         internal string Mapping()

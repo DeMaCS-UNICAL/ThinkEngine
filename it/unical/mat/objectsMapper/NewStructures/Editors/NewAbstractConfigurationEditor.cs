@@ -19,7 +19,7 @@ namespace NewStructures.Editors
         static GUIStyle redText;
         static GUIStyle toUse;
 
-        void Reset()
+        protected void Reset()
         {
             configuration = target as NewAbstractConfiguration;
             go = configuration.gameObject;

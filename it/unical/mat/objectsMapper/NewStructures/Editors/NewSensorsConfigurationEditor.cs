@@ -16,7 +16,7 @@ namespace NewStructures.Editors
         {
             if (target == null && go!=null)
             {
-                DestroyImmediate(go.GetComponent<MonoBehaviourSensorsManager>());
+                DestroyImmediate(go.GetComponent<NewMonoBehaviourSensorsManager>());
             }
         }
         protected override void SpecificFields(MyListString property)

@@ -131,9 +131,9 @@ public class BrainEditor:Editor
     }
     private void ReadingFromBrain()
     {
-        reasoningExecutionIndex = Utility.getTriggerMethodIndex(myScript.executeReasonerOn);
+        reasoningExecutionIndex = Utility.getTriggerMethodIndex(myScript.ExecuteReasonerOn);
         bool delete = false;
-        foreach (string sensorConfName in myScript.chosenSensorConfigurations)
+        foreach (string sensorConfName in myScript.ChosenSensorConfigurations)
         {
             if (!Utility.sensorsManager.ExistsConfigurationWithName(sensorConfName))
             {
@@ -147,7 +147,7 @@ public class BrainEditor:Editor
             myScript.RemoveNullSensorConfigurations();
             delete = false;
         }
-        foreach (string actuatorConfName in myScript.chosenActuatorConfigurations)
+        foreach (string actuatorConfName in myScript.ChosenActuatorConfigurations)
         {
             if (!Utility.actuatorsManager.ExistsConfigurationWithName(actuatorConfName,myScript))
             {
@@ -255,7 +255,7 @@ public class BrainEditor:Editor
         EditorGUILayout.LabelField("Choose when to run the reasoner");
         reasoningExecutionIndex = EditorGUILayout.Popup(reasoningExecutionIndex, methodsToShow.ToArray());
         EditorGUILayout.EndHorizontal();
-        myScript.executeReasonerOn = methodsToShow[reasoningExecutionIndex];
+        myScript.ExecuteReasonerOn = methodsToShow[reasoningExecutionIndex];
     }
     private void ListAvailableConfigurations()
     {
@@ -358,7 +358,7 @@ public class BrainEditor:Editor
             if (isActuator)
             {
                 Brain assignedTo = Utility.actuatorsManager.AssignedTo(confName);
-                if (assignedTo != null && !myScript.chosenActuatorConfigurations.Contains(confName))
+                if (assignedTo != null && !myScript.ChosenActuatorConfigurations.Contains(confName))
                 {
                     GUI.enabled = false;
                 }
@@ -372,8 +372,8 @@ public class BrainEditor:Editor
     }
     private void SavingInBrain()
     {
-        SaveConfigurations(toggledSensorsConfigurations,myScript.chosenSensorConfigurations);
-        SaveConfigurations(toggledActuatorsConfigurations,myScript.chosenActuatorConfigurations);
+        SaveConfigurations(toggledSensorsConfigurations,myScript.ChosenSensorConfigurations);
+        SaveConfigurations(toggledActuatorsConfigurations,myScript.ChosenActuatorConfigurations);
     }
     private void SaveConfigurations(Dictionary<string, bool> toggledConfigurations, List<string> chosenConfigurations)
     {

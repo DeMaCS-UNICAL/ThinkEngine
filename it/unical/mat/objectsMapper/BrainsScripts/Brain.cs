@@ -7,6 +7,7 @@ using System.Threading;
 using System.Reflection;
 using System.Collections;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
+using NewStructures;
 
 [ExecuteAlways]
 public class Brain :MonoBehaviour
@@ -35,7 +36,7 @@ public class Brain :MonoBehaviour
     internal bool globalASPFile;
     #endregion
     private object triggerClass;
-    internal List<string> chosenSensorConfigurations
+    internal List<string> ChosenSensorConfigurations
     {
         get
         {
@@ -46,7 +47,7 @@ public class Brain :MonoBehaviour
             return _chosenSensorConfigurations;
         }
     }
-    internal List<string> chosenActuatorConfigurations
+    internal List<string> ChosenActuatorConfigurations
     {
         get
         {
@@ -76,7 +77,7 @@ public class Brain :MonoBehaviour
             return _ASPFileTemplatePath;
         }
     }
-    internal string executeReasonerOn
+    internal string ExecuteReasonerOn
     {
         get
         {
@@ -113,7 +114,7 @@ public class Brain :MonoBehaviour
         {
             gameObject.AddComponent<IndexTracker>();
         }
-        triggerClass = Utility.triggerClass;
+        triggerClass = Utility.TriggerClass;
     }
     void OnEnable()
     {
@@ -168,25 +169,31 @@ public class Brain :MonoBehaviour
             fs.Write(info, 0, info.Length);
             HashSet<string> seenActuatorConfNames = new HashSet<string>();
             HashSet<string> seenSensorConfNames = new HashSet<string>();
-            foreach (ActuatorConfiguration actuatorConf in Utility.actuatorsManager.GetCorrespondingConfigurations(chosenActuatorConfigurations))
+            foreach (NewActuatorConfiguration actuatorConf in Utility.actuatorsManager.GetCorrespondingConfigurations(ChosenActuatorConfigurations))
             {
-                if (seenActuatorConfNames.Contains(actuatorConf.configurationName))
+                if (seenActuatorConfNames.Contains(actuatorConf.ConfigurationName))
                 {
                     continue;
                 }
-                seenActuatorConfNames.Add(actuatorConf.configurationName);
-                info = new UTF8Encoding(true).GetBytes(actuatorConf.GetAspTemplate());
-                fs.Write(info, 0, info.Length);
+                seenActuatorConfNames.Add(actuatorConf.ConfigurationName);
+                foreach (MyListString property in actuatorConf.ToMapProperties)
+                {
+                    info = new UTF8Encoding(true).GetBytes(MapperManager.GetASPTemplate(actuatorConf.ConfigurationName, actuatorConf.gameObject, property));
+                    fs.Write(info, 0, info.Length);
+                }
             }
-            foreach (SensorConfiguration sensorConf in Utility.sensorsManager.GetConfigurations(chosenSensorConfigurations))
+            foreach (NewSensorConfiguration sensorConf in Utility.sensorsManager.GetConfigurations(ChosenSensorConfigurations))
             {
-                if (seenSensorConfNames.Contains(sensorConf.configurationName))
+                if (seenSensorConfNames.Contains(sensorConf.ConfigurationName))
                 {
                     continue;
                 }
-                seenSensorConfNames.Add(sensorConf.configurationName);
-                info = new UTF8Encoding(true).GetBytes(sensorConf.GetAspTemplate());
-                fs.Write(info, 0, info.Length);
+                seenSensorConfNames.Add(sensorConf.ConfigurationName);
+                foreach (MyListString property in sensorConf.ToMapProperties)
+                {
+                    info = new UTF8Encoding(true).GetBytes(MapperManager.GetASPTemplate(sensorConf.ConfigurationName, sensorConf.gameObject, property, true));
+                    fs.Write(info, 0, info.Length);
+                }
             }
         }
     }
@@ -203,9 +210,9 @@ public class Brain :MonoBehaviour
         {
             missingData = true;
         }
-        if (!executeReasonerOn.Equals("When Sensors are ready"))
+        if (!ExecuteReasonerOn.Equals("When Sensors are ready"))
         {
-            reasonerMethod = Utility.getTriggerMethod(executeReasonerOn);
+            reasonerMethod = Utility.getTriggerMethod(ExecuteReasonerOn);
             if (reasonerMethod != null)
             {
                 StartCoroutine(PulseOn());
@@ -222,19 +229,19 @@ public class Brain :MonoBehaviour
     }
     internal void RemoveNullSensorConfigurations()
     {
-        chosenSensorConfigurations.RemoveAll(x => !Utility.sensorsManager.ExistsConfigurationWithName(x));
+        ChosenSensorConfigurations.RemoveAll(x => !Utility.sensorsManager.ExistsConfigurationWithName(x));
     }
     internal void RemoveNullActuatorConfigurations()
     {
-        chosenActuatorConfigurations.RemoveAll(x => !Utility.actuatorsManager.ExistsConfigurationWithName(x,this));
+        ChosenActuatorConfigurations.RemoveAll(x => !Utility.actuatorsManager.ExistsConfigurationWithName(x,this));
     }
     private void PrepareActuators()
     {
-        Utility.actuatorsManager.RegisterBrainActuatorConfigurations(this, chosenActuatorConfigurations);
+        Utility.actuatorsManager.RegisterBrainActuatorConfigurations(this, ChosenActuatorConfigurations);
     }
     private void PrepareSensors()
     {
-        Utility.sensorsManager.RegisterBrainsSensorConfigurations(this, chosenSensorConfigurations);
+        Utility.sensorsManager.RegisterBrainsSensorConfigurations(this, ChosenSensorConfigurations);
     }
     private IEnumerator PulseOn()
     {
@@ -250,7 +257,7 @@ public class Brain :MonoBehaviour
     }
     private bool SomeConfigurationAvailable()
     {
-        return Utility.sensorsManager.IsSomeActiveInScene(chosenSensorConfigurations) && Utility.actuatorsManager.IsSomeActiveInScene(chosenActuatorConfigurations);
+        return Utility.sensorsManager.IsSomeActiveInScene(ChosenSensorConfigurations) && Utility.actuatorsManager.IsSomeActiveInScene(ChosenActuatorConfigurations);
     }
 }
 
