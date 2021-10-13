@@ -34,7 +34,17 @@ namespace NewStructures
         {
             
         }
-
+        internal override string ConfigurationName
+        {
+            set
+            {
+                if (!Utility.actuatorsManager.IsConfigurationNameValid(value, this))
+                {
+                    throw new Exception("The chosen configuration name cannot be used.");
+                }
+                _configurationName = value;
+            }
+        }
         internal override string GetAutoConfigurationName()
         {
             string name;
@@ -52,7 +62,7 @@ namespace NewStructures
 
         internal override bool IsAValidName(string temporaryName)
         {
-            return Utility.actuatorsManager.IsConfigurationNameValid(temporaryName, this);
+            return temporaryName.Equals(ConfigurationName) || Utility.actuatorsManager.IsConfigurationNameValid(temporaryName, this);
         }
 
         internal override bool IsSensor()

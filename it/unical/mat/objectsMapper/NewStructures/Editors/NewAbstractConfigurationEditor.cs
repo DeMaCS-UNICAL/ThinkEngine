@@ -85,6 +85,10 @@ namespace NewStructures.Editors
                     configuration.Clear();
                     temporaryName = configuration.ConfigurationName;
                 }
+                if (GUI.changed)
+                {
+                    EditorUtility.SetDirty(target);
+                }
             }
             catch (Exception e)
             {

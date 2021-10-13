@@ -53,13 +53,17 @@ internal class NewMonoBehaviourActuatorsManager : MonoBehaviour
     }
     void Update()
     {
+        foreach (NewActuatorConfiguration configuration in Actuators.Keys)
+        {
+            Actuators[configuration].Clear();
+        }
         foreach (MyListString property in propertiesIndex.Keys)
         {
             int propertyIndex = propertiesIndex[property];
             IActuators actuators = monoBehaviourActuatorsForProperty[propertyIndex];
             InformationRefresh(propertyIndex);
             monoBehaviourActuatorsForProperty[propertyIndex] = MapperManager.ManageActuators(instantiationInformationForProperty[propertyIndex], actuators);
-            Actuators[(NewActuatorConfiguration) instantiationInformationForProperty[propertyIndex].configuration] = monoBehaviourActuatorsForProperty[propertyIndex].GetActuatorsList();
+            Actuators[(NewActuatorConfiguration) instantiationInformationForProperty[propertyIndex].configuration].AddRange(monoBehaviourActuatorsForProperty[propertyIndex].GetActuatorsList());
         }
     }
 

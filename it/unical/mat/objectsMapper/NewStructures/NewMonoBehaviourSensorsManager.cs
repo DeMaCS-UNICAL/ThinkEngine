@@ -57,13 +57,17 @@ namespace NewStructures
         }
         void Update()
         {
+            foreach(NewSensorConfiguration configuration in Sensors.Keys)
+            {
+                Sensors[configuration].Clear();
+            }
             foreach(MyListString property in propertiesIndex.Keys)
             {
                 int propertyIndex = propertiesIndex[property];
                 ISensors sensors = monoBehaviourSensorsForProperty[propertyIndex];
                 InformationRefresh(propertyIndex);
                 monoBehaviourSensorsForProperty[propertyIndex] = MapperManager.ManageSensors(instantiationInformationForProperty[propertyIndex], sensors);
-                Sensors[(NewSensorConfiguration) instantiationInformationForProperty[propertyIndex].configuration] = monoBehaviourSensorsForProperty[propertyIndex].GetSensorsList();
+                Sensors[(NewSensorConfiguration) instantiationInformationForProperty[propertyIndex].configuration].AddRange(monoBehaviourSensorsForProperty[propertyIndex].GetSensorsList());
             }
         }
 

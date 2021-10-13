@@ -43,17 +43,11 @@ namespace NewStructures
             property = new MyListString(information.propertyHierarchy.myStrings);
             PropertyInfo.AddRange(information.hierarchyInfo);
             int index = GetComponent<IndexTracker>().CurrentIndex;
-            this._mapping = NewASPMapperHelper.AspFormat(configurationName)+"("+NewASPMapperHelper.AspFormat(gameObject.name)+", objectIndex("+index+"),"+mapping+")."+Environment.NewLine;
+            this._mapping = NewASPMapperHelper.AspFormat(configurationName)+"("+NewASPMapperHelper.AspFormat(gameObject.name)+",objectIndex("+index+"),"+mapping+")."+Environment.NewLine;
             ready = true;
         }
         void Update()
         {
-            count++;
-
-            if (count % 1000 == 0)
-            {
-                Debug.Log(Map());
-            }
         }
         void LateUpdate()
         {

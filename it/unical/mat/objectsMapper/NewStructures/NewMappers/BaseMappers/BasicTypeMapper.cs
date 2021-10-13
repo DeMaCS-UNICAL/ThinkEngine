@@ -225,7 +225,6 @@ internal abstract class BasicTypeMapper : IDataMapper
     {
         variables.Add("Value");
         string mapping = GenerateMapping(information);
-        Debug.Log(mapping);
         return string.Format(mapping, variables.ToArray());
     }
     public void SetPropertyValue(NewMonoBehaviourActuator actuator, MyListString propertyHierarchy, object currentObject, object valueToSet, int level)

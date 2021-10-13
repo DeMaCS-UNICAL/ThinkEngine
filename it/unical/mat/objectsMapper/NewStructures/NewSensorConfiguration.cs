@@ -147,7 +147,7 @@ namespace NewStructures
 
         internal override bool IsAValidName(string temporaryName)
         {
-            return Utility.sensorsManager.IsConfigurationNameValid(temporaryName, this);
+            return temporaryName.Equals(ConfigurationName) || Utility.sensorsManager.IsConfigurationNameValid(temporaryName, this);
         }
     }
 }

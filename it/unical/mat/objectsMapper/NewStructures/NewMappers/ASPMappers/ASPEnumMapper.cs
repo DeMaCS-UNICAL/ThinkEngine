@@ -36,7 +36,7 @@ namespace newMappers
             {
                 throw new Exception("Type " + currentObject.GetType() + " is not supported as Sensor");
             }
-            return "" + currentObject;
+            return "\"" + currentObject+"\"";
         }
 
         public override Type GetAggregationTypes(Type type)

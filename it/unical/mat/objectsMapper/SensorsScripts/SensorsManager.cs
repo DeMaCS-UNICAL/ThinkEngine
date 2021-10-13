@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using UnityEditor;
 using UnityEngine;
 
 [ExecuteInEditMode]
@@ -35,17 +36,28 @@ public  class SensorsManager : MonoBehaviour
 
     internal bool IsConfigurationNameValid(string name, NewSensorConfiguration newSensorConfiguration)
     {
+#if UNITY_EDITOR
+        
         if (name.Equals(""))
         {
             return false;
         }
         foreach (NewMonoBehaviourSensorsManager manager in Resources.FindObjectsOfTypeAll<NewMonoBehaviourSensorsManager>())
         {
-            if (manager.ExistsConfigurationOtherThan(name, newSensorConfiguration))
+            if (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(newSensorConfiguration.gameObject) != null)
+            {
+                GameObject managerPrefab = PrefabUtility.GetCorrespondingObjectFromSource(manager.gameObject);
+                if (managerPrefab != null && newSensorConfiguration.gameObject.Equals(managerPrefab))
+                {
+                    continue;
+                }
+            }
+            if (manager!=null && manager.ExistsConfigurationOtherThan(name, newSensorConfiguration))
             {
                 return false;
             }
         }
+#endif
         return true;
     }
 

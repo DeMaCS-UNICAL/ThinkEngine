@@ -90,12 +90,6 @@ internal class NewMonoBehaviourActuator : MonoBehaviour
     }
     void Update()
     {
-        count++;
-
-        if (count % 1000 == 0)
-        {
-            Debug.Log(MapperManager.GetActuatorBasicMap(this, gameObject, new MyListString(property.myStrings), new List<object>(), 0));
-        }
     }
    
     void OnDisable()

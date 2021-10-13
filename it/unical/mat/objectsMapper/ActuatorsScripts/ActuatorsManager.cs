@@ -4,6 +4,7 @@ using NewStructures;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using UnityEditor;
 using UnityEngine;
 
 [ExecuteInEditMode]
@@ -44,13 +45,23 @@ internal class ActuatorsManager : MonoBehaviour
         {
             return false;
         }
+#if UNITY_EDITOR
         foreach (NewMonoBehaviourActuatorsManager manager in Resources.FindObjectsOfTypeAll<NewMonoBehaviourActuatorsManager>())
         {
-            if (manager.ExistsConfigurationOtherThan(temporaryName, newActuatorConfiguration))
+            if (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(newActuatorConfiguration.gameObject) != null)
+            {
+                GameObject managerPrefab = PrefabUtility.GetCorrespondingObjectFromSource(manager.gameObject);
+                if (managerPrefab != null && newActuatorConfiguration.gameObject.Equals(managerPrefab))
+                {
+                    continue;
+                }
+            }
+            if (manager != null && manager.ExistsConfigurationOtherThan(name, newActuatorConfiguration))
             {
                 return false;
             }
         }
+#endif
         return true;
     }
 

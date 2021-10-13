@@ -110,10 +110,12 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     {
                         if (answers.GetOptimalAnswerSets().Count > 0)
                         {
+                            Debug.Log(answers.GetOptimalAnswerSets()[0]);
                             ActuatorsManager.NotifyActuators(brain, answers.GetOptimalAnswerSets()[0]);
                         }
                         else
                         {
+                            Debug.Log(answers.answersets[0]);
                             ActuatorsManager.NotifyActuators(brain, answers.answersets[0]);
                         }
                     }

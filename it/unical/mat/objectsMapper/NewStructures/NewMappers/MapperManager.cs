@@ -305,8 +305,8 @@ internal class MapperManager
                 information.currentType = information.currentObjectOfTheHierarchy.GetType();
             }
             string partial = mapper.GetASPTemplate(ref information, new List<string>());
-            CompleteMapping(configurationName, gameObject, isSensor, information);
-            return information.Mapping();
+            CompleteMapping(configurationName, gameObject, isSensor, ref partial);
+            return partial;
         }
         information.prependMapping.Clear();
         information.appendMapping.Clear();
@@ -335,22 +335,22 @@ internal class MapperManager
         return "";
     }
 
-    private static void CompleteMapping(string configurationName, GameObject gameObject, bool isSensor, InstantiationInformation information)
+    private static void CompleteMapping(string configurationName, GameObject gameObject, bool isSensor, ref string partialMapping)
     {
         string cleanConfigurationName = NewASPMapperHelper.AspFormat(configurationName);
-        information.prependMapping.Insert(0, cleanConfigurationName + "(" + NewASPMapperHelper.AspFormat(gameObject.name) + ",objectIndex(Index),");
-        information.appendMapping.Add(")");
+        partialMapping = cleanConfigurationName + "(" + NewASPMapperHelper.AspFormat(gameObject.name) + ",objectIndex(Index),"+partialMapping;
+        partialMapping+=")";
         if (!isSensor)
         {
-            information.prependMapping.Insert(0,"setOnActuator(");
-            information.appendMapping.Add( ") :- objectIndex("+ cleanConfigurationName+", Index), .");
+            partialMapping = "setOnActuator("+partialMapping;
+           partialMapping+=") :-objectIndex("+ cleanConfigurationName+", Index), .";
         }
         else
         {
-            information.prependMapping.Insert(0, "%");
-            information.appendMapping.Add(".");
+            partialMapping= "%"+partialMapping;
+            partialMapping+=".";
         }
-        information.appendMapping.Add(Environment.NewLine);
+        partialMapping+=Environment.NewLine;
     }
 
     internal static void RegisterMappers()
