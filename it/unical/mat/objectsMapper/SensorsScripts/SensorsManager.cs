@@ -1,4 +1,4 @@
-﻿using NewStructures;
+﻿using Structures;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -34,7 +34,7 @@ public  class SensorsManager : MonoBehaviour
         }
     }
 
-    internal bool IsConfigurationNameValid(string name, NewSensorConfiguration newSensorConfiguration)
+    internal bool IsConfigurationNameValid(string name, SensorConfiguration newSensorConfiguration)
     {
 #if UNITY_EDITOR
         
@@ -42,7 +42,7 @@ public  class SensorsManager : MonoBehaviour
         {
             return false;
         }
-        foreach (NewMonoBehaviourSensorsManager manager in Resources.FindObjectsOfTypeAll<NewMonoBehaviourSensorsManager>())
+        foreach (MonoBehaviourSensorsManager manager in Resources.FindObjectsOfTypeAll<MonoBehaviourSensorsManager>())
         {
             if (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(newSensorConfiguration.gameObject) != null)
             {
@@ -140,7 +140,7 @@ public  class SensorsManager : MonoBehaviour
                 lastUpdateFPS = currentFps;
             }
             updateScaleFactor = (bestAvgFps - avgFps) / bestAvgFps * 10;
-            numberOfLiveSensor = FindObjectsOfType<NewMonoBehaviourSensor>().Length;
+            numberOfLiveSensor = FindObjectsOfType<MonoBehaviourSensor>().Length;
             updateFrequencyInFrames = (int)(numberOfLiveSensor / lastUpdateFPS);
             updateFrequencyInFrames += (int)Math.Ceiling(updateFrequencyInFrames * updateScaleFactor);
             updateFrequencyInFrames = Math.Max(1, updateFrequencyInFrames);
@@ -168,7 +168,7 @@ public  class SensorsManager : MonoBehaviour
     internal IEnumerable<string> ConfigurationNames()
     {
         List<string> availableConfigurationNames = new List<string>();
-        foreach(NewMonoBehaviourSensorsManager manager in Resources.FindObjectsOfTypeAll<NewMonoBehaviourSensorsManager>())
+        foreach(MonoBehaviourSensorsManager manager in Resources.FindObjectsOfTypeAll<MonoBehaviourSensorsManager>())
         {
             availableConfigurationNames.AddRange(manager.GetAllConfigurationNames());
         }
@@ -184,12 +184,12 @@ public  class SensorsManager : MonoBehaviour
         }
         ConfigurationsChanged = false;
     }
-    internal List<NewSensorConfiguration> GetConfigurations(List<string> chosenSensorConfigurations)
+    internal List<SensorConfiguration> GetConfigurations(List<string> chosenSensorConfigurations)
     {
-        List<NewSensorConfiguration> toReturn = new List<NewSensorConfiguration>();
+        List<SensorConfiguration> toReturn = new List<SensorConfiguration>();
         foreach (string confName in chosenSensorConfigurations)
         {
-            foreach (NewMonoBehaviourSensorsManager manager in Resources.FindObjectsOfTypeAll<NewMonoBehaviourSensorsManager>())
+            foreach (MonoBehaviourSensorsManager manager in Resources.FindObjectsOfTypeAll<MonoBehaviourSensorsManager>())
             {
 #if UNITY_EDITOR
                 if (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(manager.gameObject)!=null)
@@ -197,7 +197,7 @@ public  class SensorsManager : MonoBehaviour
                     continue;
                 }
 #endif
-                NewSensorConfiguration currentConfiguration = manager.GetConfiguration(confName);
+                SensorConfiguration currentConfiguration = manager.GetConfiguration(confName);
                 if (currentConfiguration != null)
                 {
                     toReturn.Add(currentConfiguration);
@@ -208,7 +208,7 @@ public  class SensorsManager : MonoBehaviour
     }
     public bool ExistsConfigurationWithName(string name)
     {
-        foreach (NewMonoBehaviourSensorsManager manager in Resources.FindObjectsOfTypeAll<NewMonoBehaviourSensorsManager>())
+        foreach (MonoBehaviourSensorsManager manager in Resources.FindObjectsOfTypeAll<MonoBehaviourSensorsManager>())
         {
             if (manager.GetConfiguration(name)!=null)
             {
@@ -223,7 +223,7 @@ public  class SensorsManager : MonoBehaviour
     {
         foreach(string configurationName in configurationNames)
         {
-            foreach(NewMonoBehaviourSensorsManager manager in FindObjectsOfType<NewMonoBehaviourSensorsManager>())
+            foreach(MonoBehaviourSensorsManager manager in FindObjectsOfType<MonoBehaviourSensorsManager>())
             {
                 if (manager.GetConfiguration(configurationName) != null)
                 {
@@ -258,11 +258,11 @@ public  class SensorsManager : MonoBehaviour
             lock (toLock)
             {
                 string mapping = "";
-                List<NewMonoBehaviourSensor> sensors = RetrieveBrainsSensors(brain);
+                List<MonoBehaviourSensor> sensors = RetrieveBrainsSensors(brain);
                 UnityEngine.Debug.Log("there are " + sensors.Count + " sensors ");
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
-                foreach (NewMonoBehaviourSensor sensor in sensors)
+                foreach (MonoBehaviourSensor sensor in sensors)
                 {
                     //UnityEngine.Debug.Log(sensor +" "+ sensor.Map());
                     mapping += sensor.Map();
@@ -281,18 +281,18 @@ public  class SensorsManager : MonoBehaviour
             uncompletedTasks = false;
         }
     }
-    private static List<NewMonoBehaviourSensor> RetrieveBrainsSensors(Brain brain)
+    private static List<MonoBehaviourSensor> RetrieveBrainsSensors(Brain brain)
     {
-        List<NewMonoBehaviourSensor> sensors = new List<NewMonoBehaviourSensor>();
+        List<MonoBehaviourSensor> sensors = new List<MonoBehaviourSensor>();
         foreach (string sensorConf in InstantiatedSensors[brain])
         {
-            foreach (NewMonoBehaviourSensorsManager monobehaviourManager in FindObjectsOfType<NewMonoBehaviourSensorsManager>())
+            foreach (MonoBehaviourSensorsManager monobehaviourManager in FindObjectsOfType<MonoBehaviourSensorsManager>())
             {
                 if (!monobehaviourManager.ready)
                 {
                     continue;
                 }
-                NewSensorConfiguration currentConfiguration = monobehaviourManager.GetConfiguration(sensorConf);
+                SensorConfiguration currentConfiguration = monobehaviourManager.GetConfiguration(sensorConf);
                 if (currentConfiguration != null)
                 {
                     sensors.AddRange(monobehaviourManager.Sensors[currentConfiguration]);

@@ -7,9 +7,9 @@ using System.Threading;
 using System.Reflection;
 using System.Collections;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
-using NewStructures;
+using Structures;
 
-[ExecuteAlways]
+[ExecuteAlways, RequireComponent(typeof(IndexTracker))]
 public class Brain :MonoBehaviour
 {
     #region Serialized Fieds
@@ -108,25 +108,18 @@ public class Brain :MonoBehaviour
     #endregion
 
     #region Unity Messages
-    void Reset()
-    {
-        if (GetComponent<IndexTracker>() == null)
-        {
-            gameObject.AddComponent<IndexTracker>();
-        }
-        triggerClass = Utility.TriggerClass;
-    }
+
     void OnEnable()
     {
         originalName = gameObject.name;
-        Reset();
     }
     void Start()
     {
         //Debug.Log("DLL success");
-        Utility.loadPrefabs();
+        Utility.LoadPrefabs();
         if (Application.isPlaying && enableBrain)
         {
+            triggerClass = Utility.TriggerClass;
             StartCoroutine(InitBrain2());
         }
     }
@@ -169,7 +162,7 @@ public class Brain :MonoBehaviour
             fs.Write(info, 0, info.Length);
             HashSet<string> seenActuatorConfNames = new HashSet<string>();
             HashSet<string> seenSensorConfNames = new HashSet<string>();
-            foreach (NewActuatorConfiguration actuatorConf in Utility.actuatorsManager.GetCorrespondingConfigurations(ChosenActuatorConfigurations))
+            foreach (ActuatorConfiguration actuatorConf in Utility.ActuatorsManager.GetCorrespondingConfigurations(ChosenActuatorConfigurations))
             {
                 if (seenActuatorConfNames.Contains(actuatorConf.ConfigurationName))
                 {
@@ -182,7 +175,7 @@ public class Brain :MonoBehaviour
                     fs.Write(info, 0, info.Length);
                 }
             }
-            foreach (NewSensorConfiguration sensorConf in Utility.sensorsManager.GetConfigurations(ChosenSensorConfigurations))
+            foreach (SensorConfiguration sensorConf in Utility.SensorsManager.GetConfigurations(ChosenSensorConfigurations))
             {
                 if (seenSensorConfNames.Contains(sensorConf.ConfigurationName))
                 {
@@ -212,7 +205,7 @@ public class Brain :MonoBehaviour
         }
         if (!ExecuteReasonerOn.Equals("When Sensors are ready"))
         {
-            reasonerMethod = Utility.getTriggerMethod(ExecuteReasonerOn);
+            reasonerMethod = Utility.GetTriggerMethod(ExecuteReasonerOn);
             if (reasonerMethod != null)
             {
                 StartCoroutine(PulseOn());
@@ -229,19 +222,19 @@ public class Brain :MonoBehaviour
     }
     internal void RemoveNullSensorConfigurations()
     {
-        ChosenSensorConfigurations.RemoveAll(x => !Utility.sensorsManager.ExistsConfigurationWithName(x));
+        ChosenSensorConfigurations.RemoveAll(x => !Utility.SensorsManager.ExistsConfigurationWithName(x));
     }
     internal void RemoveNullActuatorConfigurations()
     {
-        ChosenActuatorConfigurations.RemoveAll(x => !Utility.actuatorsManager.ExistsConfigurationWithName(x,this));
+        ChosenActuatorConfigurations.RemoveAll(x => !Utility.ActuatorsManager.ExistsConfigurationWithName(x,this));
     }
     private void PrepareActuators()
     {
-        Utility.actuatorsManager.RegisterBrainActuatorConfigurations(this, ChosenActuatorConfigurations);
+        Utility.ActuatorsManager.RegisterBrainActuatorConfigurations(this, ChosenActuatorConfigurations);
     }
     private void PrepareSensors()
     {
-        Utility.sensorsManager.RegisterBrainsSensorConfigurations(this, ChosenSensorConfigurations);
+        Utility.SensorsManager.RegisterBrainsSensorConfigurations(this, ChosenSensorConfigurations);
     }
     private IEnumerator PulseOn()
     {
@@ -257,7 +250,7 @@ public class Brain :MonoBehaviour
     }
     private bool SomeConfigurationAvailable()
     {
-        return Utility.sensorsManager.IsSomeActiveInScene(ChosenSensorConfigurations) && Utility.actuatorsManager.IsSomeActiveInScene(ChosenActuatorConfigurations);
+        return Utility.SensorsManager.IsSomeActiveInScene(ChosenSensorConfigurations) && Utility.ActuatorsManager.IsSomeActiveInScene(ChosenActuatorConfigurations);
     }
 }
 

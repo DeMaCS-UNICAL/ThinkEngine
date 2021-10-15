@@ -9,7 +9,7 @@ using System.IO;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 using System.Globalization;
 using Debug = UnityEngine.Debug;
-using NewStructures;
+using Structures;
 
 class Performance : MonoBehaviour
 {
@@ -86,7 +86,7 @@ class Performance : MonoBehaviour
             updatedSensors = false;
             using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, true))
             {
-                fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";"+SensorsManager.avgFps+";"+SensorsManager.bestAvgFps+";"+ FindObjectsOfType<NewMonoBehaviourSensor>().Length+"\n");
+                fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";"+SensorsManager.avgFps+";"+SensorsManager.bestAvgFps+";"+ FindObjectsOfType<MonoBehaviourSensor>().Length+"\n");
                 fs.Close();
             }
         }

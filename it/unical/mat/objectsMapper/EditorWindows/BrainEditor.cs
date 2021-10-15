@@ -93,7 +93,7 @@ public class BrainEditor:Editor
 
     void OnEnable()
     {
-        Utility.loadPrefabs();
+        Utility.LoadPrefabs();
         MyReset();
         myScript.prefabBrain = PrefabStageUtility.GetCurrentPrefabStage() != null;
     }
@@ -131,11 +131,11 @@ public class BrainEditor:Editor
     }
     private void ReadingFromBrain()
     {
-        reasoningExecutionIndex = Utility.getTriggerMethodIndex(myScript.ExecuteReasonerOn);
+        reasoningExecutionIndex = Utility.GetTriggerMethodIndex(myScript.ExecuteReasonerOn);
         bool delete = false;
         foreach (string sensorConfName in myScript.ChosenSensorConfigurations)
         {
-            if (!Utility.sensorsManager.ExistsConfigurationWithName(sensorConfName))
+            if (!Utility.SensorsManager.ExistsConfigurationWithName(sensorConfName))
             {
                 delete = true;
                 continue;
@@ -149,7 +149,7 @@ public class BrainEditor:Editor
         }
         foreach (string actuatorConfName in myScript.ChosenActuatorConfigurations)
         {
-            if (!Utility.actuatorsManager.ExistsConfigurationWithName(actuatorConfName,myScript))
+            if (!Utility.ActuatorsManager.ExistsConfigurationWithName(actuatorConfName,myScript))
             {
                 delete = true;
                 continue;
@@ -163,7 +163,7 @@ public class BrainEditor:Editor
     }
     private void BasicConfiguration()
     {
-        methodsToShow = Utility.triggerMethodsToShow;
+        methodsToShow = Utility.TriggerMethodsToShow;
         methodsToShow.Add("When Sensors are ready");
         RemoveUnexistingActuators();
         RemoveUnexistingSensors();
@@ -176,7 +176,7 @@ public class BrainEditor:Editor
         bool removed = false;
         foreach (string actuatorName in actuatorsConfigurationNames)
         {
-            if (!Utility.actuatorsManager.ExistsConfigurationWithName(actuatorName, myScript))
+            if (!Utility.ActuatorsManager.ExistsConfigurationWithName(actuatorName, myScript))
             {
                 toDelete.Add(actuatorName);
                 toggledActuatorsConfigurations.Remove(actuatorName);
@@ -198,7 +198,7 @@ public class BrainEditor:Editor
         bool removed = false;
         foreach (string sensorName in sensorsConfigurationNames)
         {
-            if (!Utility.sensorsManager.ExistsConfigurationWithName(sensorName))
+            if (!Utility.SensorsManager.ExistsConfigurationWithName(sensorName))
             {
                 toDelete.Add(sensorName);
                 toggledSensorsConfigurations.Remove(sensorName);
@@ -216,14 +216,14 @@ public class BrainEditor:Editor
     }
     private void AddNewActuatorsConfigurations()
     {
-        foreach (string actuatorConfName in Utility.actuatorsManager.AvailableConfigurationNames(myScript))
+        foreach (string actuatorConfName in Utility.ActuatorsManager.AvailableConfigurationNames(myScript))
         {
             AddConfigurationName(actuatorConfName, actuatorsConfigurationNames, toggledActuatorsConfigurations);
         }
     }
     private void AddNewSensorsConfigurations()
     {
-        foreach (string sensorConfName in Utility.sensorsManager.ConfigurationNames())
+        foreach (string sensorConfName in Utility.SensorsManager.ConfigurationNames())
         {
             AddConfigurationName(sensorConfName, sensorsConfigurationNames, toggledSensorsConfigurations);
         }
@@ -276,7 +276,7 @@ public class BrainEditor:Editor
     private void ShowNotEditableInformations()
     {
         GUI.enabled = false;
-        EditorGUILayout.TextField("Trigger Script Path", Utility.triggerClassPath);
+        EditorGUILayout.TextField("Trigger Script Path", Utility.TriggerClassPath);
         EditorGUILayout.TextField("ASP Template File Path", myScript.ASPFileTemplatePath);
         EditorGUILayout.TextField("ASP Files Path", myScript.ASPFilesPath);
         myScript.ASPFilesPath = @".\Assets\StreamingAssets\";
@@ -357,7 +357,7 @@ public class BrainEditor:Editor
         {
             if (isActuator)
             {
-                Brain assignedTo = Utility.actuatorsManager.AssignedTo(confName);
+                Brain assignedTo = Utility.ActuatorsManager.AssignedTo(confName);
                 if (assignedTo != null && !myScript.ChosenActuatorConfigurations.Contains(confName))
                 {
                     GUI.enabled = false;
