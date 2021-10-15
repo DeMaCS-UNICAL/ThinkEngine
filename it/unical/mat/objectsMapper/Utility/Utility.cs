@@ -204,7 +204,6 @@ public static class Utility
     {
         if (!prefabsLoaded)
         {
-            //Resources.LoadAll<GameObject>("Prefabs");//check HERE
             Resources.LoadAll("");
             prefabsLoaded = true;
         }

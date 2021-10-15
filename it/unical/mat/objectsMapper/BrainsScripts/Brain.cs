@@ -7,7 +7,6 @@ using System.Threading;
 using System.Reflection;
 using System.Collections;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
-using Structures;
 
 [ExecuteAlways, RequireComponent(typeof(IndexTracker))]
 public class Brain :MonoBehaviour

@@ -1,6 +1,5 @@
 ﻿using it.unical.mat.embasp.languages.asp;
 using Mappers;
-using Structures;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -384,7 +383,7 @@ internal class ActuatorsManager : MonoBehaviour
                         Performance.updatingActuators = true;
                         foreach (MonoBehaviourActuator act in actuators)
                         {
-                            act.toSet = act.Parse(answerSet);
+                            act.ToSet = act.Parse(answerSet);
                         }
                     }
                 }
@@ -407,7 +406,7 @@ internal class ActuatorsManager : MonoBehaviour
                 Performance.updatingActuators = true;
                 foreach (MonoBehaviourActuator act in actuators)
                 {
-                    act.toSet = act.Parse(answerSet);
+                    act.ToSet = act.Parse(answerSet);
                 }
             }
         }
