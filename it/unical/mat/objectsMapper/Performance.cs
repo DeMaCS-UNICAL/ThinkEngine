@@ -30,7 +30,7 @@ class Performance : MonoBehaviour
             Directory.CreateDirectory("Performance");
         }
         nfi.NumberDecimalSeparator = ".";
-        if (GameObject.FindObjectOfType<Brain>().enableBrain)
+        if (GameObject.FindObjectOfType<ActuatorBrain>().enableBrain)
         {
             using (StreamWriter fs = new StreamWriter(withBrainPath, false))
             {

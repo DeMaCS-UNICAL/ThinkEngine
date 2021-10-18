@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEngine;
 
-[CustomEditor(typeof(Brain))]
+[CustomEditor(typeof(ActuatorBrain))]
 public class BrainEditor:Editor
 {
     List<string> _excludedProperties;
@@ -14,7 +14,7 @@ public class BrainEditor:Editor
     Dictionary<string, bool> _toggledSensorsConfigurations;
     Dictionary<string, bool> _toggledActuatorsConfigurations;
     private int reasoningExecutionIndex = 0;
-    private Brain myScript;
+    private ActuatorBrain myScript;
     List<string> ExcludedProperties
     {
         get
@@ -99,7 +99,7 @@ public class BrainEditor:Editor
     }
     void MyReset()
     {
-        myScript = target as Brain;
+        myScript = target as ActuatorBrain;
         BasicConfiguration();
         ReadingFromBrain();
     }
@@ -242,7 +242,7 @@ public class BrainEditor:Editor
         
     private void GenerateASPTemplateFileButton()
     {
-        Brain brain = (Brain)target;
+        ActuatorBrain brain = (ActuatorBrain)target;
         if (GUILayout.Button("Generate ASP file template", GUILayout.Width(300)))
         {
             brain.GenerateFile();
@@ -357,7 +357,7 @@ public class BrainEditor:Editor
         {
             if (isActuator)
             {
-                Brain assignedTo = Utility.ActuatorsManager.AssignedTo(confName);
+                ActuatorBrain assignedTo = Utility.ActuatorsManager.AssignedTo(confName);
                 if (assignedTo != null && !myScript.ChosenActuatorConfigurations.Contains(confName))
                 {
                     GUI.enabled = false;

@@ -11,17 +11,16 @@ using UnityEngine;
 
 namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 {
-    internal class SolverExectuor
+    internal class ActuatorExecutor:Executor
     {
-        readonly Brain brain;
+        readonly ActuatorBrain brain;
         string factsPath;
-        internal bool reason;
         readonly Stopwatch stopwatch = new Stopwatch();
-        internal SolverExectuor(Brain b)
+        internal ActuatorExecutor(ActuatorBrain b)
         {
             brain = b;
         }
-        internal void Run()
+        internal override void Run()
         {
             if (!Directory.Exists(Path.GetTempPath() + @"ThinkEngineFacts\"))
             {

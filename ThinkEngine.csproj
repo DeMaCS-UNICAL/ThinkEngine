@@ -203,10 +203,13 @@
     <Compile Include="it\unical\mat\embasp\specializations\solver_planning_domains\desktop\SPDDesktopService.cs" />
     <Compile Include="it\unical\mat\embasp\specializations\solver_planning_domains\SPDPlan.cs" />
     <Compile Include="it\unical\mat\embasp\specializations\solver_planning_domains\SPDUtility.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Executor.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Planner\Action.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Planner\Brain.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Editors\ActuatorConfigurationEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\MonoBehaviourActuatorsManager.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Brain.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\SolverExecutor.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\ActuatorBrain.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\ActuatorExecutor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorsManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Editors\BrainEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\GlobalIndexer.cs" />

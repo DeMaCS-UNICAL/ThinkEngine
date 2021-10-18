@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Planner;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -154,9 +155,9 @@ public  class SensorsManager : MonoBehaviour
             KeyValuePair<Brain,object> pair = RequestedMappings.Dequeue();
             Brain brain = pair.Key;
             object toLock = pair.Value;
-            if (brain.embasp != null)
+            if (brain.executor != null)
             {
-                brain.embasp.reason = false;
+                brain.executor.reason = false;
                 lock (toLock)
                 {
                     Monitor.Pulse(toLock);
@@ -177,7 +178,7 @@ public  class SensorsManager : MonoBehaviour
     #region Design-time methods
     private static void NotifyBrains()
     {
-        foreach (Brain brain in Resources.FindObjectsOfTypeAll<Brain>())
+        foreach (ActuatorBrain brain in Resources.FindObjectsOfTypeAll<ActuatorBrain>())
         {
             brain.sensorsConfigurationsChanged = true;
         }

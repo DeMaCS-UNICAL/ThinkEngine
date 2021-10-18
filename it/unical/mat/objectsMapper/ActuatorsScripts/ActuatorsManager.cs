@@ -9,30 +9,30 @@ using UnityEngine;
 [ExecuteInEditMode]
 internal class ActuatorsManager : MonoBehaviour
 {
-    private static Dictionary<Brain, List<string>> _instantiatedActuators;
-    private static Queue<KeyValuePair<Brain, AnswerSet>> _actuatorsToApply;
-    private static Queue<KeyValuePair<Brain, object>> _requestedObjectIndexes;
+    private static Dictionary<ActuatorBrain, List<string>> _instantiatedActuators;
+    private static Queue<KeyValuePair<ActuatorBrain, AnswerSet>> _actuatorsToApply;
+    private static Queue<KeyValuePair<ActuatorBrain, object>> _requestedObjectIndexes;
 
     internal static bool _configurationsChanged;
     internal static bool destroyed;
-    private static Dictionary<Brain, List<string>> InstantiatedActuators
+    private static Dictionary<ActuatorBrain, List<string>> InstantiatedActuators
     {
         get
         {
             if (_instantiatedActuators == null)
             {
-                _instantiatedActuators = new Dictionary<Brain, List<string>>();
+                _instantiatedActuators = new Dictionary<ActuatorBrain, List<string>>();
             }
             return _instantiatedActuators;
         }
     }
-    internal static Queue<KeyValuePair<Brain, AnswerSet>> ActuatorsToApply
+    internal static Queue<KeyValuePair<ActuatorBrain, AnswerSet>> ActuatorsToApply
     {
         get
         {
             if (_actuatorsToApply == null)
             {
-                _actuatorsToApply = new Queue<KeyValuePair<Brain, AnswerSet>>();
+                _actuatorsToApply = new Queue<KeyValuePair<ActuatorBrain, AnswerSet>>();
             }
             return _actuatorsToApply;
         }
@@ -64,13 +64,13 @@ internal class ActuatorsManager : MonoBehaviour
         return true;
     }
 
-    internal static Queue<KeyValuePair<Brain, object>> RequestedObjectIndexes
+    internal static Queue<KeyValuePair<ActuatorBrain, object>> RequestedObjectIndexes
     {
         get
         {
             if (_requestedObjectIndexes == null)
             {
-                _requestedObjectIndexes = new Queue<KeyValuePair<Brain, object>>();
+                _requestedObjectIndexes = new Queue<KeyValuePair<ActuatorBrain, object>>();
             }
             return _requestedObjectIndexes;
         }
@@ -136,12 +136,12 @@ internal class ActuatorsManager : MonoBehaviour
     {
         while (RequestedObjectIndexes.Count > 0)
         {
-            KeyValuePair<Brain, object> pair = RequestedObjectIndexes.Dequeue();
-            Brain brain = pair.Key;
+            KeyValuePair<ActuatorBrain, object> pair = RequestedObjectIndexes.Dequeue();
+            ActuatorBrain brain = pair.Key;
             object toLock = pair.Value;
-            if (brain.embasp != null)
+            if (brain.executor != null)
             {
-                brain.embasp.reason = false;
+                brain.executor.reason = false;
                 lock (toLock)
                 {
                     Monitor.Pulse(toLock);
@@ -153,13 +153,13 @@ internal class ActuatorsManager : MonoBehaviour
     #region Design-time methods
     private static void NotifyBrains()
     {
-        foreach (Brain brain in Resources.FindObjectsOfTypeAll<Brain>())
+        foreach (ActuatorBrain brain in Resources.FindObjectsOfTypeAll<ActuatorBrain>())
         {
             brain.actuatorsConfigurationsChanged = true;
         }
         ConfigurationsChanged = false;
     }
-    internal IEnumerable<string> AvailableConfigurationNames(Brain myScript) //Names of the actuator configurations that could be associated to the brain
+    internal IEnumerable<string> AvailableConfigurationNames(ActuatorBrain myScript) //Names of the actuator configurations that could be associated to the brain
     {
         if (!myScript.prefabBrain)//if it is not a prefab, all the acutator configurations can be associated to the brain
         {
@@ -209,7 +209,7 @@ internal class ActuatorsManager : MonoBehaviour
         }
         return toReturn;
     }
-    public bool ExistsConfigurationWithName(string name, Brain brain = null)
+    public bool ExistsConfigurationWithName(string name, ActuatorBrain brain = null)
     {
         if (brain != null && brain.prefabBrain)
         {
@@ -230,7 +230,7 @@ internal class ActuatorsManager : MonoBehaviour
         }
         return false;
     }
-    private static bool ExistsLocalConfigurationWithName(string name, Brain brain)
+    private static bool ExistsLocalConfigurationWithName(string name, ActuatorBrain brain)
     {
         MonoBehaviourActuatorsManager monoBehaviourActuatorsManager = brain.GetComponent<MonoBehaviourActuatorsManager>();
         if (monoBehaviourActuatorsManager != null)
@@ -242,14 +242,14 @@ internal class ActuatorsManager : MonoBehaviour
         }
         return false;
     }
-    internal Brain AssignedTo(string confName)//return the brain to which the actuator configuration is assigned
+    internal ActuatorBrain AssignedTo(string confName)//return the brain to which the actuator configuration is assigned
     {
-        Brain[] brains = Resources.FindObjectsOfTypeAll<Brain>();
+        ActuatorBrain[] brains = Resources.FindObjectsOfTypeAll<ActuatorBrain>();
         if (brains == null)
         {
             return null;
         }
-        foreach (Brain brain in brains)
+        foreach (ActuatorBrain brain in brains)
         {
             if (brain.ChosenActuatorConfigurations.Contains(confName))
             {
@@ -274,7 +274,7 @@ internal class ActuatorsManager : MonoBehaviour
         }
         return false;
     }
-    public void RegisterBrainActuatorConfigurations(Brain b, List<string> instantiated)//brains notify the manager with the configurations it is interested in
+    public void RegisterBrainActuatorConfigurations(ActuatorBrain b, List<string> instantiated)//brains notify the manager with the configurations it is interested in
     {
         if (!InstantiatedActuators.ContainsKey(b))
         {
@@ -282,12 +282,12 @@ internal class ActuatorsManager : MonoBehaviour
         }
         InstantiatedActuators[b].AddRange(instantiated);
     }
-    internal static void RequestObjectIndexes(Brain brain)//a solver executor request the asp mapping of the index (IndexTracker) of the gameobjects to which its actuators are attached
+    internal static void RequestObjectIndexes(ActuatorBrain brain)//a solver executor request the asp mapping of the index (IndexTracker) of the gameobjects to which its actuators are attached
     {
         object toLock = new object();
         lock (toLock)
         {
-            RequestedObjectIndexes.Enqueue(new KeyValuePair<Brain, object>(brain, toLock));
+            RequestedObjectIndexes.Enqueue(new KeyValuePair<ActuatorBrain, object>(brain, toLock));
             Monitor.Wait(toLock);
         }
     }
@@ -297,8 +297,8 @@ internal class ActuatorsManager : MonoBehaviour
         while (RequestedObjectIndexes.Count > 0 && count < 5)//count is used to avoid starvation (i.e. solver executors are faster than the main thread, thus the queue is never empty)
         {
             count++;
-            KeyValuePair<Brain, object> currentPair = RequestedObjectIndexes.Dequeue();
-            Brain brain = currentPair.Key;
+            KeyValuePair<ActuatorBrain, object> currentPair = RequestedObjectIndexes.Dequeue();
+            ActuatorBrain brain = currentPair.Key;
             object toLock = currentPair.Value;
             lock (toLock)
             {
@@ -315,7 +315,7 @@ internal class ActuatorsManager : MonoBehaviour
             }
         }
     }
-    private static string GetObjectIndexes(Brain brain)//retrieves the asp representation of the indexes (IndexTracker) of the gameobject to which it is associated an actuator assigned to the relative brain 
+    private static string GetObjectIndexes(ActuatorBrain brain)//retrieves the asp representation of the indexes (IndexTracker) of the gameobject to which it is associated an actuator assigned to the relative brain 
     {
         string toReturn = "";
         MonoBehaviourActuatorsManager[] monoBehaviourActuatorsManager;
@@ -351,8 +351,8 @@ internal class ActuatorsManager : MonoBehaviour
     {
         while (ActuatorsToApply.Count > 0)
         {
-            KeyValuePair<Brain, AnswerSet> brainAnswerSet = ActuatorsToApply.Dequeue();
-            Brain brain = brainAnswerSet.Key;
+            KeyValuePair<ActuatorBrain, AnswerSet> brainAnswerSet = ActuatorsToApply.Dequeue();
+            ActuatorBrain brain = brainAnswerSet.Key;
             AnswerSet answerSet = brainAnswerSet.Value;
             if (!InstantiatedActuators.ContainsKey(brain))
             {
@@ -390,7 +390,7 @@ internal class ActuatorsManager : MonoBehaviour
             }
         }
     }
-    private void ApplyActuatorForPrefabBrain(Brain brain, AnswerSet answerSet)
+    private void ApplyActuatorForPrefabBrain(ActuatorBrain brain, AnswerSet answerSet)
     {
         MonoBehaviourActuatorsManager monoBehaviourActuatorsManager = brain.GetComponent<MonoBehaviourActuatorsManager>();
         if (monoBehaviourActuatorsManager == null)
@@ -411,9 +411,9 @@ internal class ActuatorsManager : MonoBehaviour
             }
         }
     }
-    internal static void NotifyActuators(Brain brain, AnswerSet answerSet)
+    internal static void NotifyActuators(ActuatorBrain brain, AnswerSet answerSet)
     {
-        ActuatorsToApply.Enqueue(new KeyValuePair<Brain, AnswerSet>(brain, answerSet));
+        ActuatorsToApply.Enqueue(new KeyValuePair<ActuatorBrain, AnswerSet>(brain, answerSet));
     }
 #endregion
 }
