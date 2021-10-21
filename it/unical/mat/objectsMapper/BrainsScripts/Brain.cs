@@ -37,13 +37,16 @@ namespace Planner
         internal string ASPFilesPrefix;
         [SerializeField, HideInInspector]
         protected string _ASPFileTemplatePath;
+
+        [SerializeField, HideInInspector]
+        internal bool prefabBrain;
         internal string ASPFileTemplatePath
         {
             get
             {
-                if (_ASPFileTemplatePath == null || !_ASPFileTemplatePath.Equals(this.GetType().Name + "Template" + gameObject.name + ".asp"))
+                if (_ASPFileTemplatePath == null || !_ASPFileTemplatePath.Equals(this.GetType().Name + "Template" + ASPFilesPrefix+ ".asp"))
                 {
-                    _ASPFileTemplatePath = @".\Assets\Resources\" + this.GetType().Name + "Template" + gameObject.name + ".asp";
+                    _ASPFileTemplatePath = @".\Assets\Resources\" + this.GetType().Name + "Template" + ASPFilesPrefix + ".asp";
                     if (!File.Exists(_ASPFileTemplatePath))
                     {
                         if (!Directory.Exists(@".\Assets\Resources"))
@@ -93,7 +96,7 @@ namespace Planner
             originalName = gameObject.name;
         }
 
-        void Start()
+        protected void Start()
         {
             Utility.LoadPrefabs();
             if (Application.isPlaying && enableBrain)
@@ -103,7 +106,7 @@ namespace Planner
             }
         }
         
-        void Update()
+        protected virtual void Update()
         {
             if (reasonerMethod == null)
             {
@@ -119,6 +122,26 @@ namespace Planner
                         solverWaiting = false;
                         Monitor.Pulse(toLock);
                     }
+                }
+            }
+        }
+        internal void RemoveNullSensorConfigurations()
+        {
+            ChosenSensorConfigurations.RemoveAll(x => !Utility.SensorsManager.ExistsConfigurationWithName(x));
+        }
+        protected void PrepareSensors()
+        {
+            Utility.SensorsManager.RegisterBrainsSensorConfigurations(this, ChosenSensorConfigurations);
+        }
+        protected IEnumerator PulseOn()
+        {
+            while (true)
+            {
+                yield return new WaitUntil(() => solverWaiting && SomeConfigurationAvailable() && (bool)reasonerMethod.Invoke(triggerClass, null));
+                lock (toLock)
+                {
+                    solverWaiting = false;
+                    Monitor.Pulse(toLock);
                 }
             }
         }
@@ -143,15 +166,6 @@ namespace Planner
                 }
             }
         }
-        internal void RemoveNullSensorConfigurations()
-        {
-            ChosenSensorConfigurations.RemoveAll(x => !Utility.SensorsManager.ExistsConfigurationWithName(x));
-        }
-        protected void PrepareSensors()
-        {
-            Utility.SensorsManager.RegisterBrainsSensorConfigurations(this, ChosenSensorConfigurations);
-        }
-
         protected virtual IEnumerator Init()
         {
             if (specificASPFile && originalName.Equals(gameObject.name))
@@ -172,19 +186,6 @@ namespace Planner
                 }
             }
         }
-        protected IEnumerator PulseOn()
-        {
-            while (true)
-            {
-                yield return new WaitUntil(() => solverWaiting && SomeConfigurationAvailable() && (bool)reasonerMethod.Invoke(triggerClass, null));
-                lock (toLock)
-                {
-                    solverWaiting = false;
-                    Monitor.Pulse(toLock);
-                }
-            }
-        }
-
         protected virtual bool SomeConfigurationAvailable()
         {
             return Utility.SensorsManager.IsSomeActiveInScene(ChosenSensorConfigurations);

@@ -17,8 +17,6 @@ public class ActuatorBrain :Brain
     [SerializeField, HideInInspector]
     private List<string> _chosenActuatorConfigurations;
     
-    [SerializeField, HideInInspector]
-    internal bool prefabBrain;
     #endregion
     internal List<string> ChosenActuatorConfigurations
     {

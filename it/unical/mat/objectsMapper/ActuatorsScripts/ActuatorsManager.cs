@@ -1,6 +1,7 @@
 ﻿using it.unical.mat.embasp.languages.asp;
 using Mappers;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEditor;
@@ -10,8 +11,8 @@ using UnityEngine;
 internal class ActuatorsManager : MonoBehaviour
 {
     private static Dictionary<ActuatorBrain, List<string>> _instantiatedActuators;
-    private static Queue<KeyValuePair<ActuatorBrain, AnswerSet>> _actuatorsToApply;
-    private static Queue<KeyValuePair<ActuatorBrain, object>> _requestedObjectIndexes;
+    private static ConcurrentQueue<KeyValuePair<ActuatorBrain, AnswerSet>> _actuatorsToApply;
+    private static ConcurrentQueue<KeyValuePair<ActuatorBrain, object>> _requestedObjectIndexes;
 
     internal static bool _configurationsChanged;
     internal static bool destroyed;
@@ -26,13 +27,13 @@ internal class ActuatorsManager : MonoBehaviour
             return _instantiatedActuators;
         }
     }
-    internal static Queue<KeyValuePair<ActuatorBrain, AnswerSet>> ActuatorsToApply
+    internal static ConcurrentQueue<KeyValuePair<ActuatorBrain, AnswerSet>> ActuatorsToApply
     {
         get
         {
             if (_actuatorsToApply == null)
             {
-                _actuatorsToApply = new Queue<KeyValuePair<ActuatorBrain, AnswerSet>>();
+                _actuatorsToApply = new ConcurrentQueue<KeyValuePair<ActuatorBrain, AnswerSet>>();
             }
             return _actuatorsToApply;
         }
@@ -64,13 +65,13 @@ internal class ActuatorsManager : MonoBehaviour
         return true;
     }
 
-    internal static Queue<KeyValuePair<ActuatorBrain, object>> RequestedObjectIndexes
+    internal static ConcurrentQueue<KeyValuePair<ActuatorBrain, object>> RequestedObjectIndexes
     {
         get
         {
             if (_requestedObjectIndexes == null)
             {
-                _requestedObjectIndexes = new Queue<KeyValuePair<ActuatorBrain, object>>();
+                _requestedObjectIndexes = new ConcurrentQueue<KeyValuePair<ActuatorBrain, object>>();
             }
             return _requestedObjectIndexes;
         }
@@ -134,9 +135,8 @@ internal class ActuatorsManager : MonoBehaviour
     }
     void OnApplicationQuit()
     {
-        while (RequestedObjectIndexes.Count > 0)
+        while (RequestedObjectIndexes.TryDequeue(out KeyValuePair<ActuatorBrain, object> pair))
         {
-            KeyValuePair<ActuatorBrain, object> pair = RequestedObjectIndexes.Dequeue();
             ActuatorBrain brain = pair.Key;
             object toLock = pair.Value;
             if (brain.executor != null)
@@ -262,6 +262,10 @@ internal class ActuatorsManager : MonoBehaviour
 #region Run-time methods
     internal bool IsSomeActiveInScene(List<string> configurationNames)//returns true iff there is at least a gameobject in the scene for any of requested configuration
     {
+        if (configurationNames.Count == 0)
+        {
+            return true;
+        }
         foreach (string configurationName in configurationNames)
         {
             foreach (MonoBehaviourActuatorsManager manager in FindObjectsOfType<MonoBehaviourActuatorsManager>())
@@ -297,20 +301,22 @@ internal class ActuatorsManager : MonoBehaviour
         while (RequestedObjectIndexes.Count > 0 && count < 5)//count is used to avoid starvation (i.e. solver executors are faster than the main thread, thus the queue is never empty)
         {
             count++;
-            KeyValuePair<ActuatorBrain, object> currentPair = RequestedObjectIndexes.Dequeue();
-            ActuatorBrain brain = currentPair.Key;
-            object toLock = currentPair.Value;
-            lock (toLock)
+            if (RequestedObjectIndexes.TryDequeue(out KeyValuePair<ActuatorBrain, object> currentPair))
             {
-                string objectIndexes = GetObjectIndexes(brain);
-                if (objectIndexes.Equals(""))
+                ActuatorBrain brain = currentPair.Key;
+                object toLock = currentPair.Value;
+                lock (toLock)
                 {
-                    RequestedObjectIndexes.Enqueue(currentPair);
-                }
-                else
-                {
-                    brain.objectsIndexes = objectIndexes;
-                    Monitor.Pulse(toLock);
+                    string objectIndexes = GetObjectIndexes(brain);
+                    if (objectIndexes.Equals(""))
+                    {
+                        RequestedObjectIndexes.Enqueue(currentPair);
+                    }
+                    else
+                    {
+                        brain.objectsIndexes = objectIndexes;
+                        Monitor.Pulse(toLock);
+                    }
                 }
             }
         }
@@ -351,39 +357,41 @@ internal class ActuatorsManager : MonoBehaviour
     {
         while (ActuatorsToApply.Count > 0)
         {
-            KeyValuePair<ActuatorBrain, AnswerSet> brainAnswerSet = ActuatorsToApply.Dequeue();
-            ActuatorBrain brain = brainAnswerSet.Key;
-            AnswerSet answerSet = brainAnswerSet.Value;
-            if (!InstantiatedActuators.ContainsKey(brain))
+            if (ActuatorsToApply.TryDequeue(out KeyValuePair<ActuatorBrain, AnswerSet> brainAnswerSet))
             {
-                continue;
-            }
-            if (brain.prefabBrain)
-            {
-                ApplyActuatorForPrefabBrain(brain, answerSet);
-                continue;
-            }
-            MonoBehaviourActuatorsManager[] monobehaviourManagers = FindObjectsOfType<MonoBehaviourActuatorsManager>();
-            if (monobehaviourManagers == null)
-            {
-                continue;
-            }
-            foreach (MonoBehaviourActuatorsManager monobehaviourManager in monobehaviourManagers)
-            {
-                if (!monobehaviourManager.ready)
+                ActuatorBrain brain = brainAnswerSet.Key;
+                AnswerSet answerSet = brainAnswerSet.Value;
+                if (!InstantiatedActuators.ContainsKey(brain))
                 {
                     continue;
                 }
-                foreach (string actuatorConf in InstantiatedActuators[brain])
+                if (brain.prefabBrain)
                 {
-                    ActuatorConfiguration currentConfiguration = monobehaviourManager.GetConfiguration(actuatorConf);
-                    if (currentConfiguration != null && currentConfiguration.CheckIfApply())
+                    ApplyActuatorForPrefabBrain(brain, answerSet);
+                    continue;
+                }
+                MonoBehaviourActuatorsManager[] monobehaviourManagers = FindObjectsOfType<MonoBehaviourActuatorsManager>();
+                if (monobehaviourManagers == null)
+                {
+                    continue;
+                }
+                foreach (MonoBehaviourActuatorsManager monobehaviourManager in monobehaviourManagers)
+                {
+                    if (!monobehaviourManager.ready)
                     {
-                        List<MonoBehaviourActuator> actuators = monobehaviourManager.Actuators[currentConfiguration];
-                        Performance.updatingActuators = true;
-                        foreach (MonoBehaviourActuator act in actuators)
+                        continue;
+                    }
+                    foreach (string actuatorConf in InstantiatedActuators[brain])
+                    {
+                        ActuatorConfiguration currentConfiguration = monobehaviourManager.GetConfiguration(actuatorConf);
+                        if (currentConfiguration != null && currentConfiguration.CheckIfApply())
                         {
-                            act.ToSet = act.Parse(answerSet);
+                            List<MonoBehaviourActuator> actuators = monobehaviourManager.Actuators[currentConfiguration];
+                            Performance.updatingActuators = true;
+                            foreach (MonoBehaviourActuator act in actuators)
+                            {
+                                act.ToSet = act.Parse(answerSet);
+                            }
                         }
                     }
                 }

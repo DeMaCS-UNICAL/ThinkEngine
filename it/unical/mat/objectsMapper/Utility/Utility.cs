@@ -25,7 +25,7 @@ public static class Utility
             {
                 try
                 {
-                    _triggerMethods = TriggerClass.GetType().GetMethods();
+                    _triggerMethods = TriggerClass.GetType().GetMethods(BindingAttr);
                 }
                 catch
                 {

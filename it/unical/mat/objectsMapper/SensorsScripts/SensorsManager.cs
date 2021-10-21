@@ -1,5 +1,6 @@
 ﻿using Planner;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -10,7 +11,7 @@ using UnityEngine;
 public  class SensorsManager : MonoBehaviour
 {
     private static Dictionary<Brain, List<string>> _instantiatedSensors;
-    private static Queue<KeyValuePair<Brain,object>> _requestedMappings;
+    private static ConcurrentQueue<KeyValuePair<Brain,object>> _requestedMappings;
     internal static int updateFrequencyInFrames=12;
     internal static bool _configurationsChanged;
     internal static float avgFps = 0;
@@ -62,13 +63,13 @@ public  class SensorsManager : MonoBehaviour
     }
 
 
-    private static Queue<KeyValuePair<Brain,object>> RequestedMappings
+    private static ConcurrentQueue<KeyValuePair<Brain,object>> RequestedMappings
     {
         get
         {
             if (_requestedMappings == null)
             {
-                _requestedMappings = new Queue<KeyValuePair<Brain, object>>();
+                _requestedMappings = new ConcurrentQueue<KeyValuePair<Brain, object>>();
             }
             return _requestedMappings;
         }
@@ -150,9 +151,8 @@ public  class SensorsManager : MonoBehaviour
     void OnApplicationQuit()
     {
         destroyed = true;
-        while (RequestedMappings.Count > 0)
-        {
-            KeyValuePair<Brain,object> pair = RequestedMappings.Dequeue();
+        while (RequestedMappings.TryDequeue(out KeyValuePair<Brain, object> pair)) 
+        { 
             Brain brain = pair.Key;
             object toLock = pair.Value;
             if (brain.executor != null)
@@ -221,6 +221,10 @@ public  class SensorsManager : MonoBehaviour
 #region Run-time methods
     internal bool IsSomeActiveInScene(List<string> configurationNames)
     {
+        if (configurationNames.Count == 0)
+        {
+            return true;
+        }
         foreach(string configurationName in configurationNames)
         {
             foreach(MonoBehaviourSensorsManager manager in FindObjectsOfType<MonoBehaviourSensorsManager>())
@@ -249,17 +253,15 @@ public  class SensorsManager : MonoBehaviour
             return;
         }
         int count = 0;
-        while (RequestedMappings.Count > 0 && count<5)
+        while (RequestedMappings.TryDequeue(out KeyValuePair<Brain, object> currentPair) && count<5)
         {
             count++;
-            KeyValuePair<Brain,object> currentPair = RequestedMappings.Dequeue();
             Brain brain = currentPair.Key;
             object toLock = currentPair.Value;
             lock (toLock)
             {
                 string mapping = "";
                 List<MonoBehaviourSensor> sensors = RetrieveBrainsSensors(brain);
-                UnityEngine.Debug.Log("there are " + sensors.Count + " sensors ");
                 Stopwatch watch = new Stopwatch();
                 watch.Start();
                 foreach (MonoBehaviourSensor sensor in sensors)
