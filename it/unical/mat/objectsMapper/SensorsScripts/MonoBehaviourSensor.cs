@@ -180,38 +180,45 @@ internal class MonoBehaviourSensorHider
             IList currentValuesList;
             Type currentValuesListType;
             string value;
-            if (propertyType.Equals("VALUE"))
+            try
             {
-                currentValuesList = propertyValues[0];
-                currentValuesListType = currentValuesList.GetType().GetGenericArguments()[0];
-                mapperForT = MappingManager.GetMapper(currentValuesListType);
-                value = mapperForT.BasicMap(Operation.Compute(operationType, currentValuesList));
-                return string.Format(myTemplate[0], gameObject.GetComponent<IndexTracker>().currentIndex, value) + Environment.NewLine;
-            }
-            if (propertyType.Equals("LIST") || propertyType.Equals("ARRAY2"))
-            {
-                object[] parameters;
-                if (propertyType.Equals("LIST"))
+                if (propertyType.Equals("VALUE"))
                 {
-                    parameters = new object[3];
-                    parameters[1] = indexes[0];
-                }
-                else
-                {
-                    parameters = new object[4];
-                    parameters[1] = indexes[0];
-                    parameters[2] = indexes[1];
-                }
-                parameters[0] = gameObject.GetComponent<IndexTracker>().currentIndex;
-                for (int i = 0; i < collectionElementProperties.Count; i++)
-                {
-                    currentValuesList = propertyValues[i];
+                    currentValuesList = propertyValues[0];
                     currentValuesListType = currentValuesList.GetType().GetGenericArguments()[0];
                     mapperForT = MappingManager.GetMapper(currentValuesListType);
-                    value = mapperForT.BasicMap(currentValuesList[currentValuesList.Count - 1]);
-                    parameters[parameters.Length - 1] = value;
-                    toReturn += string.Format(myTemplate[i], parameters) + Environment.NewLine;
+                    value = mapperForT.BasicMap(Operation.Compute(operationType, currentValuesList));
+                    return string.Format(myTemplate[0], gameObject.GetComponent<IndexTracker>().currentIndex, value) + Environment.NewLine;
                 }
+                if (propertyType.Equals("LIST") || propertyType.Equals("ARRAY2"))
+                {
+                    object[] parameters;
+                    if (propertyType.Equals("LIST"))
+                    {
+                        parameters = new object[3];
+                        parameters[1] = indexes[0];
+                    }
+                    else
+                    {
+                        parameters = new object[4];
+                        parameters[1] = indexes[0];
+                        parameters[2] = indexes[1];
+                    }
+                    parameters[0] = gameObject.GetComponent<IndexTracker>().currentIndex;
+                    for (int i = 0; i < collectionElementProperties.Count; i++)
+                    {
+                        currentValuesList = propertyValues[i];
+                        currentValuesListType = currentValuesList.GetType().GetGenericArguments()[0];
+                        mapperForT = MappingManager.GetMapper(currentValuesListType);
+                        value = mapperForT.BasicMap(currentValuesList[currentValuesList.Count - 1]);
+                        parameters[parameters.Length - 1] = value;
+                        toReturn += string.Format(myTemplate[i], parameters) + Environment.NewLine;
+                    }
+                }
+            }
+            catch(ArgumentOutOfRangeException e)
+            {
+                Debug.Log("Exception caused by " + e.ParamName + " value is " + e.ActualValue);
             }
             return toReturn;
         }

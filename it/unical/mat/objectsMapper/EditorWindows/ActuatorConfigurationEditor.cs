@@ -55,7 +55,10 @@ public class ActuatorConfigurationEditor : AbstractConfigurationEditor
         {
             ((ActuatorConfiguration)target).applyMethod = Utility.getTriggerMethod(chosenMethod);
         }
-        serializedObject.ApplyModifiedProperties();
+        if (GUI.changed)
+        {
+            EditorUtility.SetDirty((ActuatorConfiguration)target);
+        }
         base.OnInspectorGUI();
 
     }
