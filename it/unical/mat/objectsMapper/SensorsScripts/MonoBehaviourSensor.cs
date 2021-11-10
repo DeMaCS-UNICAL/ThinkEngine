@@ -175,6 +175,10 @@ internal class MonoBehaviourSensorHider
         internal string Map()
         {
             List<string> myTemplate = GetCorrespondingConfiguration().GetTemplate(property);
+            if (myTemplate.Count == 0)
+            {
+                throw new Exception("MyTemplate was empty for " + sensorName);
+            }
             string toReturn = "";
             IMapper mapperForT;
             IList currentValuesList;
@@ -184,6 +188,10 @@ internal class MonoBehaviourSensorHider
             {
                 if (propertyType.Equals("VALUE"))
                 {
+                    if (propertyValues.Count == 0)
+                    {
+                        throw new Exception("propertyValues was empty for " + sensorName);
+                    }
                     currentValuesList = propertyValues[0];
                     currentValuesListType = currentValuesList.GetType().GetGenericArguments()[0];
                     mapperForT = MappingManager.GetMapper(currentValuesListType);
@@ -207,7 +215,20 @@ internal class MonoBehaviourSensorHider
                     parameters[0] = gameObject.GetComponent<IndexTracker>().currentIndex;
                     for (int i = 0; i < collectionElementProperties.Count; i++)
                     {
+                        if (propertyValues.Count <= i)
+                        {
+                            throw new Exception("propertyValues lists list has "+propertyValues.Count+" instead of "+collectionElementProperties.Count+" for " + sensorName);
+                        }
+                        if (myTemplate.Count <= i)
+                        {
+                            throw new Exception("myTemplate was has " + myTemplate.Count + " instead of " + collectionElementProperties.Count + " for " + sensorName);
+                        }
                         currentValuesList = propertyValues[i];
+                        if (currentValuesList.Count == 0)
+                        {
+                            Debug.Log("No values for " + collectionElementProperties[i]);
+                            continue;
+                        }
                         currentValuesListType = currentValuesList.GetType().GetGenericArguments()[0];
                         mapperForT = MappingManager.GetMapper(currentValuesListType);
                         value = mapperForT.BasicMap(currentValuesList[currentValuesList.Count - 1]);
@@ -216,14 +237,9 @@ internal class MonoBehaviourSensorHider
                     }
                 }
             }
-            catch(ArgumentOutOfRangeException e)
+            catch(Exception e)
             {
-                Debug.Log("Exception " + e.Message);
-                foreach(ICollection d in e.Data.Keys)
-                {
-                    Debug.Log(d);
-                    Debug.Log(e.Data[d]);
-                }
+                Debug.Log(e);
             }
             return toReturn;
         }
