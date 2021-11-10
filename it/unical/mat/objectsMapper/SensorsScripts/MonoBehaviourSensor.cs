@@ -218,7 +218,12 @@ internal class MonoBehaviourSensorHider
             }
             catch(ArgumentOutOfRangeException e)
             {
-                Debug.Log("Exception caused by " + e.ParamName + " value is " + e.ActualValue);
+                Debug.Log("Exception " + e.Message);
+                foreach(ICollection d in e.Data.Keys)
+                {
+                    Debug.Log(d);
+                    Debug.Log(e.Data[d]);
+                }
             }
             return toReturn;
         }

@@ -5,8 +5,24 @@ using System.Reflection;
 [ExecuteInEditMode, Serializable]
 public class ActuatorConfiguration : AbstractConfiguration
 {
-    public Brain assignedTo;
     private object triggerClass;
+    [SerializeField, HideInInspector]
+    private string _methodToApply;
+    internal string MethodToApply
+    {
+        get
+        {
+            if (_methodToApply == null)
+            {
+                _methodToApply = "";
+            }
+            return _methodToApply;
+        }
+        set
+        {
+            _methodToApply = value;
+        }
+    }
     internal MethodInfo applyMethod;
 
     #region Unity Messages
@@ -14,6 +30,7 @@ public class ActuatorConfiguration : AbstractConfiguration
     {
         base.Reset();
         triggerClass = Utility.triggerClass;
+        applyMethod = Utility.getTriggerMethod(MethodToApply);
     }
     new void Reset()
     {
