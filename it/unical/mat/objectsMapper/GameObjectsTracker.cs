@@ -176,7 +176,8 @@ public class GameObjectsTracker
         {
             foreach (SimpleGameObjectsTracker currentSimpleTracker in configuration.advancedConf)
             {
-                if (currentSimpleTracker.propertyName.Equals(currentPropertyHierarchy))
+                
+                if (!(currentSimpleTracker is null) && currentSimpleTracker.propertyName.Equals(currentPropertyHierarchy))
                 {
                     basicTypeCollectionsConfigurations.Add(currentFieldOrProperty, currentSimpleTracker);
                     break;

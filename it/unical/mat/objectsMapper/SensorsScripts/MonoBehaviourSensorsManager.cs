@@ -461,6 +461,7 @@ internal class MonoBehaviourSensorsManager : MonoBehaviour
     private MyPropertyInfo ReadSimpleValueProperty(string st, Type gOType, object obj)
     {
         MemberInfo[] members = gOType.GetMember(st, SensorsUtility.BindingAttr);
+               // UnityEngine.Debug.Log("members of name " + st + " are " + members.Length);
         if (members.Length == 0)
         {
             return null;

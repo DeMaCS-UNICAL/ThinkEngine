@@ -28,17 +28,22 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 Directory.CreateDirectory(Path.GetTempPath() + @"ThinkEngineFacts\");
             }
             reason = true;
-            InputProgram encoding = new ASPInputProgram();
-            foreach (string fileName in Directory.GetFiles(Application.streamingAssetsPath))
-            {
-                string actualFileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
-                if (actualFileName.StartsWith(brain.ASPFilesPrefix) && actualFileName.EndsWith(".asp"))
-                {
-                    encoding.AddFilesPath( fileName);
-                }
-            }
+            
             while (reason)
             {
+                InputProgram encoding = new ASPInputProgram();
+                foreach (string fileName in Directory.GetFiles(Application.streamingAssetsPath))
+                {
+                    string actualFileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
+                    if (actualFileName.StartsWith(brain.ASPFilesPrefix) && actualFileName.EndsWith(".asp"))
+                    {
+                        encoding.AddFilesPath(fileName);
+                    }
+                }
+                if (encoding.FilesPaths.Count == 0)
+                {
+                    continue;
+                }
                 lock (brain.toLock)
                 {
                     if (brain.reasonerMethod!=null)
@@ -57,8 +62,20 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                             Monitor.Wait(brain.toLock);
                         }
                     }
+                    if (!reason)
+                    {
+                        return;
+                    }
                     ActuatorsManager.RequestObjectIndexes(brain);
+                    if (!reason)
+                    {
+                        return;
+                    }
                     SensorsManager.RequestSensorsMapping(brain);
+                    if (!reason)
+                    {
+                        return;
+                    }
                     factsPath = Path.GetTempPath() + @"ThinkEngineFacts\" + Path.GetRandomFileName() + ".txt";
                     using (StreamWriter fs = new StreamWriter(factsPath, true))
                     {
@@ -108,8 +125,8 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 catch (Exception e)
                 {
                     reason = false;
-                    Debug.LogError("CAUGHT EXECPTION!!!!");
-                    Debug.LogError(e.Source);
+                    Debug.LogError("CAUGHT EXECPTION!!!! from "+Thread.CurrentThread.Name);
+                    //Debug.LogError(e.Source);
                     Debug.LogError(e.Message);
                     Debug.LogError(e.StackTrace);
                 }
