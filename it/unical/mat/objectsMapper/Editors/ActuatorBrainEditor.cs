@@ -69,8 +69,8 @@ public class ActuatorBrainEditor:BrainEditor
     }
     protected override void OnEnable()
     {
-        base.OnEnable();
         myScript = target as ActuatorBrain;
+        base.OnEnable();
     }
     
 

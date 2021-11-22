@@ -64,9 +64,9 @@ namespace Editors
                 return (PlannerBrain)target;
             }
         }
-        protected override string GetASPFilesPrefixSpecifications()
+        protected override string GetAIFilesPrefixSpecifications()
         {
-            return base.GetASPFilesPrefixSpecifications()+"Planner"+(((PlannerBrain)target).Priority+1);
+            return base.GetAIFilesPrefixSpecifications()+"Planner"+(((PlannerBrain)target).Priority+1);
         }
         protected override void ShowSpecificFields()
         {

@@ -12,10 +12,10 @@ using Planner;
 
 namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 {
-    internal class ActuatorExecutor:Executor
+    internal class ASPActuatorExecutor:ASPExecutor
     {
         
-        internal ActuatorExecutor(ActuatorBrain b)
+        internal ASPActuatorExecutor(ActuatorBrain b)
         {
             brain = b;
         }
@@ -24,12 +24,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         {
             if (answers.GetOptimalAnswerSets().Count > 0)
             {
-                UnityEngine.Debug.Log(answers.GetOptimalAnswerSets()[0]);
                 ActuatorsManager.NotifyActuators((ActuatorBrain)brain, answers.GetOptimalAnswerSets()[0]);
             }
             else
             {
-                Debug.Log(answers.answersets[0]);
                 ActuatorsManager.NotifyActuators((ActuatorBrain)brain, answers.answersets[0]);
             }
         }

@@ -8,6 +8,8 @@ using System.Reflection;
 using System.Collections;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 using Planner;
+using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Actuator;
+using BrainsScripts.Specialitations.ASP;
 
 [ExecuteAlways, RequireComponent(typeof(IndexTracker))]
 public class ActuatorBrain :Brain
@@ -30,6 +32,15 @@ public class ActuatorBrain :Brain
         }
     }
 
+    protected override HashSet<string> SupportedFileExtensions 
+    {
+        get
+        {
+            return new HashSet<string> { "asp" };
+        }
+    }
+
+    IActualActuatorBrain actuatorBrain;
     #region Runtime Fields
     internal string objectsIndexes;
     internal bool actuatorsConfigurationsChanged;
@@ -50,41 +61,54 @@ public class ActuatorBrain :Brain
         }
     }
     #endregion
-    internal override void GenerateFile()
+    protected override string SpecificFileParts()
     {
-        base.GenerateFile();
-        using (StreamWriter fs = File.AppendText(ASPFileTemplatePath))
+        string toReturn = "%Actuators:\n";
+        HashSet<string> seenActuatorConfNames = new HashSet<string>();
+        foreach (ActuatorConfiguration actuatorConf in Utility.ActuatorsManager.GetCorrespondingConfigurations(ChosenActuatorConfigurations))
         {
-            fs.Write("%Actuators.\n");
-            HashSet<string> seenActuatorConfNames = new HashSet<string>();
-            foreach (ActuatorConfiguration actuatorConf in Utility.ActuatorsManager.GetCorrespondingConfigurations(ChosenActuatorConfigurations))
+            if (seenActuatorConfNames.Contains(actuatorConf.ConfigurationName))
             {
-                if (seenActuatorConfNames.Contains(actuatorConf.ConfigurationName))
-                {
-                    continue;
-                }
-                seenActuatorConfNames.Add(actuatorConf.ConfigurationName);
-                foreach (MyListString property in actuatorConf.ToMapProperties)
-                {
-                    fs.Write(MapperManager.GetASPTemplate(actuatorConf.ConfigurationName, actuatorConf.gameObject, property));
-                }
+                continue;
+            }
+            seenActuatorConfNames.Add(actuatorConf.ConfigurationName);
+            foreach (MyListString property in actuatorConf.ToMapProperties)
+            {
+                string actuatorMappingAsASP = MapperManager.GetASPTemplate(actuatorConf.ConfigurationName, actuatorConf.gameObject, property);
+                toReturn += ActualActuatorEncoding(actuatorMappingAsASP);
             }
         }
+        return toReturn;
+    }
+
+    internal string ActualActuatorEncoding(string actuatorMappingAsASP)
+    {
+        return actuatorBrain.ActualActuatorEncoding(actuatorMappingAsASP);
+    }
+    protected override void Start()
+    {
+        if (FileExtension.Equals("asp"))
+        {
+            actuatorBrain = new ASPActuatorBrain();
+        }
+        base.Start();
     }
     protected override IEnumerator Init()
     {
-        base.Init();
-        executor = new ActuatorExecutor(this);
-        PrepareActuators();
-        string GOname = gameObject.name;
-        executionThread = new Thread(() =>
+        if (actuatorBrain != null)
         {
-            Thread.CurrentThread.Name = "Solver executor "+ GOname;
-            Thread.CurrentThread.IsBackground = true;
-            executor.Run();
-        });
-        executionThread.Start();
-        return null;
+            yield return StartCoroutine(base.Init());
+            executor = new ASPActuatorExecutor(this);
+            PrepareActuators();
+            string GOname = gameObject.name;
+            executionThread = new Thread(() =>
+            {
+                Thread.CurrentThread.Name = "Solver executor " + GOname;
+                Thread.CurrentThread.IsBackground = true;
+                executor.Run();
+            });
+            executionThread.Start();
+        }
     }
     internal void RemoveNullActuatorConfigurations()
     {
@@ -100,5 +124,9 @@ public class ActuatorBrain :Brain
         return base.SomeConfigurationAvailable() && Utility.ActuatorsManager.IsSomeActiveInScene(ChosenActuatorConfigurations);
     }
 
+    internal override string ActualSensorEncoding(string sensorsAsASP)
+    {
+        return actuatorBrain.ActualSensorEncoding(sensorsAsASP);
+    }
 }
 

@@ -17,7 +17,29 @@ class ActuatorConfiguration : AbstractConfiguration
             return _triggerClass;
         }
     }
+    [SerializeField, HideInInspector]
+    private string _methodToApply;
+    internal string MethodToApply
+    {
+        get
+        {
+            if (_methodToApply == null)
+            {
+                _methodToApply = "";
+            }
+            return _methodToApply;
+        }
+        set
+        {
+            _methodToApply = value;
+        }
+    }
     internal MethodInfo applyMethod;
+
+    void OnEnable()
+    {
+        applyMethod = Utility.GetTriggerMethod(MethodToApply);
+    }
     protected override void PropertyDeleted(MyListString property)
     {
             

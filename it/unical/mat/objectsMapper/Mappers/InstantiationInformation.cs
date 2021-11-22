@@ -4,6 +4,8 @@ using UnityEngine;
 
 namespace Mappers
 {
+        
+
     internal class InstantiationInformation
     {
         internal GameObject instantiateOn;
@@ -12,12 +14,13 @@ namespace Mappers
         internal MyListString propertyHierarchy;
         internal MyListString residualPropertyHierarchy;
         internal int firstPlaceholder;
-        internal List<string> prependMapping;
-        internal List<string> appendMapping;
         internal bool mappingDone;
         internal List<IInfoAndValue> hierarchyInfo;
         internal AbstractConfiguration configuration;
+        internal List<string> prependMapping;
+        internal List<string> appendMapping;
 
+        
         internal InstantiationInformation()
         {
             hierarchyInfo = new List<IInfoAndValue>();
@@ -37,11 +40,10 @@ namespace Mappers
             hierarchyInfo = new List<IInfoAndValue>(original.hierarchyInfo);
             currentType = original.currentType;
         }
-
         internal string Mapping()
         {
             string toReturn = "";
-            for (int i=0; i<prependMapping.Count;i++)
+            for (int i = 0; i < prependMapping.Count; i++)
             {
                 toReturn += prependMapping[i];
             }

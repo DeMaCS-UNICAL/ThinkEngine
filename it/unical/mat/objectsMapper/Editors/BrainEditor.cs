@@ -158,7 +158,7 @@ namespace Editors
             AddNewSensorsConfigurations();
             RemoveUnexistingSensors();
         }
-        protected void GenerateASPTemplateFileButton()
+        protected void GenerateAITemplateFileButton()
         {
             if (GUILayout.Button("Generate ASP file template", GUILayout.Width(300)))
             {
@@ -219,30 +219,30 @@ namespace Editors
         }
         private void ExclusiveTogglesCheck(string currentTrue)
         {
-            if (brainTarget.specificASPFile && brainTarget.globalASPFile)
+            if (brainTarget.specificAIFile && brainTarget.globalAIFile)
             {
                 if (currentTrue.Equals("Specific"))
                 {
-                    brainTarget.specificASPFile = false;
+                    brainTarget.specificAIFile = false;
                 }
                 else
                 {
-                    brainTarget.globalASPFile = false;
+                    brainTarget.globalAIFile = false;
                 }
             }
-            if (!brainTarget.specificASPFile && !brainTarget.globalASPFile)
+            if (!brainTarget.specificAIFile && !brainTarget.globalAIFile)
             {
-                brainTarget.globalASPFile = true;
+                brainTarget.globalAIFile = true;
             }
         }
-        private void ConfigurePrefabASPFile()
+        private void ConfigurePrefabAIFile()
         {
             string currentTrue = "";
-            if (brainTarget.specificASPFile)
+            if (brainTarget.specificAIFile)
             {
                 currentTrue = "Specific";
             }
-            if (brainTarget.globalASPFile)
+            if (brainTarget.globalAIFile)
             {
                 currentTrue = "Global";
             }
@@ -250,26 +250,26 @@ namespace Editors
                 "to use a specific ASP program file for each instantiation or a global one!", MessageType.Warning, true);
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            brainTarget.specificASPFile = EditorGUILayout.ToggleLeft("Specific file.", brainTarget.specificASPFile);
-            brainTarget.globalASPFile = EditorGUILayout.ToggleLeft("Global file.", brainTarget.globalASPFile);
+            brainTarget.specificAIFile = EditorGUILayout.ToggleLeft("Specific file.", brainTarget.specificAIFile);
+            brainTarget.globalAIFile = EditorGUILayout.ToggleLeft("Global file.", brainTarget.globalAIFile);
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
             ExclusiveTogglesCheck(currentTrue);
-            if (brainTarget.specificASPFile)
+            if (brainTarget.specificAIFile)
             {
                 EditorGUILayout.HelpBox("At runtime the system will look for the following files pattern \n" +
                     "in which \" nameOfTheInstantiation will be the name of the GameObject instantiated at runtime.", MessageType.Warning, true);
                 GUI.enabled = false;
-                brainTarget.ASPFilesPrefix = @"nameOfTheInstantiation"+GetASPFilesPrefixSpecifications();
-                EditorGUILayout.TextField("ASP Files Pattern", brainTarget.ASPFilesPrefix + "*.asp");
+                brainTarget.AIFilesPrefix = @"nameOfTheInstantiation"+GetAIFilesPrefixSpecifications();
+                EditorGUILayout.TextField("ASP Files Pattern", brainTarget.AIFilesPrefix + "*.asp");
                 GUI.enabled = true;
                 EditorGUILayout.HelpBox("DO NOT use the default GameObject name when instantiating.", MessageType.Warning, true);
             }
-            if (brainTarget.globalASPFile)
+            if (brainTarget.globalAIFile)
             {
                 GUI.enabled = false;
-                brainTarget.ASPFilesPrefix = brainTarget.gameObject.name;
-                EditorGUILayout.TextField("ASP File Path", brainTarget.ASPFilesPrefix);
+                brainTarget.AIFilesPrefix = brainTarget.gameObject.name;
+                EditorGUILayout.TextField("AI File Path", brainTarget.AIFilesPrefix);
                 GUI.enabled = true;
             }
 
@@ -279,26 +279,25 @@ namespace Editors
         {
             GUI.enabled = false;
             EditorGUILayout.TextField("Trigger Script Path", Utility.TriggerClassPath);
-            EditorGUILayout.TextField("ASP Files Path", brainTarget.ASPFilesPath);
-            brainTarget.ASPFilesPath = @".\Assets\StreamingAssets\";
+            EditorGUILayout.TextField("AI Files Path", brainTarget.AIFilesPath);
             GUI.enabled = true;
             if (!brainTarget.prefabBrain)
             {
                 GUI.enabled = false;
-                brainTarget.ASPFilesPrefix = Target.gameObject.name+GetASPFilesPrefixSpecifications();
-                EditorGUILayout.TextField("ASP Files Pattern", brainTarget.ASPFilesPrefix + "*.asp");
+                brainTarget.AIFilesPrefix = Target.gameObject.name+GetAIFilesPrefixSpecifications();
+                EditorGUILayout.TextField("AI Files Pattern", brainTarget.AIFilesPrefix + "*.(asp | pddl | dlp)");
                 GUI.enabled = true;
             }
             else
             {
-                ConfigurePrefabASPFile();
+                ConfigurePrefabAIFile();
             }
             GUI.enabled = false;
-            EditorGUILayout.TextField("ASP Template File Path", brainTarget.ASPFileTemplatePath);
+            EditorGUILayout.TextField("AI Template File Path", brainTarget.AIFileTemplatePath);
             GUI.enabled = true;
         }
 
-        protected virtual string GetASPFilesPrefixSpecifications() 
+        protected virtual string GetAIFilesPrefixSpecifications() 
         {
             return "";
         }
@@ -312,7 +311,7 @@ namespace Editors
             ListAvailableConfigurations();
             ChooseReasonerTriggerMethod();
             serializedObject.ApplyModifiedProperties();
-            GenerateASPTemplateFileButton();
+            GenerateAITemplateFileButton();
             SavingInBrain();
             if (GUI.changed)
             {

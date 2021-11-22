@@ -15,9 +15,26 @@ namespace Planner
     [ExecuteAlways, RequireComponent(typeof(IndexTracker))]
     public abstract class Brain: MonoBehaviour
     {
+        private string _fileExtension;
+        protected string FileExtension
+        {
+            get
+            {
+                if (_fileExtension == null)
+                {
+                    FindCurrentParadigm();
+                }
+                return _fileExtension;
+            }
+            set
+            {
+                _fileExtension = value;
+            }
+        }
+        protected abstract HashSet<string> SupportedFileExtensions { get; }
         public bool enableBrain = true;
         public bool debug = true;
-        public bool maintainFactFile;
+        public bool maintainInputFile;
         [SerializeField, HideInInspector]
         protected List<string> _chosenSensorConfigurations;
         internal List<string> ChosenSensorConfigurations
@@ -32,31 +49,30 @@ namespace Planner
             }
         }
         [SerializeField, HideInInspector]
-        internal string ASPFilesPath;
+        internal string AIFilesPath=  @".\Assets\StreamingAssets\";
         [SerializeField, HideInInspector]
-        internal string ASPFilesPrefix;
+        internal string AIFilesPrefix;
         [SerializeField, HideInInspector]
-        protected string _ASPFileTemplatePath;
-
+        protected string _AIFileTemplatePath;
         [SerializeField, HideInInspector]
         internal bool prefabBrain;
-        internal string ASPFileTemplatePath
+        internal string AIFileTemplatePath
         {
             get
             {
-                if (_ASPFileTemplatePath == null || !_ASPFileTemplatePath.Equals(this.GetType().Name + "Template" + ASPFilesPrefix+ ".asp"))
+                if (_AIFileTemplatePath == null || !_AIFileTemplatePath.Equals(this.GetType().Name + "Template" + AIFilesPrefix+ ".asp"))
                 {
-                    _ASPFileTemplatePath = @".\Assets\Resources\" + this.GetType().Name + "Template" + ASPFilesPrefix + ".asp";
-                    if (!File.Exists(_ASPFileTemplatePath))
+                    _AIFileTemplatePath = @".\Assets\Resources\" + this.GetType().Name + "Template" + AIFilesPrefix + ".asp";
+                    if (!File.Exists(_AIFileTemplatePath))
                     {
                         if (!Directory.Exists(@".\Assets\Resources"))
                         {
                             Directory.CreateDirectory(@".\Assets\Resources");
                         }
-                        File.Create(_ASPFileTemplatePath);
+                        File.Create(_AIFileTemplatePath);
                     }
                 }
-                return _ASPFileTemplatePath;
+                return _AIFileTemplatePath;
             }
         }
         [SerializeField, HideInInspector]
@@ -77,9 +93,9 @@ namespace Planner
             }
         }
         [SerializeField, HideInInspector]
-        internal bool specificASPFile;
+        internal bool specificAIFile;
         [SerializeField, HideInInspector]
-        internal bool globalASPFile;
+        internal bool globalAIFile;
         protected object triggerClass;
         internal readonly object toLock = new object();
         internal string sensorsMapping;
@@ -96,7 +112,7 @@ namespace Planner
             originalName = gameObject.name;
         }
 
-        protected void Start()
+        protected virtual void Start()
         {
             Utility.LoadPrefabs();
             if (Application.isPlaying && enableBrain)
@@ -105,10 +121,36 @@ namespace Planner
                 StartCoroutine(Init());
             }
         }
-        
+
+        private void FindCurrentParadigm()
+        {
+            FileExtension = "";
+            foreach (string fileName in Directory.GetFiles(Application.streamingAssetsPath))
+            {
+                string actualFileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
+                if (actualFileName.StartsWith(AIFilesPrefix))
+                {
+                    string extension = actualFileName.Substring(actualFileName.LastIndexOf(".") + 1);
+                    if (FileExtension.Equals("") && SupportedFileExtensions.Contains(extension))
+                    {
+                        FileExtension = extension;
+                    }
+                    else if (!extension.Equals(FileExtension) && SupportedFileExtensions.Contains(extension))
+                    {
+                        throw new Exception("Multiple paradigms encoding found. You should either use " + FileExtension + " or " + extension + " for " + AIFilesPrefix);
+                    }
+                }
+            }
+
+            if (FileExtension.Equals(""))
+            {
+                throw new Exception("AI files not found in Assets/StreamingAssets. Be sure to use one of the supported encoding.");
+            }
+        }
+
         protected virtual void Update()
         {
-            if (reasonerMethod == null)
+            if (Application.isPlaying &&  reasonerMethod == null)
             {
                 lock (toLock)
                 {
@@ -147,7 +189,8 @@ namespace Planner
         }
         internal virtual void GenerateFile()
         {
-            using (StreamWriter fs = File.CreateText(ASPFileTemplatePath))
+            string sensorsAsASP;
+            using (StreamWriter fs = File.CreateText(AIFileTemplatePath))
             {
                 fs.Write("%For runtime instantiated GameObject, only the prefab mapping is provided. Use that one substituting the gameobject name accordingly.\n %Sensors.\n");
                 HashSet<string> seenSensorConfNames = new HashSet<string>();
@@ -161,14 +204,20 @@ namespace Planner
                     seenSensorConfNames.Add(sensorConf.ConfigurationName);
                     foreach (MyListString property in sensorConf.ToMapProperties)
                     {
-                        fs.Write(MapperManager.GetASPTemplate(sensorConf.ConfigurationName, sensorConf.gameObject, property, true));
+                        sensorsAsASP= MapperManager.GetASPTemplate(sensorConf.ConfigurationName, sensorConf.gameObject, property, true);
+                        fs.Write(ActualSensorEncoding(sensorsAsASP));
                     }
                 }
+                fs.Write(SpecificFileParts());
             }
         }
+
+        protected abstract string SpecificFileParts();
+        internal abstract string ActualSensorEncoding(string sensorsAsASP);
+
         protected virtual IEnumerator Init()
         {
-            if (specificASPFile && originalName.Equals(gameObject.name))
+            if (specificAIFile && originalName.Equals(gameObject.name))
             {
                 yield return new WaitUntil(() => !originalName.Equals(gameObject.name));
             }

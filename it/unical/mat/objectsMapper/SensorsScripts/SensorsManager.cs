@@ -267,7 +267,7 @@ public  class SensorsManager : MonoBehaviour
                 foreach (MonoBehaviourSensor sensor in sensors)
                 {
                     //UnityEngine.Debug.Log(sensor +" "+ sensor.Map());
-                    mapping += sensor.Map();
+                    mapping += brain.ActualSensorEncoding(sensor.Map());
                 }
                 watch.Stop();
                 brain.sensorsMapping = mapping;

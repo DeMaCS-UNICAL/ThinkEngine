@@ -26,14 +26,7 @@ namespace Editors
             base.Reset();
             methodsToShow = Utility.TriggerMethodsToShow;
             methodsToShow.Add("Always");
-            if (((ActuatorConfiguration)target).applyMethod is null)
-            {
-                chosenMethod = methodsToShow.Count - 1;
-            }
-            else
-            {
-                chosenMethod = Utility.GetTriggerMethodIndex(((ActuatorConfiguration)target).applyMethod.Name);
-            }
+            chosenMethod = Utility.GetTriggerMethodIndex(((ActuatorConfiguration)target).MethodToApply);
         }
         public override void OnInspectorGUI()
         {
@@ -49,14 +42,7 @@ namespace Editors
             EditorGUILayout.LabelField("Choose when to apply the reasoner actions");
             chosenMethod = EditorGUILayout.Popup(chosenMethod, methodsToShow.ToArray());
             EditorGUILayout.EndHorizontal();
-            if (chosenMethod == methodsToShow.Count - 1)
-            {
-                ((ActuatorConfiguration)target).applyMethod = null;
-            }
-            else
-            {
-                ((ActuatorConfiguration)target).applyMethod = Utility.GetTriggerMethod(chosenMethod);
-            }
+            ((ActuatorConfiguration)target).MethodToApply = methodsToShow[chosenMethod];
             serializedObject.ApplyModifiedProperties();
             base.OnInspectorGUI();
         }

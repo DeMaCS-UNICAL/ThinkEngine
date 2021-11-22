@@ -347,7 +347,8 @@ internal class ActuatorsManager : MonoBehaviour
             {
                 if (InstantiatedActuators[brain].Contains(configuration.ConfigurationName))
                 {
-                    toReturn += "objectIndex(" + NewASPMapperHelper.AspFormat(configuration.ConfigurationName) + "," + configuration.GetComponent<IndexTracker>().CurrentIndex + ")." + Environment.NewLine;
+                    string currentIndex = "objectIndex(" + NewASPMapperHelper.AspFormat(configuration.ConfigurationName) + "," + configuration.GetComponent<IndexTracker>().CurrentIndex + ")." + Environment.NewLine;
+                    toReturn += brain.ActualActuatorEncoding(currentIndex);
                 }
             }
         }

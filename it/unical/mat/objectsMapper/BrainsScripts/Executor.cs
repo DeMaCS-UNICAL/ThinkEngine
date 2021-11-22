@@ -1,7 +1,5 @@
 ﻿using it.unical.mat.embasp.@base;
 using it.unical.mat.embasp.languages.asp;
-using it.unical.mat.embasp.platforms.desktop;
-using it.unical.mat.embasp.specializations.dlv2.desktop;
 using Planner;
 using System;
 using System.Collections.Generic;
@@ -21,6 +19,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         protected string factsPath;
         protected readonly Stopwatch stopwatch = new Stopwatch();
         internal bool reason;
+        InputProgram encoding;
         internal virtual void Run()
         {
             if (!Directory.Exists(Path.GetTempPath() + @"ThinkEngineFacts\"))
@@ -31,11 +30,11 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 
             while (reason)
             {
-                InputProgram encoding = new ASPInputProgram();
+                encoding = GetProgramInstance();
                 foreach (string fileName in Directory.GetFiles(Application.streamingAssetsPath))
                 {
                     string actualFileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
-                    if (actualFileName.StartsWith(brain.ASPFilesPrefix) && actualFileName.EndsWith(".asp"))
+                    if (actualFileName.StartsWith(brain.AIFilesPrefix) && actualFileName.EndsWith(GetCurrentFileExtension()))
                     {
                         encoding.AddFilesPath(fileName);
                     }
@@ -75,11 +74,11 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     factsPath = Path.GetTempPath() + @"ThinkEngineFacts\" + Path.GetRandomFileName() + ".txt";
                     using (StreamWriter fs = new StreamWriter(factsPath, true))
                     {
-                        SpecificFactsWriting(brain,fs);
+                        SpecificFactsWriting(brain, fs);
                         fs.Write(brain.sensorsMapping);
                         fs.Close();
                     }
-                    Handler handler = new DesktopHandler(new DLV2DesktopService(Path.Combine(Application.streamingAssetsPath, @"lib\dlv2.exe")));
+                    Handler handler = GetHandler();
                     InputProgram facts = new ASPInputProgram();
                     facts.AddFilesPath(factsPath);
                     handler.AddProgram(encoding);
@@ -95,13 +94,9 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     {
                         UnityEngine.Debug.LogError(o.ErrorsString + " " + o.OutputString);
                     }
-                    AnswerSets answers = (AnswerSets)o;
-                    stopwatch.Stop();
-                    if (answers.Answersets.Count > 0)
-                    {
-                        SpecificAnswerSetOperations(answers);
-                    }
-                    if (!brain.maintainFactFile)
+
+                    OutputParsing(o);
+                    if (!brain.maintainInputFile)
                     {
                         File.Delete(factsPath);
                     }
@@ -119,7 +114,12 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 
         }
 
-        protected abstract void SpecificAnswerSetOperations(AnswerSets answers);
+        protected abstract void OutputParsing(Output o);
+
+        protected abstract Handler GetHandler();
+
+        protected abstract string GetCurrentFileExtension();
+        protected abstract InputProgram GetProgramInstance();
         protected abstract void SpecificFactsWriting(Brain brain, StreamWriter fs);
         protected abstract bool SpecificFactsRetrieving(Brain brain);
         protected abstract void SpecificOptions(Handler handler);

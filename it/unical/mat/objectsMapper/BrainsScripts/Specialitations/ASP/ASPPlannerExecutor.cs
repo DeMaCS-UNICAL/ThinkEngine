@@ -11,10 +11,10 @@ using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 
 namespace Planner
 {
-    class PlannerExecutor : Executor
+    class ASPPlannerExecutor : ASPExecutor
     {
 
-        public PlannerExecutor(PlannerBrain plannerBrain)
+        public ASPPlannerExecutor(PlannerBrain plannerBrain)
         {
             brain = plannerBrain;
         }
@@ -23,11 +23,11 @@ namespace Planner
         {
             if (answers.GetOptimalAnswerSets().Count > 0)
             {
-                ((PlannerBrain)brain).AnswerSetAvailable(answers.GetOptimalAnswerSets()[0]);
+                ((PlannerBrain)brain).PlanAvailable(answers.GetOptimalAnswerSets()[0]);
             }
             else
             {
-                ((PlannerBrain)brain).AnswerSetAvailable(answers.answersets[0]);
+                ((PlannerBrain)brain).PlanAvailable(answers.answersets[0]);
             }
         }
 
