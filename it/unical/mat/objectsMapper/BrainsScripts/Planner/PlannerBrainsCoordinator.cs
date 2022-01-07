@@ -11,7 +11,7 @@ namespace Planner
     {
         private Scheduler scheduler;
         private int priorityExecuting;
-        private PlannerBrain waiting;
+        private SortedDictionary<int, Plan> plannersLastPlan;
         internal void SetPriority(int previousPriority, int newPriority, PlannerBrain brain)
         {
             if(!ValidPriority(newPriority))
@@ -46,15 +46,38 @@ namespace Planner
 
         internal void PlanReady(PlannerBrain brain)
         {
-            if (priorityExecuting < brain.Priority)
+            if (priorityExecuting >= brain.Priority)
             {
                 priorityExecuting = brain.Priority;
+                if (plannersLastPlan.ContainsKey(brain.Priority))
+                {
+                    plannersLastPlan.Remove(brain.Priority);
+                }
                 scheduler.NewPlan(brain.GetPlan());
             }
+            else
+            {
+                plannersLastPlan[brain.Priority] = brain.GetPlan();
+            }
         }
+
+        internal void SchedulerIsWaiting()
+        {
+            priorityExecuting = NumberOfBrains();
+            if (plannersLastPlan.Count != 0)
+            {
+                KeyValuePair<int, Plan> toExecute = plannersLastPlan.Last();
+                scheduler.NewPlan(toExecute.Value);
+                plannersLastPlan.Remove(toExecute.Key);
+                priorityExecuting = toExecute.Key;
+            }
+        }
+
         void Start()
         {
             scheduler = GetComponent<Scheduler>();
+            priorityExecuting = NumberOfBrains();
+            plannersLastPlan = new SortedDictionary<int, Plan>();
         }
         
 

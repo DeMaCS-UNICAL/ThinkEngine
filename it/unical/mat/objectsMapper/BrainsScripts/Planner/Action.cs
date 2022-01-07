@@ -10,7 +10,7 @@ namespace Planner
     public abstract class Action : ScriptableObject, IComparable<Action>
     {
         public int order;
-        public abstract bool Prerequisite();
+        public abstract State Prerequisite();
         public abstract void Do();
         public abstract bool Done();
 
@@ -19,4 +19,5 @@ namespace Planner
             return order.CompareTo(other.order);
         }
     }
+    public enum State { READY, WAIT, ABORT};
 }

@@ -11,70 +11,40 @@ namespace Planner
 
     internal class Scheduler : MonoBehaviour
     {
-        Queue<Action> plan;
-
-        public bool IsWaiting { get; internal set; }
-
-            
-        internal void CleanPlan()
-        {
-            plan = new Queue<Action>();
-            StopCoroutine(ApplyPlan());
-        }
-
-        internal void NewPlan(List<Action> actions)
-        {
-            CleanPlan();
-            for (int i = 0; i < actions.Count; i++)
+        Plan currentPlan;
+        private bool _isWaiting;
+        public bool IsWaiting {
+            get
             {
-                AppendAction(actions[i]);
+                return _isWaiting;
             }
-            StartCoroutine(ApplyPlan());
-        }
-
-        internal void AppendAction(Action action)
-        {
-            plan.Enqueue(action);
-        }
-
-        internal void AppendPlan(List<Action> actions)
-        {
-            for (int i = 0; i < actions.Count; i++)
+            internal set
             {
-                plan.Enqueue(actions[i]);
-            }
-        }
-
-        private bool ActionAvailable()
-        {
-            return plan.Count > 0;
-        }
-            
-        private Action NextAction()
-        {
-            if (ActionAvailable())
-            {
-                return plan.Dequeue();
-            }
-            return null;
-        }
-          
-        private IEnumerator ApplyPlan()
-        {
-            while (true)
-            {
-                yield return new WaitUntil(()=>ActionAvailable());
-                Action next = NextAction();
-                IsWaiting = !ActionAvailable();
-                if(next == null)
+                _isWaiting = value;
+                if (_isWaiting)
                 {
-                    continue;
+                    GetComponent<PlannerBrainsCoordinator>().SchedulerIsWaiting();
                 }
-                yield return new WaitUntil(()=>next.Prerequisite());
-                next.Do();
-                yield return new WaitUntil(()=>next.Done());
             }
         }
 
+
+        internal void NewPlan(Plan plan)
+        {
+            if(currentPlan!=null && currentPlan.IsExecuting)
+            {
+                if (plan.IsExecutable())
+                {
+                    StopCoroutine(currentPlan.ApplyPlan(this));
+                }
+                else
+                {
+                    return;
+                }
+            }
+            currentPlan = plan;
+            StartCoroutine(currentPlan.ApplyPlan(this));
+            IsWaiting = false;
+        }
     }
 }

@@ -25,10 +25,9 @@ namespace Planner
             }
         }
 
-       
         [SerializeField,HideInInspector]
         private int _priority=-1;
-        List<Action> plan;
+        Plan plan;
         [HideInInspector]
         public int Priority
         {
@@ -64,9 +63,9 @@ namespace Planner
             planner.NewPlanAvailable(plan);
         }
 
-        internal List<Action> GetPlan()
+        internal Plan GetPlan()
         {
-            return plan?? new List<Action>();
+            return plan?? new Plan();
         }
 
         void Reset()
@@ -108,7 +107,7 @@ namespace Planner
                 if (planner.IsNewPlanAvailable())
                 {
                     plan = planner.GetNewPlan();
-                    if (plan!=null && plan.Count != 0)
+                    if (plan!=null)
                     {
                         Coordinator.PlanReady(this);
                     }

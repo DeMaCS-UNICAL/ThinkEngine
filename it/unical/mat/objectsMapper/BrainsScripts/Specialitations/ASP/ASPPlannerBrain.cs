@@ -13,7 +13,7 @@ namespace Planner
 {
     class ASPPlannerBrain:IActualPlannerBrain
     {
-        List<Action> plan;
+        Plan plan;
         private bool answerSetAvailable;
         private AnswerSet currentAnswerSet;
         private Dictionary<int, Action> _actions;
@@ -122,7 +122,7 @@ namespace Planner
                 ActionParameters[order] = new List<KeyValuePair<string, string>>();
             }
         }
-        internal List<Action> GetPlan()
+        internal Plan GetPlan()
         {
             return plan;
         }
@@ -132,15 +132,15 @@ namespace Planner
             return answerSetAvailable;
         }
 
-        public List<Action> GetNewPlan()
+        public Plan GetNewPlan()
         {
             if (answerSetAvailable)
             {
                 answerSetAvailable = false;
-                plan = Parse(currentAnswerSet);
+                plan = new Plan(Parse(currentAnswerSet));
                 return GetPlan();
             }
-            return new List<Action>();
+            return new Plan();
         }
 
         public ASPExecutor GetPlannerExecutor(PlannerBrain plannerBrain)
