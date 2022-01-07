@@ -66,6 +66,12 @@ namespace Planner
             }
             return true;
         }
+
+        internal bool IsReadyToExecute()
+        {
+            return HasExecutableAction();
+        }
+
         internal IEnumerator ApplyPlan(Scheduler scheduler)
         {
             Debug.Log("Applying plan");

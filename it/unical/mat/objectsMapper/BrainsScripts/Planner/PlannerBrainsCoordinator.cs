@@ -46,14 +46,22 @@ namespace Planner
 
         internal void PlanReady(PlannerBrain brain)
         {
-            if (priorityExecuting >= brain.Priority)
+            if (priorityExecuting > brain.Priority || (priorityExecuting == brain.Priority && brain.GetPlan().IsReadyToExecute()))
             {
                 priorityExecuting = brain.Priority;
-                if (plannersLastPlan.ContainsKey(brain.Priority))
+                
+                bool used = scheduler.NewPlan(brain.GetPlan());
+                if (used)
                 {
-                    plannersLastPlan.Remove(brain.Priority);
+                    if (plannersLastPlan.ContainsKey(brain.Priority))
+                    {
+                        plannersLastPlan.Remove(brain.Priority);
+                    }
                 }
-                scheduler.NewPlan(brain.GetPlan());
+                else
+                {
+                    plannersLastPlan[brain.Priority] = brain.GetPlan();
+                }
             }
             else
             {

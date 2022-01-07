@@ -29,22 +29,23 @@ namespace Planner
         }
 
 
-        internal void NewPlan(Plan plan)
+        internal bool NewPlan(Plan plan)
         {
             if(currentPlan!=null && currentPlan.IsExecuting)
             {
-                if (plan.IsExecutable())
+                if (plan.IsReadyToExecute())
                 {
                     StopCoroutine(currentPlan.ApplyPlan(this));
                 }
                 else
                 {
-                    return;
+                    return false;
                 }
             }
             currentPlan = plan;
             StartCoroutine(currentPlan.ApplyPlan(this));
             IsWaiting = false;
+            return true;
         }
     }
 }
