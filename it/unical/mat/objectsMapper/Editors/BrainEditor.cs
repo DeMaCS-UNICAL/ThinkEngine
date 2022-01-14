@@ -160,7 +160,8 @@ namespace Editors
         }
         protected void GenerateAITemplateFileButton()
         {
-            if (GUILayout.Button("Generate ASP file template", GUILayout.Width(300)))
+            string paradigm = brainTarget.FileExtension.Equals("") ? "ASP-like" : brainTarget.FileExtension.ToUpper();
+            if (GUILayout.Button("Generate "+paradigm+" file template", GUILayout.Width(300)))
             {
                 brainTarget.GenerateFile();
             }

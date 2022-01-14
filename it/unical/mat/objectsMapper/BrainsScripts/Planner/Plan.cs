@@ -74,7 +74,6 @@ namespace Planner
 
         internal IEnumerator ApplyPlan(Scheduler scheduler)
         {
-            Debug.Log("Applying plan");
             if (actions.Count == 0)
             {
                 scheduler.IsWaiting = true;

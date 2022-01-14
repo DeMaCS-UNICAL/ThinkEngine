@@ -16,19 +16,19 @@ namespace Planner
     public abstract class Brain: MonoBehaviour
     {
         private string _fileExtension;
-        protected string FileExtension
+        internal string FileExtension
         {
             get
             {
                 if (_fileExtension == null)
                 {
                     FindCurrentParadigm();
+                    if (_fileExtension == null)
+                    {
+                        return "";
+                    }
                 }
                 return _fileExtension;
-            }
-            set
-            {
-                _fileExtension = value;
             }
         }
         protected abstract HashSet<string> SupportedFileExtensions { get; }
@@ -124,7 +124,11 @@ namespace Planner
 
         private void FindCurrentParadigm()
         {
-            FileExtension = "";
+            if (AIFilesPrefix == null)
+            {
+                return;
+            }
+            _fileExtension = "";
             foreach (string fileName in Directory.GetFiles(Application.streamingAssetsPath))
             {
                 string actualFileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
@@ -133,7 +137,7 @@ namespace Planner
                     string extension = actualFileName.Substring(actualFileName.LastIndexOf(".") + 1);
                     if (FileExtension.Equals("") && SupportedFileExtensions.Contains(extension))
                     {
-                        FileExtension = extension;
+                        _fileExtension = extension;
                     }
                     else if (!extension.Equals(FileExtension) && SupportedFileExtensions.Contains(extension))
                     {
@@ -144,7 +148,7 @@ namespace Planner
 
             if (FileExtension.Equals(""))
             {
-                throw new Exception("AI files not found in Assets/StreamingAssets. Be sure to use one of the supported encoding.");
+                _fileExtension = null;
             }
         }
 

@@ -50,7 +50,21 @@ namespace Planner
                 }
             }
         }
-        IActualPlannerBrain planner;
+        IActualPlannerBrain _planner;
+        IActualPlannerBrain Planner
+        {
+            get
+            {
+                if (_planner == null)
+                {
+                    if (FileExtension.Equals("asp"))
+                    {
+                        _planner = new ASPPlannerBrain();
+                    }
+                }
+                return _planner;
+            }
+        }
         protected override HashSet<string> SupportedFileExtensions
         {
             get
@@ -60,7 +74,7 @@ namespace Planner
         }
         internal void PlanAvailable(object plan)
         {
-            planner.NewPlanAvailable(plan);
+            Planner.NewPlanAvailable(plan);
         }
 
         internal Plan GetPlan()
@@ -75,20 +89,12 @@ namespace Planner
                 Priority = GetComponents<PlannerBrain>().Count() - 1;
             }
         }
-        protected override void  Start()
-        {
-            if (FileExtension.Equals("asp"))
-            {
-                planner = new ASPPlannerBrain();
-            }
-            base.Start();
-        }
         protected override IEnumerator Init()
         {
-            if (planner != null)
+            if (Planner != null)
             {
                 yield return StartCoroutine(base.Init());
-                executor = planner.GetPlannerExecutor(this);
+                executor = Planner.GetPlannerExecutor(this);
                 string GOname = gameObject.name;
                 executionThread = new Thread(() =>
                 {
@@ -101,12 +107,12 @@ namespace Planner
         }
         protected override void Update()
         {
-            if (Application.isPlaying && planner!=null)
+            if (Application.isPlaying && Planner!=null)
             {
                 base.Update();
-                if (planner.IsNewPlanAvailable())
+                if (Planner.IsNewPlanAvailable())
                 {
-                    plan = planner.GetNewPlan();
+                    plan = Planner.GetNewPlan();
                     if (plan!=null)
                     {
                         Coordinator.PlanReady(this);
@@ -122,12 +128,21 @@ namespace Planner
 
         internal override string ActualSensorEncoding(string sensorsAsASP)
         {
-            return planner.ActualSensorEncoding(sensorsAsASP);
+            if (Planner != null)
+            {
+                return Planner.ActualSensorEncoding(sensorsAsASP);
+            }
+            return sensorsAsASP;
         }
 
         protected override string SpecificFileParts()
         {
-            return planner.SpecificFileParts();
+            if (Planner != null)
+            {
+                return Planner.SpecificFileParts();
+            }
+            string toReturn = "%For ASP programs:\n" + (new ASPPlannerBrain()).SpecificFileParts();
+            return toReturn;
         }
     }
 }
