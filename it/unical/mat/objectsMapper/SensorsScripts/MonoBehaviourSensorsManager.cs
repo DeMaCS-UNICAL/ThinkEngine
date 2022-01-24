@@ -44,7 +44,10 @@ class MonoBehaviourSensorsManager:MonoBehaviour
                 };
                 instantiationInformationForProperty[propertyIndex]= information;
                 monoBehaviourSensorsForProperty[propertyIndex] = MapperManager.InstantiateSensors(information);
-                Sensors[configuration].AddRange(monoBehaviourSensorsForProperty[propertyIndex].GetSensorsList());
+                if (monoBehaviourSensorsForProperty[propertyIndex] != null)
+                {
+                    Sensors[configuration].AddRange(monoBehaviourSensorsForProperty[propertyIndex].GetSensorsList());
+                }
             }
         }
         ready = true;
@@ -61,7 +64,10 @@ class MonoBehaviourSensorsManager:MonoBehaviour
             ISensors sensors = monoBehaviourSensorsForProperty[propertyIndex];
             InformationRefresh(propertyIndex);
             monoBehaviourSensorsForProperty[propertyIndex] = MapperManager.ManageSensors(instantiationInformationForProperty[propertyIndex], sensors);
-            Sensors[(SensorConfiguration) instantiationInformationForProperty[propertyIndex].configuration].AddRange(monoBehaviourSensorsForProperty[propertyIndex].GetSensorsList());
+            if (monoBehaviourSensorsForProperty[propertyIndex] != null)
+            {
+                Sensors[(SensorConfiguration)instantiationInformationForProperty[propertyIndex].configuration].AddRange(monoBehaviourSensorsForProperty[propertyIndex].GetSensorsList());
+            }
         }
     }
 

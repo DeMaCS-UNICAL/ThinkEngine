@@ -14,9 +14,12 @@ namespace Editors
         SensorConfiguration sensorConfiguration;
         void OnDestroy()
         {
-            if (target == null && go!=null)
+            if (!Application.isPlaying && target == null && go!=null)
             {
-                DestroyImmediate(go.GetComponent<MonoBehaviourSensorsManager>());
+                if (go.GetComponent<SensorConfiguration>() == null)
+                {
+                    DestroyImmediate(go.GetComponent<MonoBehaviourSensorsManager>());
+                }
             }
         }
         protected override void SpecificFields(MyListString property)

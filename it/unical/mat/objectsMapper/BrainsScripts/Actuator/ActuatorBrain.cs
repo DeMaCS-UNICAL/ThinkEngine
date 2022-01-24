@@ -83,7 +83,11 @@ public class ActuatorBrain :Brain
 
     internal string ActualActuatorEncoding(string actuatorMappingAsASP)
     {
-        return actuatorBrain.ActualActuatorEncoding(actuatorMappingAsASP);
+        if (actuatorBrain != null)
+        {
+            return actuatorBrain.ActualActuatorEncoding(actuatorMappingAsASP);
+        }
+        return actuatorMappingAsASP;
     }
     protected override void Start()
     {
@@ -126,7 +130,11 @@ public class ActuatorBrain :Brain
 
     internal override string ActualSensorEncoding(string sensorsAsASP)
     {
-        return actuatorBrain.ActualSensorEncoding(sensorsAsASP);
+        if (actuatorBrain != null)
+        {
+            return actuatorBrain.ActualSensorEncoding(sensorsAsASP);
+        }
+        return sensorsAsASP;
     }
 }
 

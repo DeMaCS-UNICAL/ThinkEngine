@@ -75,7 +75,7 @@ namespace Planner
                 {
                     foreach (KeyValuePair<string, string> parameter in ActionParameters[order])
                     {
-                        PropertyInfo property = Actions[order].GetType().GetProperty(parameter.Key);
+                        PropertyInfo property = Actions[order].GetType().GetProperty(parameter.Key);/// tutti i tipi di property!
                         if (property != null)
                         {
                             Type propertyType = property.PropertyType;
@@ -167,7 +167,7 @@ namespace Planner
             string toReturn = "";
             toReturn += "% Predicates for Action invokation.\n";
             toReturn += "% applyAction(OrderOfExecution,ActionClassName).\n";
-            toReturn += "% actionArguments(OrderOfExecution,ArgumentName, ArgumentValue).\n";
+            toReturn += "% actionArgument(ActionOrder,ArgumentName, ArgumentValue).\n";
             return toReturn;
         }
     }
