@@ -28,7 +28,7 @@ namespace Mappers
         private ASPBoolMapper() 
         {
             _operationList = new List<Operation>() { Newest, Oldest, Specific_Value, Conjunction, Disjunction };
-            _supportedTypes = new List<Type> { typeof(bool) };
+            _supportedTypes = new List<Type> { typeof(bool), typeof(Boolean) };
             _convertingType = typeof(bool);
         }
         #endregion

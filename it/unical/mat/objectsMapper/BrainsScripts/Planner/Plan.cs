@@ -7,6 +7,7 @@ namespace Planner
 {
     internal class Plan
     {
+        static int counter = 0;
         private List<Action> actions;
         private bool _isExecuting;
         internal bool IsExecuting
@@ -74,6 +75,7 @@ namespace Planner
 
         internal IEnumerator ApplyPlan(Scheduler scheduler)
         {
+            counter++;
             if (actions.Count == 0)
             {
                 scheduler.IsWaiting = true;

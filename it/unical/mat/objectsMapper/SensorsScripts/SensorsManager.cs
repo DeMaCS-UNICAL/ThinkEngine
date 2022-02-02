@@ -1,18 +1,27 @@
 ﻿using Planner;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 [ExecuteInEditMode]
 public  class SensorsManager : MonoBehaviour
 {
+    private const int MAX_SENSORS_PER_FRAME = 20;
+    private const int MIN_AVG_FPS = 60;
+    private const int MIN_CURRENT_FPS = 20;
+    private const int MAX_AVG_FPS = 70;
+    private const int MAX_CURRENT_FPS = 40;
+    private static int MAX_MS = 5;
     private static Dictionary<Brain, List<string>> _instantiatedSensors;
     private static ConcurrentQueue<KeyValuePair<Brain,object>> _requestedMappings;
-    internal static int updateFrequencyInFrames=12;
+    public static int updateFrequencyInFrames=12;
     internal static bool _configurationsChanged;
     internal static float avgFps = 0;
     internal static float bestAvgFps = 0;
@@ -23,6 +32,7 @@ public  class SensorsManager : MonoBehaviour
     internal static float lastUpdateFPS;
     private static bool uncompletedTasks;
     internal static bool destroyed;
+    internal static float currentFps;
     private static Dictionary<Brain, List<string>> InstantiatedSensors
     {
         get
@@ -34,7 +44,6 @@ public  class SensorsManager : MonoBehaviour
             return _instantiatedSensors;
         }
     }
-
     internal bool IsConfigurationNameValid(string name, SensorConfiguration newSensorConfiguration)
     {
 #if UNITY_EDITOR
@@ -45,7 +54,7 @@ public  class SensorsManager : MonoBehaviour
         }
         foreach (MonoBehaviourSensorsManager manager in Resources.FindObjectsOfTypeAll<MonoBehaviourSensorsManager>())
         {
-            if (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(newSensorConfiguration.gameObject) != null)
+            if (PrefabStageUtility.GetPrefabStage(newSensorConfiguration.gameObject) != null)
             {
                 GameObject managerPrefab = PrefabUtility.GetCorrespondingObjectFromSource(manager.gameObject);
                 if (managerPrefab != null && newSensorConfiguration.gameObject.Equals(managerPrefab))
@@ -115,13 +124,6 @@ public  class SensorsManager : MonoBehaviour
             }
         }
     }
-    void Start()
-    {
-        if (Application.isPlaying)
-        {
-            Reset();
-        }
-    }
     void Update()
     {
         if (Application.isPlaying)
@@ -130,24 +132,71 @@ public  class SensorsManager : MonoBehaviour
             frameCount++;
             float currentFps = 1f / Time.unscaledDeltaTime;
             avgFps = (avgFps * (frameCount - 1) + currentFps) / frameCount;
-            if (bestAvgFps < avgFps)
+            if((avgFps< MIN_AVG_FPS || currentFps < MIN_CURRENT_FPS) && MAX_MS>1)
             {
-                bestAvgFps = avgFps;
+                MAX_MS--;
             }
-            if (frameFromLastUpdate > updateFrequencyInFrames)
+            else if(avgFps> MAX_AVG_FPS && currentFps> MAX_CURRENT_FPS)
             {
-                frameFromLastUpdate = -1;
-                Performance.updatedSensors = true;
-                lastUpdateFPS = currentFps;
+                MAX_MS++;
             }
-            updateScaleFactor = (bestAvgFps - avgFps) / bestAvgFps * 10;
-            numberOfLiveSensor = FindObjectsOfType<MonoBehaviourSensor>().Length;
-            updateFrequencyInFrames = (int)(numberOfLiveSensor / lastUpdateFPS);
-            updateFrequencyInFrames += (int)Math.Ceiling(updateFrequencyInFrames * updateScaleFactor);
-            updateFrequencyInFrames = Math.Max(1, updateFrequencyInFrames);
-            ReturnSensorsMappings();// here is safe since the sensors are updated in the LateUpdate
         }
     }
+    void Start()
+    {
+        if (Application.isPlaying)
+        {
+            Reset();
+            StartCoroutine(SensorsUpdate());
+        }
+    }
+    MonoBehaviourSensorsManager[] RetrieveSensorsManagers()
+    {
+        return FindObjectsOfType<MonoBehaviourSensorsManager>();
+    }
+    IEnumerator SensorsUpdate()
+    {
+        Stopwatch watch = new Stopwatch();
+        while (true)
+        {
+            MonoBehaviourSensorsManager[] managers = RetrieveSensorsManagers();
+            foreach (MonoBehaviourSensorsManager manager in managers)
+            {
+                watch.Start();
+                if (manager != null)
+                {
+                    manager.ManageSensors();
+                    if (watch.ElapsedMilliseconds > MAX_MS)
+                    {
+                        watch.Reset();
+                        yield return null;
+                        watch.Start();
+                    }
+                    foreach (List<MonoBehaviourSensor> sensorsList in manager.Sensors.Values)
+                    {
+                        foreach (MonoBehaviourSensor sensor in sensorsList)
+                        {
+                            if (sensor != null)
+                            {
+                                sensor.UpdateValue();
+                            }
+                            if (watch.ElapsedMilliseconds > MAX_MS)
+                            {
+                                watch.Reset();
+                                yield return null;
+                                watch.Start();
+                            }
+                        }
+                    }
+                }
+            }
+            watch.Reset();
+            yield return null;
+            StartCoroutine(ReturnSensorsMappings());
+        }
+    }
+
+
     void OnApplicationQuit()
     {
         destroyed = true;
@@ -192,7 +241,7 @@ public  class SensorsManager : MonoBehaviour
             foreach (MonoBehaviourSensorsManager manager in Resources.FindObjectsOfTypeAll<MonoBehaviourSensorsManager>())
             {
 #if UNITY_EDITOR
-                if (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(manager.gameObject)!=null)
+                if (PrefabStageUtility.GetPrefabStage(manager.gameObject)!=null)
                 {
                     continue;
                 }
@@ -246,12 +295,8 @@ public  class SensorsManager : MonoBehaviour
             Monitor.Wait(toLock);
         }
     }
-    internal static void ReturnSensorsMappings()
+    internal static IEnumerator ReturnSensorsMappings()
     {
-        if (frameFromLastUpdate !=-1 && !uncompletedTasks)
-        {
-            return;
-        }
         int count = 0;
         while (RequestedMappings.TryDequeue(out KeyValuePair<Brain, object> currentPair) && count<5)
         {
@@ -266,10 +311,18 @@ public  class SensorsManager : MonoBehaviour
                 watch.Start();
                 foreach (MonoBehaviourSensor sensor in sensors)
                 {
-                    //UnityEngine.Debug.Log(sensor +" "+ sensor.Map());
-                    mapping += brain.ActualSensorEncoding(sensor.Map());
+                    if (watch.ElapsedMilliseconds > MAX_MS)
+                    {
+                        watch.Reset();
+                        yield return null;
+                        watch.Start();
+                    }
+                    if (sensor != null)
+                    {
+                        //UnityEngine.Debug.Log(sensor +" "+ sensor.Map());
+                        mapping += brain.ActualSensorEncoding(sensor.Map());
+                    }
                 }
-                watch.Stop();
                 brain.sensorsMapping = mapping;
                 Monitor.Pulse(toLock);
             }
@@ -290,7 +343,7 @@ public  class SensorsManager : MonoBehaviour
         {
             foreach (MonoBehaviourSensorsManager monobehaviourManager in FindObjectsOfType<MonoBehaviourSensorsManager>())
             {
-                if (!monobehaviourManager.ready)
+                if (monobehaviourManager== null || !monobehaviourManager.ready)
                 {
                     continue;
                 }

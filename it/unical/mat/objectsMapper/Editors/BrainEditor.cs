@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace Editors
@@ -161,10 +162,16 @@ namespace Editors
         protected void GenerateAITemplateFileButton()
         {
             string paradigm = brainTarget.FileExtension.Equals("") ? "ASP-like" : brainTarget.FileExtension.ToUpper();
-            if (GUILayout.Button("Generate "+paradigm+" file template", GUILayout.Width(300)))
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Generate "+paradigm+" file template", GUILayout.Width(200)))
             {
                 brainTarget.GenerateFile();
             }
+            if (GUILayout.Button("Show in explorer"))
+            {
+                EditorUtility.RevealInFinder(brainTarget.AIFileTemplatePath);
+            }
+            EditorGUILayout.EndHorizontal();
             EditorGUILayout.HelpBox("Generating a new file will delete the previouse template!", MessageType.Warning);
         }
         protected void ChooseReasonerTriggerMethod()

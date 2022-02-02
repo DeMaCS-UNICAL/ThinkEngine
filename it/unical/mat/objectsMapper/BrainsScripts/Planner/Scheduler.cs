@@ -13,6 +13,7 @@ namespace Planner
     {
         Plan currentPlan;
         private bool _isWaiting;
+        Coroutine currentCoroutine;
         public bool IsWaiting {
             get
             {
@@ -35,15 +36,16 @@ namespace Planner
             {
                 if (plan.IsReadyToExecute())
                 {
-                    StopCoroutine(currentPlan.ApplyPlan(this));
+                    StopCoroutine(currentCoroutine);
                 }
                 else
                 {
                     return false;
                 }
             }
+            
             currentPlan = plan;
-            StartCoroutine(currentPlan.ApplyPlan(this));
+            currentCoroutine = StartCoroutine(currentPlan.ApplyPlan(this));
             IsWaiting = false;
             return true;
         }

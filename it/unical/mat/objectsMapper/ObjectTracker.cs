@@ -87,7 +87,7 @@ internal class ObjectTracker
             derivedProperties.Add(memberIndex, RetrieveObjectProperties(propertiesValue[memberIndex], memberName));
             return true;
         }
-        else if (propertiesType.ContainsKey(memberIndex))
+        if (propertiesType.ContainsKey(memberIndex))
         {
             derivedProperties.Add(memberIndex, RetrieveTypeProperties(propertiesType[memberIndex], memberName));
             return true;

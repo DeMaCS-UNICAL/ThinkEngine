@@ -1,6 +1,7 @@
 ﻿using Mappers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(IndexTracker))]
@@ -40,24 +41,26 @@ class MonoBehaviourSensor : MonoBehaviour
         this._mapping = NewASPMapperHelper.AspFormat(configurationName)+"("+NewASPMapperHelper.AspFormat(gameObject.name)+",objectIndex("+index+"),"+mapping+")."+Environment.NewLine;
         ready = true;
     }
-    void Update()
-    {
-    }
-    void LateUpdate()
+    internal void UpdateValue()
     {
         if (!ready)
         {
             return;
         }
-        if (SensorsManager.frameFromLastUpdate >= SensorsManager.updateFrequencyInFrames)
-        {
-            MapperManager.UpdateSensor(this, gameObject, new MyListString(property.myStrings), 0);
-        }
+        MapperManager.UpdateSensor(this, gameObject, new MyListString(property.myStrings), 0);
     }
 
     internal string Map()
     {
-        return MapperManager.GetSensorBasicMap(this, gameObject, new MyListString(property.myStrings), new List<object>(), 0);
+        List<object> values = new List<object>();
+        for(int i=0; i<PropertyInfo.Count;i++)
+        {
+
+            object toAdd = PropertyInfo[i].GetValuesForPlaceholders();
+            values.Add(toAdd);
+        }
+        //return MapperManager.GetSensorBasicMap(this, gameObject, new MyListString(property.myStrings), new List<object>(), 0);
+        return string.Format(Mapping, values.ToArray());
     }
     void OnDisable()
     {

@@ -74,8 +74,8 @@ internal abstract class AbstractConfiguration : MonoBehaviour
     internal virtual void Clear()
     {
         _objectTracker = new ObjectTracker(gameObject);
-        ConfigurationName = GetAutoConfigurationName();
         SavedProperties = new List<MyListString>();
+        ToMapProperties = new List<MyListString>();
     }
     internal bool IsPropertySelected(MyListString property)
     {

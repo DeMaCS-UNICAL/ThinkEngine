@@ -8,6 +8,7 @@ class MonoBehaviourSensorsManager:MonoBehaviour
     Dictionary<int, InstantiationInformation> instantiationInformationForProperty;
     Dictionary<int, ISensors> monoBehaviourSensorsForProperty;
     internal bool ready;
+    private int frameToWait;
     internal Dictionary<SensorConfiguration,List<MonoBehaviourSensor>> _configurations;
     internal Dictionary<SensorConfiguration,List<MonoBehaviourSensor>> Sensors
     {
@@ -21,7 +22,7 @@ class MonoBehaviourSensorsManager:MonoBehaviour
         }
     }
 
-    void Start()
+    void OnEnable()
     {
         propertiesIndex = new Dictionary<MyListString, int>();
         instantiationInformationForProperty = new Dictionary<int, InstantiationInformation>();
@@ -52,7 +53,7 @@ class MonoBehaviourSensorsManager:MonoBehaviour
         }
         ready = true;
     }
-    void Update()
+    internal void ManageSensors()
     {
         foreach(SensorConfiguration configuration in Sensors.Keys)
         {
@@ -70,7 +71,24 @@ class MonoBehaviourSensorsManager:MonoBehaviour
             }
         }
     }
-
+    /*void LateUpdate()
+    {
+        if (!ready)
+        {
+            return;
+        }
+        if (SensorsManager.frameFromLastUpdate >= SensorsManager.updateFrequencyInFrames+frameToWait)
+        {
+            MyLateUpdate();
+            foreach (List<MonoBehaviourSensor> sensorsList in Sensors.Values)
+            {
+                foreach (MonoBehaviourSensor sensor in sensorsList)
+                {
+                    sensor.MyLateUpdate();
+                }
+            }
+        }
+    }*/
     private void InformationRefresh(int propertyIndex)
     {
         instantiationInformationForProperty[propertyIndex].currentObjectOfTheHierarchy = gameObject;

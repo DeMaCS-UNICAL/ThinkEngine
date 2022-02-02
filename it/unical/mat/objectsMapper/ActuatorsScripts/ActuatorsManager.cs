@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 [ExecuteInEditMode]
@@ -48,7 +49,7 @@ internal class ActuatorsManager : MonoBehaviour
 #if UNITY_EDITOR
         foreach (MonoBehaviourActuatorsManager manager in Resources.FindObjectsOfTypeAll<MonoBehaviourActuatorsManager>())
         {
-            if (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(newActuatorConfiguration.gameObject) != null)
+            if (PrefabStageUtility.GetPrefabStage(newActuatorConfiguration.gameObject) != null)
             {
                 GameObject managerPrefab = PrefabUtility.GetCorrespondingObjectFromSource(manager.gameObject);
                 if (managerPrefab != null && newActuatorConfiguration.gameObject.Equals(managerPrefab))
@@ -195,7 +196,7 @@ internal class ActuatorsManager : MonoBehaviour
             foreach (MonoBehaviourActuatorsManager manager in managers)
             {
 #if UNITY_EDITOR
-                if (UnityEditor.Experimental.SceneManagement.PrefabStageUtility.GetPrefabStage(manager.gameObject) != null)
+                if (PrefabStageUtility.GetPrefabStage(manager.gameObject) != null)
                 {
                     continue;
                 }

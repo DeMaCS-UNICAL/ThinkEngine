@@ -33,6 +33,10 @@ namespace Mappers.BaseMappers
                 List<MonoBehaviourSensor> toReturn = new List<MonoBehaviourSensor>();
                 foreach(ISensors isensors in sensorsMatrix)
                 {
+                    if (isensors == null)
+                    {
+                        Debug.LogError("isensors is null");
+                    }
                     toReturn.AddRange(isensors.GetSensorsList());
                 }
                 return toReturn;
@@ -120,8 +124,10 @@ namespace Mappers.BaseMappers
             }
             Type underlyingType = objectType.GetElementType();
             MyListString rootName = new MyListString(currentObjectPropertyHierarchy.myStrings);
-            rootName.Add(underlyingType.Name);
-            Debug.Log("invoking manager with " + underlyingType);
+            if (!MapperManager.ExistsMapper(underlyingType))
+            {
+                rootName.Add(underlyingType.Name);
+            }
             return MapperManager.RetrieveProperties(underlyingType, rootName, null);
         }
 
@@ -137,7 +143,7 @@ namespace Mappers.BaseMappers
             Array2Sensors sensors = new Array2Sensors(x, y);
             GenerateMapping(ref information);
             information.firstPlaceholder += 2;
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, IsMappableElement(actualMatrix.GetType()));
             for (int i = 0; i < x; i++)
             {
                 for (int j = 0; j < y; j++)
@@ -147,7 +153,12 @@ namespace Mappers.BaseMappers
             }
             return sensors;
         }
-        
+
+        private bool IsMappableElement(Type matrixType)
+        {
+            return MapperManager.ExistsMapper(matrixType.GetElementType());
+        }
+
         private ISensors InstantiateSensorsForElement(InstantiationInformation information, Array actualMatrix, int i, int j)
         {
             InstantiationInformation localInformation = AddLocalInformation(information, actualMatrix, i, j);
@@ -159,7 +170,7 @@ namespace Mappers.BaseMappers
         {
             Array2Sensors toReturn = new Array2Sensors(x, y);
             information.firstPlaceholder += 2;
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, IsMappableElement(actualMatrix.GetType()));
             for (int i = 0; i < x; i++)
             {
                 for (int j = 0; j < y; j++)
@@ -177,12 +188,12 @@ namespace Mappers.BaseMappers
             return toReturn;
         }
 
-        private static void UpdateResidualPropertyHierarchy(MyListString residualPropertyHierarchy)
+        private static void UpdateResidualPropertyHierarchy(MyListString residualPropertyHierarchy, bool mappable)
         {
             if (residualPropertyHierarchy.Count > 0)
             {
                 residualPropertyHierarchy.RemoveAt(0);
-                if (residualPropertyHierarchy.Count > 0)//if it's not a primitive type array
+                if (mappable && residualPropertyHierarchy.Count > 0)//if it's not a primitive type array
                 {
                     residualPropertyHierarchy.RemoveAt(0);
                 }
@@ -226,7 +237,7 @@ namespace Mappers.BaseMappers
             if (matrix.GetLength(0) > info.indexes[0] && matrix.GetLength(1) > info.indexes[1])
             {
                 object matrixElement = matrix.GetValue(info.indexes[0], info.indexes[1]);
-                UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
+                UpdateResidualPropertyHierarchy(residualPropertyHierarchy, IsMappableElement(matrix.GetType()));
                 MapperManager.UpdateSensor(sensor, matrixElement, residualPropertyHierarchy, hierarchyLevel + 1);
             }
             else
@@ -240,7 +251,7 @@ namespace Mappers.BaseMappers
             valuesForPlaceholders.Add(info.indexes[0]);
             valuesForPlaceholders.Add(info.indexes[1]);
             Array matrix = (Array)currentObject;
-            UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(residualPropertyHierarchy, IsMappableElement(matrix.GetType()));
             return MapperManager.GetSensorBasicMap(sensor, matrix.GetValue(info.indexes[0], info.indexes[1]), residualPropertyHierarchy, valuesForPlaceholders, hierarchyLevel + 1);
         }
 
@@ -256,7 +267,7 @@ namespace Mappers.BaseMappers
             Array2Actuators actuators = new Array2Actuators(x, y);
             GenerateMapping(ref information);
             information.firstPlaceholder += 2;
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, IsMappableElement(actualMatrix.GetType()));
             for (int i = 0; i < x; i++)
             {
                 for (int j = 0; j < y; j++)
@@ -306,7 +317,7 @@ namespace Mappers.BaseMappers
         {
             Array2Actuators toReturn = new Array2Actuators(x, y);
             information.firstPlaceholder += 2;
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy,IsMappableElement(actualMatrix.GetType()));
             for (int i = 0; i < x; i++)
             {
                 for (int j = 0; j < y; j++)
@@ -330,7 +341,7 @@ namespace Mappers.BaseMappers
             valuesForPlaceholders.Add(info.indexes[0]);
             valuesForPlaceholders.Add(info.indexes[1]);
             Array matrix = (Array)currentObject;
-            UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(residualPropertyHierarchy, IsMappableElement(matrix.GetType()));
             return MapperManager.GetActuatorBasicMap(actuator, matrix.GetValue(info.indexes[0], info.indexes[1]), residualPropertyHierarchy, valuesForPlaceholders, hierarchyLevel + 1);
 
         }
@@ -340,7 +351,7 @@ namespace Mappers.BaseMappers
             Array2InfoAndValue info = (Array2InfoAndValue)actuator.PropertyInfo[hierarchyLevel];
             if (matrix.GetLength(0) > info.indexes[0] && matrix.GetLength(1) > info.indexes[1])
             {
-                UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
+                UpdateResidualPropertyHierarchy(residualPropertyHierarchy,IsMappableElement(matrix.GetType()));
                 if (MapperManager.IsBasic(matrix.GetType().GetElementType()))
                 {
                     matrix.SetValue(Convert.ChangeType(valueToSet, matrix.GetType().GetElementType()), info.indexes[0], info.indexes[1]);
@@ -381,6 +392,7 @@ namespace Mappers.BaseMappers
             variables.Add("Index" + (information.firstPlaceholder+2));
             GenerateMapping(ref information);
             information.firstPlaceholder+=2;
+            bool isMappableElement = IsMappableElement(information.currentType);
             information.currentType = information.currentType.GetElementType();
             if (information.currentObjectOfTheHierarchy != null)
             {
@@ -394,7 +406,7 @@ namespace Mappers.BaseMappers
                     information.currentObjectOfTheHierarchy = null;
                 }
             }
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy,isMappableElement);
             return MapperManager.GetASPTemplate(ref information, variables);
         }
     }

@@ -46,6 +46,7 @@ internal class MapperManager
     private static IDataMapper RetrieveAdditionalInformation(ref InstantiationInformation information, bool generateMapping = false)
     {
         object currentObject = information.currentObjectOfTheHierarchy;
+
         IDataMapper mapper = RetrieveMapper(ref information.residualPropertyHierarchy, ref currentObject, out information.currentType);
         if (mapper != null)
         {
@@ -56,6 +57,11 @@ internal class MapperManager
             }
         }
         return mapper;
+    }
+
+    internal static IDataMapper GetMapper(Type type)
+    {
+        return ExistsMapper(type) ? metMappers[type] : null;
     }
 
     private static IDataMapper RetrieveAdditionalInformationByType(ref InstantiationInformation information, bool generateMapping)
@@ -88,7 +94,7 @@ internal class MapperManager
     internal static IDataMapper RetrieveMapper(ref MyListString residualPropertyHierarchy, ref object currentObject, out Type currentType)
     {
         currentType = null;
-        if (residualPropertyHierarchy.Count == 0 && currentObject != null)
+        if (currentObject != null)
         {
             if (ExistsMapper(currentObject.GetType()))
             {
@@ -150,15 +156,14 @@ internal class MapperManager
         return null;
     }
 
-    private static Type RetrievePropertyByType(string currentProperty, ref Type currentType)
+    private static void RetrievePropertyByType(string currentProperty, ref Type currentType)
     {
         MemberInfo[] members = currentType.GetMember(currentProperty, Utility.BindingAttr);
         if (members.Length > 0)
         {
             FieldOrProperty fieldOrProperty = new FieldOrProperty(members[0]);
-            return fieldOrProperty.Type();
+            currentType = fieldOrProperty.Type();
         }
-        return null;
     }
 
     internal static object RetrieveProperty(object currentObject, string currentProperty, out Type currentType)
@@ -252,8 +257,12 @@ internal class MapperManager
                 {
                     propertyValue = null;
                 }
+                if (toReturn.ContainsKey(toAdd))
+                {
+                    continue;
+                }
                 KeyValuePair<Type, object> propertyPair = new KeyValuePair<Type, object>(fieldOrProperty.Type(), propertyValue);
-                toReturn.Add(toAdd, propertyPair);
+                toReturn[toAdd]=propertyPair;
             }
         }
         if (currentObject is GameObject @object)
@@ -382,7 +391,7 @@ internal class MapperManager
         }
         return true;
     }
-    private static bool ExistsMapper(Type type)
+    internal static bool ExistsMapper(Type type)
     {
         return !unsupportedTypes.Contains(type) && (metMappers.ContainsKey(type) || IsSupportedByMapper(type));
     }
@@ -404,7 +413,9 @@ internal class MapperManager
     #region SENSORS METHODS
     internal static ISensors InstantiateSensors(InstantiationInformation information)
     {
+
         IDataMapper mapper = RetrieveAdditionalInformation(ref information,!information.mappingDone);
+
         if (mapper != null)
         {
             return mapper.InstantiateSensors(information);

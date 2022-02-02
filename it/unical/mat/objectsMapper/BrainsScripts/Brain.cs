@@ -15,6 +15,7 @@ namespace Planner
     [ExecuteAlways, RequireComponent(typeof(IndexTracker))]
     public abstract class Brain: MonoBehaviour
     {
+        public float FPS = SensorsManager.avgFps;
         private string _fileExtension;
         internal string FileExtension
         {
@@ -154,6 +155,7 @@ namespace Planner
 
         protected virtual void Update()
         {
+            FPS = SensorsManager.avgFps;
             if (Application.isPlaying &&  reasonerMethod == null)
             {
                 lock (toLock)

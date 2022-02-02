@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Mappers.ASPMappers
 {
@@ -128,7 +129,10 @@ namespace Mappers.ASPMappers
             }
             Type underlyingType = objectType.GenericTypeArguments[0];
             MyListString rootName = new MyListString(currentObjectPropertyHierarchy.myStrings);
-            rootName.Add(underlyingType.Name);
+            if (!MapperManager.ExistsMapper(underlyingType))
+            {
+                rootName.Add(underlyingType.Name);
+            }
             return MapperManager.RetrieveProperties(underlyingType, rootName, null);
         }
 

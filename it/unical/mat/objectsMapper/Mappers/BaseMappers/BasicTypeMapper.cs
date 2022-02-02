@@ -3,6 +3,7 @@ using Mappers.BaseMappers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using static Mappers.OperationContainer;
 
 internal abstract class BasicTypeMapper : IDataMapper
@@ -20,9 +21,11 @@ internal abstract class BasicTypeMapper : IDataMapper
 
         public object GetValuesForPlaceholders()
         {
-            return null;
+            return GetMapper(values[0].GetType()).BasicMap(operation(values));
         }
     }
+
+
     private class BasicTypeSensor : ISensors
     {
         internal MonoBehaviourSensor sensor;
@@ -65,6 +68,15 @@ internal abstract class BasicTypeMapper : IDataMapper
     internal enum StringOperations { Newest, Oldest, Specific_Value };
     #endregion
 
+    private static BasicTypeMapper GetMapper(Type type)
+    {
+        IDataMapper mapper = MapperManager.GetMapper(type);
+        if(mapper is BasicTypeMapper mapper1)
+        {
+            return mapper1;
+        }
+        return null;
+    }
     internal Type _convertingType;
     internal Type ConvertingType {
         get
@@ -142,12 +154,15 @@ internal abstract class BasicTypeMapper : IDataMapper
     }
     public ISensors InstantiateSensors(InstantiationInformation information)
     {
-        if (!SupportedTypes.Contains(information.currentObjectOfTheHierarchy.GetType()) || information.residualPropertyHierarchy.Count > 1)
+        if (!SupportedTypes.Contains(information.currentType) || information.residualPropertyHierarchy.Count > 1)
         {
             throw new Exception("Wrong mapper for property " + information.propertyHierarchy);
         }
-        
         BasicTypeInfoAndValue additionalInfo = new BasicTypeInfoAndValue();
+        if (!((SensorConfiguration)information.configuration).OperationPerProperty.ContainsKey(information.propertyHierarchy.GetHashCode()))
+        {
+            Debug.Log(information.propertyHierarchy);
+        }
         int operationIndex = ((SensorConfiguration)information.configuration).OperationPerProperty[information.propertyHierarchy.GetHashCode()];
         additionalInfo.operation = OperationList()[operationIndex];
         if (operationIndex == GetAggregationSpecificIndex())
