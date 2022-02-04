@@ -122,14 +122,10 @@ internal class MapperManager
         return null;
     }
 
-    internal static string Parse(MonoBehaviourActuator newMonoBehaviourActuator, string literal)
-    {
-        throw new NotImplementedException();
-    }
 
     internal static IDataMapper RetrieveMapperByType(ref MyListString residualPropertyHierarchy, ref Type currentType)
     {
-        if (residualPropertyHierarchy.Count == 0 && currentType != null)
+        if (currentType != null)
         {
             if (ExistsMapper(currentType))
             {
@@ -415,10 +411,13 @@ internal class MapperManager
     {
 
         IDataMapper mapper = RetrieveAdditionalInformation(ref information,!information.mappingDone);
-
         if (mapper != null)
         {
-            return mapper.InstantiateSensors(information);
+            ISensors sensors= mapper.InstantiateSensors(information);
+            if (sensors != null)
+            {
+                return sensors;
+            }
         }
         information.prependMapping.Clear();
         information.appendMapping.Clear();

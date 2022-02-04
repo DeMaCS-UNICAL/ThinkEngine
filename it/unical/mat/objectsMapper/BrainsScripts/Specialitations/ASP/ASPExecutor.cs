@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 {
@@ -35,6 +36,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
             stopwatch.Stop();
             if (answers.Answersets.Count > 0)
             {
+                foreach(string s in answers.answersets[0].GetAnswerSet())
+                {
+                    Debug.Log(s);
+                }
                 SpecificAnswerSetOperations(answers);
             }
         }

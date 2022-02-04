@@ -195,7 +195,7 @@ namespace Mappers.BaseMappers
         {
             if (information.currentObjectOfTheHierarchy == null)
             {
-                return new ArraySensors(0);
+                return null;
             }
             Array actualArray = (Array)information.currentObjectOfTheHierarchy;
             int x = actualArray.GetLength(0);

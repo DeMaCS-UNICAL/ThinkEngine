@@ -142,7 +142,7 @@ namespace Mappers.ASPMappers
         {
             if (information.currentObjectOfTheHierarchy == null)
             {
-                return new ListSensors();
+                return null;
             }
             IList actualList = (IList)information.currentObjectOfTheHierarchy;
             int x = actualList.Count;

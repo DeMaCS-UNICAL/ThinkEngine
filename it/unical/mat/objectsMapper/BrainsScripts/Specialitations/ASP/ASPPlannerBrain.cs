@@ -75,7 +75,7 @@ namespace Planner
                 {
                     foreach (KeyValuePair<string, string> parameter in ActionParameters[order])
                     {
-                        PropertyInfo property = Actions[order].GetType().GetProperty(parameter.Key);/// tutti i tipi di property!
+                        PropertyInfo property = Actions[order].GetType().GetProperty(parameter.Key, Utility.BindingAttr);
                         if (property != null)
                         {
                             Type propertyType = property.PropertyType;
@@ -96,6 +96,7 @@ namespace Planner
 
         private void ParseActionArgumentLiteral(string literal)
         {
+                Debug.Log(literal);
             string partial = literal.Remove(0, "actionArgument(".Count());
             string toParse = partial.Substring(0, partial.IndexOf(","));
             bool converted = int.TryParse(toParse, out int order);
@@ -103,8 +104,14 @@ namespace Planner
             {
                 partial = partial.Remove(0, partial.IndexOf(",") + 1);
                 string parameterName = partial.Substring(0, partial.IndexOf(",")).Trim('\"');
+                Debug.Log(parameterName+" remain "+partial);
                 partial = partial.Remove(0, partial.IndexOf(",") + 1);
                 string parameterValue = partial.Substring(0, partial.IndexOf(")")).Trim('\"');
+                if (!ActionParameters.ContainsKey(order))
+                {
+                    ActionParameters[order] = new List<KeyValuePair<string, string>>();
+                }
+                Debug.Log(parameterValue);
                 ActionParameters[order].Add(new KeyValuePair<string, string>(parameterName, parameterValue));
             }
         }
@@ -119,7 +126,10 @@ namespace Planner
                 partial = partial.Remove(0, partial.IndexOf(",") + 1);
                 string actionClass = partial.Substring(0, partial.IndexOf(")")).Trim('\"');
                 Actions[order] = ScriptableObject.CreateInstance(actionClass) as Action;
-                ActionParameters[order] = new List<KeyValuePair<string, string>>();
+                if (!ActionParameters.ContainsKey(order))
+                {
+                    ActionParameters[order] = new List<KeyValuePair<string, string>>();
+                }
             }
         }
         internal Plan GetPlan()

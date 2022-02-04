@@ -210,7 +210,9 @@ namespace Planner
                     seenSensorConfNames.Add(sensorConf.ConfigurationName);
                     foreach (MyListString property in sensorConf.ToMapProperties)
                     {
+                        Debug.Log(property);
                         sensorsAsASP= MapperManager.GetASPTemplate(sensorConf.ConfigurationName, sensorConf.gameObject, property, true);
+                        Debug.Log(sensorsAsASP);
                         fs.Write(ActualSensorEncoding(sensorsAsASP));
                     }
                 }
