@@ -13,7 +13,7 @@ namespace it.unical.mat.embasp.@base
         public InputProgram()
         {
             Init();
-            separator = " ";
+            separator = "\n";
         }
 
         public InputProgram(object inputObj)
@@ -69,7 +69,7 @@ namespace it.unical.mat.embasp.@base
                 StringBuilder to_return = new StringBuilder();
                 foreach (String paths in files_paths)
                     if (paths.Length != 0)
-                        to_return.Append("\""+ paths+"\"").Append(" ");
+                        to_return.Append(paths).Append(" ");
                 return to_return.ToString();
             }
         }

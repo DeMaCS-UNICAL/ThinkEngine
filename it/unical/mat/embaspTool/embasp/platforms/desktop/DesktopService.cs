@@ -35,7 +35,6 @@ namespace it.unical.mat.embasp.platforms.desktop
 
         public virtual Output StartSync(IList<InputProgram> programs, IList<OptionDescriptor> options)
         {
-
             string option = "";
             foreach (OptionDescriptor o in options)
             {
@@ -45,7 +44,7 @@ namespace it.unical.mat.embasp.platforms.desktop
                     option += o.Separator;
                 }
                 else
-                    UnityEngine.Debug.Log("Warning : wrong " + typeof(OptionDescriptor).FullName);
+                    Console.Error.WriteLine("Warning : wrong " + typeof(OptionDescriptor).FullName);
             }
 
             string files_paths = "";
@@ -61,15 +60,15 @@ namespace it.unical.mat.embasp.platforms.desktop
                         FileAttributes f = File.GetAttributes(@program_file);
                         if (File.Exists(program_file) && !f.HasFlag(FileAttributes.Directory))
                         {
-                            files_paths += "\""+program_file+"\"";
+                            files_paths += program_file;
                             files_paths += " ";
                         }
                         else
-                            UnityEngine.Debug.Log("Warning : the file " + Path.GetFullPath(@program_file) + " does not exists.");
+                            Console.Error.WriteLine("Warning : the file " + Path.GetFullPath(@program_file) + " does not exists.");
                     }
                 }
                 else
-                    UnityEngine.Debug.Log("Warning : wrong " + typeof(InputProgram).FullName);
+                    Console.Error.WriteLine("Warning : wrong " + typeof(InputProgram).FullName);
             }
 
             string solverOutput = "EMPTY_OUTPUT";
@@ -88,7 +87,7 @@ namespace it.unical.mat.embasp.platforms.desktop
 
                 Process solver_process = new Process();
                 stringBuffer.Append(exe_path).Append(" ").Append(option).Append(" ").Append(files_paths);
-                solver_process.StartInfo.FileName = Path.GetFullPath(exe_path);
+                solver_process.StartInfo.FileName = exe_path;
                 options_string.Append(option).Append(" ").Append(files_paths);
 
                 if (final_program.Length > 0)
@@ -97,9 +96,9 @@ namespace it.unical.mat.embasp.platforms.desktop
                     stringBuffer.Append(this.load_from_STDIN_option);
                 }
 
-                //UnityEngine.Debug.Log(stringBuffer.ToString());
+                Console.Error.WriteLine(stringBuffer.ToString());
                 solver_process.EnableRaisingEvents = true;
-                solver_process.StartInfo.Arguments = options_string.ToString();
+                solver_process.StartInfo.Arguments = @options_string.ToString();
                 solver_process.StartInfo.UseShellExecute = false;
                 solver_process.StartInfo.CreateNoWindow = true;
                 solver_process.StartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
@@ -120,21 +119,20 @@ namespace it.unical.mat.embasp.platforms.desktop
 
                 solverOutput = solver_process.StandardOutput.ReadToEnd().ToString();
                 solverError = solver_process.StandardError.ReadToEnd().ToString();
+
                 solver_process.WaitForExit();
                 solver_process.Close();
 
                 watch.Stop();
 
-                //UnityEngine.Debug.Log("Total time : " + watch.ElapsedMilliseconds);
+                Console.Error.WriteLine("Total time : " + watch.ElapsedMilliseconds);
 
                 return GetOutput(solverOutput.ToString(), solverError.ToString());
             }
             catch (Win32Exception e2)
             {
-                UnityEngine.Debug.Log(e2.ToString());
-                UnityEngine.Debug.Log(e2.StackTrace);
-                UnityEngine.Debug.LogError(e2.ToString());
-                UnityEngine.Debug.LogError(e2.StackTrace);
+                Console.Error.WriteLine(e2.ToString());
+                Console.Error.Write(e2.StackTrace);
             }
 
             return GetOutput("", "");

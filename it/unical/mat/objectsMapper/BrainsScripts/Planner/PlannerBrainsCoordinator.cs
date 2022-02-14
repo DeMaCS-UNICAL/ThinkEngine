@@ -46,6 +46,10 @@ namespace Planner
 
         internal void PlanReady(PlannerBrain brain)
         {
+            if (!brain.GetPlan().IsExecutable())
+            {
+                return;
+            }
             if (priorityExecuting > brain.Priority || (priorityExecuting == brain.Priority && brain.GetPlan().IsReadyToExecute()))
             {
                 priorityExecuting = brain.Priority;
@@ -72,12 +76,21 @@ namespace Planner
         internal void SchedulerIsWaiting()
         {
             priorityExecuting = NumberOfBrains();
-            if (plannersLastPlan.Count != 0)
+            while (plannersLastPlan.Count != 0)
             {
                 KeyValuePair<int, Plan> toExecute = plannersLastPlan.Last();
-                scheduler.NewPlan(toExecute.Value);
-                plannersLastPlan.Remove(toExecute.Key);
-                priorityExecuting = toExecute.Key;
+                if (!toExecute.Value.IsExecutable())
+                {
+                    plannersLastPlan.Remove(toExecute.Key);
+                    continue;
+                }
+                bool used = scheduler.NewPlan(toExecute.Value);
+                if (used)
+                {
+                    plannersLastPlan.Remove(toExecute.Key); 
+                    priorityExecuting = toExecute.Key;
+                    break;
+                }
             }
         }
 

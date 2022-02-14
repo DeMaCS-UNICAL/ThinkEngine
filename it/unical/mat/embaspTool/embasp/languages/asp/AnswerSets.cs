@@ -32,15 +32,14 @@ namespace it.unical.mat.embasp.languages.asp
 
         public virtual IList<AnswerSet> GetOptimalAnswerSets()
         {
-            //////FIX!
             int level = 0;
             IList<AnswerSet> answerSets = Answersets, optimalAnswerSets = new List<AnswerSet>();
 
             foreach (AnswerSet answerSet in answerSets)
             {
-                if (answerSet.LevelWeight.Count == 0)//ADDED BY DENISE
+                if (answerSet.LevelWeight.Keys.Count == 0)
                 {
-                    return answerSets;
+                    continue;
                 }
                 int maxLevel = answerSet.LevelWeight.Keys.Max();
 

@@ -5,6 +5,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
+using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -13,26 +15,20 @@ using Debug = UnityEngine.Debug;
 [ExecuteInEditMode]
 public  class SensorsManager : MonoBehaviour
 {
-    private const int MAX_SENSORS_PER_FRAME = 20;
-    private const int MIN_AVG_FPS = 60;
-    private const int MIN_CURRENT_FPS = 20;
-    private const int MAX_AVG_FPS = 70;
-    private const int MAX_CURRENT_FPS = 40;
-    private static int MAX_MS = 5;
+    public int MIN_AVG_FPS = 60;
+    public int MIN_CURRENT_FPS = 20;
+    public int MAX_AVG_FPS = 70;
+    public int MAX_CURRENT_FPS = 40;
+    private int MAX_MS = 5;
+    private float currentFps;
     private static Dictionary<Brain, List<string>> _instantiatedSensors;
     private static ConcurrentQueue<KeyValuePair<Brain,object>> _requestedMappings;
-    public static int updateFrequencyInFrames=12;
     internal static bool _configurationsChanged;
-    internal static float avgFps = 0;
+    internal float avgFps = 0;
     internal static float bestAvgFps = 0;
     internal static int frameCount = 0;
-    internal static int numberOfLiveSensor = 0;
-    internal static int frameFromLastUpdate = 2;
-    internal static float updateScaleFactor = 1;
-    internal static float lastUpdateFPS;
-    private static bool uncompletedTasks;
     internal static bool destroyed;
-    internal static float currentFps;
+    internal static MonoBehaviourSensorsManager[] monoBehaviourMenagers;
     private static Dictionary<Brain, List<string>> InstantiatedSensors
     {
         get
@@ -76,10 +72,15 @@ public  class SensorsManager : MonoBehaviour
     {
         get
         {
+            if (destroyed)
+            {
+                throw new Exception("application is closing");
+            }
             if (_requestedMappings == null)
             {
                 _requestedMappings = new ConcurrentQueue<KeyValuePair<Brain, object>>();
             }
+            //Debug.Log(_requestedMappings.Count);
             return _requestedMappings;
         }
     }
@@ -101,6 +102,7 @@ public  class SensorsManager : MonoBehaviour
     #region Unity Messages
     void OnDestroy()
     {
+       // Debug.Log("destroing");
         destroyed = true;
     }
     void Reset()
@@ -128,9 +130,8 @@ public  class SensorsManager : MonoBehaviour
     {
         if (Application.isPlaying)
         {
-            frameFromLastUpdate++;
             frameCount++;
-            float currentFps = 1f / Time.unscaledDeltaTime;
+            currentFps = 1f / Time.unscaledDeltaTime;
             avgFps = (avgFps * (frameCount - 1) + currentFps) / frameCount;
             if((avgFps< MIN_AVG_FPS || currentFps < MIN_CURRENT_FPS) && MAX_MS>1)
             {
@@ -146,6 +147,7 @@ public  class SensorsManager : MonoBehaviour
     {
         if (Application.isPlaying)
         {
+            destroyed = false;
             Reset();
             StartCoroutine(SensorsUpdate());
         }
@@ -159,8 +161,11 @@ public  class SensorsManager : MonoBehaviour
         Stopwatch watch = new Stopwatch();
         while (true)
         {
-            MonoBehaviourSensorsManager[] managers = RetrieveSensorsManagers();
-            foreach (MonoBehaviourSensorsManager manager in managers)
+            Stopwatch localWatch = new Stopwatch();
+            watch.Start();
+            yield return new WaitUntil(()=>Executor.CanRead(false));
+            monoBehaviourMenagers = RetrieveSensorsManagers();
+            foreach (MonoBehaviourSensorsManager manager in monoBehaviourMenagers)
             {
                 watch.Start();
                 if (manager != null)
@@ -191,28 +196,16 @@ public  class SensorsManager : MonoBehaviour
                 }
             }
             watch.Reset();
+            Executor.CanRead(true);
             yield return null;
-            StartCoroutine(ReturnSensorsMappings());
         }
     }
 
 
     void OnApplicationQuit()
     {
+        Executor.ShutDownAll();
         destroyed = true;
-        while (RequestedMappings.TryDequeue(out KeyValuePair<Brain, object> pair)) 
-        { 
-            Brain brain = pair.Key;
-            object toLock = pair.Value;
-            if (brain.executor != null)
-            {
-                brain.executor.reason = false;
-                lock (toLock)
-                {
-                    Monitor.Pulse(toLock);
-                }
-            }
-        }
     }
     internal IEnumerable<string> ConfigurationNames()
     {
@@ -286,62 +279,26 @@ public  class SensorsManager : MonoBehaviour
         }
         return false;
     }
-    internal static void RequestSensorsMapping(Brain brain)
+    internal static void ReturnSensorsMappings(Brain brain)
     {
-        object toLock = new object();
-        lock (toLock)
+        ConcurrentBag<string> mapping = new ConcurrentBag<string>(); ;
+        List<MonoBehaviourSensor> sensors = RetrieveBrainsSensors(brain);
+        Parallel.ForEach(sensors, sensor =>
         {
-            RequestedMappings.Enqueue(new KeyValuePair<Brain,object>(brain,toLock));
-            Monitor.Wait(toLock);
-        }
-    }
-    internal static IEnumerator ReturnSensorsMappings()
-    {
-        int count = 0;
-        while (RequestedMappings.TryDequeue(out KeyValuePair<Brain, object> currentPair) && count<5)
-        {
-            count++;
-            Brain brain = currentPair.Key;
-            object toLock = currentPair.Value;
-            lock (toLock)
+            if (sensor != null)
             {
-                string mapping = "";
-                List<MonoBehaviourSensor> sensors = RetrieveBrainsSensors(brain);
-                Stopwatch watch = new Stopwatch();
-                watch.Start();
-                foreach (MonoBehaviourSensor sensor in sensors)
-                {
-                    if (watch.ElapsedMilliseconds > MAX_MS)
-                    {
-                        watch.Reset();
-                        yield return null;
-                        watch.Start();
-                    }
-                    if (sensor != null)
-                    {
-                        //UnityEngine.Debug.Log(sensor +" "+ sensor.Map());
-                        mapping += brain.ActualSensorEncoding(sensor.Map());
-                    }
-                }
-                brain.sensorsMapping = mapping;
-                Monitor.Pulse(toLock);
+                mapping.Add(brain.ActualSensorEncoding(sensor.Map()));
             }
-        }
-        if (RequestedMappings.Count > 0)
-        {
-            uncompletedTasks = true;
-        }
-        else
-        {
-            uncompletedTasks = false;
-        }
+        });
+        brain.sensorsMapping = string.Join("",mapping);
+        
     }
     private static List<MonoBehaviourSensor> RetrieveBrainsSensors(Brain brain)
     {
         List<MonoBehaviourSensor> sensors = new List<MonoBehaviourSensor>();
         foreach (string sensorConf in InstantiatedSensors[brain])
         {
-            foreach (MonoBehaviourSensorsManager monobehaviourManager in FindObjectsOfType<MonoBehaviourSensorsManager>())
+            foreach (MonoBehaviourSensorsManager monobehaviourManager in monoBehaviourMenagers)
             {
                 if (monobehaviourManager== null || !monobehaviourManager.ready)
                 {

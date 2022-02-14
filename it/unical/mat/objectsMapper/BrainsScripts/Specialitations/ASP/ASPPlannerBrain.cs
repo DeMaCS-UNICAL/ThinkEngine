@@ -96,7 +96,6 @@ namespace Planner
 
         private void ParseActionArgumentLiteral(string literal)
         {
-                Debug.Log(literal);
             string partial = literal.Remove(0, "actionArgument(".Count());
             string toParse = partial.Substring(0, partial.IndexOf(","));
             bool converted = int.TryParse(toParse, out int order);
@@ -104,14 +103,12 @@ namespace Planner
             {
                 partial = partial.Remove(0, partial.IndexOf(",") + 1);
                 string parameterName = partial.Substring(0, partial.IndexOf(",")).Trim('\"');
-                Debug.Log(parameterName+" remain "+partial);
                 partial = partial.Remove(0, partial.IndexOf(",") + 1);
                 string parameterValue = partial.Substring(0, partial.IndexOf(")")).Trim('\"');
                 if (!ActionParameters.ContainsKey(order))
                 {
                     ActionParameters[order] = new List<KeyValuePair<string, string>>();
                 }
-                Debug.Log(parameterValue);
                 ActionParameters[order].Add(new KeyValuePair<string, string>(parameterName, parameterValue));
             }
         }

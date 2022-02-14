@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 {
@@ -20,6 +21,58 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         protected readonly Stopwatch stopwatch = new Stopwatch();
         internal bool reason;
         InputProgram encoding;
+        private static object toLock = new object();
+        internal static bool _canRead=false;
+        
+        private static int _readingSensors=0;
+        private static void IncrementReadingSensors()
+        {
+            lock (toLock)
+            {
+                if (!_canRead)
+                {
+                    Monitor.Wait(toLock);
+                }
+                _readingSensors++;
+            }
+        }
+        private static void DecreaseReadingSensors()
+        {
+            lock (toLock)
+            {
+                _readingSensors--;
+            }
+        }
+        internal static void ShutDownAll()
+        {
+            lock (toLock)
+            {
+                _canRead = false;
+                Monitor.PulseAll(toLock);
+            }
+        }
+
+        internal static bool Reading()
+        {
+            return _readingSensors > 0;
+        }
+
+        internal static bool CanRead(bool value)
+        {
+            lock (toLock)
+            {
+                if(_readingSensors>0 && !value)
+                {
+                    return false;
+                }
+                _canRead = value;
+                if (_canRead)
+                {
+                    Monitor.PulseAll(toLock);
+                }
+                return true;
+            }
+        }
         internal virtual void Run()
         {
             if (!Directory.Exists(Path.GetTempPath() + @"ThinkEngineFacts\"))
@@ -66,11 +119,13 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 
                         return;
                     }
-                    SensorsManager.RequestSensorsMapping(brain);
-                    if (!reason)
+                    IncrementReadingSensors();
+                    if (!_canRead)
                     {
                         return;
                     }
+                    SensorsManager.ReturnSensorsMappings(brain);
+                    DecreaseReadingSensors();
                     factsPath = Path.GetTempPath() + @"ThinkEngineFacts\" + Path.GetRandomFileName() + ".txt";
                     using (StreamWriter fs = new StreamWriter(factsPath, true))
                     {
@@ -85,9 +140,12 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     handler.AddProgram(facts);
                     SpecificOptions(handler);
                     stopwatch.Restart();
+
+                    //Debug.Log("running dlv");
                     Output o = handler.StartSync();
                     if (!reason)
                     {
+                         //Debug.Log("i'm done");
                         return;
                     }
                     if (!o.ErrorsString.Equals(""))
@@ -103,6 +161,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 }
                 catch (Exception e)
                 {
+                Debug.Log("there was an exception");
                     reason = false;
                     if (!(e is ThreadAbortException))
                     {
@@ -111,6 +170,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 }
 
             }
+            Debug.Log("i'm done");
 
         }
 

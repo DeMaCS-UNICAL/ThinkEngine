@@ -1,25 +1,25 @@
-﻿using EmbASP.it.unical.mat.embasp.languages.asp;
-using it.unical.mat.parsers.asp;
+using it.unical.mat.embasp.languages.asp;
+using it.unical.mat.parsers.datalog;
 using System;
 using System.Collections.Generic;
 
-namespace it.unical.mat.embasp.languages.asp
+namespace it.unical.mat.embasp.languages.datalog
 {
-    public class ASPMapper : Mapper
+    public class DatalogMapper : Mapper
     {
-        private static ASPMapper mapper;
+        private static DatalogMapper mapper;
 
-        public static ASPMapper Instance
+        public static DatalogMapper Instance
         {
             get
             {
-                if (ASPMapper.mapper == null)
-                    ASPMapper.mapper = new ASPMapper();
-                return ASPMapper.mapper;
+                if (DatalogMapper.mapper == null)
+                    DatalogMapper.mapper = new DatalogMapper();
+                return DatalogMapper.mapper;
             }
         }
 
-        private ASPMapper() : base() { }
+        private DatalogMapper() : base() { }
 
         protected internal override string GetActualString(string predicate, Dictionary<int, object> parametersMap)
         {
@@ -34,7 +34,7 @@ namespace it.unical.mat.embasp.languages.asp
 
                 object objectTerm = parametersMap[i];
                 if (objectTerm == null)
-                    throw new IllegalTermException("Wrong term number of predicate " + predicate);
+                    throw new asp.IllegalTermException("Wrong term number of predicate " + predicate);
 
                 if (objectTerm is int?)
                     atom += objectTerm + "";
@@ -58,7 +58,8 @@ namespace it.unical.mat.embasp.languages.asp
 
         protected internal override string[] GetParam(string @string)
         {
-            return ASPParser.Parse(@string).GetParameters();
+
+            return DatalogParser.ParseParametersFromAtom(@string);
         }
     }
 }

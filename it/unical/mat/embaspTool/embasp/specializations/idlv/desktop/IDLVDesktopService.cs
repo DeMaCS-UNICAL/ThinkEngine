@@ -21,7 +21,6 @@ namespace it.unical.mat.embasp.specializations.idlv.desktop
 
         public void StartAsync(ICallback callback, IList<InputProgram> programs, IList<OptionDescriptor> options)
         {
-            options.Add(new OptionDescriptor("--t "));
             base.StartAsync(callback, programs, options);
         }
 

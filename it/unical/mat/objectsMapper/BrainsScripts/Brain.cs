@@ -15,7 +15,6 @@ namespace Planner
     [ExecuteAlways, RequireComponent(typeof(IndexTracker))]
     public abstract class Brain: MonoBehaviour
     {
-        public float FPS = SensorsManager.avgFps;
         private string _fileExtension;
         internal string FileExtension
         {
@@ -155,7 +154,6 @@ namespace Planner
 
         protected virtual void Update()
         {
-            FPS = SensorsManager.avgFps;
             if (Application.isPlaying &&  reasonerMethod == null)
             {
                 lock (toLock)
@@ -210,9 +208,9 @@ namespace Planner
                     seenSensorConfNames.Add(sensorConf.ConfigurationName);
                     foreach (MyListString property in sensorConf.ToMapProperties)
                     {
-                        Debug.Log(property);
+                        //Debug.Log(property);
                         sensorsAsASP= MapperManager.GetASPTemplate(sensorConf.ConfigurationName, sensorConf.gameObject, property, true);
-                        Debug.Log(sensorsAsASP);
+                        //Debug.Log(sensorsAsASP);
                         fs.Write(ActualSensorEncoding(sensorsAsASP));
                     }
                 }
@@ -246,6 +244,18 @@ namespace Planner
         protected virtual bool SomeConfigurationAvailable()
         {
             return Utility.SensorsManager.IsSomeActiveInScene(ChosenSensorConfigurations);
+        }
+        void OnApplicationQuit()
+        {
+            if (executor != null)
+            {
+                //Debug.Log("pulse " + gameObject);
+                executor.reason = false;
+                lock (toLock)
+                {
+                    Monitor.Pulse(toLock);
+                }
+            }
         }
     }
     

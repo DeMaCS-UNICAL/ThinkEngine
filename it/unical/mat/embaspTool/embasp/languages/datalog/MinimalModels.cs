@@ -1,6 +1,5 @@
 using it.unical.mat.parsers.datalog;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -18,7 +17,7 @@ namespace it.unical.mat.embasp.languages.datalog
 
         public override object Clone() => base.Clone();
 
-        public virtual ISet<MinimalModel> Minimalmodels
+        public virtual IList<MinimalModel> Minimalmodels
         {
             get
             {
@@ -28,7 +27,8 @@ namespace it.unical.mat.embasp.languages.datalog
                     Parse();
                 }
 
-                return ImmutableHashSet.Create<MinimalModel>(minimalModels.ToArray());
+                return new ReadOnlyCollection<MinimalModel>(minimalModels.ToList());
+
             }
         }
 

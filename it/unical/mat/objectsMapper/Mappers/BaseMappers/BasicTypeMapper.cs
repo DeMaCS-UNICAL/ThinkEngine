@@ -159,10 +159,10 @@ internal abstract class BasicTypeMapper : IDataMapper
             throw new Exception("Wrong mapper for property " + information.propertyHierarchy);
         }
         BasicTypeInfoAndValue additionalInfo = new BasicTypeInfoAndValue();
-        if (!((SensorConfiguration)information.configuration).OperationPerProperty.ContainsKey(information.propertyHierarchy.GetHashCode()))
+        /*if (!((SensorConfiguration)information.configuration).OperationPerProperty.ContainsKey(information.propertyHierarchy.GetHashCode()))
         {
             Debug.Log(information.propertyHierarchy);
-        }
+        }*/
         int operationIndex = ((SensorConfiguration)information.configuration).OperationPerProperty[information.propertyHierarchy.GetHashCode()];
         additionalInfo.operation = OperationList()[operationIndex];
         if (operationIndex == GetAggregationSpecificIndex())

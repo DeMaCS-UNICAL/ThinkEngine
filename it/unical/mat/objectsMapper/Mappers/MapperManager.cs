@@ -2,6 +2,7 @@
 using Mappers.BaseMappers;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -9,13 +10,13 @@ using UnityEngine;
 internal class MapperManager
 {
 
-    static readonly Dictionary<Type, IDataMapper> metMappers; //each type that is supported for sensors is associated with the actual data mapper 
+    static readonly ConcurrentDictionary<Type, IDataMapper> metMappers; //each type that is supported for sensors is associated with the actual data mapper 
                                                         //that is a derived class of DataMapper. The derived class register itself to this dictionary
     static readonly List<Type> unsupportedTypes;
     static readonly List<IDataMapper> mappers;
     static MapperManager()
     {
-        metMappers = new Dictionary<Type, IDataMapper>();
+        metMappers = new ConcurrentDictionary<Type, IDataMapper>();
         mappers = new List<IDataMapper>();
         unsupportedTypes = new List<Type>();
         RegisterMappers();
@@ -397,7 +398,7 @@ internal class MapperManager
         {
             if (mapper.Supports(type))
             {
-                metMappers.Add(type, mapper);
+                metMappers[type]= mapper;
                 return true;
             }
         }

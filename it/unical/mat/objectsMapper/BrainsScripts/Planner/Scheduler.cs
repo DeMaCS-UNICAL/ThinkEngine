@@ -36,7 +36,10 @@ namespace Planner
             {
                 if (plan.IsReadyToExecute())
                 {
-                    StopCoroutine(currentCoroutine);
+                    if (currentCoroutine != null)
+                    {
+                        StopCoroutine(currentCoroutine);
+                    }
                 }
                 else
                 {
@@ -46,7 +49,6 @@ namespace Planner
             
             currentPlan = plan;
             currentCoroutine = StartCoroutine(currentPlan.ApplyPlan(this));
-            IsWaiting = false;
             return true;
         }
     }

@@ -49,17 +49,7 @@ public class ActuatorBrain :Brain
     #region Unity Messages
 
     
-    void OnApplicationQuit()
-    {
-        if (executor != null)
-        {
-            executor.reason = false;
-            lock (toLock)
-            {
-                Monitor.Pulse(toLock);
-            }
-        }
-    }
+
     #endregion
     protected override string SpecificFileParts()
     {

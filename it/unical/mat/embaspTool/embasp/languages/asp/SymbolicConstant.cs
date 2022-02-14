@@ -1,6 +1,6 @@
-﻿namespace EmbASP.it.unical.mat.embasp.languages.asp
+﻿namespace it.unical.mat.embasp.languages.asp
 {
-    class SymbolicConstant
+    public class SymbolicConstant
     {
         private string value;
         public SymbolicConstant() { }

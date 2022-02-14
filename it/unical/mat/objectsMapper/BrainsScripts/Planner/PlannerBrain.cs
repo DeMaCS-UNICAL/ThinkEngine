@@ -72,6 +72,7 @@ namespace Planner
                 return new HashSet<string> { "asp" };
             }
         }
+        
         internal void PlanAvailable(object plan)
         {
             Planner.NewPlanAvailable(plan);

@@ -9,16 +9,17 @@ class MonoBehaviourSensorsManager:MonoBehaviour
     Dictionary<int, ISensors> monoBehaviourSensorsForProperty;
     internal bool ready;
     private int frameToWait;
-    internal Dictionary<SensorConfiguration,List<MonoBehaviourSensor>> _configurations;
+    SensorConfiguration[] configurations;
+    internal Dictionary<SensorConfiguration,List<MonoBehaviourSensor>> _sensorsForConfigurations;
     internal Dictionary<SensorConfiguration,List<MonoBehaviourSensor>> Sensors
     {
         get
         {
-            if (_configurations == null)
+            if (_sensorsForConfigurations == null)
             {
-                _configurations = new Dictionary<SensorConfiguration, List<MonoBehaviourSensor>>();
+                _sensorsForConfigurations = new Dictionary<SensorConfiguration, List<MonoBehaviourSensor>>();
             }
-            return _configurations;
+            return _sensorsForConfigurations;
         }
     }
 
@@ -55,7 +56,9 @@ class MonoBehaviourSensorsManager:MonoBehaviour
     }
     internal void ManageSensors()
     {
-        foreach(SensorConfiguration configuration in Sensors.Keys)
+        configurations = GetComponents<SensorConfiguration>();
+
+        foreach (SensorConfiguration configuration in Sensors.Keys)
         {
             Sensors[configuration].Clear();
         }
@@ -110,10 +113,16 @@ class MonoBehaviourSensorsManager:MonoBehaviour
 
     internal SensorConfiguration GetConfiguration(string confName)
     {
-        SensorConfiguration[] configurations = GetComponents<SensorConfiguration>();
+        configurations = GetComponents<SensorConfiguration>();
         if (configurations == null || configurations.Length == 0)
         {
-            Destroy(this);
+            if(Application.isPlaying)
+            { 
+                Destroy(this);
+            }
+            else{
+                DestroyImmediate(this);
+            }
             return null;
         }
         foreach (SensorConfiguration configuration in configurations)
@@ -129,10 +138,17 @@ class MonoBehaviourSensorsManager:MonoBehaviour
     internal IEnumerable<string> GetAllConfigurationNames()
     {
         List<string> toReturn = new List<string>();
-        SensorConfiguration[] configurations = GetComponents<SensorConfiguration>();
-        if(configurations==null || configurations.Length == 0)
+        configurations = GetComponents<SensorConfiguration>();
+        if (configurations==null || configurations.Length == 0)
         {
-            Destroy(this);
+            if (Application.isPlaying)
+            {
+                Destroy(this);
+            }
+            else
+            {
+                DestroyImmediate(this);
+            }
             return toReturn;
         }
         foreach (SensorConfiguration configuration in configurations)

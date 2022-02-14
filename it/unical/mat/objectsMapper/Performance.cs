@@ -69,7 +69,7 @@ class Performance : MonoBehaviour
         steps++;
         using (StreamWriter fs = new StreamWriter(path, true))
         {
-            fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";" + SensorsManager.avgFps + ";" + "\n");
+            fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";" + Utility.SensorsManager.avgFps + ";" + "\n");
 
             fs.Close();
         }
@@ -78,7 +78,7 @@ class Performance : MonoBehaviour
             updatedSensors = false;
             using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, true))
             {
-                fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";"+SensorsManager.avgFps+";"+SensorsManager.bestAvgFps+";"+ FindObjectsOfType<MonoBehaviourSensor>().Length+"\n");
+                fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";"+ Utility.SensorsManager.avgFps+";"+SensorsManager.bestAvgFps+";"+ FindObjectsOfType<MonoBehaviourSensor>().Length+"\n");
                 fs.Close();
             }
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 using UnityEditor;
 using UnityEngine;
 
@@ -41,7 +42,7 @@ public static class Utility
     {
         get
         {
-            return SensorsManager.frameFromLastUpdate >= SensorsManager.updateFrequencyInFrames;
+            return Executor.Reading(); ;
         }
     }
     internal static List<string> TriggerMethodsToShow

@@ -78,11 +78,18 @@ namespace Planner
             counter++;
             if (actions.Count == 0)
             {
-                scheduler.IsWaiting = true;
-                yield break;
+                try
+                {
+                    yield break;
+                }
+                finally
+                {
+                    scheduler.IsWaiting = true;
+                }
             }
+            scheduler.IsWaiting = false;
             _isExecuting = true;
-            while (actions.Count > 0 && IsExecutable())
+            while (actions.Count > 0)
             {
                 yield return new WaitUntil(() => !IsExecutable() || HasExecutableAction());
                 if (IsExecutable())
