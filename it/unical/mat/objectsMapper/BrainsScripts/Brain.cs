@@ -1,256 +1,262 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using UnityEngine;
-using System.IO;
-using System.Threading;
-using System.Reflection;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
+using UnityEngine;
 
-[ExecuteAlways]
-public class Brain :MonoBehaviour
+namespace Planner
 {
-    #region Serialized Fieds
-    public bool enableBrain=true;
-    public bool debug=true;
-    public bool maintainFactFile;
-    [SerializeField, HideInInspector]
-    private List<string> _chosenSensorConfigurations;
-    [SerializeField, HideInInspector]
-    private List<string> _chosenActuatorConfigurations;
-    [SerializeField,HideInInspector]
-    internal string ASPFilesPath;
-    [SerializeField, HideInInspector]
-    internal string ASPFilesPrefix;
-    [SerializeField,HideInInspector]
-    private string _ASPFileTemplatePath;
-    [SerializeField, HideInInspector]
-    private string _executeReasonerOn;
-    [SerializeField, HideInInspector]
-    internal bool prefabBrain;
-    [SerializeField, HideInInspector]
-    internal bool specificASPFile;
-    [SerializeField, HideInInspector]
-    internal bool globalASPFile;
-    #endregion
-    private object triggerClass;
-    internal List<string> chosenSensorConfigurations
+    [ExecuteAlways, RequireComponent(typeof(IndexTracker))]
+    public abstract class Brain: MonoBehaviour
     {
-        get
+        private string _fileExtension;
+        internal string FileExtension
         {
-            if (_chosenSensorConfigurations == null)
+            get
             {
-                _chosenSensorConfigurations = new List<string>();
-            }
-            return _chosenSensorConfigurations;
-        }
-    }
-    internal List<string> chosenActuatorConfigurations
-    {
-        get
-        {
-            if (_chosenActuatorConfigurations == null)
-            {
-                _chosenActuatorConfigurations = new List<string>();
-            }
-            return _chosenActuatorConfigurations;
-        }
-    }
-    internal string ASPFileTemplatePath
-    {
-        get
-        {
-            if (_ASPFileTemplatePath == null || !_ASPFileTemplatePath.Equals("Template" + gameObject.name + ".asp"))
-            {
-                _ASPFileTemplatePath = @".\Assets\Resources\" + "Template"+gameObject.name + ".asp";
-                if (!File.Exists(_ASPFileTemplatePath))
+                if (_fileExtension == null)
                 {
-                    if (!Directory.Exists(@".\Assets\Resources"))
+                    FindCurrentParadigm();
+                    if (_fileExtension == null)
                     {
-                        Directory.CreateDirectory(@".\Assets\Resources");
+                        return "";
                     }
-                    File.Create(_ASPFileTemplatePath);
                 }
+                return _fileExtension;
             }
-            return _ASPFileTemplatePath;
         }
-    }
-    internal string executeReasonerOn
-    {
-        get
+        protected abstract HashSet<string> SupportedFileExtensions { get; }
+        public bool enableBrain = true;
+        public bool debug = true;
+        public bool maintainInputFile;
+        [SerializeField, HideInInspector]
+        protected List<string> _chosenSensorConfigurations;
+        internal List<string> ChosenSensorConfigurations
         {
-            if (_executeReasonerOn == null)
+            get
             {
-                _executeReasonerOn = "";
-            }
-            return _executeReasonerOn;
-        }
-        set
-        {
-            _executeReasonerOn = value;
-        }
-    }
-
-    #region Runtime Fields
-    internal readonly object toLock = new object();
-    internal string sensorsMapping;
-    internal string objectsIndexes;
-    internal bool sensorsConfigurationsChanged;
-    internal bool actuatorsConfigurationsChanged;
-    private string originalName;
-    internal MethodInfo reasonerMethod;
-    internal bool missingData;
-    private Thread executionThread;
-    internal SolverExectuor embasp;
-    internal bool solverWaiting;
-    #endregion
-
-    #region Unity Messages
-    void Reset()
-    {
-        if (GetComponent<IndexTracker>() == null)
-        {
-            gameObject.AddComponent<IndexTracker>();
-        }
-        triggerClass = Utility.triggerClass;
-    }
-    void OnEnable()
-    {
-        originalName = gameObject.name;
-        Reset();
-    }
-    void Start()
-    {
-        //Debug.Log("DLL success");
-        Utility.loadPrefabs();
-        if (Application.isPlaying && enableBrain)
-        {
-            StartCoroutine(InitBrain2());
-        }
-    }
-    void Update()
-    {
-        if (reasonerMethod == null)
-        {
-            lock (toLock)
-            {
-                if (!SomeConfigurationAvailable())
+                if (_chosenSensorConfigurations == null)
                 {
-                    missingData = true;
-                    return;
+                    _chosenSensorConfigurations = new List<string>();
                 }
-                if (solverWaiting)
+                return _chosenSensorConfigurations;
+            }
+        }
+        [SerializeField, HideInInspector]
+        internal string AIFilesPath=  @".\Assets\StreamingAssets\";
+        [SerializeField, HideInInspector]
+        internal string AIFilesPrefix;
+        [SerializeField, HideInInspector]
+        protected string _AIFileTemplatePath;
+        [SerializeField, HideInInspector]
+        internal bool prefabBrain;
+        internal string AIFileTemplatePath
+        {
+            get
+            {
+                if (_AIFileTemplatePath == null || !_AIFileTemplatePath.Equals(this.GetType().Name + "Template" + AIFilesPrefix+ ".asp"))
+                {
+                    _AIFileTemplatePath = @".\Assets\Resources\" + this.GetType().Name + "Template" + AIFilesPrefix + ".asp";
+                    if (!File.Exists(_AIFileTemplatePath))
+                    {
+                        if (!Directory.Exists(@".\Assets\Resources"))
+                        {
+                            Directory.CreateDirectory(@".\Assets\Resources");
+                        }
+                        File.Create(_AIFileTemplatePath);
+                    }
+                }
+                return _AIFileTemplatePath;
+            }
+        }
+        [SerializeField, HideInInspector]
+        protected string _executeReasonerOn;
+        internal string ExecuteReasonerOn
+        {
+            get
+            {
+                if (_executeReasonerOn == null)
+                {
+                    _executeReasonerOn = "";
+                }
+                return _executeReasonerOn;
+            }
+            set
+            {
+                _executeReasonerOn = value;
+            }
+        }
+        [SerializeField, HideInInspector]
+        internal bool specificAIFile;
+        [SerializeField, HideInInspector]
+        internal bool globalAIFile;
+        protected object triggerClass;
+        internal readonly object toLock = new object();
+        internal string sensorsMapping;
+        internal bool sensorsConfigurationsChanged;
+        protected string originalName;
+        internal MethodInfo reasonerMethod;
+        internal bool missingData;
+        protected Thread executionThread;
+        internal Executor executor;
+        internal bool solverWaiting;
+
+        void OnEnable()
+        {
+            originalName = gameObject.name;
+        }
+
+        protected virtual void Start()
+        {
+            Utility.LoadPrefabs();
+            if (Application.isPlaying && enableBrain)
+            {
+                triggerClass = Utility.TriggerClass;
+                StartCoroutine(Init());
+            }
+        }
+
+        private void FindCurrentParadigm()
+        {
+            if (AIFilesPrefix == null)
+            {
+                return;
+            }
+            _fileExtension = "";
+            foreach (string fileName in Directory.GetFiles(Application.streamingAssetsPath))
+            {
+                string actualFileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
+                if (actualFileName.StartsWith(AIFilesPrefix))
+                {
+                    string extension = actualFileName.Substring(actualFileName.LastIndexOf(".") + 1);
+                    if (FileExtension.Equals("") && SupportedFileExtensions.Contains(extension))
+                    {
+                        _fileExtension = extension;
+                    }
+                    else if (!extension.Equals(FileExtension) && SupportedFileExtensions.Contains(extension))
+                    {
+                        throw new Exception("Multiple paradigms encoding found. You should either use " + FileExtension + " or " + extension + " for " + AIFilesPrefix);
+                    }
+                }
+            }
+
+            if (FileExtension.Equals(""))
+            {
+                _fileExtension = null;
+            }
+        }
+
+        protected virtual void Update()
+        {
+            if (Application.isPlaying &&  reasonerMethod == null)
+            {
+                lock (toLock)
+                {
+                    if (!SomeConfigurationAvailable())
+                    {
+                        missingData = true;
+                        return;
+                    }
+                    if (solverWaiting)
+                    {
+                        solverWaiting = false;
+                        Monitor.Pulse(toLock);
+                    }
+                }
+            }
+        }
+        internal void RemoveNullSensorConfigurations()
+        {
+            ChosenSensorConfigurations.RemoveAll(x => !Utility.SensorsManager.ExistsConfigurationWithName(x));
+        }
+        protected void PrepareSensors()
+        {
+            Utility.SensorsManager.RegisterBrainsSensorConfigurations(this, ChosenSensorConfigurations);
+        }
+        protected IEnumerator PulseOn()
+        {
+            while (true)
+            {
+                yield return new WaitUntil(() => solverWaiting && SomeConfigurationAvailable() && (bool)reasonerMethod.Invoke(triggerClass, null));
+                lock (toLock)
                 {
                     solverWaiting = false;
                     Monitor.Pulse(toLock);
                 }
             }
         }
-    }
-    void OnApplicationQuit()
-    {
-        if (embasp != null)
+        internal virtual void GenerateFile()
         {
-            embasp.reason = false;
-            lock (toLock)
+            string sensorsAsASP;
+            using (StreamWriter fs = File.CreateText(AIFileTemplatePath))
             {
-                Monitor.Pulse(toLock);
-            }
-        }
-    }
-    #endregion
-    internal void GenerateFile()
-    {
-        using (FileStream fs = File.Create(ASPFileTemplatePath))
-        {
-            Byte[] info = new UTF8Encoding(true).GetBytes("%For runtime instantiated GameObject, only the prefab mapping is provided. Use that one substituting the gameobject name accordingly\n");
-            fs.Write(info, 0, info.Length);
-            HashSet<string> seenActuatorConfNames = new HashSet<string>();
-            HashSet<string> seenSensorConfNames = new HashSet<string>();
-            foreach (ActuatorConfiguration actuatorConf in Utility.actuatorsManager.GetCorrespondingConfigurations(chosenActuatorConfigurations))
-            {
-                if (seenActuatorConfNames.Contains(actuatorConf.configurationName))
+                fs.Write("%For runtime instantiated GameObject, only the prefab mapping is provided. Use that one substituting the gameobject name accordingly.\n %Sensors.\n");
+                HashSet<string> seenSensorConfNames = new HashSet<string>();
+                
+                foreach (SensorConfiguration sensorConf in Utility.SensorsManager.GetConfigurations(ChosenSensorConfigurations))
                 {
-                    continue;
+                    if (seenSensorConfNames.Contains(sensorConf.ConfigurationName))
+                    {
+                        continue;
+                    }
+                    seenSensorConfNames.Add(sensorConf.ConfigurationName);
+                    foreach (MyListString property in sensorConf.ToMapProperties)
+                    {
+                        //Debug.Log(property);
+                        sensorsAsASP= MapperManager.GetASPTemplate(sensorConf.ConfigurationName, sensorConf.gameObject, property, true);
+                        //Debug.Log(sensorsAsASP);
+                        fs.Write(ActualSensorEncoding(sensorsAsASP));
+                    }
                 }
-                seenActuatorConfNames.Add(actuatorConf.configurationName);
-                info = new UTF8Encoding(true).GetBytes(actuatorConf.GetAspTemplate());
-                fs.Write(info, 0, info.Length);
-            }
-            foreach (SensorConfiguration sensorConf in Utility.sensorsManager.GetConfigurations(chosenSensorConfigurations))
-            {
-                if (seenSensorConfNames.Contains(sensorConf.configurationName))
-                {
-                    continue;
-                }
-                seenSensorConfNames.Add(sensorConf.configurationName);
-                info = new UTF8Encoding(true).GetBytes(sensorConf.GetAspTemplate());
-                fs.Write(info, 0, info.Length);
+                fs.Write(SpecificFileParts());
             }
         }
-    }
-    IEnumerator InitBrain2()
-    {
-        if(specificASPFile && originalName.Equals(gameObject.name))
-        {
-            yield return new WaitUntil( () => !originalName.Equals(gameObject.name));
-        }
-        embasp = new SolverExectuor(this);
-        PrepareSensors();
-        PrepareActuators();
-        if (!SomeConfigurationAvailable())
-        {
-            missingData = true;
-        }
-        if (!executeReasonerOn.Equals("When Sensors are ready"))
-        {
-            reasonerMethod = Utility.getTriggerMethod(executeReasonerOn);
-            if (reasonerMethod != null)
-            {
-                StartCoroutine(PulseOn());
-            }
-        }
-        string GOname = gameObject.name;
-        executionThread = new Thread(() =>
-        {
-            Thread.CurrentThread.Name = "Solver executor "+ GOname;
-            Thread.CurrentThread.IsBackground = true;
-            embasp.Run();
-        });
-        executionThread.Start();
-    }
-    internal void RemoveNullSensorConfigurations()
-    {
-        chosenSensorConfigurations.RemoveAll(x => !Utility.sensorsManager.ExistsConfigurationWithName(x));
-    }
-    internal void RemoveNullActuatorConfigurations()
-    {
-        chosenActuatorConfigurations.RemoveAll(x => !Utility.actuatorsManager.ExistsConfigurationWithName(x,this));
-    }
-    private void PrepareActuators()
-    {
-        Utility.actuatorsManager.RegisterBrainActuatorConfigurations(this, chosenActuatorConfigurations);
-    }
-    private void PrepareSensors()
-    {
-        Utility.sensorsManager.RegisterBrainsSensorConfigurations(this, chosenSensorConfigurations);
-    }
-    private IEnumerator PulseOn()
-    {
-        while (true)
-        {
-            yield return new WaitUntil(() => solverWaiting && SomeConfigurationAvailable() && (bool)reasonerMethod.Invoke(triggerClass, null));
-            lock (toLock)
-            {
-                solverWaiting = false;
-                Monitor.Pulse(toLock);
-            }
-        }
-    }
-    private bool SomeConfigurationAvailable()
-    {
-        return Utility.sensorsManager.IsSomeActiveInScene(chosenSensorConfigurations) && Utility.actuatorsManager.IsSomeActiveInScene(chosenActuatorConfigurations);
-    }
-}
 
+        protected abstract string SpecificFileParts();
+        internal abstract string ActualSensorEncoding(string sensorsAsASP);
+
+        protected virtual IEnumerator Init()
+        {
+            if (specificAIFile && originalName.Equals(gameObject.name))
+            {
+                yield return new WaitUntil(() => !originalName.Equals(gameObject.name));
+            }
+            PrepareSensors();
+            if (!SomeConfigurationAvailable())
+            {
+                missingData = true;
+            }
+            if (!ExecuteReasonerOn.Equals("When Sensors are ready"))
+            {
+                reasonerMethod = Utility.GetTriggerMethod(ExecuteReasonerOn);
+                if (reasonerMethod != null)
+                {
+                    StartCoroutine(PulseOn());
+                }
+            }
+        }
+        protected virtual bool SomeConfigurationAvailable()
+        {
+            return Utility.SensorsManager.IsSomeActiveInScene(ChosenSensorConfigurations);
+        }
+        void OnApplicationQuit()
+        {
+            if (executor != null)
+            {
+                //Debug.Log("pulse " + gameObject);
+                executor.reason = false;
+                lock (toLock)
+                {
+                    Monitor.Pulse(toLock);
+                }
+            }
+        }
+    }
+    
+}

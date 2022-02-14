@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
+using UnityEditor;
 using UnityEngine;
 
 public static class Utility
 {
+    public static  BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
     private static List<string> _triggerMethodsToShow;
     internal static object _triggerClass;
     private static GameObject _hiddenGameObject;
@@ -15,42 +18,58 @@ public static class Utility
     private static string _triggerClassPath= @".\Assets\Scripts\Trigger.cs";
     internal static bool prefabsLoaded = false;
     private static MethodInfo[] _triggerMethods;
+    private static MethodInfo[] TriggerMethods
+    {
+        get
+        {
+            if (_triggerMethods == null)
+            {
+                try
+                {
+                    _triggerMethods = TriggerClass.GetType().GetMethods(BindingAttr);
+                }
+                catch
+                {
+                    return new MethodInfo[0];
+                }
+            }
+            return _triggerMethods;
+        }
+    }
     #region Properties
 
-    public static bool updatingSensors
+    public static bool UpdatingSensors
     {
         get
         {
-            return SensorsManager.frameFromLastUpdate >= SensorsManager.updateFrequencyInFrames;
+            return Executor.Reading(); ;
         }
     }
-    internal static List<string> triggerMethodsToShow
+    internal static List<string> TriggerMethodsToShow
     {
         get
         {
-            checkTriggerClass();
-            _triggerMethodsToShow = findMethodsToShow();
+            CheckTriggerClass();
+            _triggerMethodsToShow = FindMethodsToShow();
             return _triggerMethodsToShow;
         }
-        set
-        {
-            _triggerMethodsToShow = value;
-        }
     }
-    internal static object triggerClass
+    internal static object TriggerClass
     {
         get
         {
-            checkTriggerClass();
-            _triggerClass = ScriptableObject.CreateInstance("Trigger");
+            CheckTriggerClass();
+            if (_triggerClass == null)
+            {
+                if (!EditorApplication.isCompiling)
+                {
+                    _triggerClass = ScriptableObject.CreateInstance("Trigger");
+                }
+            }
             return _triggerClass;
         }
-        set
-        {
-            _triggerClass = value;
-        }
     }
-    internal static GameObject hiddenGameObject
+    internal static GameObject HiddenGameObject
     {
         get
         {
@@ -60,55 +79,54 @@ public static class Utility
                 if (_hiddenGameObject==null)
                 {
                     _hiddenGameObject = new GameObject("ThinkEngineUtility");
-                    _hiddenGameObject.AddComponent<MonoUtility>();
                     //_hiddenGameObject.hideFlags = HideFlags.HideInHierarchy & HideFlags.HideInInspector;
                 }
             }
             return _hiddenGameObject;
         }
     }
-    internal static bool managersDestroyed
+    internal static bool ManagersDestroyed
     {
         get
         {
             return SensorsManager.destroyed || ActuatorsManager.destroyed;
         }
     }
-    internal static SensorsManager sensorsManager
+    internal static SensorsManager SensorsManager
     {
         get
         {
             if (_sensorsManager == null)
             {
-                _sensorsManager = hiddenGameObject.GetComponent<SensorsManager>();
+                _sensorsManager = HiddenGameObject.GetComponent<SensorsManager>();
                 if (_sensorsManager == null)
                 {
-                    _sensorsManager = hiddenGameObject.AddComponent<SensorsManager>();
+                    _sensorsManager = HiddenGameObject.AddComponent<SensorsManager>();
                 }
             }
             return _sensorsManager;
         }
     }
-    internal static ActuatorsManager actuatorsManager
+    internal static ActuatorsManager ActuatorsManager
     {
         get
         {
             if (_actuatorsManager == null)
             {
-                _actuatorsManager = hiddenGameObject.GetComponent<ActuatorsManager>();
+                _actuatorsManager = HiddenGameObject.GetComponent<ActuatorsManager>();
                 if (_actuatorsManager == null)
                 {
-                    _actuatorsManager = hiddenGameObject.AddComponent<ActuatorsManager>();
+                    _actuatorsManager = HiddenGameObject.AddComponent<ActuatorsManager>();
                 }
             }
             return _actuatorsManager;
         }
     }
-    internal static string triggerClassPath
+    internal static string TriggerClassPath
     {
         get
         {
-            checkTriggerClass();
+            CheckTriggerClass();
             return _triggerClassPath;
         }
         set
@@ -117,12 +135,10 @@ public static class Utility
         }
     }
     #endregion
-    private static List<string> findMethodsToShow()
+    private static List<string> FindMethodsToShow()
     {
-        _triggerMethods = triggerClass.GetType().GetMethods();
         List<string> toReturn = new List<string>();
-
-        foreach (MethodInfo mI in _triggerMethods)
+        foreach (MethodInfo mI in TriggerMethods)
         {
             if (mI.ReturnType == typeof(bool) && mI.GetParameters().Length == 0)
             {
@@ -131,32 +147,32 @@ public static class Utility
         }
         return toReturn;
     }
-    internal static int getTriggerMethodIndex(string name)
+    internal static int GetTriggerMethodIndex(string name)
     {
-        int index = triggerMethodsToShow.IndexOf(name);
+        int index = TriggerMethodsToShow.IndexOf(name);
         if (index != -1)
         {
             return index;
         }
-        return triggerMethodsToShow.Count;
+        return TriggerMethodsToShow.Count;
     }
-    internal static MethodInfo getTriggerMethod(int chosenMethod)
+    internal static MethodInfo GetTriggerMethod(int chosenMethod)
     {
-        if(chosenMethod>_triggerMethods.Length || chosenMethod < 0)
+        if (chosenMethod > TriggerMethods.Length || chosenMethod < 0)
         {
             return null;
         }
-        return _triggerMethods[chosenMethod];
+        return TriggerMethods[chosenMethod];
     }
-    internal static MethodInfo getTriggerMethod(string chosenMethod)
+    internal static MethodInfo GetTriggerMethod(string chosenMethod)
     {
-        if (!triggerMethodsToShow.Contains(chosenMethod))
+        if (!TriggerMethodsToShow.Contains(chosenMethod))
         {
             return null;
         }
-        return _triggerMethods[triggerMethodsToShow.IndexOf(chosenMethod)];
+        return TriggerMethods[TriggerMethodsToShow.IndexOf(chosenMethod)];
     }
-    internal static void checkTriggerClass()
+    internal static void CheckTriggerClass()
     {
         if (!Directory.Exists(@"Assets\Scripts"))
         {
@@ -164,10 +180,10 @@ public static class Utility
         }
         if (!File.Exists(_triggerClassPath))
         {
-            createTriggerScript();
+            CreateTriggerScript();
         }
     }
-    private static void createTriggerScript()
+    private static void CreateTriggerScript()
     {
 #if UNITY_EDITOR
         using (FileStream fs = File.Create(_triggerClassPath))
@@ -179,16 +195,16 @@ public static class Utility
             triggerClassContent += "}";
             Byte[] info = new UTF8Encoding(true).GetBytes(triggerClassContent);
             fs.Write(info, 0, info.Length);
+            fs.Close();
         }
 
         UnityEditor.AssetDatabase.Refresh();
 #endif
     }
-    internal static void loadPrefabs()
+    internal static void LoadPrefabs()
     {
         if (!prefabsLoaded)
         {
-            //Resources.LoadAll<GameObject>("Prefabs");//check HERE
             Resources.LoadAll("");
             prefabsLoaded = true;
         }

@@ -1,11 +1,23 @@
 ﻿using System;
-using UnityEngine;
 using System.Reflection;
+using UnityEngine;
 
-[ExecuteInEditMode, Serializable]
-public class ActuatorConfiguration : AbstractConfiguration
+[ExecuteInEditMode, Serializable, RequireComponent(typeof(MonoBehaviourActuatorsManager))]
+class ActuatorConfiguration : AbstractConfiguration
 {
-    private object triggerClass;
+
+    private object _triggerClass;
+    private object TriggerClass
+    {
+        get
+        {
+            if (_triggerClass == null)
+            {
+                _triggerClass = Utility.TriggerClass;
+            }
+            return _triggerClass;
+        }
+    }
     [SerializeField, HideInInspector]
     private string _methodToApply;
     internal string MethodToApply
@@ -25,64 +37,62 @@ public class ActuatorConfiguration : AbstractConfiguration
     }
     internal MethodInfo applyMethod;
 
-    #region Unity Messages
     void OnEnable()
     {
-        base.Reset();
-        triggerClass = Utility.triggerClass;
-        applyMethod = Utility.getTriggerMethod(MethodToApply);
+        applyMethod = Utility.GetTriggerMethod(MethodToApply);
     }
-    new void Reset()
+    protected override void PropertyDeleted(MyListString property)
     {
-        OnEnable();
+            
     }
-    #endregion
-    protected override void ConfigurationSaved(GameObjectsTracker tracker)
+
+    protected override void PropertySelected(MyListString property)
     {
-        if (GetComponent<MonoBehaviourActuatorsManager>() == null)
+            
+    }
+    internal override string ConfigurationName
+    {
+        set
         {
-            gameObject.AddComponent<MonoBehaviourActuatorsManager>();//.hideFlags = HideFlags.HideInInspector;
-        }
-        GetComponent<MonoBehaviourActuatorsManager>().AddConfiguration(this);
-    }
-    internal override void DeleteConfiguration()
-    {
-        if (saved)
-        {
-            MonoBehaviourActuatorsManager monoBehaviourActuatorsManager = GetComponent<MonoBehaviourActuatorsManager>();
-            if (monoBehaviourActuatorsManager != null)
+            if (!Utility.ActuatorsManager.IsConfigurationNameValid(value, this))
             {
-                monoBehaviourActuatorsManager.DeleteConfiguration(this);
+                throw new Exception("The chosen configuration name cannot be used.");
             }
+            _configurationName = value;
         }
     }
-    internal override void ASPRepresentation()
+    internal override string GetAutoConfigurationName()
     {
-        base.ASPRepresentation();
-        foreach(MyListString property in aspTemplate.Keys)
+        string name;
+        string toAppend = "";
+        int count = 0;
+        do
         {
-            for (int j = 0; j < aspTemplate[property].Count; j++)
-            {
-                aspTemplate[property][j] = "setOnActuator(" + aspTemplate[property][j] + ")";
-            }
+            name = char.ToLower(gameObject.name[0]).ToString() + gameObject.name.Substring(1) + "Actuator" + toAppend;
+            toAppend += count;
+            count++;
         }
+        while (!Utility.ActuatorsManager.IsConfigurationNameValid(name, this));
+        return name;
     }
-    internal override string GetAspTemplate()
+
+    internal override bool IsAValidName(string temporaryName)
     {
-        string original = base.GetAspTemplate();
-        string toReturn = "";
-        foreach(string line in original.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries))
-        {
-            toReturn += line + ":-objectIndex("+ ASPMapperHelper.aspFormat(configurationName) + ",X)"+Environment.NewLine;
-        }
-        return toReturn;
+        return temporaryName.Equals(ConfigurationName) || Utility.ActuatorsManager.IsConfigurationNameValid(temporaryName, this);
     }
+
+    internal override bool IsSensor()
+    {
+        return false;
+    }
+
     internal bool CheckIfApply()
     {
-        if(applyMethod is null)
+        if (applyMethod is null)
         {
             return true;
         }
-        return (bool) applyMethod.Invoke(triggerClass, null);
+        return (bool)applyMethod.Invoke(TriggerClass, null);
     }
 }
+

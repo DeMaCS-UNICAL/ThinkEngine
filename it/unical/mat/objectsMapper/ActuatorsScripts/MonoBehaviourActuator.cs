@@ -1,154 +1,127 @@
-﻿using System;
+﻿using it.unical.mat.embasp.languages.asp;
+using Mappers;
+using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text.RegularExpressions;
-using it.unical.mat.embasp.languages.asp;
 using UnityEngine;
 
-internal class MonoBehaviourActuatorHider
+[RequireComponent(typeof(IndexTracker))]
+internal class MonoBehaviourActuator : MonoBehaviour
 {
-    internal class MonoBehaviourActuator : MonoBehaviour
+    internal string configurationName;
+    private object toPass;
+    private MyListString property;
+    private string mappingToCompare;
+    private List<IInfoAndValue> _propertyInfo;
+    internal List<IInfoAndValue> PropertyInfo
     {
-        private const BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
+        get
+        {
+            if (_propertyInfo == null)
+            {
+                _propertyInfo = new List<IInfoAndValue>();
+            }
+            return _propertyInfo;
+        }
+    }
+    private string _mapping;
+    internal string Mapping
+    {
+        get
+        {
+            return _mapping;
+        }
+    }
+    private string _toSet;
+    private string suffix;
 
-        internal MyListString property;
-        internal string actuatorName;
-        private string _toSet;
-        internal string toSet
+    internal string ToSet
+    {
+        get
         {
-            get
-            {
-                return _toSet;
-            }
-            set
-            {
-                _toSet = value;
-                ApplyToGameLogic();
-            }
+            return _toSet;
         }
-        void Awake()
+        set
         {
-            hideFlags = HideFlags.HideAndDontSave;
+            _toSet = value;
+            ApplyToGameLogic();
         }
-        void OnDisable()
+    }
+
+    internal void Configure(InstantiationInformation information, string mapping)
+    {
+        toPass = gameObject;
+        configurationName = information.configuration.ConfigurationName;
+        property = new MyListString(information.propertyHierarchy.myStrings);
+        PropertyInfo.AddRange(information.hierarchyInfo);
+        int index = GetComponent<IndexTracker>().CurrentIndex;
+        this._mapping = "setOnActuator("+NewASPMapperHelper.AspFormat(configurationName) + "(" + NewASPMapperHelper.AspFormat(gameObject.name) + ",objectIndex(" + index + ")," + mapping+"))";
+        List<object> temp = new List<object>();
+        for(int i=0; i < PropertyInfo.Count; i++)
         {
-            Destroy(this);
-        }
-        
-        private void ApplyToGameLogic()
-        {
-            if (_toSet == null)
+            object currentValue = PropertyInfo[i].GetValuesForPlaceholders();
+            if (currentValue.GetType().IsArray)
             {
-                return;
-            }
-            if (property.Count == 1)//if the property is a direct one (i.e. a "field" of the gameobject)
-            {
-                UpdateSimpleProperty(property, property[0], typeof(GameObject), gameObject);
+                Array array = (Array)currentValue;
+                for (int j=0; j< array.Length; j++)
+                {
+                    temp.Add(array.GetValue(j));
+                }
             }
             else
             {
-                UpdateComposedProperty(property, property, typeof(GameObject), gameObject);
+                if (temp != null)
+                {
+                    temp.Add(currentValue);
+                }
+                else
+                {
+                    temp.Add("");
+                }
             }
+        }
+        mappingToCompare = _mapping.Substring(0,_mapping.IndexOf("{" + (temp.Count) + "}"));
+        int indexOfValue = _mapping.IndexOf("{" + temp.Count + "}");
+        suffix = _mapping.Substring(indexOfValue + 3);
+        mappingToCompare = string.Format(mappingToCompare, temp.ToArray());
+    }
+    void Update()
+    {
+    }
+   
+    void OnDisable()
+    {
+        Destroy(this);
+    }
 
-        }
-        private void UpdateSimpleProperty(MyListString currentProperty, string lastLevelHierarchy, Type gOType, object obj)//set the value of the tracked property with the one stored in _toSet 
+    private void ApplyToGameLogic()
+    {
+        if (_toSet == null)
         {
-            MemberInfo[] members = gOType.GetMember(lastLevelHierarchy, BindingAttr);
-            if (members.Length == 0)
-            {
-                return;
-            }
-            FieldOrProperty property = new FieldOrProperty(members[0]);
-            property.SetValue(obj, Convert.ChangeType(_toSet, property.Type()));
+            return;
         }
-        private void UpdateComposedProperty(MyListString currentProperty, MyListString partialHierarchy, Type objType, object obj)
+        MapperManager.SetPropertyValue(this, new MyListString(property.myStrings), toPass, _toSet, 0);
+
+    }
+    internal string Parse(AnswerSet answerSet)
+    {
+        string pattern = "objectIndex\\(([0-9]+)\\)";
+        Regex regex = new Regex(@pattern);
+        int myIndex = gameObject.GetComponent<IndexTracker>().CurrentIndex;
+        foreach (string literal in answerSet.GetAnswerSet())
         {
-            string parentName = partialHierarchy[0];
-            MyListString child = partialHierarchy.GetRange(1, partialHierarchy.Count - 1);
-            MemberInfo[] members = objType.GetMember(parentName, BindingAttr);
-            if (members.Length == 0)
+            string literalPrefix = literal.Substring(0, mappingToCompare.Length);
+            Match matcher = regex.Match(literalPrefix);
+            if (matcher.Success && int.Parse(matcher.Groups[1].Value) == myIndex)//if the index of the object associated to the actuator is different from the one of the literal
             {
-                UpdateComponent(currentProperty, partialHierarchy, objType, obj);
-                return;
-            }
-            FieldOrProperty parentProperty = new FieldOrProperty(objType.GetMember(parentName)[0]);
-            object parent = parentProperty.GetValue(obj);
-            if (parent == null)
-            {
-                return;
-            }
-            Type parentType = parent.GetType();
-            if (child.Count == 1)
-            {
-                UpdateSimpleProperty(currentProperty, child[0], parentType, parent);
-            }
-            else
-            {
-                UpdateComposedProperty(currentProperty, child, parentType, parent);
-            }
-        }
-        private void UpdateComponent(MyListString currentProperty, MyListString partialHierarchy, Type gOType, object obj)
-        {
-            string parentName = partialHierarchy[0];
-            MyListString child = partialHierarchy.GetRange(1, partialHierarchy.Count - 1);
-            if (gOType == typeof(GameObject))
-            {
-                Component c = ((GameObject)obj).GetComponent(parentName);
-                if (c != null)
+                if (literalPrefix.Contains(mappingToCompare))
                 {
-                    if (child.Count == 1)
-                    {
-                        UpdateSimpleProperty(currentProperty, child[0], c.GetType(), c);
-                    }
-                    else
-                    {
-                        UpdateComposedProperty(currentProperty, child, c.GetType(), c);
-                    }
+                    string partialRes = literal.Substring(mappingToCompare.Length);
+                    partialRes = partialRes.Remove(partialRes.IndexOf(suffix));
+                    return partialRes.Trim('\"',' ');//trim " to avoid conversion problems
                 }
             }
         }
-        internal string Parse(AnswerSet value)//parses an AnswerSet looking for a literal matching its property
-        {
-            List<string> myTemplate = GetMyConfiguration().GetTemplate(property);
-            if (myTemplate.Count > 1)
-            {
-                throw new Exception("It is not expected to have more than 1 entry for actuators");
-            }
-            string myTemplatePrefix = myTemplate[0].Substring(0, myTemplate[0].LastIndexOf('('));
-            string pattern = "objectIndex\\(([0-9]+)\\)";
-            Regex regex = new Regex(@pattern);
-            int myIndex = gameObject.GetComponent<IndexTracker>().currentIndex;
-            foreach (string literal in value.GetAnswerSet())
-            {
-                string literalPrefix = literal.Substring(0, literal.LastIndexOf('('));
-                Match matcher = regex.Match(literalPrefix);
-                if (matcher.Success && int.Parse(matcher.Groups[1].Value) == myIndex)//if the index of the object associated to the actuator is different from the one of the literal
-                {
-                    if (literalPrefix.Equals(string.Format(myTemplatePrefix, myIndex)))
-                    {
-                        int startIndex = literal.LastIndexOf("(") + 1;//the value to assign to the property is wrapped in the inner pair of ()
-                        string partialRes = literal.Substring(startIndex, literal.IndexOf(")", startIndex) - startIndex);
-                        return partialRes.Trim('\"');//trim " to avoid conversion problems
-                    }
-                }
-            }
-            return null;
-        }
-        private ActuatorConfiguration GetMyConfiguration()//retrieves the configuration underlying the actuator
-        {
-            ActuatorConfiguration[] actuatorConfs = gameObject.GetComponents<ActuatorConfiguration>();
-            if (actuatorConfs == null)
-            {
-                throw new Exception("ActuatorConfiguration missing for " + actuatorName);
-            }
-            foreach (ActuatorConfiguration actuatorConf in actuatorConfs)
-            {
-                if (actuatorConf.configurationName.Equals(actuatorName))
-                {
-                    return actuatorConf;
-                }
-            }
-            throw new Exception("ActuatorConfiguration missing for " + actuatorName);
-        }
+        return null;
     }
 }

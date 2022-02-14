@@ -22,6 +22,12 @@ public class MyListString
         myStrings.AddRange(clone);
         Count = myStrings.Count;
     }
+    public MyListString(string first)
+    {
+        myStrings = new List<string>();
+        myStrings.Add(first);
+        Count = 1 ;
+    }
     public override bool Equals(object obj)
     {
         return myStrings.SequenceEqual(((MyListString)obj).myStrings);
@@ -34,7 +40,7 @@ public class MyListString
         {
             result = result * prime + s.GetHashCode();
         }
-        return base.GetHashCode();
+        return result;
     }
     public MyListString GetRange(int start, int count)
     {
@@ -49,6 +55,11 @@ public class MyListString
     public void Remove(string s)
     {
         myStrings.Remove(s);
+        Count = myStrings.Count;
+    }
+    public void RemoveAt(int index)
+    {
+        myStrings.RemoveAt(index);
         Count = myStrings.Count;
     }
     public string this[int key]

@@ -1,17 +1,15 @@
-﻿using System;
+﻿using Mappers;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using static MonoBehaviourActuatorHider;
 
-[ExecuteInEditMode]
 internal class MonoBehaviourActuatorsManager : MonoBehaviour
 {
-    internal Dictionary<ActuatorConfiguration, List<MonoBehaviourActuator>> _actuators;
-    internal bool ready = false;
-    bool destroyed;
-
-    internal Dictionary<ActuatorConfiguration, List<MonoBehaviourActuator>> actuators
+    Dictionary<MyListString, int> propertiesIndex;
+    Dictionary<int, InstantiationInformation> instantiationInformationForProperty;
+    Dictionary<int, IActuators> monoBehaviourActuatorsForProperty;
+    internal bool ready;
+    internal Dictionary<ActuatorConfiguration,List<MonoBehaviourActuator>> _actuators;
+    internal Dictionary<ActuatorConfiguration,List<MonoBehaviourActuator>> Actuators
     {
         get
         {
@@ -22,125 +20,100 @@ internal class MonoBehaviourActuatorsManager : MonoBehaviour
             return _actuators;
         }
     }
-    #region Unity Messages
-    void OnEnable()
-    {
-        Reset();
-    }
-    void Reset()
-    {
-        //hideFlags = HideFlags.HideInInspector;
-        ActuatorsManager.configurationsChanged = true;
-    }
+
     void Start()
     {
-        if (Application.isPlaying)
+        propertiesIndex = new Dictionary<MyListString, int>();
+        instantiationInformationForProperty = new Dictionary<int, InstantiationInformation>();
+        monoBehaviourActuatorsForProperty = new Dictionary<int, IActuators>();
+        foreach (ActuatorConfiguration configuration in GetComponents<ActuatorConfiguration>())
         {
-            ActuatorConfiguration[] configurations = GetComponents<ActuatorConfiguration>();
-            if (configurations == null)
+            Actuators[configuration] = new List<MonoBehaviourActuator>();
+            foreach (MyListString property in configuration.ToMapProperties)
             {
-                Destroy(this);
-                return;
-            }
-            foreach (ActuatorConfiguration configuration in configurations)
-            {
-                if (configuration.saved)
+                int propertyIndex = property.GetHashCode();
+                propertiesIndex[property] = propertyIndex;
+                InstantiationInformation information = new InstantiationInformation()
                 {
-                    InstantiateActuator(configuration);
-                }
+                    instantiateOn = gameObject,
+                    currentObjectOfTheHierarchy = gameObject,
+                    propertyHierarchy = new MyListString(property.myStrings),
+                    residualPropertyHierarchy = new MyListString(property.myStrings),
+                    firstPlaceholder = 0,
+                    configuration = configuration
+                };
+                instantiationInformationForProperty[propertyIndex] = information;
+                monoBehaviourActuatorsForProperty[propertyIndex] = MapperManager.InstantiateActuators(information);
+                Actuators[configuration].AddRange(monoBehaviourActuatorsForProperty[propertyIndex].GetActuatorsList());
             }
-            ready = true;
+        }
+        ready = true;
+    }
+    void Update()
+    {
+        foreach (ActuatorConfiguration configuration in Actuators.Keys)
+        {
+            Actuators[configuration].Clear();
+        }
+        foreach (MyListString property in propertiesIndex.Keys)
+        {
+            int propertyIndex = propertiesIndex[property];
+            IActuators actuators = monoBehaviourActuatorsForProperty[propertyIndex];
+            InformationRefresh(propertyIndex);
+            monoBehaviourActuatorsForProperty[propertyIndex] = MapperManager.ManageActuators(instantiationInformationForProperty[propertyIndex], actuators);
+            Actuators[(ActuatorConfiguration) instantiationInformationForProperty[propertyIndex].configuration].AddRange(monoBehaviourActuatorsForProperty[propertyIndex].GetActuatorsList());
         }
     }
-    void OnDestroy()
+
+    private void InformationRefresh(int propertyIndex)
     {
-        destroyed = true;
+        instantiationInformationForProperty[propertyIndex].currentObjectOfTheHierarchy = gameObject;
+        instantiationInformationForProperty[propertyIndex].residualPropertyHierarchy = new MyListString(instantiationInformationForProperty[propertyIndex].propertyHierarchy.myStrings);
+        instantiationInformationForProperty[propertyIndex].firstPlaceholder = 0;
     }
-    void OnDisable()
+    internal bool ExistsConfigurationOtherThan(string name, ActuatorConfiguration newActuatorConfiguration)
     {
-        destroyed = true;
-    }
-    void OnApplicationQuit()
-    {
-        destroyed = true;
-    }
-    #endregion
-    public void InstantiateActuator(ActuatorConfiguration actuatorConfiguration)
-    {
-        if (!actuators.Keys.Contains(actuatorConfiguration))
+        foreach (ActuatorConfiguration configuration in GetComponents<ActuatorConfiguration>())
         {
-            if (actuatorConfiguration.gameObject.Equals(gameObject))
+            if (configuration != newActuatorConfiguration && configuration.ConfigurationName.Equals(name))
             {
-                actuators.Add(actuatorConfiguration, GenerateActuator(actuatorConfiguration));
+                return true;
             }
         }
+        return false;
     }
-    private List<MonoBehaviourActuator> GenerateActuator(ActuatorConfiguration actuatorConfiguration)
-    {
-        List<MonoBehaviourActuator> generatedActuators = new List<MonoBehaviourActuator>();
-        foreach (MyListString currentProperty in actuatorConfiguration.properties)
-        {
-            MonoBehaviourActuator newActuator = gameObject.AddComponent<MonoBehaviourActuator>();
-            newActuator.property = currentProperty;
-            newActuator.actuatorName = actuatorConfiguration.configurationName;
-            generatedActuators.Add(newActuator);
-        }
-        return generatedActuators;
-    }
+
     internal IEnumerable<string> GetAllConfigurationNames()
     {
         List<string> toReturn = new List<string>();
         ActuatorConfiguration[] configurations = GetComponents<ActuatorConfiguration>();
-        if (configurations == null)
+        if (configurations == null || configurations.Length==0)
         {
             Destroy(this);
             return toReturn;
         }
         foreach (ActuatorConfiguration configuration in configurations)
         {
-            toReturn.Add(configuration.configurationName);
+            toReturn.Add(configuration.ConfigurationName);
         }
         return toReturn;
     }
-    internal ActuatorConfiguration GetConfiguration(string name)
+
+    internal ActuatorConfiguration GetConfiguration(string confName)
     {
         ActuatorConfiguration[] configurations = GetComponents<ActuatorConfiguration>();
-        if (configurations == null)
+        if (configurations == null || configurations.Length==0)
         {
             Destroy(this);
             return null;
         }
         foreach (ActuatorConfiguration configuration in configurations)
         {
-            if (configuration.saved && configuration.configurationName.Equals(name))
+            if (configuration.ConfigurationName.Equals(confName))
             {
                 return configuration;
             }
         }
         return null;
     }
-    internal void AddConfiguration(ActuatorConfiguration configuration)
-    {
-        ActuatorsManager.configurationsChanged = true;
-    }
-    internal void DeleteConfiguration(ActuatorConfiguration configuration)
-    {
-        if (destroyed)
-        {
-            return;
-        }
-        ActuatorsManager.configurationsChanged = true;
-        if (GetComponents<ActuatorConfiguration>().Length == 1)
-        {
-            if (Application.isPlaying)
-            {
-                Destroy(this);
-            }
-            else
-            {
-                DestroyImmediate(this);
-            }
-        }
-    }
 }
-
