@@ -138,7 +138,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     facts.AddFilesPath(factsPath);
                     handler.AddProgram(encoding);
                     handler.AddProgram(facts);
-                    SpecificOptions(handler);
+                    if (!brain.debug)
+                    {
+                        SpecificOptions(handler);
+                    }
                     stopwatch.Restart();
 
                     //Debug.Log("running dlv");

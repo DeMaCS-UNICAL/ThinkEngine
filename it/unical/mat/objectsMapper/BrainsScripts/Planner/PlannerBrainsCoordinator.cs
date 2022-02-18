@@ -7,10 +7,10 @@ using UnityEngine;
 
 namespace Planner
 {
-    class PlannerBrainsCoordinator : MonoBehaviour
+    public class PlannerBrainsCoordinator : MonoBehaviour
     {
         private Scheduler scheduler;
-        private int priorityExecuting;
+        public int priorityExecuting;
         private SortedDictionary<int, Plan> plannersLastPlan;
         internal void SetPriority(int previousPriority, int newPriority, PlannerBrain brain)
         {
@@ -50,10 +50,8 @@ namespace Planner
             {
                 return;
             }
-            if (priorityExecuting > brain.Priority || (priorityExecuting == brain.Priority && brain.GetPlan().IsReadyToExecute()))
+            if (priorityExecuting >= brain.Priority && brain.GetPlan().IsReadyToExecute())
             {
-                priorityExecuting = brain.Priority;
-                
                 bool used = scheduler.NewPlan(brain.GetPlan());
                 if (used)
                 {
@@ -61,6 +59,7 @@ namespace Planner
                     {
                         plannersLastPlan.Remove(brain.Priority);
                     }
+                    priorityExecuting = brain.Priority;
                 }
                 else
                 {
@@ -73,9 +72,17 @@ namespace Planner
             }
         }
 
+        void Update()
+        {
+            if (plannersLastPlan.Count != 0)
+            {
+                
+            }
+        }
+
         internal void SchedulerIsWaiting()
         {
-            priorityExecuting = NumberOfBrains();
+            priorityExecuting = NumberOfBrains()+1;
             while (plannersLastPlan.Count != 0)
             {
                 KeyValuePair<int, Plan> toExecute = plannersLastPlan.Last();
@@ -97,7 +104,7 @@ namespace Planner
         void Start()
         {
             scheduler = GetComponent<Scheduler>();
-            priorityExecuting = NumberOfBrains();
+            priorityExecuting = NumberOfBrains()+1;
             plannersLastPlan = new SortedDictionary<int, Plan>();
         }
         

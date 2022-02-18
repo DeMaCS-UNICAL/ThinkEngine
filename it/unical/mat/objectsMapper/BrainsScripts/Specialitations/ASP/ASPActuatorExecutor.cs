@@ -20,16 +20,9 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
             brain = b;
         }
 
-        protected override void SpecificAnswerSetOperations(AnswerSets answers)
+        protected override void SpecificAnswerSetOperations(AnswerSet answer)
         {
-            if (answers.GetOptimalAnswerSets().Count > 0)
-            {
-                ActuatorsManager.NotifyActuators((ActuatorBrain)brain, answers.GetOptimalAnswerSets()[0]);
-            }
-            else
-            {
-                ActuatorsManager.NotifyActuators((ActuatorBrain)brain, answers.answersets[0]);
-            }
+                ActuatorsManager.NotifyActuators((ActuatorBrain)brain,answer);
         }
 
         protected override bool SpecificFactsRetrieving(Brain brain)

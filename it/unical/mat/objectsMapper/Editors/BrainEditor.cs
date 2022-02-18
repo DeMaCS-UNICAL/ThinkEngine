@@ -1,6 +1,7 @@
 ﻿using Planner;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -314,6 +315,14 @@ namespace Editors
         {
             IfConfigurationChanged();
             DrawPropertiesExcluding(serializedObject, ExcludedProperties.ToArray());
+            EditorGUILayout.BeginHorizontal();
+            Target.maintainInputFile = EditorGUILayout.Toggle("Maintain input file", Target.maintainInputFile);
+            if (GUILayout.Button("Open input folder"))
+            {
+                EditorUtility.RevealInFinder(Path.GetTempPath()+ @"ThinkEngineFacts\");
+            }
+            EditorGUILayout.Space();
+            EditorGUILayout.EndHorizontal();
             ShowSpecificFields();
             ShowNotEditableInformations();
             ListAvailableConfigurations();

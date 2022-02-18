@@ -116,6 +116,7 @@ namespace Planner
                     plan = Planner.GetNewPlan();
                     if (plan!=null)
                     {
+                        plan.priority = Priority;
                         Coordinator.PlanReady(this);
                     }
                 }

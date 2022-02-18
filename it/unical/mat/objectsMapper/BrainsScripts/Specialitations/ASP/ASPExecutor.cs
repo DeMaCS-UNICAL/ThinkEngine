@@ -36,9 +36,31 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
             stopwatch.Stop();
             if (answers.Answersets.Count > 0)
             {
-                SpecificAnswerSetOperations(answers);
+                if (answers.GetOptimalAnswerSets().Count > 0)
+                {
+                    AnswerSet answer = answers.GetOptimalAnswerSets()[0];
+                    if (brain.debug)
+                    {
+                        Debug.Log("Computed AnswerSet:\n" + string.Join(" ; ", answer.GetAnswerSet()));
+                        foreach(int level in answer.LevelWeight.Keys)
+                        {
+                            Debug.Log("level " + level + " cost " + answer.LevelWeight[level]);
+                        }
+
+                    }
+                    SpecificAnswerSetOperations(answer);
+                }
+                else
+                {
+                    AnswerSet answer = answers.answersets[0];
+                    if (brain.debug)
+                    {
+                        Debug.Log("Computed AnswerSet:\n" + string.Join(" ; ", answer.GetAnswerSet()));
+                    }
+                    SpecificAnswerSetOperations(answer);
+                }
             }
         }
-        protected abstract void SpecificAnswerSetOperations(AnswerSets answers);
+        protected abstract void SpecificAnswerSetOperations(AnswerSet answer);
     }
 }

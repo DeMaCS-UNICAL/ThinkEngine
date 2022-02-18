@@ -50,12 +50,13 @@ class MonoBehaviourSensor : MonoBehaviour
         MapperManager.UpdateSensor(this, gameObject, new MyListString(property.myStrings), 0);
     }
 
+    
     internal string Map()
     {
+        //VELOCIZZA EVITANDO COPIE!!
         List<object> values = new List<object>();
         for(int i=0; i<PropertyInfo.Count;i++)
         {
-
             object toAdd = PropertyInfo[i].GetValuesForPlaceholders();
             values.Add(toAdd);
         }

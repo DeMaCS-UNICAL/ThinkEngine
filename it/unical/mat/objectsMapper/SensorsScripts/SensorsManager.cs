@@ -28,7 +28,7 @@ public  class SensorsManager : MonoBehaviour
     internal static float bestAvgFps = 0;
     internal static int frameCount = 0;
     internal static bool destroyed;
-    internal static MonoBehaviourSensorsManager[] monoBehaviourMenagers;
+    internal static MonoBehaviourSensorsManager[] monoBehaviourManagers;
     private static Dictionary<Brain, List<string>> InstantiatedSensors
     {
         get
@@ -164,8 +164,8 @@ public  class SensorsManager : MonoBehaviour
             Stopwatch localWatch = new Stopwatch();
             watch.Start();
             yield return new WaitUntil(()=>Executor.CanRead(false));
-            monoBehaviourMenagers = RetrieveSensorsManagers();
-            foreach (MonoBehaviourSensorsManager manager in monoBehaviourMenagers)
+            monoBehaviourManagers = RetrieveSensorsManagers();
+            foreach (MonoBehaviourSensorsManager manager in monoBehaviourManagers)
             {
                 watch.Start();
                 if (manager != null)
@@ -298,7 +298,7 @@ public  class SensorsManager : MonoBehaviour
         List<MonoBehaviourSensor> sensors = new List<MonoBehaviourSensor>();
         foreach (string sensorConf in InstantiatedSensors[brain])
         {
-            foreach (MonoBehaviourSensorsManager monobehaviourManager in monoBehaviourMenagers)
+            foreach (MonoBehaviourSensorsManager monobehaviourManager in monoBehaviourManagers)
             {
                 if (monobehaviourManager== null || !monobehaviourManager.ready)
                 {

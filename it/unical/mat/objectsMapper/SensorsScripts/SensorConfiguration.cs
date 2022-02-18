@@ -52,7 +52,12 @@ class SensorConfiguration : AbstractConfiguration, ISerializationCallbackReceive
             {
                 throw new Exception("The chosen configuration name cannot be used.");
             }
+            string old = _configurationName;
             _configurationName = value;
+            if (!old.Equals(_configurationName))
+            {
+                SensorsManager.ConfigurationsChanged=true;
+            }
         } 
     }
         

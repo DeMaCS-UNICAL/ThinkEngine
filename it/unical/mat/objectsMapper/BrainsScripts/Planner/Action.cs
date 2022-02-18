@@ -10,6 +10,7 @@ namespace Planner
     public abstract class Action : ScriptableObject, IComparable<Action>
     {
         public int order;
+        public Plan belongingTO;
         public abstract State Prerequisite();
         public abstract void Do();
         public abstract bool Done();

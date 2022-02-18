@@ -5,12 +5,13 @@ using UnityEngine;
 
 namespace Planner
 {
-    internal class Plan
+    public class Plan
     {
         static int counter = 0;
-        private List<Action> actions;
+        internal List<Action> actions;
+        public int priority;
         private bool _isExecuting;
-        internal bool IsExecuting
+        public bool IsExecuting
         {
             get
             {
@@ -24,7 +25,12 @@ namespace Planner
 
         public Plan(List<Action> lists)
         {
-            actions = new List<Action>(lists);
+            actions = new List<Action>();
+            for (int i = 0; i < lists.Count; i++)
+            {
+                actions.Add(lists[i]);
+                actions[i].belongingTO = this;
+            }
         }
 
         private Action Next()
@@ -52,6 +58,10 @@ namespace Planner
                 if (actions[i].Prerequisite().Equals(State.READY))
                 {
                     return true;
+                }
+                if (actions[i].Prerequisite().Equals(State.ABORT))
+                {
+                    return false;
                 }
             }
             return false;

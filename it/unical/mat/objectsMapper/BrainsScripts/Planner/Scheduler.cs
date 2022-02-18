@@ -9,11 +9,22 @@ using UnityEngine;
 namespace Planner
 {
 
-    internal class Scheduler : MonoBehaviour
+    public class Scheduler : MonoBehaviour
     {
         Plan currentPlan;
         private bool _isWaiting;
-        Coroutine currentCoroutine;
+        Coroutine planExecutionCoroutine;
+        public int ResidualActions
+        {
+            get
+            {
+                if (currentPlan == null)
+                {
+                    return 0;
+                }
+                return currentPlan.actions.Count;
+            }
+        }
         public bool IsWaiting {
             get
             {
@@ -34,21 +45,13 @@ namespace Planner
         {
             if(currentPlan!=null && currentPlan.IsExecuting)
             {
-                if (plan.IsReadyToExecute())
-                {
-                    if (currentCoroutine != null)
+                    if (planExecutionCoroutine != null)
                     {
-                        StopCoroutine(currentCoroutine);
+                        StopCoroutine(planExecutionCoroutine);
                     }
-                }
-                else
-                {
-                    return false;
-                }
             }
-            
             currentPlan = plan;
-            currentCoroutine = StartCoroutine(currentPlan.ApplyPlan(this));
+            planExecutionCoroutine = StartCoroutine(currentPlan.ApplyPlan(this));
             return true;
         }
     }

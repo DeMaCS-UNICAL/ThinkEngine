@@ -50,6 +50,8 @@ namespace Planner
 
         private List<Action> Parse(AnswerSet answerSet)
         {
+            _actionParameters = new Dictionary<int, List<KeyValuePair<string, string>>>();
+            _actions = new Dictionary<int, Action>();
             foreach (string literal in answerSet.GetAnswerSet())
             {
                 if (literal.StartsWith("applyAction("))

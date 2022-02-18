@@ -20,16 +20,9 @@ namespace Planner
             brain = plannerBrain;
         }
 
-        protected override void SpecificAnswerSetOperations(AnswerSets answers)
+        protected override void SpecificAnswerSetOperations(AnswerSet answer)
         {
-            if (answers.GetOptimalAnswerSets().Count > 0)
-            {
-                ((PlannerBrain)brain).PlanAvailable(answers.GetOptimalAnswerSets()[0]);
-            }
-            else
-            {
-                ((PlannerBrain)brain).PlanAvailable(answers.answersets[0]);
-            }
+                ((PlannerBrain)brain).PlanAvailable(answer);
         }
 
         protected override bool SpecificFactsRetrieving(Brain brain)

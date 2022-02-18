@@ -1,9 +1,11 @@
 ﻿using Mappers;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 class MonoBehaviourSensorsManager:MonoBehaviour
 {
+    private Thread mainThread;
     Dictionary<MyListString,int> propertiesIndex;
     Dictionary<int, InstantiationInformation> instantiationInformationForProperty;
     Dictionary<int, ISensors> monoBehaviourSensorsForProperty;
@@ -25,6 +27,7 @@ class MonoBehaviourSensorsManager:MonoBehaviour
 
     void OnEnable()
     {
+        mainThread = System.Threading.Thread.CurrentThread;
         propertiesIndex = new Dictionary<MyListString, int>();
         instantiationInformationForProperty = new Dictionary<int, InstantiationInformation>();
         monoBehaviourSensorsForProperty = new Dictionary<int, ISensors>();
@@ -113,7 +116,10 @@ class MonoBehaviourSensorsManager:MonoBehaviour
 
     internal SensorConfiguration GetConfiguration(string confName)
     {
-        configurations = GetComponents<SensorConfiguration>();
+        if (mainThread== null || mainThread.Equals(System.Threading.Thread.CurrentThread))
+        {
+            configurations = GetComponents<SensorConfiguration>();
+        }
         if (configurations == null || configurations.Length == 0)
         {
             if(Application.isPlaying)
@@ -138,7 +144,10 @@ class MonoBehaviourSensorsManager:MonoBehaviour
     internal IEnumerable<string> GetAllConfigurationNames()
     {
         List<string> toReturn = new List<string>();
-        configurations = GetComponents<SensorConfiguration>();
+        if (mainThread == null || mainThread.Equals(System.Threading.Thread.CurrentThread))
+        {
+            configurations = GetComponents<SensorConfiguration>();
+        }
         if (configurations==null || configurations.Length == 0)
         {
             if (Application.isPlaying)

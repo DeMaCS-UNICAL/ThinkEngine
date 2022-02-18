@@ -34,7 +34,8 @@ namespace Planner
         protected abstract HashSet<string> SupportedFileExtensions { get; }
         public bool enableBrain = true;
         public bool debug = true;
-        public bool maintainInputFile;
+        [SerializeField, HideInInspector]
+        internal bool maintainInputFile;
         [SerializeField, HideInInspector]
         protected List<string> _chosenSensorConfigurations;
         internal List<string> ChosenSensorConfigurations
