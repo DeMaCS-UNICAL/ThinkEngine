@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace it.unical.mat.embasp.platforms.desktop
 {
@@ -20,7 +22,18 @@ namespace it.unical.mat.embasp.platforms.desktop
             IList<OptionDescriptor> input_options = CollectOptions(option_index);
             service.StartAsync(c, input_programs, input_options);
         }
-
+        public void StopProcess()
+        {
+            try
+            {
+                service.solver_process.Kill();
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Tried to kill dlv but exception occurred");
+                Debug.Log(e);
+            }
+        }
         public override Output StartSync(IList<int> program_index, IList<int> option_index)
         {
             IList<InputProgram> input_programs = CollectPrograms(program_index);

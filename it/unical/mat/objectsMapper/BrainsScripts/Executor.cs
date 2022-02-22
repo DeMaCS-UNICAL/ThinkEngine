@@ -1,5 +1,6 @@
 ﻿using it.unical.mat.embasp.@base;
 using it.unical.mat.embasp.languages.asp;
+using it.unical.mat.embasp.platforms.desktop;
 using Planner;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,30 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 {
     abstract class Executor
     {
+        private class MyCallBack : ICallback
+        {
+            Executor executor;
+            public MyCallBack(Executor executor)
+            {
+                this.executor = executor;
+            }
+            public void Callback(Output o)
+            {
+
+                if (!o.ErrorsString.Equals(""))
+                {
+                    UnityEngine.Debug.LogError(o.ErrorsString + " " + o.OutputString);
+                }
+                Performance.WriteOnFile("solver", executor.stopwatch.ElapsedMilliseconds);
+                executor.stopwatch.Stop();
+                executor.OutputParsing(o);
+                if (!executor.brain.maintainInputFile)
+                {
+                    File.Delete(executor.factsPath);
+                }
+                executor.solverDone = true;
+            }
+        }
         protected Brain brain;
         protected string factsPath;
         protected readonly Stopwatch stopwatch = new Stopwatch();
@@ -25,6 +50,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         internal static bool _canRead=false;
         
         private static int _readingSensors=0;
+        internal bool solverDone;
         private static void IncrementReadingSensors()
         {
             lock (toLock)
@@ -124,6 +150,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     {
                         return;
                     }
+                    stopwatch.Restart();
                     SensorsManager.ReturnSensorsMappings(brain);
                     DecreaseReadingSensors();
                     factsPath = Path.GetTempPath() + @"ThinkEngineFacts\" + Path.GetRandomFileName() + ".txt";
@@ -133,6 +160,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                         fs.Write(brain.sensorsMapping);
                         fs.Close();
                     }
+                    Performance.WriteOnFile("facts", stopwatch.ElapsedMilliseconds);
                     Handler handler = GetHandler();
                     InputProgram facts = new ASPInputProgram();
                     facts.AddFilesPath(factsPath);
@@ -145,22 +173,20 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     stopwatch.Restart();
 
                     //Debug.Log("running dlv");
-                    Output o = handler.StartSync();
-                    if (!reason)
+                    stopwatch.Restart();
+                    handler.StartAsync(new MyCallBack(this));
+                    while (!solverDone)
                     {
-                         //Debug.Log("i'm done");
-                        return;
+                        if (!reason)
+                        {
+                            if(handler is DesktopHandler dh)
+                            {
+                                dh.StopProcess();
+                            }
+                            return;
+                        }
                     }
-                    if (!o.ErrorsString.Equals(""))
-                    {
-                        UnityEngine.Debug.LogError(o.ErrorsString + " " + o.OutputString);
-                    }
-
-                    OutputParsing(o);
-                    if (!brain.maintainInputFile)
-                    {
-                        File.Delete(factsPath);
-                    }
+                    solverDone = false;
                 }
                 catch (Exception e)
                 {

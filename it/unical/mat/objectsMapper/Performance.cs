@@ -2,6 +2,8 @@
 using UnityEngine;
 using System.IO;
 using System.Globalization;
+using Planner;
+using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 
 class Performance : MonoBehaviour
 {
@@ -11,6 +13,7 @@ class Performance : MonoBehaviour
     private static readonly string factsAndASPath = @"Performance\factsAndAS.csv";
     private static readonly string sensorsUpdateRate = @"Performance\sensors.csv";
     private static readonly string actuatorsUpdateRate = @"Performance\actuators.csv";
+    private static readonly string plansUpdateRate = @"Performance\actuators.csv";
     private static string path;
     public static bool updatedSensors;
     public static bool updatingActuators;
@@ -21,44 +24,46 @@ class Performance : MonoBehaviour
 
     void Start()
     {
-        //stopwatch = new Stopwatch();
-        //stopwatch.Start();
-        //MyDebugger.MyDebug("starting performace");
-        //Application.targetFrameRate = 60;
+
         if (!Directory.Exists("Performance"))
         {
             Directory.CreateDirectory("Performance");
         }
         nfi.NumberDecimalSeparator = ".";
-        if (GameObject.FindObjectOfType<ActuatorBrain>().enableBrain)
+        Brain brain = GameObject.FindObjectOfType<Brain>();
+        if (brain != null && brain.enableBrain)
         {
-            using (StreamWriter fs = new StreamWriter(withBrainPath, false))
+            using (StreamWriter fs = new StreamWriter(withBrainPath, true))
             {
-                fs.Write("Iteration; Rate; AvgRate\n");
+                fs.Write("\nIteration; Rate; AvgRate\n");
                 fs.Close();
             }
             path = withBrainPath;
 
+            using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, true))
+            {
+                fs.Write("\nIteration; Rate; AvgFPS; BestAvgFPS; NumberOfSensors \n");
+                fs.Close();
+            }
+            if (FindObjectOfType<ActuatorBrain>() != null)
+            {
+                using (StreamWriter fs = new StreamWriter(actuatorsUpdateRate, true))
+                {
+                    fs.Write("\nIteration; Rate\n");
+                    fs.Close();
+                }
+            }
+
         }
         else
         {
-            using (StreamWriter fs = new StreamWriter(withoutBrainPath, false))
+            using (StreamWriter fs = new StreamWriter(withoutBrainPath, true))
             {
-                fs.Write("Iteration; Rate; AvgRate\n");
+                fs.Write("\nIteration; Rate; AvgRate\n");
                 fs.Close();
             }
             path = withoutBrainPath;
 
-        }
-        using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, false))
-        {
-            fs.Write("Iteration; Rate; AvgFPS; BestAvgFPS \n");
-            fs.Close();
-        }
-        using (StreamWriter fs = new StreamWriter(actuatorsUpdateRate, false))
-        {
-            fs.Write("Iteration; Rate\n");
-            fs.Close();
         }
         initialized = true;
     }
@@ -73,9 +78,8 @@ class Performance : MonoBehaviour
 
             fs.Close();
         }
-        if (updatedSensors)
+        if (!Executor._canRead)//if Executors can not read, sensors are updating
         {
-            updatedSensors = false;
             using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, true))
             {
                 fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";"+ Utility.SensorsManager.avgFps+";"+SensorsManager.bestAvgFps+";"+ FindObjectsOfType<MonoBehaviourSensor>().Length+"\n");

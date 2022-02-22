@@ -18,6 +18,7 @@ namespace it.unical.mat.embasp.platforms.desktop
     {
         protected internal string exe_path;
         protected internal string load_from_STDIN_option;
+        internal Process solver_process;
 
         public DesktopService(string exe_path) => this.exe_path = exe_path;
 
@@ -85,7 +86,7 @@ namespace it.unical.mat.embasp.platforms.desktop
                     return new Output("", "Error: executable not found");
                 }
 
-                Process solver_process = new Process();
+                solver_process = new Process();
                 stringBuffer.Append(exe_path).Append(" ").Append(option).Append(" ").Append(files_paths);
                 solver_process.StartInfo.FileName = exe_path;
                 options_string.Append(option).Append(" ").Append(files_paths);
