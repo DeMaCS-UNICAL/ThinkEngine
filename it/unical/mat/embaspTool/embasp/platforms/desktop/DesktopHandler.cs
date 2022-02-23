@@ -26,7 +26,10 @@ namespace it.unical.mat.embasp.platforms.desktop
         {
             try
             {
-                service.solver_process.Kill();
+                if (service.solver_process!=null && service.solver_process.StartTime!= null && !service.solver_process.HasExited)
+                {
+                    service.solver_process.Kill();
+                }
             }
             catch (Exception e)
             {

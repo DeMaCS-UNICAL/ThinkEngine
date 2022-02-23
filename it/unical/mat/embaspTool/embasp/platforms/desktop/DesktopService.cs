@@ -107,7 +107,6 @@ namespace it.unical.mat.embasp.platforms.desktop
                 solver_process.StartInfo.RedirectStandardOutput = true;
                 solver_process.StartInfo.RedirectStandardError = true;
                 solver_process.Start();
-
                 if (final_program.Length > 0)
                 {
                     StreamWriter writer = solver_process.StandardInput;
@@ -123,7 +122,6 @@ namespace it.unical.mat.embasp.platforms.desktop
 
                 solver_process.WaitForExit();
                 solver_process.Close();
-
                 watch.Stop();
 
                 Console.Error.WriteLine("Total time : " + watch.ElapsedMilliseconds);

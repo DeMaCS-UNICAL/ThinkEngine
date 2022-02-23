@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace Planner
 {
     public class Plan
     {
-        static int counter = 0;
+        internal static int checkingPlan = 0;
+        internal static int totalAction=0;
         internal List<Action> actions;
         public int priority;
         private bool _isExecuting;
@@ -35,7 +37,7 @@ namespace Planner
 
         private Action Next()
         {
-            if (!HasExecutableAction())
+            if (!HasExecutableAction().Equals(State.READY))
             {
                 throw new Exception("No executable actions are available");
             }
@@ -51,41 +53,34 @@ namespace Planner
             actions.RemoveAt(0);
             return toReturn;
         }
-        private bool HasExecutableAction()
+        private State HasExecutableAction()
         {
             for (int i = 0; i < actions.Count; i++)
             {
                 if (actions[i].Prerequisite().Equals(State.READY))
                 {
-                    return true;
+                    return State.READY;
                 }
                 if (actions[i].Prerequisite().Equals(State.ABORT))
                 {
-                    return false;
+                    return State.ABORT;
                 }
             }
-            return false;
+            return State.WAIT;
         }
+
         internal bool IsExecutable()
         {
-            for (int i = 0; i < actions.Count; i++)
-            {
-                if (actions[i].Prerequisite().Equals(State.ABORT))
-                {
-                    return false;
-                }
-            }
-            return true;
+            return !HasExecutableAction().Equals(State.ABORT);
         }
 
         internal bool IsReadyToExecute()
         {
-            return HasExecutableAction();
+            return HasExecutableAction().Equals(State.READY);
         }
 
         internal IEnumerator ApplyPlan(Scheduler scheduler)
         {
-            counter++;
             if (actions.Count == 0)
             {
                 try
@@ -101,16 +96,35 @@ namespace Planner
             _isExecuting = true;
             while (actions.Count > 0)
             {
-                yield return new WaitUntil(() => !IsExecutable() || HasExecutableAction());
-                if (IsExecutable())
+                State planState=State.WAIT;
+                checkingPlan++;
+                totalAction += actions.Count;
+                while (!PlanNotWaiting(ref planState))
+                {
+                    yield return null;
+                }
+                totalAction -= actions.Count;
+                checkingPlan--;
+                if (planState.Equals(State.READY))
                 {
                     Action next = Next();
                     next.Do();
-                    yield return new WaitUntil(() => next.Done());
+                    yield return new WaitUntil(()=> next.Done());
+                }
+                else
+                {
+                    break;
                 }
             }
             _isExecuting = false;
             scheduler.IsWaiting = true;
         }
+
+        bool PlanNotWaiting(ref State planState)
+        {
+            planState = HasExecutableAction();
+            return !planState.Equals(State.WAIT);
+        }
     }
+
 }

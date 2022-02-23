@@ -26,7 +26,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
             }
             public void Callback(Output o)
             {
-
+                if (!executor.reason)
+                {
+                    return;
+                }
                 if (!o.ErrorsString.Equals(""))
                 {
                     UnityEngine.Debug.LogError(o.ErrorsString + " " + o.OutputString);
@@ -128,6 +131,11 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     {
                         brain.solverWaiting = true;
                         Monitor.Wait(brain.toLock);
+                        if (!reason)
+                        {
+                            return;
+                        }
+
                     }
                 }
                 try
@@ -153,6 +161,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     stopwatch.Restart();
                     SensorsManager.ReturnSensorsMappings(brain);
                     DecreaseReadingSensors();
+                    if (!reason)
+                    {
+                        return;
+                    }
                     factsPath = Path.GetTempPath() + @"ThinkEngineFacts\" + Path.GetRandomFileName() + ".txt";
                     using (StreamWriter fs = new StreamWriter(factsPath, true))
                     {
@@ -174,6 +186,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 
                     //Debug.Log("running dlv");
                     stopwatch.Restart();
+                    if (!reason)
+                    {
+                        return;
+                    }
                     handler.StartAsync(new MyCallBack(this));
                     while (!solverDone)
                     {

@@ -250,7 +250,7 @@ namespace Planner
         {
             if (executor != null)
             {
-                //Debug.Log("pulse " + gameObject);
+                Debug.Log("pulse " + gameObject);
                 executor.reason = false;
                 lock (toLock)
                 {
