@@ -67,17 +67,16 @@ class Performance : MonoBehaviour
                 }
                 break;
             }
-
-            if(!found)
+        }
+        if (!found)
+        {
+            using (StreamWriter fs = new StreamWriter(withoutBrainPath, true))
             {
-                using (StreamWriter fs = new StreamWriter(withoutBrainPath, true))
-                {
-                    fs.Write("\nIteration; Rate; AvgRate\n");
-                    fs.Close();
-                }
-                path = withoutBrainPath;
-
+                fs.Write("\nIteration; Rate; AvgRate\n");
+                fs.Close();
             }
+            path = withoutBrainPath;
+
         }
         initialized = true;
     }
@@ -92,29 +91,32 @@ class Performance : MonoBehaviour
 
             fs.Close();
         }
-        if (!Executor._canRead)//if Executors can not read, sensors are updating
+        if (path.Equals(withBrainPath))
         {
-            using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, true))
+            if (!Executor._canRead)//if Executors can not read, sensors are updating
             {
-                fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";"+ Utility.SensorsManager.avgFps+";"+ FindObjectsOfType<MonoBehaviourSensor>().Length+"\n");
-                fs.Close();
+                using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, true))
+                {
+                    fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";" + Utility.SensorsManager.avgFps + ";" + FindObjectsOfType<MonoBehaviourSensor>().Length + "\n");
+                    fs.Close();
+                }
             }
-        }
-        if (Plan.checkingPlan > 0)
-        {
-            using (StreamWriter fs = new StreamWriter(plansUpdateRate, true))
+            if (Plan.checkingPlan > 0)
             {
-                fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";" + Utility.SensorsManager.avgFps  + ";" + Plan.checkingPlan +";"+Plan.totalAction+"\n");
-                fs.Close();
+                using (StreamWriter fs = new StreamWriter(plansUpdateRate, true))
+                {
+                    fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";" + Utility.SensorsManager.avgFps + ";" + Plan.checkingPlan + ";" + Plan.totalAction + "\n");
+                    fs.Close();
+                }
             }
-        }
-        if (updatingActuators)
-        {
-            updatingActuators = false;
-            using (StreamWriter fs = new StreamWriter(actuatorsUpdateRate, true))
+            if (updatingActuators)
             {
-                fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + "\n");
-                fs.Close();
+                updatingActuators = false;
+                using (StreamWriter fs = new StreamWriter(actuatorsUpdateRate, true))
+                {
+                    fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + "\n");
+                    fs.Close();
+                }
             }
         }
     }

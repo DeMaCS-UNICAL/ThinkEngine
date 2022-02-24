@@ -128,6 +128,10 @@ internal abstract class BasicTypeMapper : IDataMapper
     }
     public void UpdateSensor(MonoBehaviourSensor sensor, object actualValue, MyListString property, int hierarchyLevel)
     {
+        if (actualValue == null)
+        {
+            return;
+        }
         if (!Supports(actualValue.GetType()))
         {
             throw new Exception("Wrong mapper for property " + property);

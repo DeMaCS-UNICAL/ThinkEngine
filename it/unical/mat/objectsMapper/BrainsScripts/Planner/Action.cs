@@ -20,5 +20,5 @@ namespace Planner
             return order.CompareTo(other.order);
         }
     }
-    public enum State { READY, WAIT, ABORT};
+    public enum State { READY, WAIT, SKIP, ABORT};
 }

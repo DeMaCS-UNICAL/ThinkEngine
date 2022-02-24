@@ -11,7 +11,7 @@ namespace Planner
 
     public class Scheduler : MonoBehaviour
     {
-        Plan currentPlan;
+        internal Plan currentPlan;
         private bool _isWaiting;
         Coroutine planExecutionCoroutine;
         public int ResidualActions
@@ -35,6 +35,7 @@ namespace Planner
                 _isWaiting = value;
                 if (_isWaiting)
                 {
+                    Debug.Log("requesting new plan");
                     GetComponent<PlannerBrainsCoordinator>().SchedulerIsWaiting();
                 }
             }

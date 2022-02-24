@@ -82,9 +82,11 @@ namespace Planner
 
         internal void SchedulerIsWaiting()
         {
+            Debug.Log("checking if plan ready");
             priorityExecuting = NumberOfBrains()+1;
             while (plannersLastPlan.Count != 0)
             {
+                Debug.Log("plan found");
                 KeyValuePair<int, Plan> toExecute = plannersLastPlan.Last();
                 if (!toExecute.Value.IsExecutable())
                 {
@@ -94,7 +96,8 @@ namespace Planner
                 bool used = scheduler.NewPlan(toExecute.Value);
                 if (used)
                 {
-                    plannersLastPlan.Remove(toExecute.Key); 
+            Debug.Log("plan executed");
+                    plannersLastPlan.Remove(toExecute.Key);
                     priorityExecuting = toExecute.Key;
                     break;
                 }

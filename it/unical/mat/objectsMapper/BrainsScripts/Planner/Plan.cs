@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Planner
 {
@@ -37,46 +38,40 @@ namespace Planner
 
         private Action Next()
         {
-            if (!HasExecutableAction().Equals(State.READY))
+            if (!PlanState().Equals(State.READY))
             {
-                throw new Exception("No executable actions are available");
+                throw new Exception("Plan not ready to be executed");
             }
-            for (int i = 0; i < actions.Count; i++)
+            if (actions.Count == 0)
             {
-                if (actions[i].Prerequisite().Equals(State.READY))
-                {
-                    actions.RemoveRange(0, i);
-                    break;
-                }
+                throw new Exception("Empty plan");
             }
             Action toReturn = actions[0];
             actions.RemoveAt(0);
             return toReturn;
         }
-        private State HasExecutableAction()
+        private State PlanState()
         {
-            for (int i = 0; i < actions.Count; i++)
+            List<Action> toRemove = new List<Action>();
+            while (actions.Count>0 && actions[0].Prerequisite() == State.SKIP)
             {
-                if (actions[i].Prerequisite().Equals(State.READY))
-                {
-                    return State.READY;
-                }
-                if (actions[i].Prerequisite().Equals(State.ABORT))
-                {
-                    return State.ABORT;
-                }
+                actions.RemoveAt(0);
             }
-            return State.WAIT;
+            if (actions.Count > 0)
+            {
+                return actions[0].Prerequisite(); //WAIT, READY, ABORT
+            }
+            return State.ABORT;
         }
 
         internal bool IsExecutable()
         {
-            return !HasExecutableAction().Equals(State.ABORT);
+            return !PlanState().Equals(State.ABORT);
         }
 
         internal bool IsReadyToExecute()
         {
-            return HasExecutableAction().Equals(State.READY);
+            return PlanState().Equals(State.READY);
         }
 
         internal IEnumerator ApplyPlan(Scheduler scheduler)
@@ -99,13 +94,13 @@ namespace Planner
                 State planState=State.WAIT;
                 checkingPlan++;
                 totalAction += actions.Count;
-                while (!PlanNotWaiting(ref planState))
+                while (PlanWaiting(ref planState))
                 {
                     yield return null;
                 }
                 totalAction -= actions.Count;
                 checkingPlan--;
-                if (planState.Equals(State.READY))
+                if (planState==State.READY)
                 {
                     Action next = Next();
                     next.Do();
@@ -113,17 +108,19 @@ namespace Planner
                 }
                 else
                 {
+                    Debug.Log("Breaking for abort");
                     break;
                 }
             }
             _isExecuting = false;
             scheduler.IsWaiting = true;
+            scheduler.currentPlan = null;
         }
 
-        bool PlanNotWaiting(ref State planState)
+        bool PlanWaiting(ref State planState)
         {
-            planState = HasExecutableAction();
-            return !planState.Equals(State.WAIT);
+            planState = PlanState();
+            return planState==State.WAIT;
         }
     }
 

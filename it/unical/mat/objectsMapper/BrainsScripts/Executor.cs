@@ -153,6 +153,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 
                         return;
                     }
+            Debug.Log("need sensors "+Thread.CurrentThread.Name);
                     IncrementReadingSensors();
                     if (!_canRead)
                     {
@@ -160,6 +161,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     }
                     stopwatch.Restart();
                     SensorsManager.ReturnSensorsMappings(brain);
+            Debug.Log("got sensors "+Thread.CurrentThread.Name);
                     DecreaseReadingSensors();
                     if (!reason)
                     {
