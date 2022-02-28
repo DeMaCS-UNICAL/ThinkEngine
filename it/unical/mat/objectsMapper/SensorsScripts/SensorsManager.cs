@@ -7,20 +7,24 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
-using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.SceneManagement;
+#endif
 
 [ExecuteInEditMode]
 public  class SensorsManager : MonoBehaviour
 {
+    internal static Stopwatch watch = new Stopwatch();
     public int MIN_AVG_FPS = 60;
     public int MIN_CURRENT_FPS = 20;
     public int MAX_AVG_FPS = 70;
     public int MAX_CURRENT_FPS = 40;
-    private int MAX_MS = 5;
+    internal static int MAX_MS = 5;
     private float currentFps;
+    internal static int updatedSensors;
     private static Dictionary<Brain, List<string>> _instantiatedSensors;
     private static ConcurrentQueue<KeyValuePair<Brain,object>> _requestedMappings;
     internal static bool _configurationsChanged;
@@ -137,7 +141,7 @@ public  class SensorsManager : MonoBehaviour
             {
                 MAX_MS--;
             }
-            else if(avgFps> MAX_AVG_FPS && currentFps> MAX_CURRENT_FPS)
+            else if(avgFps> MAX_AVG_FPS && currentFps> MAX_CURRENT_FPS && MAX_MS<5)
             {
                 MAX_MS++;
             }
@@ -158,9 +162,9 @@ public  class SensorsManager : MonoBehaviour
     }
     IEnumerator SensorsUpdate()
     {
-        Stopwatch watch = new Stopwatch();
         while (true)
         {
+            updatedSensors = 0;
             Stopwatch localWatch = new Stopwatch();
             watch.Start();
             yield return new WaitUntil(()=>Executor.CanRead(false));
@@ -177,19 +181,23 @@ public  class SensorsManager : MonoBehaviour
                         yield return null;
                         watch.Start();
                     }
-                    foreach (List<MonoBehaviourSensor> sensorsList in manager.Sensors.Values)
+                    if (manager != null) //while yield, the manager could have been destroied
                     {
-                        foreach (MonoBehaviourSensor sensor in sensorsList)
+                        foreach (List<MonoBehaviourSensor> sensorsList in manager.Sensors.Values)
                         {
-                            if (sensor != null)
+                            foreach (MonoBehaviourSensor sensor in sensorsList)
                             {
-                                sensor.UpdateValue();
-                            }
-                            if (watch.ElapsedMilliseconds > MAX_MS)
-                            {
-                                watch.Reset();
-                                yield return null;
-                                watch.Start();
+                                if (sensor != null)
+                                {
+                                    sensor.UpdateValue();
+                                    updatedSensors++;
+                                }
+                                if (watch.ElapsedMilliseconds > MAX_MS)
+                                {
+                                    watch.Reset();
+                                    yield return null;
+                                    watch.Start();
+                                }
                             }
                         }
                     }

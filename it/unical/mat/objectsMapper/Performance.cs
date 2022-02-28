@@ -44,24 +44,11 @@ class Performance : MonoBehaviour
                 }
                 path = withBrainPath;
 
-                using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, true))
-                {
-                    fs.Write("\nIteration; Rate; AvgRate; NumberOfSensors \n");
-                    fs.Close();
-                }
-                if (FindObjectOfType<ActuatorBrain>() != null)
-                {
-                    using (StreamWriter fs = new StreamWriter(actuatorsUpdateRate, true))
-                    {
-                        fs.Write("\nIteration; Rate\n");
-                        fs.Close();
-                    }
-                }
                 if (FindObjectOfType<PlannerBrain>() != null)
                 {
                     using (StreamWriter fs = new StreamWriter(plansUpdateRate, true))
                     {
-                        fs.Write("\nIteration; Rate; AvgRate; NumberOfPlansChecking; TotalNumberOfActions \n");
+                        fs.Write("\nIteration; Rate; AvgRate; TotalNumberOfActions \n");
                         fs.Close();
                     }
                 }
@@ -70,6 +57,22 @@ class Performance : MonoBehaviour
         }
         if (!found)
         {
+            if (FindObjectOfType<MonoBehaviourSensor>()!=null)
+            {
+                using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, true))
+                {
+                    fs.Write("\nIteration; Rate; AvgRate; NumberOfSensors; UpdatedSensors; MSPerIteration; ElapsedMS \n");
+                    fs.Close();
+                }
+            }
+            if (FindObjectOfType<MonoBehaviourActuator>() != null)
+            {
+                using (StreamWriter fs = new StreamWriter(actuatorsUpdateRate, true))
+                {
+                    fs.Write("\nIteration; Rate\n");
+                    fs.Close();
+                }
+            }
             using (StreamWriter fs = new StreamWriter(withoutBrainPath, true))
             {
                 fs.Write("\nIteration; Rate; AvgRate\n");
@@ -82,7 +85,6 @@ class Performance : MonoBehaviour
     }
     void LateUpdate()
     {
-
         double current = 1f / Time.unscaledDeltaTime;
         steps++;
         using (StreamWriter fs = new StreamWriter(path, true))
@@ -91,24 +93,25 @@ class Performance : MonoBehaviour
 
             fs.Close();
         }
+        if (FindObjectOfType<MonoBehaviourSensor>()!=null && !Executor._canRead)//if Executors can not read, sensors are updating
+        {
+            using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, true))
+            {
+                fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";" + Utility.SensorsManager.avgFps + ";" + FindObjectsOfType<MonoBehaviourSensor>().Length +";"+ SensorsManager.updatedSensors+";"+SensorsManager.MAX_MS+";"+SensorsManager.watch.ElapsedMilliseconds+ "\n"); 
+                fs.Close();
+            }
+        }
         if (path.Equals(withBrainPath))
         {
-            if (!Executor._canRead)//if Executors can not read, sensors are updating
-            {
-                using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, true))
-                {
-                    fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";" + Utility.SensorsManager.avgFps + ";" + FindObjectsOfType<MonoBehaviourSensor>().Length + "\n");
-                    fs.Close();
-                }
-            }
-            if (Plan.checkingPlan > 0)
+            if (FindObjectOfType<PlannerBrain>() != null)
             {
                 using (StreamWriter fs = new StreamWriter(plansUpdateRate, true))
                 {
-                    fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";" + Utility.SensorsManager.avgFps + ";" + Plan.checkingPlan + ";" + Plan.totalAction + "\n");
+                    fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";" + Utility.SensorsManager.avgFps + ";" + FindObjectOfType<Scheduler>().ResidualActions + "\n");
                     fs.Close();
                 }
             }
+
             if (updatingActuators)
             {
                 updatingActuators = false;

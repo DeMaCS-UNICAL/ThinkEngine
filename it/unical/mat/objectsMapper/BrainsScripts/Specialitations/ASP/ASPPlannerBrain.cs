@@ -16,7 +16,7 @@ namespace Planner
         Plan plan;
         private bool answerSetAvailable;
         private AnswerSet currentAnswerSet;
-        private Dictionary<int, Action> _actions;
+        private SortedDictionary<int, Action> _actions;
         private Dictionary<int, List<KeyValuePair<string, string>>> _actionParameters;
         private Dictionary<int, List<KeyValuePair<string, string>>> ActionParameters
         {
@@ -30,13 +30,13 @@ namespace Planner
             }
         }
 
-        private Dictionary<int, Action> Actions
+        private SortedDictionary<int, Action> Actions
         {
             get
             {
                 if (_actions == null)
                 {
-                    _actions = new Dictionary<int, Action>();
+                    _actions = new SortedDictionary<int, Action>();
                 }
                 return _actions;
             }
@@ -51,7 +51,7 @@ namespace Planner
         private List<Action> Parse(AnswerSet answerSet)
         {
             _actionParameters = new Dictionary<int, List<KeyValuePair<string, string>>>();
-            _actions = new Dictionary<int, Action>();
+            _actions = new SortedDictionary<int, Action>();
             foreach (string literal in answerSet.GetAnswerSet())
             {
                 if (literal.StartsWith("applyAction("))

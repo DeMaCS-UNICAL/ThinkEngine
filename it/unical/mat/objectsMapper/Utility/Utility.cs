@@ -4,8 +4,12 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
-using UnityEditor;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 
 public static class Utility
 {
@@ -61,10 +65,12 @@ public static class Utility
             CheckTriggerClass();
             if (_triggerClass == null)
             {
+#if UNITY_EDITOR
                 if (!EditorApplication.isCompiling)
                 {
                     _triggerClass = ScriptableObject.CreateInstance("Trigger");
                 }
+#endif
             }
             return _triggerClass;
         }
@@ -134,7 +140,7 @@ public static class Utility
             _triggerClassPath = value;
         }
     }
-    #endregion
+#endregion
     private static List<string> FindMethodsToShow()
     {
         List<string> toReturn = new List<string>();

@@ -9,8 +9,8 @@ namespace Planner
 {
     public class Plan
     {
-        internal static int checkingPlan = 0;
-        internal static int totalAction=0;
+        internal static int counter=0;
+        public int myCount;
         internal List<Action> actions;
         public int priority;
         private bool _isExecuting;
@@ -23,6 +23,7 @@ namespace Planner
         }
         internal Plan()
         {
+            myCount = ++counter;
             actions = new List<Action>();
         }
 
@@ -53,13 +54,17 @@ namespace Planner
         private State PlanState()
         {
             List<Action> toRemove = new List<Action>();
-            while (actions.Count>0 && actions[0].Prerequisite() == State.SKIP)
+            while (actions.Count>0)
             {
-                actions.RemoveAt(0);
-            }
-            if (actions.Count > 0)
-            {
-                return actions[0].Prerequisite(); //WAIT, READY, ABORT
+                State state = actions[0].Prerequisite();
+                if (state == State.SKIP)
+                {
+                    actions.RemoveAt(0);
+                }
+                else
+                {
+                    return state;
+                }
             }
             return State.ABORT;
         }
@@ -84,22 +89,18 @@ namespace Planner
                 }
                 finally
                 {
-                    scheduler.IsWaiting = true;
+                    scheduler.IsIdle = true;
                 }
             }
-            scheduler.IsWaiting = false;
+            scheduler.IsIdle = false;
             _isExecuting = true;
             while (actions.Count > 0)
             {
                 State planState=State.WAIT;
-                checkingPlan++;
-                totalAction += actions.Count;
                 while (PlanWaiting(ref planState))
                 {
                     yield return null;
                 }
-                totalAction -= actions.Count;
-                checkingPlan--;
                 if (planState==State.READY)
                 {
                     Action next = Next();
@@ -108,12 +109,12 @@ namespace Planner
                 }
                 else
                 {
-                    Debug.Log("Breaking for abort");
+                    //Debug.Log("Breaking for abort");
                     break;
                 }
             }
             _isExecuting = false;
-            scheduler.IsWaiting = true;
+            scheduler.IsIdle = true;
             scheduler.currentPlan = null;
         }
 

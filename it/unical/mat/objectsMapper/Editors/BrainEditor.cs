@@ -1,4 +1,5 @@
-﻿using Planner;
+﻿#if UNITY_EDITOR
+using Planner;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -353,3 +354,4 @@ namespace Editors
         protected virtual void ShowSpecificFields() { }
     }
 }
+#endif

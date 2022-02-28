@@ -30,6 +30,11 @@ namespace Planner
             }
         }
 
+        internal void SchedulerIsIdle()
+        {
+            priorityExecuting = NumberOfBrains() + 1;
+        }
+
         private bool ValidPriority(int priority)
         {
             if(priority<0 || priority >= NumberOfBrains())
@@ -46,12 +51,12 @@ namespace Planner
 
         internal void PlanReady(PlannerBrain brain)
         {
-            if (!brain.GetPlan().IsExecutable())
+            /*if (priorityExecuting >= brain.Priority)
             {
-                return;
-            }
-            if (priorityExecuting >= brain.Priority && brain.GetPlan().IsReadyToExecute())
-            {
+                if (!brain.GetPlan().IsExecutable())
+                {
+                    return;
+                }
                 bool used = scheduler.NewPlan(brain.GetPlan());
                 if (used)
                 {
@@ -69,25 +74,23 @@ namespace Planner
             else
             {
                 plannersLastPlan[brain.Priority] = brain.GetPlan();
-            }
+            }*/
+            plannersLastPlan[brain.Priority] = brain.GetPlan();
         }
 
         void Update()
         {
-            if (plannersLastPlan.Count != 0)
-            {
-                
-            }
+            CheckIfChangePlan();
         }
 
-        internal void SchedulerIsWaiting()
+        internal void CheckIfChangePlan()
         {
-            Debug.Log("checking if plan ready");
-            priorityExecuting = NumberOfBrains()+1;
-            while (plannersLastPlan.Count != 0)
+            //Debug.Log("checking if plan ready");
+            //priorityExecuting = NumberOfBrains()+1;
+            while (plannersLastPlan.First().Key<=priorityExecuting)
             {
-                Debug.Log("plan found");
-                KeyValuePair<int, Plan> toExecute = plannersLastPlan.Last();
+                //Debug.Log("plan found");
+                KeyValuePair<int, Plan> toExecute = plannersLastPlan.First();
                 if (!toExecute.Value.IsExecutable())
                 {
                     plannersLastPlan.Remove(toExecute.Key);
@@ -96,7 +99,7 @@ namespace Planner
                 bool used = scheduler.NewPlan(toExecute.Value);
                 if (used)
                 {
-            Debug.Log("plan executed");
+            //Debug.Log("plan executed");
                     plannersLastPlan.Remove(toExecute.Key);
                     priorityExecuting = toExecute.Key;
                     break;

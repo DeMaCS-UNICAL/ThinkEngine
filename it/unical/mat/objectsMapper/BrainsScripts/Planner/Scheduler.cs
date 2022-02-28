@@ -12,7 +12,7 @@ namespace Planner
     public class Scheduler : MonoBehaviour
     {
         internal Plan currentPlan;
-        private bool _isWaiting;
+        private bool _isIdle;
         Coroutine planExecutionCoroutine;
         public int ResidualActions
         {
@@ -25,18 +25,18 @@ namespace Planner
                 return currentPlan.actions.Count;
             }
         }
-        public bool IsWaiting {
+        public bool IsIdle {
             get
             {
-                return _isWaiting;
+                return _isIdle;
             }
             internal set
             {
-                _isWaiting = value;
-                if (_isWaiting)
+                _isIdle = value;
+                if (_isIdle)
                 {
-                    Debug.Log("requesting new plan");
-                    GetComponent<PlannerBrainsCoordinator>().SchedulerIsWaiting();
+                    //Debug.Log("requesting new plan");
+                    GetComponent<PlannerBrainsCoordinator>().SchedulerIsIdle();
                 }
             }
         }
