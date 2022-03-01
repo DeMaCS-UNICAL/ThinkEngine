@@ -38,6 +38,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
             {
                 if (answers.GetOptimalAnswerSets().Count > 0)
                 {
+                    
                     AnswerSet answer = answers.GetOptimalAnswerSets()[0];
                     if (brain.debug)
                     {

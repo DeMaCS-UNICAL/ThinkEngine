@@ -87,7 +87,7 @@ namespace Planner
         {
             //Debug.Log("checking if plan ready");
             //priorityExecuting = NumberOfBrains()+1;
-            while (plannersLastPlan.First().Key<=priorityExecuting)
+            while (plannersLastPlan.Count>0 && plannersLastPlan.First().Key<=priorityExecuting)
             {
                 //Debug.Log("plan found");
                 KeyValuePair<int, Plan> toExecute = plannersLastPlan.First();

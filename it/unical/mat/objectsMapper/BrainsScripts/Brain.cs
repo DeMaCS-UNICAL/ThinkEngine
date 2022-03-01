@@ -15,6 +15,8 @@ namespace Planner
     [ExecuteAlways, RequireComponent(typeof(IndexTracker))]
     public abstract class Brain: MonoBehaviour
     {
+        internal  string executorName;
+
         private string _fileExtension;
         internal string FileExtension
         {
@@ -184,6 +186,7 @@ namespace Planner
         {
             while (true)
             {
+               
                 yield return new WaitUntil(() => solverWaiting && SomeConfigurationAvailable() && (bool)reasonerMethod.Invoke(triggerClass, null));
                 lock (toLock)
                 {

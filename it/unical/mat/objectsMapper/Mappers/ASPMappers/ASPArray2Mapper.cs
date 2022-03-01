@@ -28,9 +28,9 @@ namespace Mappers.BaseMappers
                 sensorsMatrix = new ISensors[i, j];
             }
 
-            public List<MonoBehaviourSensor> GetSensorsList()
+            public List<Sensor> GetSensorsList()
             {
-                List<MonoBehaviourSensor> toReturn = new List<MonoBehaviourSensor>();
+                List<Sensor> toReturn = new List<Sensor>();
                 foreach(ISensors isensors in sensorsMatrix)
                 {
                     if (isensors == null)
@@ -230,7 +230,7 @@ namespace Mappers.BaseMappers
         }
         
 
-        public void UpdateSensor(MonoBehaviourSensor sensor, object currentObject, MyListString residualPropertyHierarchy, int hierarchyLevel)
+        public void UpdateSensor(Sensor sensor, object currentObject, MyListString residualPropertyHierarchy, int hierarchyLevel)
         {
             Array matrix = (Array)currentObject;
             Array2InfoAndValue info = (Array2InfoAndValue)sensor.PropertyInfo[hierarchyLevel];
@@ -242,10 +242,10 @@ namespace Mappers.BaseMappers
             }
             else
             {
-                UnityEngine.Object.Destroy(sensor);
+               sensor.Destroy();
             }
         }
-        public string SensorBasicMap(MonoBehaviourSensor sensor, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceholders)
+        public string SensorBasicMap(Sensor sensor, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceholders)
         {
             Array2InfoAndValue info = (Array2InfoAndValue)sensor.PropertyInfo[hierarchyLevel];
             valuesForPlaceholders.Add(info.indexes[0]);

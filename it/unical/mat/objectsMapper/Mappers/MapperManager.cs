@@ -436,7 +436,7 @@ internal class MapperManager
         return null;
     }
 
-    internal static string GetSensorBasicMap(MonoBehaviourSensor sensor, object currentObject, MyListString residualPropertyHierarchy, List<object> values, int level)
+    internal static string GetSensorBasicMap(Sensor sensor, object currentObject, MyListString residualPropertyHierarchy, List<object> values, int level)
     {
         IDataMapper mapper = RetrieveMapper(ref residualPropertyHierarchy, ref currentObject, out _);
         if (mapper != null)
@@ -448,7 +448,7 @@ internal class MapperManager
             return "";
         }
     }
-    internal static void UpdateSensor(MonoBehaviourSensor sensor, object currentObject, MyListString residualPropertyHierarchy, int level)
+    internal static void UpdateSensor(Sensor sensor, object currentObject, MyListString residualPropertyHierarchy, int level)
     {
         IDataMapper mapper = RetrieveMapper(ref residualPropertyHierarchy, ref currentObject, out _);
         if (mapper != null)

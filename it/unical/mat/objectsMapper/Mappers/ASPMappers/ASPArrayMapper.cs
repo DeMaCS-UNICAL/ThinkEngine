@@ -31,9 +31,9 @@ namespace Mappers.BaseMappers
                 sensorsArray = new ISensors[i];
             }
 
-            public List<MonoBehaviourSensor> GetSensorsList()
+            public List<Sensor> GetSensorsList()
             {
-                List<MonoBehaviourSensor> toReturn = new List<MonoBehaviourSensor>();
+                List<Sensor> toReturn = new List<Sensor>();
                 foreach (ISensors isensors in sensorsArray)
                 {
                     if (isensors == null)
@@ -345,7 +345,7 @@ namespace Mappers.BaseMappers
             return MapperManager.RetrieveProperties(underlyingType, rootName, null);
         }
 
-        public string SensorBasicMap(MonoBehaviourSensor sensor, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceholders)
+        public string SensorBasicMap(Sensor sensor, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceholders)
         {
             ArrayInfoAndValue info = (ArrayInfoAndValue)sensor.PropertyInfo[hierarchyLevel];
             valuesForPlaceholders.Add(info.index);
@@ -380,7 +380,7 @@ namespace Mappers.BaseMappers
             return type.IsArray && type.GetArrayRank() == 1;
         }
 
-        public void UpdateSensor(MonoBehaviourSensor sensor, object currentObject, MyListString residualPropertyHierarchy, int hierarchyLevel)
+        public void UpdateSensor(Sensor sensor, object currentObject, MyListString residualPropertyHierarchy, int hierarchyLevel)
         {
             Array array = (Array)currentObject;
             ArrayInfoAndValue info = (ArrayInfoAndValue)sensor.PropertyInfo[hierarchyLevel];
@@ -392,7 +392,7 @@ namespace Mappers.BaseMappers
             }
             else
             {
-                UnityEngine.Object.Destroy(sensor);
+                sensor.Destroy(); ;
             }
         }
     }

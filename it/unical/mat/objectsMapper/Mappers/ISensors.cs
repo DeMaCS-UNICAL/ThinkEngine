@@ -4,5 +4,5 @@
 interface ISensors
 {
     bool IsEmpty();
-    List<MonoBehaviourSensor> GetSensorsList();
+    List<Sensor> GetSensorsList();
 }

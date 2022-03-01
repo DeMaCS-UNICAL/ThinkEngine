@@ -71,6 +71,9 @@ public static class Utility
                     _triggerClass = ScriptableObject.CreateInstance("Trigger");
                 }
 #endif
+#if !UNITY_EDITOR
+                _triggerClass = ScriptableObject.CreateInstance("Trigger");
+#endif
             }
             return _triggerClass;
         }
@@ -180,6 +183,7 @@ public static class Utility
     }
     internal static void CheckTriggerClass()
     {
+#if UNITY_EDITOR
         if (!Directory.Exists(@"Assets\Scripts"))
         {
             Directory.CreateDirectory(@"Assets\Scripts");
@@ -188,6 +192,7 @@ public static class Utility
         {
             CreateTriggerScript();
         }
+#endif
     }
     private static void CreateTriggerScript()
     {

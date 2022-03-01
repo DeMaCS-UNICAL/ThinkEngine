@@ -28,15 +28,15 @@ internal abstract class BasicTypeMapper : IDataMapper
 
     private class BasicTypeSensor : ISensors
     {
-        internal MonoBehaviourSensor sensor;
-        internal BasicTypeSensor(MonoBehaviourSensor sensor)
+        internal Sensor sensor;
+        internal BasicTypeSensor(Sensor sensor)
         {
             this.sensor = sensor;
         }
 
-        public List<MonoBehaviourSensor> GetSensorsList()
+        public List<Sensor> GetSensorsList()
         {
-            return new List<MonoBehaviourSensor> { sensor };
+            return new List<Sensor> { sensor };
         }
 
         public bool IsEmpty()
@@ -126,7 +126,7 @@ internal abstract class BasicTypeMapper : IDataMapper
     {
         return SupportedTypes.Contains(type);
     }
-    public void UpdateSensor(MonoBehaviourSensor sensor, object actualValue, MyListString property, int hierarchyLevel)
+    public void UpdateSensor(Sensor sensor, object actualValue, MyListString property, int hierarchyLevel)
     {
         if (actualValue == null)
         {
@@ -145,7 +145,7 @@ internal abstract class BasicTypeMapper : IDataMapper
         values.Add(Convert.ChangeType(actualValue,ConvertingType));
     }
 
-    public string SensorBasicMap(MonoBehaviourSensor sensor, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceholders)
+    public string SensorBasicMap(Sensor sensor, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceholders)
     {
         if (!SupportedTypes.Contains(currentObject.GetType()) || residualPropertyHierarchy.Count>1)
         {
@@ -173,7 +173,7 @@ internal abstract class BasicTypeMapper : IDataMapper
         {
             additionalInfo.specificValue = ((SensorConfiguration)information.configuration).SpecificValuePerProperty[information.propertyHierarchy.GetHashCode()];
         }
-        BasicTypeSensor sensor = new BasicTypeSensor(information.instantiateOn.AddComponent<MonoBehaviourSensor>());
+        BasicTypeSensor sensor = new BasicTypeSensor(new Sensor());
         additionalInfo.values.Add(Convert.ChangeType(information.currentObjectOfTheHierarchy, ConvertingType));
         information.hierarchyInfo.Add(additionalInfo);
         sensor.sensor.Configure(information, GenerateMapping(information));

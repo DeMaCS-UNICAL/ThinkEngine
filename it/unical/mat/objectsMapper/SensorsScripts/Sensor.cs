@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-[RequireComponent(typeof(IndexTracker))]
-class MonoBehaviourSensor : MonoBehaviour
+class Sensor
 {
-    internal string configurationName;
+    GameObject gameObject;
+    MonoBehaviourSensorsManager manager;
+    internal SensorConfiguration configuration;
     private MyListString property;
     private List<IInfoAndValue> _propertyInfo;
     private bool ready;
@@ -34,11 +35,17 @@ class MonoBehaviourSensor : MonoBehaviour
 
     public void Configure(InstantiationInformation  information, string mapping)
     {
-        configurationName = information.configuration.ConfigurationName;
+        gameObject = information.instantiateOn;
+        manager = gameObject.GetComponent<MonoBehaviourSensorsManager>();
+        configuration = (SensorConfiguration)information.configuration;
         property = new MyListString(information.propertyHierarchy.myStrings);
         PropertyInfo.AddRange(information.hierarchyInfo);
-        int index = GetComponent<IndexTracker>().CurrentIndex;
-        this._mapping = NewASPMapperHelper.AspFormat(configurationName)+"("+NewASPMapperHelper.AspFormat(gameObject.name)+",objectIndex("+index+"),"+mapping+")."+Environment.NewLine;
+        if (information.instantiateOn.GetComponent<IndexTracker>() == null)
+        {
+            information.instantiateOn.AddComponent<IndexTracker>();
+        }
+        int index = information.instantiateOn.GetComponent<IndexTracker>().CurrentIndex;
+        this._mapping = NewASPMapperHelper.AspFormat(configuration.ConfigurationName)+"("+NewASPMapperHelper.AspFormat(gameObject.name)+",objectIndex("+index+"),"+mapping+")."+Environment.NewLine;
         ready = true;
     }
     internal void UpdateValue()
@@ -63,9 +70,10 @@ class MonoBehaviourSensor : MonoBehaviour
         //return MapperManager.GetSensorBasicMap(this, gameObject, new MyListString(property.myStrings), new List<object>(), 0);
         return string.Format(Mapping, values.ToArray());
     }
-    void OnDisable()
+
+    internal void Destroy()
     {
-        Destroy(this);
+        manager.Destroy(this);
     }
 }
 

@@ -12,6 +12,7 @@ namespace Planner
     [RequireComponent(typeof(Scheduler)),RequireComponent(typeof(PlannerBrainsCoordinator))]
     class PlannerBrain:Brain,IComparable<PlannerBrain>
     {
+
         private PlannerBrainsCoordinator _coordinator;
         internal PlannerBrainsCoordinator Coordinator
         {
@@ -96,10 +97,11 @@ namespace Planner
             {
                 yield return StartCoroutine(base.Init());
                 executor = Planner.GetPlannerExecutor(this);
-                string GOname = gameObject.name;
+                executorName = "Solver executor " + gameObject.name + Priority;
+                
                 executionThread = new Thread(() =>
                 {
-                    Thread.CurrentThread.Name = "Solver executor " + GOname;
+                    Thread.CurrentThread.Name = executorName;
                     Thread.CurrentThread.IsBackground = true;
                     executor.Run();
                 });

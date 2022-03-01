@@ -19,12 +19,13 @@ class Performance : MonoBehaviour
     public static bool updatingActuators;
     static readonly NumberFormatInfo nfi = new CultureInfo("en-US", false).NumberFormat;
     public static bool initialized;
+    internal static object toLock = new object();
 
 
 
     void Start()
     {
-
+       
         if (!Directory.Exists("Performance"))
         {
             Directory.CreateDirectory("Performance");
@@ -55,24 +56,25 @@ class Performance : MonoBehaviour
                 break;
             }
         }
+        if (FindObjectOfType<MonoBehaviourSensorsManager>() != null)
+        {
+            using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, true))
+            {
+                fs.Write("\nIteration; Rate; AvgRate; NumberOfSensors; UpdatedSensors; MSPerIteration; ElapsedMS \n");
+                fs.Close();
+            }
+        }
+        if (FindObjectOfType<MonoBehaviourActuator>() != null)
+        {
+            using (StreamWriter fs = new StreamWriter(actuatorsUpdateRate, true))
+            {
+                fs.Write("\nIteration; Rate\n");
+                fs.Close();
+            }
+        }
         if (!found)
         {
-            if (FindObjectOfType<MonoBehaviourSensor>()!=null)
-            {
-                using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, true))
-                {
-                    fs.Write("\nIteration; Rate; AvgRate; NumberOfSensors; UpdatedSensors; MSPerIteration; ElapsedMS \n");
-                    fs.Close();
-                }
-            }
-            if (FindObjectOfType<MonoBehaviourActuator>() != null)
-            {
-                using (StreamWriter fs = new StreamWriter(actuatorsUpdateRate, true))
-                {
-                    fs.Write("\nIteration; Rate\n");
-                    fs.Close();
-                }
-            }
+            
             using (StreamWriter fs = new StreamWriter(withoutBrainPath, true))
             {
                 fs.Write("\nIteration; Rate; AvgRate\n");
@@ -93,11 +95,11 @@ class Performance : MonoBehaviour
 
             fs.Close();
         }
-        if (FindObjectOfType<MonoBehaviourSensor>()!=null && !Executor._canRead)//if Executors can not read, sensors are updating
+        if (FindObjectOfType<MonoBehaviourSensorsManager>()!=null && !Executor._canRead)//if Executors can not read, sensors are updating
         {
             using (StreamWriter fs = new StreamWriter(sensorsUpdateRate, true))
             {
-                fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";" + Utility.SensorsManager.avgFps + ";" + FindObjectsOfType<MonoBehaviourSensor>().Length +";"+ SensorsManager.updatedSensors+";"+SensorsManager.MAX_MS+";"+SensorsManager.watch.ElapsedMilliseconds+ "\n"); 
+                fs.Write(steps + ";" + Math.Round(current, 4).ToString("N", nfi) + ";" + Utility.SensorsManager.avgFps + ";" + SensorsManager.numberOfSensors +";"+ SensorsManager.updatedSensors+";"+SensorsManager.MAX_MS+";"+SensorsManager.MS+ "\n"); 
                 fs.Close();
             }
         }
@@ -149,18 +151,21 @@ class Performance : MonoBehaviour
 
     public static void WriteOnFile(string s, double d, bool printDate=false)
     {
-        if (!initialized)
+        lock (toLock)
         {
-            return;
-        }
-        using (StreamWriter fs = new StreamWriter(factsAndASPath, true))
-        {
-            if (printDate)
+            if (!initialized)
             {
-                fs.Write("date: " + System.DateTime.Today);
+                return;
             }
-            fs.Write(s + " " + d.ToString("N", nfi) + "ms \n");
-            fs.Close();
+            using (StreamWriter fs = new StreamWriter(factsAndASPath, true))
+            {
+                if (printDate)
+                {
+                    fs.Write("date: " + System.DateTime.Today);
+                }
+                fs.Write(s + " " + d.ToString("N", nfi) + "ms \n");
+                fs.Close();
+            }
         }
     }
 }

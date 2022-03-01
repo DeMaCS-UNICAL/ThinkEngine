@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode,Serializable,RequireComponent(typeof(MonoBehaviourSensorsManager))]
+[ExecuteInEditMode,Serializable, RequireComponent(typeof(IndexTracker)), RequireComponent(typeof(MonoBehaviourSensorsManager))]
 class SensorConfiguration : AbstractConfiguration, ISerializationCallbackReceiver
 {
     [SerializeField, HideInInspector]

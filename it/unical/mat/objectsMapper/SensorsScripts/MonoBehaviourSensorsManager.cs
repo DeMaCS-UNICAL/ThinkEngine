@@ -1,4 +1,5 @@
 ﻿using Mappers;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -12,14 +13,14 @@ class MonoBehaviourSensorsManager:MonoBehaviour
     internal bool ready;
     private int frameToWait;
     SensorConfiguration[] configurations;
-    internal Dictionary<SensorConfiguration,List<MonoBehaviourSensor>> _sensorsForConfigurations;
-    internal Dictionary<SensorConfiguration,List<MonoBehaviourSensor>> Sensors
+    internal Dictionary<SensorConfiguration,List<Sensor>> _sensorsForConfigurations;
+    internal Dictionary<SensorConfiguration,List<Sensor>> Sensors
     {
         get
         {
             if (_sensorsForConfigurations == null)
             {
-                _sensorsForConfigurations = new Dictionary<SensorConfiguration, List<MonoBehaviourSensor>>();
+                _sensorsForConfigurations = new Dictionary<SensorConfiguration, List<Sensor>>();
             }
             return _sensorsForConfigurations;
         }
@@ -33,7 +34,7 @@ class MonoBehaviourSensorsManager:MonoBehaviour
         monoBehaviourSensorsForProperty = new Dictionary<int, ISensors>();
         foreach(SensorConfiguration configuration in GetComponents<SensorConfiguration>())
         {
-            Sensors[configuration] = new List<MonoBehaviourSensor>();
+            Sensors[configuration] = new List<Sensor>();
             foreach(MyListString property in configuration.ToMapProperties)
             {
                 int propertyIndex = property.GetHashCode();
@@ -57,6 +58,15 @@ class MonoBehaviourSensorsManager:MonoBehaviour
         }
         ready = true;
     }
+
+    internal void Destroy(Sensor monoBehaviourSensor)
+    {
+        if (_sensorsForConfigurations.ContainsKey(monoBehaviourSensor.configuration))
+        {
+            _sensorsForConfigurations[monoBehaviourSensor.configuration].Remove(monoBehaviourSensor);
+        }
+    }
+
     internal void ManageSensors()
     {
         configurations = GetComponents<SensorConfiguration>();

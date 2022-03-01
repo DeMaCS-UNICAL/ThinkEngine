@@ -95,9 +95,10 @@ public class ActuatorBrain :Brain
             executor = new ASPActuatorExecutor(this);
             PrepareActuators();
             string GOname = gameObject.name;
+            executorName = "executor " + GOname;
             executionThread = new Thread(() =>
             {
-                Thread.CurrentThread.Name = "Solver executor " + GOname;
+                Thread.CurrentThread.Name = executorName;
                 Thread.CurrentThread.IsBackground = true;
                 executor.Run();
             });

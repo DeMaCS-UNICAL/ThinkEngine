@@ -34,7 +34,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 {
                     UnityEngine.Debug.LogError(o.ErrorsString + " " + o.OutputString);
                 }
-                Performance.WriteOnFile("solver", executor.stopwatch.ElapsedMilliseconds);
+                Performance.WriteOnFile("solver "+executor.brain.executorName, executor.stopwatch.ElapsedMilliseconds);
                 executor.stopwatch.Stop();
                 executor.OutputParsing(o);
                 if (!executor.brain.maintainInputFile)
@@ -153,7 +153,6 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 
                         return;
                     }
-            Debug.Log("need sensors "+Thread.CurrentThread.Name);
                     IncrementReadingSensors();
                     if (!_canRead)
                     {
@@ -161,7 +160,6 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     }
                     stopwatch.Restart();
                     SensorsManager.ReturnSensorsMappings(brain);
-            Debug.Log("got sensors "+Thread.CurrentThread.Name);
                     DecreaseReadingSensors();
                     if (!reason)
                     {
@@ -174,7 +172,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                         fs.Write(brain.sensorsMapping);
                         fs.Close();
                     }
-                    Performance.WriteOnFile("facts", stopwatch.ElapsedMilliseconds);
+                    Performance.WriteOnFile("facts executor", stopwatch.ElapsedMilliseconds);
                     Handler handler = GetHandler();
                     InputProgram facts = new ASPInputProgram();
                     facts.AddFilesPath(factsPath);
@@ -208,16 +206,18 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 }
                 catch (Exception e)
                 {
-                Debug.Log("there was an exception");
-                    reason = false;
+                    Debug.Log("there was an exception");
                     if (!(e is ThreadAbortException))
                     {
                         UnityEngine.Debug.LogError(e);
                     }
+                    else
+                    {
+                        reason = false;
+                    }
                 }
 
             }
-            Debug.Log("i'm done");
 
         }
 

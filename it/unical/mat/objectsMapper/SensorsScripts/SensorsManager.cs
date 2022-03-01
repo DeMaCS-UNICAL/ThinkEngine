@@ -18,13 +18,15 @@ using UnityEditor.SceneManagement;
 public  class SensorsManager : MonoBehaviour
 {
     internal static Stopwatch watch = new Stopwatch();
-    public int MIN_AVG_FPS = 60;
-    public int MIN_CURRENT_FPS = 20;
-    public int MAX_AVG_FPS = 70;
-    public int MAX_CURRENT_FPS = 40;
+    public int MIN_AVG_FPS;
+    public int MIN_CURRENT_FPS;
+    public int MAX_AVG_FPS;
+    public int MAX_CURRENT_FPS;
     internal static int MAX_MS = 5;
+    internal List<float> MOVING_AVG_FRAMES;
     private float currentFps;
     internal static int updatedSensors;
+    internal static long MS;
     private static Dictionary<Brain, List<string>> _instantiatedSensors;
     private static ConcurrentQueue<KeyValuePair<Brain,object>> _requestedMappings;
     internal static bool _configurationsChanged;
@@ -103,6 +105,21 @@ public  class SensorsManager : MonoBehaviour
             }
         }
     }
+
+    public static int numberOfSensors {
+        get
+        {
+            int num=0;
+            foreach(MonoBehaviourSensorsManager m in FindObjectsOfType<MonoBehaviourSensorsManager>())
+            {
+                foreach(List<Sensor> sensors in m.Sensors.Values)
+                {
+                    num += sensors.Count;
+                }
+            }
+            return num;
+        }
+    }
     #region Unity Messages
     void OnDestroy()
     {
@@ -134,21 +151,45 @@ public  class SensorsManager : MonoBehaviour
     {
         if (Application.isPlaying)
         {
-            frameCount++;
+            if (MOVING_AVG_FRAMES.Count > 30)
+            {
+                MOVING_AVG_FRAMES.RemoveAt(0);
+            }
             currentFps = 1f / Time.unscaledDeltaTime;
-            avgFps = (avgFps * (frameCount - 1) + currentFps) / frameCount;
+            MOVING_AVG_FRAMES.Add(currentFps);
+            avgFps = FPSAvg();
             if((avgFps< MIN_AVG_FPS || currentFps < MIN_CURRENT_FPS) && MAX_MS>1)
             {
                 MAX_MS--;
             }
-            else if(avgFps> MAX_AVG_FPS && currentFps> MAX_CURRENT_FPS && MAX_MS<5)
+            else if(avgFps> MAX_AVG_FPS && currentFps> MAX_CURRENT_FPS && MAX_MS<10)
             {
                 MAX_MS++;
             }
         }
     }
+
+    private float FPSAvg()
+    {
+        if (MOVING_AVG_FRAMES.Count == 0)
+        {
+            return 0;
+        }
+        float sum = 0;
+        foreach(float d in MOVING_AVG_FRAMES)
+        {
+            sum += d;
+        }
+        return sum / MOVING_AVG_FRAMES.Count;
+    }
+
     void Start()
     {
+        MIN_AVG_FPS = Math.Max(Application.targetFrameRate - 10,50);
+        MIN_CURRENT_FPS = Math.Max(Application.targetFrameRate - 30,30);
+        MAX_AVG_FPS = Math.Max(Application.targetFrameRate - 5,55);
+        MAX_CURRENT_FPS = Math.Max(Application.targetFrameRate - 10,50);
+        MOVING_AVG_FRAMES = new List<float>();
         if (Application.isPlaying)
         {
             destroyed = false;
@@ -177,15 +218,16 @@ public  class SensorsManager : MonoBehaviour
                     manager.ManageSensors();
                     if (watch.ElapsedMilliseconds > MAX_MS)
                     {
+                        MS = watch.ElapsedMilliseconds;
                         watch.Reset();
                         yield return null;
                         watch.Start();
                     }
                     if (manager != null) //while yield, the manager could have been destroied
                     {
-                        foreach (List<MonoBehaviourSensor> sensorsList in manager.Sensors.Values)
+                        foreach (List<Sensor> sensorsList in manager.Sensors.Values)
                         {
-                            foreach (MonoBehaviourSensor sensor in sensorsList)
+                            foreach (Sensor sensor in sensorsList)
                             {
                                 if (sensor != null)
                                 {
@@ -194,6 +236,7 @@ public  class SensorsManager : MonoBehaviour
                                 }
                                 if (watch.ElapsedMilliseconds > MAX_MS)
                                 {
+                                    MS = watch.ElapsedMilliseconds;
                                     watch.Reset();
                                     yield return null;
                                     watch.Start();
@@ -290,7 +333,7 @@ public  class SensorsManager : MonoBehaviour
     internal static void ReturnSensorsMappings(Brain brain)
     {
         ConcurrentBag<string> mapping = new ConcurrentBag<string>(); ;
-        List<MonoBehaviourSensor> sensors = RetrieveBrainsSensors(brain);
+        List<Sensor> sensors = RetrieveBrainsSensors(brain);
         Parallel.ForEach(sensors, sensor =>
         {
             if (sensor != null)
@@ -301,9 +344,9 @@ public  class SensorsManager : MonoBehaviour
         brain.sensorsMapping = string.Join("",mapping);
         
     }
-    private static List<MonoBehaviourSensor> RetrieveBrainsSensors(Brain brain)
+    private static List<Sensor> RetrieveBrainsSensors(Brain brain)
     {
-        List<MonoBehaviourSensor> sensors = new List<MonoBehaviourSensor>();
+        List<Sensor> sensors = new List<Sensor>();
         foreach (string sensorConf in InstantiatedSensors[brain])
         {
             foreach (MonoBehaviourSensorsManager monobehaviourManager in monoBehaviourManagers)
