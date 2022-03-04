@@ -110,7 +110,7 @@ internal class MonoBehaviourActuator : MonoBehaviour
         int myIndex = gameObject.GetComponent<IndexTracker>().CurrentIndex;
         foreach (string literal in answerSet.GetAnswerSet())
         {
-            string literalPrefix = literal.Substring(0, mappingToCompare.Length);
+            string literalPrefix = literal.Substring(0, Math.Min(mappingToCompare.Length,literal.Length));
             Match matcher = regex.Match(literalPrefix);
             if (matcher.Success && int.Parse(matcher.Groups[1].Value) == myIndex)//if the index of the object associated to the actuator is different from the one of the literal
             {

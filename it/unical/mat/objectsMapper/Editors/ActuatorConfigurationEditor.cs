@@ -15,9 +15,12 @@ namespace Editors
 
         void OnDestroy()
         {
-            if (target == null && go != null)
+            if (!Application.isPlaying && target == null && go != null)
             {
-                DestroyImmediate(go.GetComponent<MonoBehaviourActuatorsManager>());
+                if (go.GetComponent<ActuatorConfiguration>() == null)
+                {
+                    DestroyImmediate(go.GetComponent<MonoBehaviourActuatorsManager>());
+                }
             }
         }
         int chosenMethod;

@@ -61,7 +61,7 @@ namespace it.unical.mat.embasp.platforms.desktop
                         FileAttributes f = File.GetAttributes(@program_file);
                         if (File.Exists(program_file) && !f.HasFlag(FileAttributes.Directory))
                         {
-                            files_paths += program_file;
+                            files_paths += "\""+program_file+"\"";
                             files_paths += " ";
                         }
                         else

@@ -158,11 +158,11 @@ public  class SensorsManager : MonoBehaviour
             currentFps = 1f / Time.unscaledDeltaTime;
             MOVING_AVG_FRAMES.Add(currentFps);
             avgFps = FPSAvg();
-            if((avgFps< MIN_AVG_FPS || currentFps < MIN_CURRENT_FPS) && MAX_MS>1)
+            if((avgFps<= MIN_AVG_FPS || currentFps <= MIN_CURRENT_FPS) && MAX_MS>1)
             {
                 MAX_MS--;
             }
-            else if(avgFps> MAX_AVG_FPS && currentFps> MAX_CURRENT_FPS && MAX_MS<10)
+            else if(avgFps>= MAX_AVG_FPS && currentFps>= MAX_CURRENT_FPS && MAX_MS<20)
             {
                 MAX_MS++;
             }
@@ -185,10 +185,10 @@ public  class SensorsManager : MonoBehaviour
 
     void Start()
     {
-        MIN_AVG_FPS = Math.Max(Application.targetFrameRate - 10,50);
-        MIN_CURRENT_FPS = Math.Max(Application.targetFrameRate - 30,30);
-        MAX_AVG_FPS = Math.Max(Application.targetFrameRate - 5,55);
-        MAX_CURRENT_FPS = Math.Max(Application.targetFrameRate - 10,50);
+        MIN_AVG_FPS = Math.Max(Application.targetFrameRate - 2,58);
+        MIN_CURRENT_FPS = Math.Max(Application.targetFrameRate - 10,50);
+        MAX_AVG_FPS = Math.Max(Application.targetFrameRate,60);
+        MAX_CURRENT_FPS = Math.Max(Application.targetFrameRate - 5,55);
         MOVING_AVG_FRAMES = new List<float>();
         if (Application.isPlaying)
         {
@@ -246,6 +246,7 @@ public  class SensorsManager : MonoBehaviour
                     }
                 }
             }
+            MS = watch.ElapsedMilliseconds;
             watch.Reset();
             Executor.CanRead(true);
             yield return null;
