@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -210,8 +211,9 @@ public  class SensorsManager : MonoBehaviour
             watch.Start();
             yield return new WaitUntil(()=>Executor.CanRead(false));
             monoBehaviourManagers = RetrieveSensorsManagers();
-            foreach (MonoBehaviourSensorsManager manager in monoBehaviourManagers)
+            for(int i=0; i<monoBehaviourManagers.Length;i++)
             {
+                MonoBehaviourSensorsManager manager = monoBehaviourManagers[i];
                 watch.Start();
                 if (manager != null)
                 {
@@ -225,21 +227,26 @@ public  class SensorsManager : MonoBehaviour
                     }
                     if (manager != null) //while yield, the manager could have been destroied
                     {
-                        foreach (List<Sensor> sensorsList in manager.Sensors.Values)
+                        for (int j = 0; j < manager.Sensors.Count; j++)
                         {
-                            foreach (Sensor sensor in sensorsList)
+                            if (manager != null)
                             {
-                                if (sensor != null)
+                                List<Sensor> sensorsList = manager.Sensors.ElementAt(j).Value;
+                                for (int k = 0; k < sensorsList.Count; k++)
                                 {
-                                    sensor.UpdateValue();
-                                    updatedSensors++;
-                                }
-                                if (watch.ElapsedMilliseconds > MAX_MS)
-                                {
-                                    MS = watch.ElapsedMilliseconds;
-                                    watch.Reset();
-                                    yield return null;
-                                    watch.Start();
+                                    Sensor sensor = sensorsList[k];
+                                    if (sensor != null)
+                                    {
+                                        sensor.UpdateValue();
+                                        updatedSensors++;
+                                    }
+                                    if (watch.ElapsedMilliseconds > MAX_MS)
+                                    {
+                                        MS = watch.ElapsedMilliseconds;
+                                        watch.Reset();
+                                        yield return null;
+                                        watch.Start();
+                                    }
                                 }
                             }
                         }
@@ -272,7 +279,7 @@ public  class SensorsManager : MonoBehaviour
     #region Design-time methods
     private static void NotifyBrains()
     {
-        foreach (ActuatorBrain brain in Resources.FindObjectsOfTypeAll<ActuatorBrain>())
+        foreach (ReactiveBrain brain in Resources.FindObjectsOfTypeAll<ReactiveBrain>())
         {
             brain.sensorsConfigurationsChanged = true;
         }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Actuator
 {
-    interface IActualActuatorBrain
+    interface IActualReactiveBrain
     {
         string ActualSensorEncoding(string sensorsAsASP);
         string ActualActuatorEncoding(string actuatorMappingAsASP);

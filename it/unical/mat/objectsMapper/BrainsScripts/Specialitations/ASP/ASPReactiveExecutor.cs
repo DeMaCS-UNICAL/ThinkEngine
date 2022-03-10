@@ -12,28 +12,28 @@ using Planner;
 
 namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 {
-    internal class ASPActuatorExecutor:ASPExecutor
+    internal class ASPReactiveExecutor:ASPExecutor
     {
         
-        internal ASPActuatorExecutor(ActuatorBrain b)
+        internal ASPReactiveExecutor(ReactiveBrain b)
         {
             brain = b;
         }
 
         protected override void SpecificAnswerSetOperations(AnswerSet answer)
         {
-                ActuatorsManager.NotifyActuators((ActuatorBrain)brain,answer);
+                ActuatorsManager.NotifyActuators((ReactiveBrain)brain,answer);
         }
 
         protected override bool SpecificFactsRetrieving(Brain brain)
         {
-            ActuatorsManager.RequestObjectIndexes(brain as ActuatorBrain);
+            ActuatorsManager.RequestObjectIndexes(brain as ReactiveBrain);
             return reason;
         }
 
         protected override void SpecificFactsWriting(Brain brain, StreamWriter fs)
         {
-            fs.Write(((ActuatorBrain)brain).objectsIndexes);
+            fs.Write(((ReactiveBrain)brain).objectsIndexes);
         }
 
         protected override void SpecificOptions(Handler handler)

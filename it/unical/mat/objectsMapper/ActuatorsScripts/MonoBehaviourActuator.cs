@@ -10,6 +10,7 @@ internal class MonoBehaviourActuator : MonoBehaviour
 {
     internal string configurationName;
     private object toPass;
+    [SerializeField]
     private MyListString property;
     private string mappingToCompare;
     private List<IInfoAndValue> _propertyInfo;
@@ -105,6 +106,7 @@ internal class MonoBehaviourActuator : MonoBehaviour
     }
     internal string Parse(AnswerSet answerSet)
     {
+        Debug.Log("parsing for " + property);
         string pattern = "objectIndex\\(([0-9]+)\\)";
         Regex regex = new Regex(@pattern);
         int myIndex = gameObject.GetComponent<IndexTracker>().CurrentIndex;

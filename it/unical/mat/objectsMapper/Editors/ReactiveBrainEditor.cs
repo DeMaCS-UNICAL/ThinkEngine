@@ -6,12 +6,12 @@ using UnityEditor;
 using UnityEditor.Experimental.SceneManagement;
 using UnityEngine;
 
-[CustomEditor(typeof(ActuatorBrain))]
-public class ActuatorBrainEditor:BrainEditor
+[CustomEditor(typeof(ReactiveBrain))]
+public class ReactiveBrainEditor:BrainEditor
 {
     List<string> _actuatorsConfigurationNames;
     Dictionary<string, bool> _toggledActuatorsConfigurations;
-    private ActuatorBrain myScript;
+    private ReactiveBrain myScript;
     protected override Brain Target
     {
         get
@@ -69,7 +69,7 @@ public class ActuatorBrainEditor:BrainEditor
     }
     protected override void OnEnable()
     {
-        myScript = target as ActuatorBrain;
+        myScript = target as ReactiveBrain;
         base.OnEnable();
     }
     
@@ -136,7 +136,7 @@ public class ActuatorBrainEditor:BrainEditor
     protected override void CheckIfDisableGUI(string confName)
     {
         base.CheckIfDisableGUI(confName);
-        ActuatorBrain assignedTo = Utility.ActuatorsManager.AssignedTo(confName);
+        ReactiveBrain assignedTo = Utility.ActuatorsManager.AssignedTo(confName);
         if (assignedTo != null && !myScript.ChosenActuatorConfigurations.Contains(confName))
         {
             GUI.enabled = false;

@@ -12,7 +12,7 @@ using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Actuator;
 using BrainsScripts.Specialitations.ASP;
 
 [ExecuteAlways, RequireComponent(typeof(IndexTracker))]
-public class ActuatorBrain :Brain
+public class ReactiveBrain :Brain
 {
     #region Serialized Fieds
     
@@ -40,7 +40,7 @@ public class ActuatorBrain :Brain
         }
     }
 
-    IActualActuatorBrain actuatorBrain;
+    IActualReactiveBrain actuatorBrain;
     #region Runtime Fields
     internal string objectsIndexes;
     internal bool actuatorsConfigurationsChanged;
@@ -83,7 +83,7 @@ public class ActuatorBrain :Brain
     {
         if (FileExtension.Equals("asp"))
         {
-            actuatorBrain = new ASPActuatorBrain();
+            actuatorBrain = new ASPReactiveBrain();
         }
         base.Start();
     }
@@ -92,7 +92,7 @@ public class ActuatorBrain :Brain
         if (actuatorBrain != null)
         {
             yield return StartCoroutine(base.Init());
-            executor = new ASPActuatorExecutor(this);
+            executor = new ASPReactiveExecutor(this);
             PrepareActuators();
             string GOname = gameObject.name;
             executorName = "executor " + GOname;

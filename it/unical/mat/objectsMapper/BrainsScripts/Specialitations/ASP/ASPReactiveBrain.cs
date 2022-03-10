@@ -7,7 +7,7 @@ using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Actuator;
 
 namespace BrainsScripts.Specialitations.ASP
 {
-    class ASPActuatorBrain : IActualActuatorBrain
+    class ASPReactiveBrain : IActualReactiveBrain
     {
         public string ActualActuatorEncoding(string actuatorMappingAsASP)
         {
