@@ -155,12 +155,20 @@ namespace Mappers.ASPMappers
                 sensors.sensorsList.Add(InstantiateSensorsForElement(information, actualList, i));
             }
             return sensors;
+
         }
 
         private ISensors InstantiateSensorsForElement(InstantiationInformation information, IList actualList, int i)
         {
             InstantiationInformation localInformation = AddLocalInformation(information, actualList, i);
-            return MapperManager.InstantiateSensors(localInformation);
+            ISensors toReturn = MapperManager.InstantiateSensors(localInformation);
+            if(!information.mappingDone && localInformation.mappingDone)
+            {
+                information.mappingDone=true;
+                information.prependMapping = localInformation.prependMapping;
+                information.appendMapping = localInformation.appendMapping;
+            }
+            return toReturn;
         }
 
         public ISensors ManageSensors(InstantiationInformation information, ISensors instantiatedSensors)
@@ -194,6 +202,10 @@ namespace Mappers.ASPMappers
         private ISensors GenerateUpdateSensors(InstantiationInformation information, ListSensors sensors, IList actualList, int x)
         {
             ListSensors toReturn = new ListSensors();
+            if (!information.mappingDone)
+            {
+                GenerateMapping(ref information);
+            }
             information.firstPlaceholder += 1;
             UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
             for (int i = 0; i < x; i++)
@@ -287,6 +299,10 @@ namespace Mappers.ASPMappers
         private IActuators GenerateUpdateActuators(InstantiationInformation information, ListActuators actuators, IList actualList, int x)
         {
             ListActuators toReturn = new ListActuators();
+            if (!information.mappingDone)
+            {
+                GenerateMapping(ref information);
+            }
             information.firstPlaceholder += 1;
             UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
             for (int i = 0; i < x; i++)

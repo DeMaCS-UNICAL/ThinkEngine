@@ -410,30 +410,37 @@ internal class MapperManager
     #region SENSORS METHODS
     internal static ISensors InstantiateSensors(InstantiationInformation information)
     {
-
+        ISensors toReturn = null;
         IDataMapper mapper = RetrieveAdditionalInformation(ref information,!information.mappingDone);
         if (mapper != null)
         {
             ISensors sensors= mapper.InstantiateSensors(information);
             if (sensors != null)
             {
-                return sensors;
+                toReturn = sensors;
             }
         }
-        information.prependMapping.Clear();
-        information.appendMapping.Clear();
-        return null;
+        if (!information.mappingDone)
+        {
+            information.prependMapping.Clear();
+            information.appendMapping.Clear();
+        }
+        return toReturn;
     }
     internal static ISensors ManageSensors(InstantiationInformation information, ISensors sensors)
     {
         IDataMapper mapper = RetrieveAdditionalInformation(ref information, !information.mappingDone);
+        ISensors toReturn = null;
         if (mapper != null)
         {
-            return mapper.ManageSensors(information, sensors);
+            toReturn= mapper.ManageSensors(information, sensors);
         }
-        information.prependMapping.Clear();
-        information.appendMapping.Clear();
-        return null;
+        if (!information.mappingDone)
+        {
+            information.prependMapping.Clear();
+            information.appendMapping.Clear();
+        }
+        return toReturn;
     }
 
     internal static string GetSensorBasicMap(Sensor sensor, object currentObject, MyListString residualPropertyHierarchy, List<object> values, int level)
@@ -461,25 +468,33 @@ internal class MapperManager
     #region ACTUATORS METHODS
     internal static IActuators InstantiateActuators(InstantiationInformation information)
     {
+        IActuators toReturn = null;
         IDataMapper mapper = RetrieveAdditionalInformation(ref information, !information.mappingDone);
         if (mapper != null)
         {
-            return mapper.InstantiateActuators(information);
+            toReturn = mapper.InstantiateActuators(information);
         }
-        information.prependMapping.Clear();
-        information.appendMapping.Clear();
-        return null;
+        if (!information.mappingDone)
+        {
+            information.prependMapping.Clear();
+            information.appendMapping.Clear();
+        }
+        return toReturn;
     }
     internal static IActuators ManageActuators(InstantiationInformation information, IActuators actuators)
     {
+        IActuators toReturn = null;
         IDataMapper mapper = RetrieveAdditionalInformation(ref information, !information.mappingDone);
         if (mapper != null)
         {
-            return mapper.ManageActuators(information,actuators);
+            toReturn = mapper.ManageActuators(information,actuators);
         }
-        information.prependMapping.Clear();
-        information.appendMapping.Clear();
-        return null;
+        if (!information.mappingDone)
+        {
+            information.prependMapping.Clear();
+            information.appendMapping.Clear();
+        }
+        return toReturn;
     }
     internal static string GetActuatorBasicMap(MonoBehaviourActuator actuator, object currentObject, MyListString residualPropertyHierarchy, List<object> values, int level)
     {

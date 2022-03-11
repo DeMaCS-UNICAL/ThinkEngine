@@ -39,6 +39,7 @@ namespace Mappers
             configuration = original.configuration;
             hierarchyInfo = new List<IInfoAndValue>(original.hierarchyInfo);
             currentType = original.currentType;
+            mappingDone = original.mappingDone;
         }
         internal string Mapping()
         {

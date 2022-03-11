@@ -213,7 +213,14 @@ namespace Mappers.BaseMappers
         private ISensors InstantiateSensorsForElement(InstantiationInformation information, Array actualArray, int i)
         {
             InstantiationInformation localInformation = AddLocalInformation(information, actualArray, i);
-            return MapperManager.InstantiateSensors(localInformation);
+            ISensors toReturn = MapperManager.InstantiateSensors(localInformation);
+            if (!information.mappingDone && localInformation.mappingDone)
+            {
+                information.mappingDone = true;
+                information.prependMapping = localInformation.prependMapping;
+                information.appendMapping = localInformation.appendMapping;
+            }
+            return toReturn;
         }
 
         public bool IsFinal(Type t)
@@ -257,6 +264,10 @@ namespace Mappers.BaseMappers
         private IActuators GenerateUpdateActuators(InstantiationInformation information, ArrayActuators actuators, Array actualArray, int x)
         {
             ArrayActuators toReturn = new ArrayActuators(x);
+            if (!information.mappingDone)
+            {
+                GenerateMapping(ref information);
+            }
             information.firstPlaceholder += 1;
             UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, IsMappableElement(actualArray.GetType()));
             for (int i = 0; i < x; i++)
@@ -304,6 +315,10 @@ namespace Mappers.BaseMappers
         private ISensors GenerateUpdateSensors(InstantiationInformation information, ArraySensors sensors, Array actualArray, int x)
         {
             ArraySensors toReturn = new ArraySensors(x);
+            if (!information.mappingDone)
+            {
+                GenerateMapping(ref information);
+            }
             information.firstPlaceholder += 2;
             UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, IsMappableElement(actualArray.GetType()));
             for (int i = 0; i < x; i++)
