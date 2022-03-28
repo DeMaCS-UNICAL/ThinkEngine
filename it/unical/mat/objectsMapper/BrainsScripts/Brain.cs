@@ -52,7 +52,7 @@ namespace Planner
             }
         }
         [SerializeField, HideInInspector]
-        internal string AIFilesPath=  @".\Assets\StreamingAssets\";
+        internal string AIFilesPath=  @".\Assets\StreamingAssets\".Replace("\\",Utility.slash);
         [SerializeField, HideInInspector]
         internal string AIFilesPrefix;
         [SerializeField, HideInInspector]
@@ -66,11 +66,12 @@ namespace Planner
                 if (_AIFileTemplatePath == null || !_AIFileTemplatePath.Equals(this.GetType().Name + "Template" + AIFilesPrefix+ ".asp"))
                 {
                     _AIFileTemplatePath = @".\Assets\Resources\" + this.GetType().Name + "Template" + AIFilesPrefix + ".asp";
+                    _AIFileTemplatePath.Replace("\\", Utility.slash);
                     if (!File.Exists(_AIFileTemplatePath))
                     {
-                        if (!Directory.Exists(@".\Assets\Resources"))
+                        if (!Directory.Exists(@".\Assets\Resources".Replace("\\", Utility.slash)))
                         {
-                            Directory.CreateDirectory(@".\Assets\Resources");
+                            Directory.CreateDirectory(@".\Assets\Resources".Replace("\\", Utility.slash));
                         }
                         File.Create(_AIFileTemplatePath);
                     }

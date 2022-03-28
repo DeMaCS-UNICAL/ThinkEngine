@@ -104,9 +104,9 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         }
         internal virtual void Run()
         {
-            if (!Directory.Exists(Path.GetTempPath() + @"ThinkEngineFacts\"))
+            if (!Directory.Exists(Path.GetTempPath() + @"ThinkEngineFacts"+Utility.slash))
             {
-                Directory.CreateDirectory(Path.GetTempPath() + @"ThinkEngineFacts\");
+                Directory.CreateDirectory(Path.GetTempPath() + @"ThinkEngineFacts" + Utility.slash);
             }
             reason = true;
 
@@ -115,7 +115,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 encoding = GetProgramInstance();
                 foreach (string fileName in Directory.GetFiles(Application.streamingAssetsPath))
                 {
-                    string actualFileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
+                    string actualFileName = fileName.Substring(fileName.LastIndexOf(Utility.slash) + 1);
                     if (actualFileName.StartsWith(brain.AIFilesPrefix) && actualFileName.EndsWith(GetCurrentFileExtension()))
                     {
                         encoding.AddFilesPath(fileName);
@@ -165,7 +165,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     {
                         return;
                     }
-                    factsPath = Path.GetTempPath() + @"ThinkEngineFacts\" + Path.GetRandomFileName() + ".txt";
+                    factsPath = Path.GetTempPath() + @"ThinkEngineFacts" + Utility.slash + Path.GetRandomFileName() + ".txt";
 
                     using (StreamWriter fs = new StreamWriter(factsPath, true))
                     {

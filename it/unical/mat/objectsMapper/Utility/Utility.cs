@@ -19,9 +19,12 @@ public static class Utility
     private static GameObject _hiddenGameObject;
     private static SensorsManager _sensorsManager;
     private static ActuatorsManager _actuatorsManager;
-    private static string _triggerClassPath= @".\Assets\Scripts\Trigger.cs";
+    internal static string slash = Path.DirectorySeparatorChar+"";
+    private static string _triggerClassPath= @".\Assets\Scripts\Trigger.cs".Replace("\\", Utility.slash);
     internal static bool prefabsLoaded = false;
     private static MethodInfo[] _triggerMethods;
+    internal static string RunnableExtension = Environment.OSVersion.Platform== PlatformID.Win32NT ? "exe": "";
+
     private static MethodInfo[] TriggerMethods
     {
         get
@@ -184,9 +187,9 @@ public static class Utility
     internal static void CheckTriggerClass()
     {
 #if UNITY_EDITOR
-        if (!Directory.Exists(@"Assets\Scripts"))
+        if (!Directory.Exists(@"Assets\Scripts".Replace("\\", slash)))
         {
-            Directory.CreateDirectory(@"Assets\Scripts");
+            Directory.CreateDirectory(@"Assets\Scripts".Replace("\\", slash));
         }
         if (!File.Exists(_triggerClassPath))
         {

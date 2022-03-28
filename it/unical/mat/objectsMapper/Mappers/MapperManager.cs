@@ -165,6 +165,11 @@ internal class MapperManager
 
     internal static object RetrieveProperty(object currentObject, string currentProperty, out Type currentType)
     {
+        if (currentObject == null)
+        {
+            currentType = null;
+            return null;
+        }
         MemberInfo[] members = currentObject.GetType().GetMember(currentProperty, Utility.BindingAttr);
         if (members.Length > 0)
         {

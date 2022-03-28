@@ -23,6 +23,8 @@ namespace Mappers.BaseMappers
         private class Array2Sensors : ISensors
         {
             internal ISensors[,] sensorsMatrix;
+            internal bool needsUpdate;
+
             internal Array2Sensors(int i, int j)
             {
                 sensorsMatrix = new ISensors[i, j];
@@ -33,11 +35,10 @@ namespace Mappers.BaseMappers
                 List<Sensor> toReturn = new List<Sensor>();
                 foreach(ISensors isensors in sensorsMatrix)
                 {
-                    if (isensors == null)
+                    if (isensors != null)
                     {
-                        Debug.LogError("isensors is null");
+                        toReturn.AddRange(isensors.GetSensorsList());
                     }
-                    toReturn.AddRange(isensors.GetSensorsList());
                 }
                 return toReturn;
             }
@@ -149,6 +150,10 @@ namespace Mappers.BaseMappers
                 for (int j = 0; j < y; j++)
                 {
                     sensors.sensorsMatrix[i, j]=InstantiateSensorsForElement(information, actualMatrix, i, j);
+                    if (sensors.sensorsMatrix[i, j] == null)
+                    {
+                        sensors.needsUpdate=true;
+                    }
                 }
             }
             return sensors;
@@ -188,7 +193,18 @@ namespace Mappers.BaseMappers
                 {
                     if (sensors.sensorsMatrix.GetLength(0) > i && sensors.sensorsMatrix.GetLength(0) > j)
                     {
-                        toReturn.sensorsMatrix[i, j] = sensors.sensorsMatrix[i, j];
+                        if (sensors.sensorsMatrix[i, j] == null)
+                        {
+                            toReturn.sensorsMatrix[i, j] = InstantiateSensorsForElement(information, actualMatrix, i, j);
+                            if(toReturn.sensorsMatrix[i, j] == null)
+                            {
+                                sensors.needsUpdate=true;
+                            }
+                        }
+                        else
+                        {
+                            toReturn.sensorsMatrix[i, j] = sensors.sensorsMatrix[i, j];
+                        }
                     }
                     else
                     {
@@ -233,7 +249,7 @@ namespace Mappers.BaseMappers
             Array actualMatrix = (Array)information.currentObjectOfTheHierarchy;
             int x = actualMatrix.GetLength(0);
             int y = actualMatrix.GetLength(1);
-            if (x == sensors.sensorsMatrix.GetLength(0) && y == sensors.sensorsMatrix.GetLength(1))
+            if (!sensors.needsUpdate && x == sensors.sensorsMatrix.GetLength(0) && y == sensors.sensorsMatrix.GetLength(1))
             {
                 return instantiatedSensors;
             }
