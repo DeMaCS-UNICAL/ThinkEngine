@@ -1,0 +1,11 @@
+xcopy /f "./System.Runtime.CompilerServices.Unsafe.dll" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
+xcopy /f "./System.Numerics.Vectors.dll" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
+xcopy /f "./System.Memory.dll" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
+xcopy /f "./System.Collections.Immutable.dll" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
+xcopy /f "./System.Buffers.dll" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
+xcopy /f "./ThinkEngine.dll" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
+xcopy /f "../Standalone/ThinkEngine.dll" "../ThinkEnginePlugin/Assets/Plugins/" /Y
+xcopy /f "./Antlr4.Runtime.Standard.dll" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
+xcopy /f "../dlv2.exe" "../ThinkEnginePlugin/Assets/StreamingAssets/lib/" /Y
+xcopy /f "./ThinkEngine.dll.meta" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
+xcopy /f "../Standalone/ThinkEngine.dll.meta" "../ThinkEnginePlugin/Assets/Plugins/" /Y
