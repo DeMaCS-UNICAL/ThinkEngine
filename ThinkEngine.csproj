@@ -101,10 +101,10 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="UnityEditor">
-      <HintPath>..\..\..\..\..\Applications\Unity\Hub\Editor\2021.2.14f1\Unity.app\Contents\Managed\UnityEditor.dll</HintPath>
+      <HintPath>bin\Debug\Editor\UnityEditor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\Applications\Unity\Hub\Editor\2021.2.14f1\Unity.app\Contents\Managed\UnityEngine.dll</HintPath>
+      <HintPath>bin\Debug\Editor\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
