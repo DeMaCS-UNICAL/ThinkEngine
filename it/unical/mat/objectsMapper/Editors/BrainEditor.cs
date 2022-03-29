@@ -320,7 +320,7 @@ namespace Editors
             Target.maintainInputFile = EditorGUILayout.Toggle("Maintain input file", Target.maintainInputFile);
             if (GUILayout.Button("Open input folder"))
             {
-                EditorUtility.RevealInFinder(Path.GetTempPath()+ @"ThinkEngineFacts"+Utility.slash);
+                EditorUtility.RevealInFinder(Path.Combine(Path.GetTempPath(),"ThinkEngineFacts"+Utility.slash));
             }
             EditorGUILayout.Space();
             EditorGUILayout.EndHorizontal();

@@ -28,7 +28,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         }
         protected override Handler GetHandler()
         {
-            return new DesktopHandler(new DLV2DesktopService(Path.Combine(Application.streamingAssetsPath, @"lib"+ Utility.slash +"dlv2"+Utility.RunnableExtension)));
+            return new DesktopHandler(new DLV2DesktopService(Path.Combine(Application.streamingAssetsPath, "lib","dlv2"+Utility.RunnableExtension)));
         }
         protected override void OutputParsing(Output o)
         {

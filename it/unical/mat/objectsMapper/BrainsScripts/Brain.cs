@@ -52,7 +52,7 @@ namespace Planner
             }
         }
         [SerializeField, HideInInspector]
-        internal string AIFilesPath=  @"."+ Utility.slash + "Assets"+ Utility.slash + "StreamingAssets"+ Utility.slash + "";
+        internal string AIFilesPath=  Path.Combine(".","Assets","StreamingAssets");
         [SerializeField, HideInInspector]
         internal string AIFilesPrefix;
         [SerializeField, HideInInspector]
@@ -63,15 +63,15 @@ namespace Planner
         {
             get
             {
-                if (_AIFileTemplatePath == null || !_AIFileTemplatePath.Equals(this.GetType().Name + "Template" + AIFilesPrefix+ ".asp"))
+                if (_AIFileTemplatePath == null || !_AIFileTemplatePath.Equals(Path.Combine(".", "Assets", "Resources", this.GetType().Name, "Template", AIFilesPrefix, ".asp")))
                 {
-                    _AIFileTemplatePath = @"."+ Utility.slash + "Assets"+ Utility.slash + "Resources"+ Utility.slash + "" + this.GetType().Name + "Template" + AIFilesPrefix + ".asp";
+                    _AIFileTemplatePath = Path.Combine(".","Assets","Resources",this.GetType().Name,"Template",AIFilesPrefix,".asp");
                     
                     if (!File.Exists(_AIFileTemplatePath))
                     {
-                        if (!Directory.Exists(@"."+ Utility.slash + "Assets"+ Utility.slash + "Resources"))
+                        if (!Directory.Exists(Path.Combine(".","Assets","Resources")))
                         {
-                            Directory.CreateDirectory(@"."+ Utility.slash + "Assets"+ Utility.slash + "Resources");
+                            Directory.CreateDirectory(Path.Combine(".", "Assets", "Resources"));
                         }
                         File.Create(_AIFileTemplatePath);
                     }

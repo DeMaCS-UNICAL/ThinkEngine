@@ -20,7 +20,7 @@ public static class Utility
     private static SensorsManager _sensorsManager;
     private static ActuatorsManager _actuatorsManager;
     internal static string slash = Path.DirectorySeparatorChar+"";
-    private static string _triggerClassPath= @"."+ Utility.slash + "Assets"+ Utility.slash+"Scripts"+ Utility.slash + "Trigger.cs";
+    private static string _triggerClassPath= Path.Combine(".","Assets","Scripts","Trigger.cs");
     internal static bool prefabsLoaded = false;
     private static MethodInfo[] _triggerMethods;
     internal static string RunnableExtension = Environment.OSVersion.Platform== PlatformID.Win32NT ? ".exe": "";
@@ -187,9 +187,9 @@ public static class Utility
     internal static void CheckTriggerClass()
     {
 #if UNITY_EDITOR
-        if (!Directory.Exists(@"Assets"+ Utility.slash + "Scripts"))
+        if (!Directory.Exists(Path.Combine("Assets","Scripts")))
         {
-            Directory.CreateDirectory(@"Assets"+ Utility.slash + "Scripts");
+            Directory.CreateDirectory(Path.Combine("Assets", "Scripts"));
         }
         if (!File.Exists(_triggerClassPath))
         {

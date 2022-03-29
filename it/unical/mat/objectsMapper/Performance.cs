@@ -8,12 +8,12 @@ using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 class Performance : MonoBehaviour
 {
     private int steps;
-    private static readonly string withBrainPath = @"Performance"+ Utility.slash + "withBrain.csv";
-    private static readonly string withoutBrainPath = @"Performance"+ Utility.slash + "withoutBrain.csv";
-    private static readonly string factsAndASPath = @"Performance"+ Utility.slash + "factsAndAS.csv";
-    private static readonly string sensorsUpdateRate = @"Performance"+ Utility.slash + "sensors.csv";
-    private static readonly string actuatorsUpdateRate = @"Performance"+ Utility.slash + "actuators.csv";
-    private static readonly string plansUpdateRate = @"Performance"+ Utility.slash + "plans.csv";
+    private static readonly string withBrainPath = Path.Combine("Performance", "withBrain.csv");
+    private static readonly string withoutBrainPath = Path.Combine("Performance","withoutBrain.csv");
+    private static readonly string factsAndASPath = Path.Combine("Performance" ,"factsAndAS.csv");
+    private static readonly string sensorsUpdateRate = Path.Combine("Performance" ,"sensors.csv");
+    private static readonly string actuatorsUpdateRate = Path.Combine("Performance","actuators.csv");
+    private static readonly string plansUpdateRate = Path.Combine("Performance","plans.csv");
     private static string path;
     public static bool updatedSensors;
     public static bool updatingActuators;
