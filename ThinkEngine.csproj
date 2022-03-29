@@ -100,13 +100,11 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="UnityEditor, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\..\Program Files\Unity\Hub\Editor\2021.2.10f1\Editor\Data\Managed\UnityEditor.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="UnityEditor">
+      <HintPath>..\..\..\..\..\Applications\Unity\Hub\Editor\2021.2.14f1\Unity.app\Contents\Managed\UnityEditor.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Program Files\Unity\Hub\Editor\2021.2.10f1\Editor\Data\Managed\UnityEngine.dll</HintPath>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\..\..\Applications\Unity\Hub\Editor\2021.2.14f1\Unity.app\Contents\Managed\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -333,7 +331,5 @@
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Editor call "C:\Users\Denise\Uni\Assegno\ThinkEngine\bin\Debug\dllCopy.bat"
-if $(ConfigurationName) == Editor call "C:\Users\Denise\Uni\Assegno\ThinkEngine\ThinkEngine_Installer.bat"</PostBuildEvent>
   </PropertyGroup>
 </Project>

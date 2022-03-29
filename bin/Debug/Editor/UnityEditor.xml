@@ -21698,7 +21698,7 @@ MYCOMPUTER\SHAREDFOLDER\.</para>
     </member>
     <member name="M:UnityEditor.Events.UnityEventTools.RemovePersistentListener(UnityEngine.Events.UnityEventBase,System.Int32)">
       <summary>
-        <para>Removes the given function from the event. Unless you use int index as the second argument, if you have added the same function multiple times, this method will remove all occurrences of it.</para>
+        <para>Removes the given function from the event.</para>
       </summary>
       <param name="unityEvent">Event to modify.</param>
       <param name="index">Index to remove (if specified).</param>
@@ -21706,7 +21706,7 @@ MYCOMPUTER\SHAREDFOLDER\.</para>
     </member>
     <member name="M:UnityEditor.Events.UnityEventTools.RemovePersistentListener(UnityEngine.Events.UnityEventBase,UnityEngine.Events.UnityAction)">
       <summary>
-        <para>Removes the given function from the event. Unless you use int index as the second argument, if you have added the same function multiple times, this method will remove all occurrences of it.</para>
+        <para>Removes the given function from the event.</para>
       </summary>
       <param name="unityEvent">Event to modify.</param>
       <param name="index">Index to remove (if specified).</param>
@@ -21714,7 +21714,7 @@ MYCOMPUTER\SHAREDFOLDER\.</para>
     </member>
     <member name="M:UnityEditor.Events.UnityEventTools.RemovePersistentListener(UnityEngine.Events.UnityEventBase,UnityEngine.Events.UnityAction`1&lt;T0&gt;)">
       <summary>
-        <para>Removes the given function from the event. Unless you use int index as the second argument, if you have added the same function multiple times, this method will remove all occurrences of it.</para>
+        <para>Removes the given function from the event.</para>
       </summary>
       <param name="unityEvent">Event to modify.</param>
       <param name="index">Index to remove (if specified).</param>
@@ -21722,7 +21722,7 @@ MYCOMPUTER\SHAREDFOLDER\.</para>
     </member>
     <member name="M:UnityEditor.Events.UnityEventTools.RemovePersistentListener(UnityEngine.Events.UnityEventBase,UnityEngine.Events.UnityAction`2&lt;T0,T1&gt;)">
       <summary>
-        <para>Removes the given function from the event. Unless you use int index as the second argument, if you have added the same function multiple times, this method will remove all occurrences of it.</para>
+        <para>Removes the given function from the event.</para>
       </summary>
       <param name="unityEvent">Event to modify.</param>
       <param name="index">Index to remove (if specified).</param>
@@ -21730,7 +21730,7 @@ MYCOMPUTER\SHAREDFOLDER\.</para>
     </member>
     <member name="M:UnityEditor.Events.UnityEventTools.RemovePersistentListener(UnityEngine.Events.UnityEventBase,UnityEngine.Events.UnityAction`3&lt;T0,T1,T2&gt;)">
       <summary>
-        <para>Removes the given function from the event. Unless you use int index as the second argument, if you have added the same function multiple times, this method will remove all occurrences of it.</para>
+        <para>Removes the given function from the event.</para>
       </summary>
       <param name="unityEvent">Event to modify.</param>
       <param name="index">Index to remove (if specified).</param>
@@ -21738,7 +21738,7 @@ MYCOMPUTER\SHAREDFOLDER\.</para>
     </member>
     <member name="M:UnityEditor.Events.UnityEventTools.RemovePersistentListener(UnityEngine.Events.UnityEventBase,UnityEngine.Events.UnityAction`4&lt;T0,T1,T2,T3&gt;)">
       <summary>
-        <para>Removes the given function from the event. Unless you use int index as the second argument, if you have added the same function multiple times, this method will remove all occurrences of it.</para>
+        <para>Removes the given function from the event.</para>
       </summary>
       <param name="unityEvent">Event to modify.</param>
       <param name="index">Index to remove (if specified).</param>
@@ -54205,6 +54205,22 @@ See PrefabUtility.IsDefaultOverride for more information.</para>
       <param name="keywords">The keywords to use during the compilation.</param>
       <param name="shaderCompilerPlatform">The shader compiler platform to compile for.</param>
       <param name="buildTarget">The build target to compile for.</param>
+      <param name="forExternalTool">Indicates whether to prepare the bytecode for Unity or to use with external tools.</param>
+      <param name="tier">An optional graphics tier.</param>
+      <param name="platformKeywords">An optional set of platform keywords. If you do not provide any, Unity uses the default keywords for the given platform, target, and tier.</param>
+      <returns>
+        <para>The compiled variant result, including resource layout information and bytecode. If the pass doesn't include the requested program, or if the pass is not the correct type, this function still succeeds but returns empty bytecode.</para>
+      </returns>
+    </member>
+    <member name="M:UnityEditor.ShaderData.Pass.CompileVariant(UnityEditor.Rendering.ShaderType,System.String[],UnityEditor.Rendering.ShaderCompilerPlatform,UnityEditor.BuildTarget,System.Boolean)">
+      <summary>
+        <para>Compiles a shader variant for this shader pass and returns its bytecode and resource layout.</para>
+      </summary>
+      <param name="shaderType">The shader type within this pass to compile. (e.g. Vertex, Fragment, etc.)  Some platforms (OpenGLCore, GLES20, GLES3x, Switch and Vulkan) include all stages within the Vertex shader type.</param>
+      <param name="keywords">The keywords to use during the compilation.</param>
+      <param name="shaderCompilerPlatform">The shader compiler platform to compile for.</param>
+      <param name="buildTarget">The build target to compile for.</param>
+      <param name="forExternalTool">Indicates whether to prepare the bytecode for Unity or to use with external tools.</param>
       <param name="tier">An optional graphics tier.</param>
       <param name="platformKeywords">An optional set of platform keywords. If you do not provide any, Unity uses the default keywords for the given platform, target, and tier.</param>
       <returns>
@@ -54219,6 +54235,22 @@ See PrefabUtility.IsDefaultOverride for more information.</para>
       <param name="keywords">The keywords to use during the compilation.</param>
       <param name="shaderCompilerPlatform">The shader compiler platform to compile for.</param>
       <param name="buildTarget">The build target to compile for.</param>
+      <param name="forExternalTool">Indicates whether to prepare the bytecode for Unity or to use with external tools.</param>
+      <param name="tier">An optional graphics tier.</param>
+      <param name="platformKeywords">An optional set of platform keywords. If you do not provide any, Unity uses the default keywords for the given platform, target, and tier.</param>
+      <returns>
+        <para>The compiled variant result, including resource layout information and bytecode. If the pass doesn't include the requested program, or if the pass is not the correct type, this function still succeeds but returns empty bytecode.</para>
+      </returns>
+    </member>
+    <member name="M:UnityEditor.ShaderData.Pass.CompileVariant(UnityEditor.Rendering.ShaderType,System.String[],UnityEditor.Rendering.ShaderCompilerPlatform,UnityEditor.BuildTarget,UnityEngine.Rendering.GraphicsTier,System.Boolean)">
+      <summary>
+        <para>Compiles a shader variant for this shader pass and returns its bytecode and resource layout.</para>
+      </summary>
+      <param name="shaderType">The shader type within this pass to compile. (e.g. Vertex, Fragment, etc.)  Some platforms (OpenGLCore, GLES20, GLES3x, Switch and Vulkan) include all stages within the Vertex shader type.</param>
+      <param name="keywords">The keywords to use during the compilation.</param>
+      <param name="shaderCompilerPlatform">The shader compiler platform to compile for.</param>
+      <param name="buildTarget">The build target to compile for.</param>
+      <param name="forExternalTool">Indicates whether to prepare the bytecode for Unity or to use with external tools.</param>
       <param name="tier">An optional graphics tier.</param>
       <param name="platformKeywords">An optional set of platform keywords. If you do not provide any, Unity uses the default keywords for the given platform, target, and tier.</param>
       <returns>
@@ -54233,6 +54265,22 @@ See PrefabUtility.IsDefaultOverride for more information.</para>
       <param name="keywords">The keywords to use during the compilation.</param>
       <param name="shaderCompilerPlatform">The shader compiler platform to compile for.</param>
       <param name="buildTarget">The build target to compile for.</param>
+      <param name="forExternalTool">Indicates whether to prepare the bytecode for Unity or to use with external tools.</param>
+      <param name="tier">An optional graphics tier.</param>
+      <param name="platformKeywords">An optional set of platform keywords. If you do not provide any, Unity uses the default keywords for the given platform, target, and tier.</param>
+      <returns>
+        <para>The compiled variant result, including resource layout information and bytecode. If the pass doesn't include the requested program, or if the pass is not the correct type, this function still succeeds but returns empty bytecode.</para>
+      </returns>
+    </member>
+    <member name="M:UnityEditor.ShaderData.Pass.CompileVariant(UnityEditor.Rendering.ShaderType,System.String[],UnityEditor.Rendering.ShaderCompilerPlatform,UnityEditor.BuildTarget,UnityEngine.Rendering.BuiltinShaderDefine[],System.Boolean)">
+      <summary>
+        <para>Compiles a shader variant for this shader pass and returns its bytecode and resource layout.</para>
+      </summary>
+      <param name="shaderType">The shader type within this pass to compile. (e.g. Vertex, Fragment, etc.)  Some platforms (OpenGLCore, GLES20, GLES3x, Switch and Vulkan) include all stages within the Vertex shader type.</param>
+      <param name="keywords">The keywords to use during the compilation.</param>
+      <param name="shaderCompilerPlatform">The shader compiler platform to compile for.</param>
+      <param name="buildTarget">The build target to compile for.</param>
+      <param name="forExternalTool">Indicates whether to prepare the bytecode for Unity or to use with external tools.</param>
       <param name="tier">An optional graphics tier.</param>
       <param name="platformKeywords">An optional set of platform keywords. If you do not provide any, Unity uses the default keywords for the given platform, target, and tier.</param>
       <returns>
@@ -54247,6 +54295,22 @@ See PrefabUtility.IsDefaultOverride for more information.</para>
       <param name="keywords">The keywords to use during the compilation.</param>
       <param name="shaderCompilerPlatform">The shader compiler platform to compile for.</param>
       <param name="buildTarget">The build target to compile for.</param>
+      <param name="forExternalTool">Indicates whether to prepare the bytecode for Unity or to use with external tools.</param>
+      <param name="tier">An optional graphics tier.</param>
+      <param name="platformKeywords">An optional set of platform keywords. If you do not provide any, Unity uses the default keywords for the given platform, target, and tier.</param>
+      <returns>
+        <para>The compiled variant result, including resource layout information and bytecode. If the pass doesn't include the requested program, or if the pass is not the correct type, this function still succeeds but returns empty bytecode.</para>
+      </returns>
+    </member>
+    <member name="M:UnityEditor.ShaderData.Pass.CompileVariant(UnityEditor.Rendering.ShaderType,System.String[],UnityEditor.Rendering.ShaderCompilerPlatform,UnityEditor.BuildTarget,UnityEngine.Rendering.BuiltinShaderDefine[],UnityEngine.Rendering.GraphicsTier,System.Boolean)">
+      <summary>
+        <para>Compiles a shader variant for this shader pass and returns its bytecode and resource layout.</para>
+      </summary>
+      <param name="shaderType">The shader type within this pass to compile. (e.g. Vertex, Fragment, etc.)  Some platforms (OpenGLCore, GLES20, GLES3x, Switch and Vulkan) include all stages within the Vertex shader type.</param>
+      <param name="keywords">The keywords to use during the compilation.</param>
+      <param name="shaderCompilerPlatform">The shader compiler platform to compile for.</param>
+      <param name="buildTarget">The build target to compile for.</param>
+      <param name="forExternalTool">Indicates whether to prepare the bytecode for Unity or to use with external tools.</param>
       <param name="tier">An optional graphics tier.</param>
       <param name="platformKeywords">An optional set of platform keywords. If you do not provide any, Unity uses the default keywords for the given platform, target, and tier.</param>
       <returns>
