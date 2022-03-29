@@ -52,7 +52,7 @@ namespace Planner
             }
         }
         [SerializeField, HideInInspector]
-        internal string AIFilesPath=  @".\Assets\StreamingAssets\".Replace("\\",Utility.slash);
+        internal string AIFilesPath=  @"."+ Utility.slash + "Assets"+ Utility.slash + "StreamingAssets"+ Utility.slash + "";
         [SerializeField, HideInInspector]
         internal string AIFilesPrefix;
         [SerializeField, HideInInspector]
@@ -65,13 +65,13 @@ namespace Planner
             {
                 if (_AIFileTemplatePath == null || !_AIFileTemplatePath.Equals(this.GetType().Name + "Template" + AIFilesPrefix+ ".asp"))
                 {
-                    _AIFileTemplatePath = @".\Assets\Resources\" + this.GetType().Name + "Template" + AIFilesPrefix + ".asp";
-                    _AIFileTemplatePath.Replace("\\", Utility.slash);
+                    _AIFileTemplatePath = @"."+ Utility.slash + "Assets"+ Utility.slash + "Resources"+ Utility.slash + "" + this.GetType().Name + "Template" + AIFilesPrefix + ".asp";
+                    
                     if (!File.Exists(_AIFileTemplatePath))
                     {
-                        if (!Directory.Exists(@".\Assets\Resources".Replace("\\", Utility.slash)))
+                        if (!Directory.Exists(@"."+ Utility.slash + "Assets"+ Utility.slash + "Resources"))
                         {
-                            Directory.CreateDirectory(@".\Assets\Resources".Replace("\\", Utility.slash));
+                            Directory.CreateDirectory(@"."+ Utility.slash + "Assets"+ Utility.slash + "Resources");
                         }
                         File.Create(_AIFileTemplatePath);
                     }
@@ -135,7 +135,7 @@ namespace Planner
             _fileExtension = "";
             foreach (string fileName in Directory.GetFiles(Application.streamingAssetsPath))
             {
-                string actualFileName = fileName.Substring(fileName.LastIndexOf(@"\") + 1);
+                string actualFileName = fileName.Substring(fileName.LastIndexOf(Utility.slash) + 1);
                 if (actualFileName.StartsWith(AIFilesPrefix))
                 {
                     string extension = actualFileName.Substring(actualFileName.LastIndexOf(".") + 1);
