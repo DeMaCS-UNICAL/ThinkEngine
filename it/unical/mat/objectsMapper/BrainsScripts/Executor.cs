@@ -165,7 +165,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     {
                         return;
                     }
-                    factsPath = Path.Combine(Path.GetTempPath(),"ThinkEngineFacts",Path.GetRandomFileName(),".txt");
+                    factsPath = Path.Combine(Path.GetTempPath(),"ThinkEngineFacts",Path.GetRandomFileName()+".txt");
 
                     using (StreamWriter fs = new StreamWriter(factsPath, true))
                     {

@@ -63,9 +63,9 @@ namespace Planner
         {
             get
             {
-                if (_AIFileTemplatePath == null || !_AIFileTemplatePath.Equals(Path.Combine(".", "Assets", "Resources", this.GetType().Name, "Template", AIFilesPrefix, ".asp")))
+                if (_AIFileTemplatePath == null || !_AIFileTemplatePath.Equals(Path.Combine(".", "Assets", "Resources", this.GetType().Name+"Template"+AIFilesPrefix+".asp")))
                 {
-                    _AIFileTemplatePath = Path.Combine(".","Assets","Resources",this.GetType().Name,"Template",AIFilesPrefix,".asp");
+                    _AIFileTemplatePath = Path.Combine(".","Assets","Resources", this.GetType().Name + "Template" + AIFilesPrefix + ".asp");
                     
                     if (!File.Exists(_AIFileTemplatePath))
                     {
