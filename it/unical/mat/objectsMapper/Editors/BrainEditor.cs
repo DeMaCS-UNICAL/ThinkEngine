@@ -171,10 +171,10 @@ namespace Editors
             }
             if (GUILayout.Button("Show in explorer"))
             {
-                EditorUtility.RevealInFinder(brainTarget.AIFileTemplatePath);
+                EditorUtility.OpenWithDefaultApp(Path.Combine(".", "Assets", "Resources"));
             }
             EditorGUILayout.EndHorizontal();
-            EditorGUILayout.HelpBox("Generating a new file will delete the previouse template!", MessageType.Warning);
+            EditorGUILayout.HelpBox("Generating a new file will delete the previous template!", MessageType.Warning);
         }
         protected void ChooseReasonerTriggerMethod()
         {
