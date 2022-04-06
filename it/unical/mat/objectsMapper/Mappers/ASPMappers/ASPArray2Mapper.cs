@@ -47,6 +47,24 @@ namespace Mappers.BaseMappers
             {
                 return sensorsMatrix.Length == 0;
             }
+
+            public override string ToString()
+            {
+                List<Sensor> localSensorsList = new List<Sensor>();
+                foreach (ISensors isensors in sensorsMatrix)
+                {
+                    if (isensors != null)
+                    {
+                        localSensorsList.AddRange(isensors.GetSensorsList());
+                    }
+                }
+                string toReturn = "";
+                foreach (Sensor localSensor in localSensorsList)
+                {
+                    toReturn += localSensor.Mapping+ "^";
+                }
+                return toReturn;
+            }
         }
         private class Array2Actuators : IActuators
         {
@@ -134,17 +152,22 @@ namespace Mappers.BaseMappers
 
         public ISensors InstantiateSensors(InstantiationInformation information)
         {
+            //Debug.Log(information.currentObjectOfTheHierarchy);
             if (information.currentObjectOfTheHierarchy == null)
             {
                 return null;
             }
+            //Debug.Log(information.prependMapping + " 2a");
             Array actualMatrix = (Array)information.currentObjectOfTheHierarchy;
             int x = actualMatrix.GetLength(0);
             int y = actualMatrix.GetLength(1);
             Array2Sensors sensors = new Array2Sensors(x, y);
             GenerateMapping(ref information);
             information.firstPlaceholder += 2;
+            //Debug.Log(information.residualPropertyHierarchy);
+            //Debug.Log(actualMatrix.GetType());
             UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, IsMappableElement(actualMatrix.GetType()));
+            //Debug.Log(information.residualPropertyHierarchy);
             for (int i = 0; i < x; i++)
             {
                 for (int j = 0; j < y; j++)
@@ -153,9 +176,12 @@ namespace Mappers.BaseMappers
                     if (sensors.sensorsMatrix[i, j] == null)
                     {
                         sensors.needsUpdate=true;
+                        //Debug.Log("null");
                     }
                 }
             }
+            //Debug.Log(information.Mapping());
+            //Debug.Log(sensors.ToString());
             return sensors;
         }
 
@@ -166,14 +192,18 @@ namespace Mappers.BaseMappers
 
         private ISensors InstantiateSensorsForElement(InstantiationInformation information, Array actualMatrix, int i, int j)
         {
+            //Debug.Log(information.currentObjectOfTheHierarchy + " information");
             InstantiationInformation localInformation = AddLocalInformation(information, actualMatrix, i, j);
+            //Debug.Log(localInformation.currentObjectOfTheHierarchy + " localInformation");
             ISensors toReturn = MapperManager.InstantiateSensors(localInformation);
+            //Debug.Log(localInformation.Mapping());
             if (!information.mappingDone && localInformation.mappingDone)
             {
                 information.mappingDone = true;
                 information.prependMapping = localInformation.prependMapping;
                 information.appendMapping = localInformation.appendMapping;
             }
+            //Debug.Log(information.propertyHierarchy.ToString());
             return toReturn;
         }
 
@@ -217,12 +247,13 @@ namespace Mappers.BaseMappers
 
         private static void UpdateResidualPropertyHierarchy(MyListString residualPropertyHierarchy, bool mappable)
         {
+            //Debug.Log(residualPropertyHierarchy.ToString()+" 1");
             if (residualPropertyHierarchy.Count > 0)
             {
-                residualPropertyHierarchy.RemoveAt(0);
-                if (mappable && residualPropertyHierarchy.Count > 0)//if it's not a primitive type array
+                residualPropertyHierarchy.RemoveAt(0); //Debug.Log(residualPropertyHierarchy.ToString() + " 2");
+                if (residualPropertyHierarchy.Count > 0)//if it's not a primitive type array
                 {
-                    residualPropertyHierarchy.RemoveAt(0);
+                    residualPropertyHierarchy.RemoveAt(0); //Debug.Log(residualPropertyHierarchy.ToString() + " 3");
                 }
             }
         }
@@ -401,6 +432,7 @@ namespace Mappers.BaseMappers
         {
             InstantiationInformation localInformation = new InstantiationInformation(information);
             localInformation.hierarchyInfo.Add(new Array2InfoAndValue(i, j));
+            //Debug.Log(actualMatrix.GetValue(i, j));
             localInformation.currentObjectOfTheHierarchy = actualMatrix.GetValue(i, j);
             return localInformation;
         }
@@ -423,6 +455,7 @@ namespace Mappers.BaseMappers
             variables.Add("Index" + (information.firstPlaceholder+2));
             GenerateMapping(ref information);
             information.firstPlaceholder+=2;
+            //Debug.Log(information.currentType);
             bool isMappableElement = IsMappableElement(information.currentType);
             information.currentType = information.currentType.GetElementType();
             if (information.currentObjectOfTheHierarchy != null)

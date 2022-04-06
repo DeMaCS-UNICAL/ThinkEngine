@@ -177,6 +177,7 @@ internal abstract class BasicTypeMapper : IDataMapper
         additionalInfo.values.Add(Convert.ChangeType(information.currentObjectOfTheHierarchy, ConvertingType));
         information.hierarchyInfo.Add(additionalInfo);
         sensor.sensor.Configure(information, GenerateMapping(information));
+        Debug.Log(information.propertyHierarchy);
         return sensor;
     }
     public ISensors ManageSensors(InstantiationInformation information, ISensors instantiatedSensors)
