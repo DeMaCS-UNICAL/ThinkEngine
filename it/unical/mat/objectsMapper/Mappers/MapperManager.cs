@@ -47,7 +47,7 @@ internal class MapperManager
     private static IDataMapper RetrieveAdditionalInformation(ref InstantiationInformation information, bool generateMapping = false)
     {
         object currentObject = information.currentObjectOfTheHierarchy;
-
+        //Debug.Log(information.currentObjectOfTheHierarchy+"2");
         IDataMapper mapper = RetrieveMapper(ref information.residualPropertyHierarchy, ref currentObject, out information.currentType);
         if (mapper != null)
         {
@@ -97,16 +97,25 @@ internal class MapperManager
         currentType = null;
         if (currentObject != null)
         {
+            //Debug.Log(currentObject);
             if (ExistsMapper(currentObject.GetType()))
             {
+                //Debug.Log("esiste il mapper per l'oggetto "+currentObject);
                 currentType = currentObject.GetType();
                 return metMappers[currentObject.GetType()];
             }
+            else
+            {
+                //Debug.Log("non esiste il mapper per l'oggetto " + currentObject);
+            }
         }
+        //Debug.Log(residualPropertyHierarchy.ToString());
         while (residualPropertyHierarchy.Count > 0)
         {
             string currentProperty = residualPropertyHierarchy[0];
+            //Debug.Log(currentProperty +" proprietà");
             currentObject = RetrieveProperty(currentObject, currentProperty, out currentType);
+            //Debug.Log(currentObject+ " C");
             if (currentType != null && ExistsMapper(currentType))
             {
                 return metMappers[currentType];
@@ -136,6 +145,8 @@ internal class MapperManager
         while (residualPropertyHierarchy.Count > 0)
         {
             string currentProperty = residualPropertyHierarchy[0];
+            //Debug.Log(currentProperty);
+            //Debug.Log(currentType);
             RetrievePropertyByType(currentProperty, ref currentType);
             if (currentType != null && ExistsMapper(currentType))
             {
@@ -155,11 +166,16 @@ internal class MapperManager
 
     private static void RetrievePropertyByType(string currentProperty, ref Type currentType)
     {
+        //Debug.Log("sono dentro RetrievePropertyByType");
         MemberInfo[] members = currentType.GetMember(currentProperty, Utility.BindingAttr);
         if (members.Length > 0)
         {
             FieldOrProperty fieldOrProperty = new FieldOrProperty(members[0]);
             currentType = fieldOrProperty.Type();
+        }
+        else
+        {
+            currentType = null;
         }
     }
 
@@ -170,22 +186,28 @@ internal class MapperManager
             currentType = null;
             return null;
         }
+        //Debug.Log(currentProperty);
         MemberInfo[] members = currentObject.GetType().GetMember(currentProperty, Utility.BindingAttr);
+        //Debug.Log(members.Length);
         if (members.Length > 0)
         {
+            //Debug.Log(currentObject + " BAU");
             FieldOrProperty fieldOrProperty = new FieldOrProperty(members[0]);
             currentObject = fieldOrProperty.GetValue(currentObject);
+            //Debug.Log(currentObject + " BAU1");
             currentType = fieldOrProperty.Type();
             return currentObject;
         }
         if (currentObject is GameObject @object)
         {
+            //Debug.Log(currentObject + " BAU2");
             foreach (Component component in @object.GetComponents<Component>())
             {
                 if (component != null)
                 {
                     if (component.GetType().Name.Equals(currentProperty))
                     {
+                        //Debug.Log(currentObject+" 5");
                         currentObject = component;
                         currentType = component.GetType();
                         return currentObject;
@@ -415,8 +437,10 @@ internal class MapperManager
     #region SENSORS METHODS
     internal static ISensors InstantiateSensors(InstantiationInformation information)
     {
+        //Debug.Log(information.Mapping());
         ISensors toReturn = null;
         IDataMapper mapper = RetrieveAdditionalInformation(ref information,!information.mappingDone);
+        //Debug.Log(information.propertyHierarchy.ToString());
         if (mapper != null)
         {
             ISensors sensors= mapper.InstantiateSensors(information);
@@ -430,6 +454,7 @@ internal class MapperManager
             information.prependMapping.Clear();
             information.appendMapping.Clear();
         }
+        Debug.Log(information.Mapping());
         return toReturn;
     }
     internal static ISensors ManageSensors(InstantiationInformation information, ISensors sensors)

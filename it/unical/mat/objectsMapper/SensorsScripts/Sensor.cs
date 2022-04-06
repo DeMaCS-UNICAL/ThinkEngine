@@ -65,8 +65,20 @@ class Sensor
         for(int i=0; i<PropertyInfo.Count;i++)
         {
             object toAdd = PropertyInfo[i].GetValuesForPlaceholders();
-            values.Add(toAdd);
+            Debug.Log(PropertyInfo[i].GetType());
+            if (toAdd is Array arrayToAdd)
+            {
+                for (int j = 0; j < arrayToAdd.Length; j++)
+                {
+                    values.Add(arrayToAdd.GetValue(j));
+                }
+            }
+            else
+            {
+                values.Add(toAdd);
+            }
         }
+        Debug.Log(values.Count);
         //return MapperManager.GetSensorBasicMap(this, gameObject, new MyListString(property.myStrings), new List<object>(), 0);
         return string.Format(Mapping, values.ToArray());
     }
