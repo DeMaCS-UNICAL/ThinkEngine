@@ -25,6 +25,8 @@ namespace Mappers.ASPMappers
         private class ListSensors : ISensors
         {
             internal List<ISensors> sensorsList;
+            internal bool needsUpdate;
+
             internal ListSensors()
             {
                 sensorsList = new List<ISensors>();
@@ -35,7 +37,10 @@ namespace Mappers.ASPMappers
                 List<Sensor> toReturn = new List<Sensor>();
                 foreach(ISensors isensors in sensorsList)
                 {
-                    toReturn.AddRange(isensors.GetSensorsList());
+                    if (isensors != null)
+                    {
+                        toReturn.AddRange(isensors.GetSensorsList());
+                    }
                 }
                 return toReturn;
             }
@@ -147,12 +152,20 @@ namespace Mappers.ASPMappers
             IList actualList = (IList)information.currentObjectOfTheHierarchy;
             int x = actualList.Count;
             ListSensors sensors = new ListSensors();
-            GenerateMapping(ref information);
+            if (x == 0)
+            {
+                return null;
+            }
+            GenerateMapping(ref information, actualList[0].GetType());
             information.firstPlaceholder += 1;
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, actualList[0].GetType());
             for (int i = 0; i < x; i++)
             {
                 sensors.sensorsList.Add(InstantiateSensorsForElement(information, actualList, i));
+                if (sensors.sensorsList[i] == null)
+                {
+                    sensors.needsUpdate = true;
+                }
             }
             return sensors;
 
@@ -192,7 +205,7 @@ namespace Mappers.ASPMappers
             }
             IList actualList = (IList)information.currentObjectOfTheHierarchy;
             int x = actualList.Count;
-            if (x == sensors.sensorsList.Count)
+            if (!sensors.needsUpdate &&  x == sensors.sensorsList.Count)
             {
                 return instantiatedSensors;
             }
@@ -202,21 +215,29 @@ namespace Mappers.ASPMappers
         private ISensors GenerateUpdateSensors(InstantiationInformation information, ListSensors sensors, IList actualList, int x)
         {
             ListSensors toReturn = new ListSensors();
+            if (x == 0)
+            {
+                return toReturn;
+            }
             if (!information.mappingDone)
             {
-                GenerateMapping(ref information);
+                GenerateMapping(ref information, actualList[0].GetType());
             }
             information.firstPlaceholder += 1;
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, actualList[0].GetType());
             for (int i = 0; i < x; i++)
             {
-                if (sensors.sensorsList.Count > i)
+                if (sensors.sensorsList.Count > i && sensors.sensorsList[i]!=null)
                 {
                     toReturn.sensorsList.Add(sensors.sensorsList[i]);
                 }
                 else
                 {
                     toReturn.sensorsList.Add(InstantiateSensorsForElement(information, actualList, i));
+                    if (toReturn.sensorsList[i] == null)
+                    {
+                        sensors.needsUpdate = true;
+                    }
                 }
             }
             return toReturn;
@@ -228,21 +249,13 @@ namespace Mappers.ASPMappers
             ListInfoAndValue info = (ListInfoAndValue)sensor.PropertyInfo[hierarchyLevel];
             if (list.Count > info.index)
             {
-                UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
+                UpdateResidualPropertyHierarchy(residualPropertyHierarchy, list[info.index].GetType());
                 MapperManager.UpdateSensor(sensor, list[info.index], residualPropertyHierarchy, hierarchyLevel + 1);
             }
             else
             {
                 sensor.Destroy();
             }
-        }
-        public string SensorBasicMap(Sensor sensor, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceholders)
-        {
-            ListInfoAndValue info = (ListInfoAndValue)sensor.PropertyInfo[hierarchyLevel];
-            valuesForPlaceholders.Add(info.index);
-            IList list = (IList)currentObject;
-            UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
-            return MapperManager.GetSensorBasicMap(sensor, list[info.index], residualPropertyHierarchy, valuesForPlaceholders, hierarchyLevel + 1);
         }
         public IActuators InstantiateActuators(InstantiationInformation information)
         {
@@ -253,9 +266,13 @@ namespace Mappers.ASPMappers
             IList actualList = (IList)information.currentObjectOfTheHierarchy;
             int x = actualList.Count;
             ListActuators actuators = new ListActuators();
-            GenerateMapping(ref information);
+            if (x == 0)
+            {
+                return actuators;
+            }
+            GenerateMapping(ref information, actualList[0].GetType());
             information.firstPlaceholder += 1;
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, actualList[0].GetType());
             for (int i = 0; i < x; i++)
             {
                 actuators.actuatorsList.Add(InstantiateActuatorsForElement(information, actualList, i));
@@ -289,6 +306,10 @@ namespace Mappers.ASPMappers
             }
             IList actualList = (IList)information.currentObjectOfTheHierarchy;
             int x = actualList.Count;
+            if (x == 0)
+            {
+                return new ListActuators();
+            }
             if (x == actuators.actuatorsList.Count)
             {
                 return instantiatedActuators;
@@ -301,10 +322,10 @@ namespace Mappers.ASPMappers
             ListActuators toReturn = new ListActuators();
             if (!information.mappingDone)
             {
-                GenerateMapping(ref information);
+                GenerateMapping(ref information, actualList[0].GetType());
             }
             information.firstPlaceholder += 1;
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, actualList[0].GetType());
             for (int i = 0; i < x; i++)
             {
                 if (actuators.actuatorsList.Count > i)
@@ -324,7 +345,7 @@ namespace Mappers.ASPMappers
             ListInfoAndValue info = (ListInfoAndValue)actuator.PropertyInfo[hierarchyLevel];
             valuesForPlaceholders.Add(info.index);
             IList list = (IList)currentObject;
-            UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(residualPropertyHierarchy, list[info.index].GetType());
             return MapperManager.GetActuatorBasicMap(actuator, list[info.index], residualPropertyHierarchy, valuesForPlaceholders, hierarchyLevel + 1);
         }
         public void SetPropertyValue(MonoBehaviourActuator actuator, MyListString residualPropertyHierarchy, object currentObject, object valueToSet, int hierarchyLevel)
@@ -333,7 +354,7 @@ namespace Mappers.ASPMappers
             ListInfoAndValue info = (ListInfoAndValue)actuator.PropertyInfo[hierarchyLevel];
             if (list.Count > info.index)
             {
-                UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
+                UpdateResidualPropertyHierarchy(residualPropertyHierarchy, list[info.index].GetType());
                 if (MapperManager.IsBasic(list.GetType().GenericTypeArguments[0]))
                 {
                     list[info.index]= Convert.ChangeType(valueToSet, list.GetType().GenericTypeArguments[0]);
@@ -356,21 +377,36 @@ namespace Mappers.ASPMappers
             return localInformation;
         }
 
-        private void GenerateMapping(ref InstantiationInformation information)
+
+        private void GenerateMapping(ref InstantiationInformation information, Type elementType)
         {
             if (information.mappingDone)
             {
                 return;
             }
-
-            string prepend = NewASPMapperHelper.AspFormat(information.residualPropertyHierarchy[0]) + "(";
-            string append = ")";
-            prepend += "{" + information.firstPlaceholder + "},";
-            information.prependMapping.Add(prepend);
-            information.appendMapping.Insert(0, append);
+            string prepend= "{" + information.firstPlaceholder + "},";
+                Debug.Log("TEMPORARY:    " + information.temporaryMapping);
+            if (!MapperManager.ExistsMapper(elementType))
+            {
+                prepend = NewASPMapperHelper.AspFormat(information.residualPropertyHierarchy[0])+"("+information.temporaryMapping+prepend;
+                Debug.Log("PREPEND:    " + prepend);
+                string append=")";
+                information.prependMapping.Add(prepend);
+                information.appendMapping.Insert(0, append);
+                information.temporaryMapping = "";
+            }
+            else
+            {
+                information.temporaryMapping += prepend;
+                Debug.Log("TEMPORARY:    " + information.temporaryMapping);
+            }
         }
-        private static void UpdateResidualPropertyHierarchy(MyListString residualPropertyHierarchy)
+        private static void UpdateResidualPropertyHierarchy(MyListString residualPropertyHierarchy, Type elementType)
         {
+            if (MapperManager.ExistsMapper(elementType) && !MapperManager.IsBasic(elementType))
+            {
+                return;
+            }
             if (residualPropertyHierarchy.Count > 0)
             {
                 residualPropertyHierarchy.RemoveAt(0);
@@ -385,9 +421,10 @@ namespace Mappers.ASPMappers
         public string GetASPTemplate(ref InstantiationInformation information, List<string> variables)
         {
             variables.Add("Index" + (information.firstPlaceholder+1));
-            GenerateMapping(ref information);
-            information.firstPlaceholder++;
             information.currentType = information.currentType.GetGenericArguments()[0];
+            GenerateMapping(ref information, information.currentType);
+            information.firstPlaceholder++;
+            Debug.Log(information.currentType);
             if (information.currentObjectOfTheHierarchy != null )
             {
                 IList list = (IList)information.currentObjectOfTheHierarchy;
@@ -400,7 +437,7 @@ namespace Mappers.ASPMappers
                     information.currentObjectOfTheHierarchy = null;
                 }
             }
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, information.currentType);
             return MapperManager.GetASPTemplate(ref information, variables);
 
         }

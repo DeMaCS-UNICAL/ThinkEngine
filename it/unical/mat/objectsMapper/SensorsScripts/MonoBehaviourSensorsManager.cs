@@ -49,6 +49,7 @@ class MonoBehaviourSensorsManager:MonoBehaviour
                     configuration = configuration
                 };
                 instantiationInformationForProperty[propertyIndex]= information;
+                Debug.Log(property);
                 monoBehaviourSensorsForProperty[propertyIndex] = MapperManager.InstantiateSensors(information);
                 if (monoBehaviourSensorsForProperty[propertyIndex] != null)
                 {
@@ -80,6 +81,7 @@ class MonoBehaviourSensorsManager:MonoBehaviour
             int propertyIndex = propertiesIndex[property];
             ISensors sensors = monoBehaviourSensorsForProperty[propertyIndex];
             InformationRefresh(propertyIndex);
+                Debug.Log(property);
             monoBehaviourSensorsForProperty[propertyIndex] = MapperManager.ManageSensors(instantiationInformationForProperty[propertyIndex], sensors);
             if (monoBehaviourSensorsForProperty[propertyIndex] != null)
             {

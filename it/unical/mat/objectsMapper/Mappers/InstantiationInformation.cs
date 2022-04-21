@@ -19,6 +19,7 @@ namespace Mappers
         internal AbstractConfiguration configuration;
         internal List<string> prependMapping;
         internal List<string> appendMapping;
+        internal string temporaryMapping;
 
         
         internal InstantiationInformation()
@@ -26,6 +27,7 @@ namespace Mappers
             hierarchyInfo = new List<IInfoAndValue>();
             prependMapping = new List<string>();
             appendMapping = new List<string>();
+            temporaryMapping = "";
         }
         internal InstantiationInformation(InstantiationInformation original)
         {
@@ -40,6 +42,7 @@ namespace Mappers
             hierarchyInfo = new List<IInfoAndValue>(original.hierarchyInfo);
             currentType = original.currentType;
             mappingDone = original.mappingDone;
+            temporaryMapping = original.temporaryMapping;
         }
         internal string Mapping()
         {

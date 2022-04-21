@@ -145,17 +145,6 @@ internal abstract class BasicTypeMapper : IDataMapper
         values.Add(Convert.ChangeType(actualValue,ConvertingType));
     }
 
-    public string SensorBasicMap(Sensor sensor, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceholders)
-    {
-        if (!SupportedTypes.Contains(currentObject.GetType()) || residualPropertyHierarchy.Count>1)
-        {
-            throw new Exception("Type " + currentObject.GetType() + " is not supported as Sensor");
-        }
-        BasicTypeInfoAndValue infoAndValue = (BasicTypeInfoAndValue)sensor.PropertyInfo[hierarchyLevel];
-        string value = BasicMap(infoAndValue.operation(infoAndValue.values));
-        valuesForPlaceholders.Add(value);
-        return string.Format(sensor.Mapping, valuesForPlaceholders.ToArray());
-    }
     public ISensors InstantiateSensors(InstantiationInformation information)
     {
         if (!SupportedTypes.Contains(information.currentType) || information.residualPropertyHierarchy.Count > 1)

@@ -88,8 +88,11 @@ internal class MapperManager
             prepend += NewASPMapperHelper.AspFormat(information.propertyHierarchy[i]) + "(";
             append = ")" + append;
         }
-        information.prependMapping.Add(prepend);
-        information.appendMapping.Add(append);
+        if (!prepend.Equals(""))
+        {
+            information.prependMapping.Add(prepend);
+            information.appendMapping.Add(append);
+        }
 
     }
     internal static IDataMapper RetrieveMapper(ref MyListString residualPropertyHierarchy, ref object currentObject, out Type currentType)
@@ -311,6 +314,7 @@ internal class MapperManager
 
     internal static string GetASPTemplate(string configurationName, GameObject gameObject, MyListString propertyHierarchy, bool isSensor = false)
     {
+        Debug.Log(propertyHierarchy);
         InstantiationInformation information = new InstantiationInformation
         {
             propertyHierarchy = propertyHierarchy,
@@ -347,6 +351,7 @@ internal class MapperManager
 
     internal static string GetASPTemplate(ref InstantiationInformation information, List<string> variables)
     {
+        Debug.Log(information.residualPropertyHierarchy);
         IDataMapper mapper=null;
         InstantiationInformation informationClone = new InstantiationInformation(information);
         if (information.currentObjectOfTheHierarchy != null)
@@ -473,18 +478,6 @@ internal class MapperManager
         return toReturn;
     }
 
-    internal static string GetSensorBasicMap(Sensor sensor, object currentObject, MyListString residualPropertyHierarchy, List<object> values, int level)
-    {
-        IDataMapper mapper = RetrieveMapper(ref residualPropertyHierarchy, ref currentObject, out _);
-        if (mapper != null)
-        {
-            return mapper.SensorBasicMap(sensor, currentObject, level, residualPropertyHierarchy, values);
-        }
-        else
-        {
-            return "";
-        }
-    }
     internal static void UpdateSensor(Sensor sensor, object currentObject, MyListString residualPropertyHierarchy, int level)
     {
         IDataMapper mapper = RetrieveMapper(ref residualPropertyHierarchy, ref currentObject, out _);

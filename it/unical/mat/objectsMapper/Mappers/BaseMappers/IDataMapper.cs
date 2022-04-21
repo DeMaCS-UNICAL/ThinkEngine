@@ -17,7 +17,6 @@ namespace Mappers.BaseMappers
         ISensors InstantiateSensors(InstantiationInformation information);
         void UpdateSensor(Sensor sensor, object currentObject, MyListString residualPropertyHierarchy, int level);
         ISensors ManageSensors(InstantiationInformation information, ISensors sensors);
-        string SensorBasicMap(Sensor sensor, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceholders);//The translation from the C# syntax to the external solver one for a sensor mapper
         IActuators InstantiateActuators(InstantiationInformation information);
         IActuators ManageActuators(InstantiationInformation information, IActuators actuators);
         string ActuatorBasicMap(MonoBehaviourActuator actuator, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceHolders); //The back translation from the external solver to C# syntax for an actuator mapper

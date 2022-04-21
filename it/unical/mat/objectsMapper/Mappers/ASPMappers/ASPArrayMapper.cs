@@ -26,6 +26,8 @@ namespace Mappers.BaseMappers
         private class ArraySensors : ISensors
         {
             internal ISensors[] sensorsArray;
+            internal bool needsUpdate;
+
             internal ArraySensors(int i)
             {
                 sensorsArray = new ISensors[i];
@@ -36,11 +38,10 @@ namespace Mappers.BaseMappers
                 List<Sensor> toReturn = new List<Sensor>();
                 foreach (ISensors isensors in sensorsArray)
                 {
-                    if (isensors == null)
+                    if (isensors != null)
                     {
-                        Debug.LogError("isensors is null");
+                        toReturn.AddRange(isensors.GetSensorsList());
                     }
-                    toReturn.AddRange(isensors.GetSensorsList());
                 }
                 return toReturn;
             }
@@ -91,7 +92,7 @@ namespace Mappers.BaseMappers
             ArrayInfoAndValue info = (ArrayInfoAndValue)actuator.PropertyInfo[hierarchyLevel];
             valuesForPlaceHolders.Add(info.index);
             Array array = (Array)currentObject;
-            UpdateResidualPropertyHierarchy(residualPropertyHierarchy, IsMappableElement(array.GetType()));
+            UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
             return MapperManager.GetActuatorBasicMap(actuator, array.GetValue(info.index), residualPropertyHierarchy, valuesForPlaceHolders, hierarchyLevel + 1);
         }
 
@@ -100,12 +101,12 @@ namespace Mappers.BaseMappers
             return MapperManager.ExistsMapper(type.GetElementType());
         }
 
-        private void UpdateResidualPropertyHierarchy(MyListString residualPropertyHierarchy, bool mappable)
+        private void UpdateResidualPropertyHierarchy(MyListString residualPropertyHierarchy)
         {
             if (residualPropertyHierarchy.Count > 0)
             {
                 residualPropertyHierarchy.RemoveAt(0);
-                if (mappable && residualPropertyHierarchy.Count > 0)//if it's not a primitive type array
+                if (residualPropertyHierarchy.Count > 0)//if it's not a primitive type array
                 {
                     residualPropertyHierarchy.RemoveAt(0);
                 }
@@ -127,7 +128,6 @@ namespace Mappers.BaseMappers
             variables.Add("Index" + (information.firstPlaceholder + 1));
             GenerateMapping(ref information);
             information.firstPlaceholder += 1;
-            bool isMappableElement = IsMappableElement(information.currentType);
             information.currentType = information.currentType.GetElementType();
             if (information.currentObjectOfTheHierarchy != null)
             {
@@ -141,7 +141,7 @@ namespace Mappers.BaseMappers
                     information.currentObjectOfTheHierarchy = null;
                 }
             }
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, isMappableElement);
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
             return MapperManager.GetASPTemplate(ref information, variables);
         }
 
@@ -169,7 +169,7 @@ namespace Mappers.BaseMappers
             ArrayActuators actuators = new ArrayActuators(x);
             GenerateMapping(ref information);
             information.firstPlaceholder += 1;
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, IsMappableElement(actualArray.GetType()));
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
             for (int i = 0; i < x; i++)
             {
                 actuators.actuatorsArray[i] = InstantiateActuatorsForElement(information, actualArray, i);
@@ -202,10 +202,14 @@ namespace Mappers.BaseMappers
             ArraySensors sensors = new ArraySensors(x);
             GenerateMapping(ref information);
             information.firstPlaceholder += 1;
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, IsMappableElement(actualArray.GetType()));
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
             for (int i = 0; i < x; i++)
             {
                 sensors.sensorsArray[i] = InstantiateSensorsForElement(information, actualArray, i);
+                if (sensors.sensorsArray[i] == null)
+                {
+                    sensors.needsUpdate = true;
+                }
             }
             return sensors;
         }
@@ -269,7 +273,7 @@ namespace Mappers.BaseMappers
                 GenerateMapping(ref information);
             }
             information.firstPlaceholder += 1;
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, IsMappableElement(actualArray.GetType()));
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
             for (int i = 0; i < x; i++)
             {
                 if (actuators.actuatorsArray.GetLength(0) > i)
@@ -305,7 +309,7 @@ namespace Mappers.BaseMappers
             }
             Array actualArray = (Array)information.currentObjectOfTheHierarchy;
             int x = actualArray.GetLength(0);
-            if (x == sensors.sensorsArray.GetLength(0))
+            if (!sensors.needsUpdate && x == sensors.sensorsArray.GetLength(0))
             {
                 return instantiatedSensors;
             }
@@ -319,17 +323,21 @@ namespace Mappers.BaseMappers
             {
                 GenerateMapping(ref information);
             }
-            information.firstPlaceholder += 2;
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, IsMappableElement(actualArray.GetType()));
+            information.firstPlaceholder += 1;
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
             for (int i = 0; i < x; i++)
             {
-                if (sensors.sensorsArray.GetLength(0) > i)
+                if (sensors.sensorsArray.GetLength(0) > i && sensors.sensorsArray[i] != null)
                 {
                     toReturn.sensorsArray[i] = sensors.sensorsArray[i];
                 }
                 else
                 {
                     toReturn.sensorsArray[i] = InstantiateSensorsForElement(information, actualArray, i);
+                    if (toReturn.sensorsArray[i] == null)
+                    {
+                        sensors.needsUpdate = true;
+                    }
                 }
             }
             return toReturn;
@@ -360,22 +368,13 @@ namespace Mappers.BaseMappers
             return MapperManager.RetrieveProperties(underlyingType, rootName, null);
         }
 
-        public string SensorBasicMap(Sensor sensor, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceholders)
-        {
-            ArrayInfoAndValue info = (ArrayInfoAndValue)sensor.PropertyInfo[hierarchyLevel];
-            valuesForPlaceholders.Add(info.index);
-            Array array = (Array)currentObject;
-            UpdateResidualPropertyHierarchy(residualPropertyHierarchy, IsMappableElement(array.GetType()));
-            return MapperManager.GetSensorBasicMap(sensor, array.GetValue(info.index), residualPropertyHierarchy, valuesForPlaceholders, hierarchyLevel + 1);
-        }
-
         public void SetPropertyValue(MonoBehaviourActuator actuator, MyListString residualPropertyHierarchy, object currentObject, object valueToSet, int hierarchyLevel)
         {
             Array array = (Array)currentObject;
             ArrayInfoAndValue info = (ArrayInfoAndValue)actuator.PropertyInfo[hierarchyLevel];
             if (array.GetLength(0) > info.index)
             {
-                UpdateResidualPropertyHierarchy(residualPropertyHierarchy, IsMappableElement(array.GetType()));
+                UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
                 if (MapperManager.IsBasic(array.GetType().GetElementType()))
                 {
                     array.SetValue(Convert.ChangeType(valueToSet, array.GetType().GetElementType()), info.index);
@@ -402,7 +401,7 @@ namespace Mappers.BaseMappers
             if (array.GetLength(0) > info.index)
             {
                 object arrayElement = array.GetValue(info.index);
-                UpdateResidualPropertyHierarchy(residualPropertyHierarchy, IsMappableElement(array.GetType()));
+                UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
                 MapperManager.UpdateSensor(sensor, arrayElement, residualPropertyHierarchy, hierarchyLevel + 1);
             }
             else
