@@ -1,74 +1,40 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using ThinkEngine.it.unical.mat.objectsMapper.Mappers.BaseMappers;
 using UnityEngine;
 
 namespace Mappers.BaseMappers
 {
-    class ASPArray2Mapper : IDataMapper
+    class ASPArray2Mapper : CollectionMapper
     {
         #region SUPPORT CLASSES
-        private class Array2InfoAndValue : IInfoAndValue
-        {
-            internal int[] indexes;
-            internal Array2InfoAndValue(int i, int j)
-            {
-                indexes = new int[2] { i, j };
-            }
-
-            public object GetValuesForPlaceholders()
-            {
-                return indexes;
-            }
-        }
-        private class Array2Sensors : ISensors
+       
+        private class Array2Sensors : CollectionOfSensors
         {
             internal ISensors[,] sensorsMatrix;
-            internal bool needsUpdate;
-
+            internal override IEnumerable sensorsCollection
+            {
+                get
+                {
+                    return sensorsMatrix;
+                }
+            }
             internal Array2Sensors(int i, int j)
             {
                 sensorsMatrix = new ISensors[i, j];
             }
-
-            public List<Sensor> GetSensorsList()
-            {
-                List<Sensor> toReturn = new List<Sensor>();
-                foreach(ISensors isensors in sensorsMatrix)
-                {
-                    if (isensors != null)
-                    {
-                        toReturn.AddRange(isensors.GetSensorsList());
-                    }
-                }
-                return toReturn;
-            }
-
-            public bool IsEmpty()
-            {
-                return sensorsMatrix.Length == 0;
-            }
-
-            public override string ToString()
-            {
-                List<Sensor> localSensorsList = new List<Sensor>();
-                foreach (ISensors isensors in sensorsMatrix)
-                {
-                    if (isensors != null)
-                    {
-                        localSensorsList.AddRange(isensors.GetSensorsList());
-                    }
-                }
-                string toReturn = "";
-                foreach (Sensor localSensor in localSensorsList)
-                {
-                    toReturn += localSensor.Mapping+ "^";
-                }
-                return toReturn;
-            }
         }
-        private class Array2Actuators : IActuators
+        private class Array2Actuators : CollectionOfActuators
         {
             internal IActuators[,] actuatorsMatrix;
+            internal override IEnumerable actuatorsCollection
+            {
+                get
+                {
+                    return actuatorsMatrix;
+                }
+            }
             internal Array2Actuators(int i, int j)
             {
                 actuatorsMatrix = new IActuators[i, j];
@@ -102,55 +68,16 @@ namespace Mappers.BaseMappers
                 return _instance;
             }
         }
-        public bool NeedsSpecifications(Type type)
+        protected override Type ElementType(Type type)
         {
-            return true;
+            return type.GetElementType();
         }
 
-        public bool IsFinal(Type type)
-        {
-            return MapperManager.IsFinal(type.GetElementType());
-        }
-        public bool Supports(Type type)
+        public override bool Supports(Type type)
         {
             return type.IsArray && type.GetArrayRank() == 2;
         }
-        public bool IsTypeExpandable(Type type)
-        {
-            return MapperManager.IsTypeExpandable(type.GetElementType());
-        }
-
-        public bool NeedsAggregates(Type type)
-        {
-            return MapperManager.NeedsAggregates(type.GetElementType());
-        }
-
-        public Type GetAggregationTypes(Type type)
-        {
-            return MapperManager.GetAggregationTypes(type.GetElementType());
-        }
-
-        public int GetAggregationSpecificIndex(Type type)
-        {
-            return MapperManager.GetAggregationSpecificIndex(type.GetElementType());
-        }
-
-        public Dictionary<MyListString, KeyValuePair<Type, object>> RetrieveProperties(Type objectType, MyListString currentObjectPropertyHierarchy, object currentObject)
-        {
-            if (!Supports(objectType))
-            {
-                throw new Exception(objectType + " is not supported.");
-            }
-            Type underlyingType = objectType.GetElementType();
-            MyListString rootName = new MyListString(currentObjectPropertyHierarchy.myStrings);
-            if (!MapperManager.ExistsMapper(underlyingType))
-            {
-                rootName.Add(underlyingType.Name);
-            }
-            return MapperManager.RetrieveProperties(underlyingType, rootName, null);
-        }
-
-        public ISensors InstantiateSensors(InstantiationInformation information)
+        public override ISensors InstantiateSensors(InstantiationInformation information)
         {
             if (information.currentObjectOfTheHierarchy == null)
             {
@@ -160,9 +87,14 @@ namespace Mappers.BaseMappers
             int x = actualMatrix.GetLength(0);
             int y = actualMatrix.GetLength(1);
             Array2Sensors sensors = new Array2Sensors(x, y);
-            GenerateMapping(ref information);
+            if (x == 0 || y==0)
+            {
+                return null;
+            }
+            Type elementType = actualMatrix.GetValue(0, 0).GetType();
+            GenerateMapping(ref information, elementType);
             information.firstPlaceholder += 2;
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, elementType);
             for (int i = 0; i < x; i++)
             {
                 for (int j = 0; j < y; j++)
@@ -176,35 +108,20 @@ namespace Mappers.BaseMappers
             }
             return sensors;
         }
-
-        private bool IsMappableElement(Type matrixType)
-        {
-            return MapperManager.ExistsMapper(matrixType.GetElementType());
-        }
-
-        private ISensors InstantiateSensorsForElement(InstantiationInformation information, Array actualMatrix, int i, int j)
-        {
-            InstantiationInformation localInformation = AddLocalInformation(information, actualMatrix, i, j);
-            ISensors toReturn = MapperManager.InstantiateSensors(localInformation);
-            if (!information.mappingDone && localInformation.mappingDone)
-            {
-                information.mappingDone = true;
-                information.prependMapping = localInformation.prependMapping;
-                information.appendMapping = localInformation.appendMapping;
-            }
-            return toReturn;
-        }
-
-
         private ISensors GenerateUpdateSensors(InstantiationInformation information, Array2Sensors sensors, Array actualMatrix, int x, int y)
         {
             Array2Sensors toReturn = new Array2Sensors(x, y);
+            if (x == 0 || y==0)
+            {
+                return toReturn;
+            }
+            Type elementType = actualMatrix.GetValue(0, 0).GetType();
             if (!information.mappingDone)
             {
-                GenerateMapping(ref information);
+                GenerateMapping(ref information, elementType);
             }
             information.firstPlaceholder += 2;
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, elementType);
             for (int i = 0; i < x; i++)
             {
                 for (int j = 0; j < y; j++)
@@ -226,21 +143,7 @@ namespace Mappers.BaseMappers
             }
             return toReturn;
         }
-
-        private static void UpdateResidualPropertyHierarchy(MyListString residualPropertyHierarchy)
-        {
-            //Debug.Log(residualPropertyHierarchy.ToString()+" 1");
-            if (residualPropertyHierarchy.Count > 0)
-            {
-                residualPropertyHierarchy.RemoveAt(0); //Debug.Log(residualPropertyHierarchy.ToString() + " 2");
-                if (residualPropertyHierarchy.Count > 0)//if it's not a primitive type array
-                {
-                    residualPropertyHierarchy.RemoveAt(0); //Debug.Log(residualPropertyHierarchy.ToString() + " 3");
-                }
-            }
-        }
-
-        public ISensors ManageSensors(InstantiationInformation information, ISensors instantiatedSensors)
+        public override ISensors ManageSensors(InstantiationInformation information, ISensors instantiatedSensors)
         {
             if (instantiatedSensors == null)
             {
@@ -268,16 +171,14 @@ namespace Mappers.BaseMappers
             }
             return GenerateUpdateSensors(information, sensors, actualMatrix, x, y);
         }
-        
-
-        public void UpdateSensor(Sensor sensor, object currentObject, MyListString residualPropertyHierarchy, int hierarchyLevel)
+        public override void UpdateSensor(Sensor sensor, object currentObject, MyListString residualPropertyHierarchy, int hierarchyLevel)
         {
             Array matrix = (Array)currentObject;
-            Array2InfoAndValue info = (Array2InfoAndValue)sensor.PropertyInfo[hierarchyLevel];
+            CollectionInfoAndValue info = (CollectionInfoAndValue)sensor.PropertyInfo[hierarchyLevel];
             if (matrix.GetLength(0) > info.indexes[0] && matrix.GetLength(1) > info.indexes[1])
             {
                 object matrixElement = matrix.GetValue(info.indexes[0], info.indexes[1]);
-                UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
+                UpdateResidualPropertyHierarchy(residualPropertyHierarchy, matrixElement.GetType());
                 MapperManager.UpdateSensor(sensor, matrixElement, residualPropertyHierarchy, hierarchyLevel + 1);
             }
             else
@@ -285,8 +186,7 @@ namespace Mappers.BaseMappers
                sensor.Destroy();
             }
         }
-
-        public IActuators InstantiateActuators(InstantiationInformation information)
+        public override IActuators InstantiateActuators(InstantiationInformation information)
         {
             if (information.currentObjectOfTheHierarchy == null)
             {
@@ -296,26 +196,28 @@ namespace Mappers.BaseMappers
             int x = actualMatrix.GetLength(0);
             int y = actualMatrix.GetLength(1);
             Array2Actuators actuators = new Array2Actuators(x, y);
-            GenerateMapping(ref information);
+            if (x == 0 || y==0)
+            {
+                return actuators;
+            }
+            Type elementType = actualMatrix.GetValue(0, 0).GetType();
+            GenerateMapping(ref information,elementType);
             information.firstPlaceholder += 2;
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, elementType);
             for (int i = 0; i < x; i++)
             {
                 for (int j = 0; j < y; j++)
                 {
                     actuators.actuatorsMatrix[i, j] = InstantiateActuatorsForElement(information, actualMatrix, i, j);
+                    if (actuators.actuatorsMatrix[i,j] == null)
+                    {
+                        actuators.needsUpdates = true;
+                    }
                 }
             }
             return actuators;
         }
-
-        private IActuators InstantiateActuatorsForElement(InstantiationInformation information, Array actualMatrix, int i, int j)
-        {
-            InstantiationInformation localInformation = AddLocalInformation(information, actualMatrix, i, j);
-            return MapperManager.InstantiateActuators(localInformation);
-        }
-
-        public IActuators ManageActuators(InstantiationInformation information, IActuators instantiatedActuators)
+        public override IActuators ManageActuators(InstantiationInformation information, IActuators instantiatedActuators)
         {
             if (instantiatedActuators == null)
             {
@@ -337,62 +239,60 @@ namespace Mappers.BaseMappers
             Array actualMatrix = (Array)information.currentObjectOfTheHierarchy;
             int x = actualMatrix.GetLength(0);
             int y = actualMatrix.GetLength(1);
-            if (x == actuators.actuatorsMatrix.GetLength(0) && y == actuators.actuatorsMatrix.GetLength(1))
+            if (!actuators.needsUpdates && x == actuators.actuatorsMatrix.GetLength(0) && y == actuators.actuatorsMatrix.GetLength(1))
             {
                 return instantiatedActuators;
             }
             return GenerateUpdateActuators(information, actuators, actualMatrix, x, y);
         }
-
         private IActuators GenerateUpdateActuators(InstantiationInformation information, Array2Actuators actuators, Array actualMatrix, int x, int y)
         {
             Array2Actuators toReturn = new Array2Actuators(x, y);
+            if (x == 0 || y==0)
+            {
+                return toReturn;
+            }
+            Type elementType = actualMatrix.GetValue(0,0).GetType();
             if (!information.mappingDone)
             {
-                GenerateMapping(ref information);
+                GenerateMapping(ref information, elementType);
             }
             information.firstPlaceholder += 2;
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
+            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, elementType);
             for (int i = 0; i < x; i++)
             {
                 for (int j = 0; j < y; j++)
                 {
-                    if (actuators.actuatorsMatrix.GetLength(0) > i && actuators.actuatorsMatrix.GetLength(0) > j)
+                    if (actuators.actuatorsMatrix.GetLength(0) > i && actuators.actuatorsMatrix.GetLength(0) > j  && actuators.actuatorsMatrix.GetValue(i,j) != null)
                     {
                         toReturn.actuatorsMatrix[i, j] = actuators.actuatorsMatrix[i, j];
                     }
                     else
                     {
                         toReturn.actuatorsMatrix[i, j] = InstantiateActuatorsForElement(information, actualMatrix, i, j);
+                        if (toReturn.actuatorsMatrix.GetValue(i,j) == null)
+                        {
+                            actuators.needsUpdates = true;
+                        }
                     }
                 }
             }
             return toReturn;
         }
-
-        public string ActuatorBasicMap(MonoBehaviourActuator actuator, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceholders)
-        {
-            Array2InfoAndValue info = (Array2InfoAndValue)actuator.PropertyInfo[hierarchyLevel];
-            valuesForPlaceholders.Add(info.indexes[0]);
-            valuesForPlaceholders.Add(info.indexes[1]);
-            Array matrix = (Array)currentObject;
-            UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
-            return MapperManager.GetActuatorBasicMap(actuator, matrix.GetValue(info.indexes[0], info.indexes[1]), residualPropertyHierarchy, valuesForPlaceholders, hierarchyLevel + 1);
-
-        }
-        public void SetPropertyValue(MonoBehaviourActuator actuator, MyListString residualPropertyHierarchy,  object currentObject, object valueToSet, int hierarchyLevel)
+        public override void SetPropertyValue(MonoBehaviourActuator actuator, MyListString residualPropertyHierarchy,  object currentObject, object valueToSet, int hierarchyLevel)
         {
             Array matrix = (Array)currentObject;
-            Array2InfoAndValue info = (Array2InfoAndValue)actuator.PropertyInfo[hierarchyLevel];
+            CollectionInfoAndValue info = (CollectionInfoAndValue)actuator.PropertyInfo[hierarchyLevel];
             if (matrix.GetLength(0) > info.indexes[0] && matrix.GetLength(1) > info.indexes[1])
             {
-                UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
-                if (MapperManager.IsBasic(matrix.GetType().GetElementType()))
+                currentObject = matrix.GetValue(info.indexes[0], info.indexes[1]);
+                Type elementType = currentObject.GetType();
+                UpdateResidualPropertyHierarchy(residualPropertyHierarchy, elementType);
+                if (MapperManager.IsBasic(elementType))
                 {
-                    matrix.SetValue(Convert.ChangeType(valueToSet, matrix.GetType().GetElementType()), info.indexes[0], info.indexes[1]);
+                    matrix.SetValue(Convert.ChangeType(valueToSet, elementType), info.indexes[0], info.indexes[1]);
                     return;
                 }
-                currentObject = matrix.GetValue(info.indexes[0], info.indexes[1]);
                 MapperManager.SetPropertyValue(actuator, residualPropertyHierarchy,  currentObject, valueToSet, hierarchyLevel + 1);
             }
             else
@@ -401,49 +301,34 @@ namespace Mappers.BaseMappers
             }
         }
 
-        private static InstantiationInformation AddLocalInformation(InstantiationInformation information, Array actualMatrix, int i, int j)
+        protected override string Placeholders(InstantiationInformation information)
         {
-            InstantiationInformation localInformation = new InstantiationInformation(information);
-            localInformation.hierarchyInfo.Add(new Array2InfoAndValue(i, j));
-            //Debug.Log(actualMatrix.GetValue(i, j));
-            localInformation.currentObjectOfTheHierarchy = actualMatrix.GetValue(i, j);
-            return localInformation;
+            return "{" + information.firstPlaceholder + "},{" + (information.firstPlaceholder + 1) + "},";
         }
-        protected void GenerateMapping(ref InstantiationInformation information)
+        protected override void AddVariables(InstantiationInformation information, List<string> variables)
         {
-            if (information.mappingDone)
-            {
-                return;
-            }
-            string prepend = NewASPMapperHelper.AspFormat(information.residualPropertyHierarchy[0]) + "(";
-            string append = ")";
-            prepend += "{" + information.firstPlaceholder + "},{" + (information.firstPlaceholder + 1) + "},";
-            information.prependMapping.Add(prepend);
-            information.appendMapping.Insert(0, append);
+            variables.Add("Index" + (information.firstPlaceholder + 1));
+            variables.Add("Index" + (information.firstPlaceholder + 2));
         }
-
-        public string GetASPTemplate(ref InstantiationInformation information, List<string> variables)
+        protected override void IncreasePlaceholders(InstantiationInformation information)
         {
-            variables.Add("Index" + (information.firstPlaceholder+1));
-            variables.Add("Index" + (information.firstPlaceholder+2));
-            GenerateMapping(ref information);
             information.firstPlaceholder+=2;
-            //Debug.Log(information.currentType);
-            information.currentType = information.currentType.GetElementType();
-            if (information.currentObjectOfTheHierarchy != null)
+        }
+        protected override void UpdateCurrentObjectOfTheHierarchy(InstantiationInformation information)
+        {
+            Array matrix = (Array)information.currentObjectOfTheHierarchy;
+            if (matrix.Length > 0)
             {
-                Array matrix = (Array)information.currentObjectOfTheHierarchy;
-                if (matrix.Length > 0)
-                {
-                    information.currentObjectOfTheHierarchy = matrix.GetValue(0, 0);
-                }
-                else
-                {
-                    information.currentObjectOfTheHierarchy = null;
-                }
+                information.currentObjectOfTheHierarchy = matrix.GetValue(0, 0);
             }
-            UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy);
-            return MapperManager.GetASPTemplate(ref information, variables);
+            else
+            {
+                information.currentObjectOfTheHierarchy = null;
+            }
+        }
+        protected override object ElementOfTheCollection(object actualCollection, params int[] indexes)
+        {
+            return ((Array)actualCollection).GetValue(indexes[0],indexes[1]);
         }
     }
 }

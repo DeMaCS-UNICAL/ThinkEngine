@@ -2,6 +2,5 @@
 
 internal interface IActuators
 {
-    bool IsEmpty();
     List<MonoBehaviourActuator> GetActuatorsList();
 }

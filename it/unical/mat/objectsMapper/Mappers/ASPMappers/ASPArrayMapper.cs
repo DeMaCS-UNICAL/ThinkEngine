@@ -87,15 +87,6 @@ namespace Mappers.BaseMappers
                 return _instance;
             }
         }
-        public string ActuatorBasicMap(MonoBehaviourActuator actuator, object currentObject, int hierarchyLevel, MyListString residualPropertyHierarchy, List<object> valuesForPlaceHolders)
-        {
-            ArrayInfoAndValue info = (ArrayInfoAndValue)actuator.PropertyInfo[hierarchyLevel];
-            valuesForPlaceHolders.Add(info.index);
-            Array array = (Array)currentObject;
-            UpdateResidualPropertyHierarchy(residualPropertyHierarchy);
-            return MapperManager.GetActuatorBasicMap(actuator, array.GetValue(info.index), residualPropertyHierarchy, valuesForPlaceHolders, hierarchyLevel + 1);
-        }
-
         private bool IsMappableElement(Type type)
         {
             return MapperManager.ExistsMapper(type.GetElementType());

@@ -519,18 +519,6 @@ internal class MapperManager
         }
         return toReturn;
     }
-    internal static string GetActuatorBasicMap(MonoBehaviourActuator actuator, object currentObject, MyListString residualPropertyHierarchy, List<object> values, int level)
-    {
-        IDataMapper mapper = RetrieveMapper(ref residualPropertyHierarchy, ref currentObject, out _);
-        if (mapper != null)
-        {
-            return mapper.ActuatorBasicMap(actuator, currentObject, level, residualPropertyHierarchy, values);
-        }
-        else
-        {
-            return "";
-        }
-    }
 
     internal static bool IsBasic(Type type)
     {

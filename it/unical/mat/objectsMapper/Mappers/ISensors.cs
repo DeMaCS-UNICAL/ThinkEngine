@@ -3,6 +3,5 @@
 
 interface ISensors
 {
-    bool IsEmpty();
     List<Sensor> GetSensorsList();
 }
