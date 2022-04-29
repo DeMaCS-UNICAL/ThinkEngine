@@ -115,11 +115,9 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.Mappers.BaseMappers
                 return;
             }
             string prepend = Placeholders(information);
-            Debug.Log("TEMPORARY:    " + information.temporaryMapping);
             if (!MapperManager.ExistsMapper(elementType))
             {
                 prepend = NewASPMapperHelper.AspFormat(information.residualPropertyHierarchy[0]) + "(" + information.temporaryMapping + prepend;
-                Debug.Log("PREPEND:    " + prepend);
                 string append = ")";
                 information.prependMapping.Add(prepend);
                 information.appendMapping.Insert(0, append);
@@ -128,7 +126,6 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.Mappers.BaseMappers
             else
             {
                 information.temporaryMapping += prepend;
-                Debug.Log("TEMPORARY:    " + information.temporaryMapping);
             }
         }
 
@@ -156,7 +153,6 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.Mappers.BaseMappers
             information.currentType = ElementType(information.currentType);
             GenerateMapping(ref information, information.currentType);
             IncreasePlaceholders(information);
-            Debug.Log(information.currentType);
             if (information.currentObjectOfTheHierarchy != null)
             {
                 UpdateCurrentObjectOfTheHierarchy(information);

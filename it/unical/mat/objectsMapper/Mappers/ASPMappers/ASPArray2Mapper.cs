@@ -40,20 +40,6 @@ namespace Mappers.BaseMappers
                 actuatorsMatrix = new IActuators[i, j];
             }
 
-            public List<MonoBehaviourActuator> GetActuatorsList()
-            {
-                List<MonoBehaviourActuator> toReturn = new List<MonoBehaviourActuator>();
-                foreach (IActuators iactuators in actuatorsMatrix)
-                {
-                    toReturn.AddRange(iactuators.GetActuatorsList());
-                }
-                return toReturn;
-            }
-
-            public bool IsEmpty()
-            {
-                return actuatorsMatrix.Length == 0;
-            }
         }
         #endregion
         private static ASPArray2Mapper _instance;
@@ -126,7 +112,7 @@ namespace Mappers.BaseMappers
             {
                 for (int j = 0; j < y; j++)
                 {
-                    if (sensors.sensorsMatrix.GetLength(0) > i && sensors.sensorsMatrix.GetLength(0) > j && sensors.sensorsMatrix[i, j] != null)
+                    if (sensors.sensorsMatrix.GetLength(0) > i && sensors.sensorsMatrix.GetLength(1) > j && sensors.sensorsMatrix[i, j] != null)
                     {
                         
                         toReturn.sensorsMatrix[i, j] = sensors.sensorsMatrix[i, j];
@@ -263,7 +249,7 @@ namespace Mappers.BaseMappers
             {
                 for (int j = 0; j < y; j++)
                 {
-                    if (actuators.actuatorsMatrix.GetLength(0) > i && actuators.actuatorsMatrix.GetLength(0) > j  && actuators.actuatorsMatrix.GetValue(i,j) != null)
+                    if (actuators.actuatorsMatrix.GetLength(0) > i && actuators.actuatorsMatrix.GetLength(1) > j  && actuators.actuatorsMatrix.GetValue(i,j) != null)
                     {
                         toReturn.actuatorsMatrix[i, j] = actuators.actuatorsMatrix[i, j];
                     }
@@ -328,7 +314,7 @@ namespace Mappers.BaseMappers
         }
         protected override object ElementOfTheCollection(object actualCollection, params int[] indexes)
         {
-            return ((Array)actualCollection).GetValue(indexes[0],indexes[1]);
+            return ((Array)actualCollection).GetValue(indexes);
         }
     }
 }

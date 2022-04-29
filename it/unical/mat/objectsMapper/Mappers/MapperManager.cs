@@ -314,7 +314,6 @@ internal class MapperManager
 
     internal static string GetASPTemplate(string configurationName, GameObject gameObject, MyListString propertyHierarchy, bool isSensor = false)
     {
-        Debug.Log(propertyHierarchy);
         InstantiationInformation information = new InstantiationInformation
         {
             propertyHierarchy = propertyHierarchy,
@@ -351,7 +350,6 @@ internal class MapperManager
 
     internal static string GetASPTemplate(ref InstantiationInformation information, List<string> variables)
     {
-        Debug.Log(information.residualPropertyHierarchy);
         IDataMapper mapper=null;
         InstantiationInformation informationClone = new InstantiationInformation(information);
         if (information.currentObjectOfTheHierarchy != null)
@@ -459,7 +457,6 @@ internal class MapperManager
             information.prependMapping.Clear();
             information.appendMapping.Clear();
         }
-        Debug.Log(information.Mapping());
         return toReturn;
     }
     internal static ISensors ManageSensors(InstantiationInformation information, ISensors sensors)

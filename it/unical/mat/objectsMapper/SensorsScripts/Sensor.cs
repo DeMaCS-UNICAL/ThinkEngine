@@ -1,5 +1,6 @@
 ﻿using Mappers;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -65,22 +66,29 @@ class Sensor
         for(int i=0; i<PropertyInfo.Count;i++)
         {
             object toAdd = PropertyInfo[i].GetValuesForPlaceholders();
-            Debug.Log(PropertyInfo[i].GetType());
-            if (toAdd is Array arrayToAdd)
+            if (toAdd != null)
             {
-                for (int j = 0; j < arrayToAdd.Length; j++)
+                if (toAdd is IList listToAdd)
                 {
-                    values.Add(arrayToAdd.GetValue(j));
+                    for (int j = 0; j < listToAdd.Count; j++)
+                    {
+                        values.Add(listToAdd[j]);
+                    }
+                }
+                else
+                {
+                    values.Add(toAdd);
                 }
             }
-            else
-            {
-                values.Add(toAdd);
-            }
         }
-        Debug.Log(values.Count);
         //return MapperManager.GetSensorBasicMap(this, gameObject, new MyListString(property.myStrings), new List<object>(), 0);
-        return string.Format(Mapping, values.ToArray());
+        try
+        {
+            return string.Format(Mapping, values.ToArray());
+        }catch(System.FormatException e)
+        {
+            return "";
+        }
     }
 
     internal void Destroy()

@@ -106,7 +106,6 @@ internal class MonoBehaviourActuator : MonoBehaviour
     }
     internal string Parse(AnswerSet answerSet)
     {
-        Debug.Log("parsing for " + property);
         string pattern = "objectIndex\\(([0-9]+)\\)";
         Regex regex = new Regex(@pattern);
         int myIndex = gameObject.GetComponent<IndexTracker>().CurrentIndex;
