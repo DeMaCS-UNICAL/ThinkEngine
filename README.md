@@ -3,6 +3,6 @@
 
 ThinkEngine’s goal is to make the integration of external declarative formalisms within the videogame lifecycle as transparent as possible, especially taking into account the perspective of game developers which look for easy-to-deal-with and hassle-free plugins. ThinkEngine provides smooth ways for dealing with data mapping issues to and from external modules, thread synchronization and reasoning event triggering. 
 
-The asset is released as a bunch of .dll files collecting a number of C# scripts. We currently support only Windows videogames.
+The asset is released as a bunch of .dll files collecting a number of C# scripts. We currently support Windows and macOS target run-time and in editor design-time.
 
 More information, installation instructions and downloads are available from our [wiki page](https://github.com/DeMaCS-UNICAL/ThinkEngine/wiki).
