@@ -1,7 +1,7 @@
 # ThinkEngine
-**ThinkEngine** is a [Unity](https://unity.com/) asset that provides an easy integration of an [ASP](https://en.wikipedia.org/wiki/Answer_set_programming) solver in a videogame or whatever other kind of software developed in Unity. 
+**ThinkEngine** is a [Unity](https://unity.com/) asset that provides allow to easy integrate automated reasoning modules in a videogame or whatever other kind of software developed in Unity. ThinkEngine has been developed having the integration of [ASP](https://en.wikipedia.org/wiki/Answer_set_programming) modules in mind, but other types of automated reasoning can be wired (e.g., PDDL), with an effort which we are constantly working at making as light as possible. 
 
-ThinkEngine’s goal is to make transparent the integration of a declarative formalism within the videogame lifecycle from the point of view of a game developer. ThinkEngine provides smooth ways for easily dealing with data mapping issues, threads synchronization and reasoning event triggering. 
+ThinkEngine’s goal is to make as transparent as possible the integration of external declarative formalisms within the videogame lifecycle, especially taking into account the perspective of game developers which look for easy-to-deal-with and hassle-free plugins. ThinkEngine provides smooth ways for easily dealing with data mapping issues to and from external modules, thread synchronization and reasoning event triggering. 
 
 The asset is released as a bunch of .dll files collecting a number of C# scripts. We currently support only Windows videogames.
 
