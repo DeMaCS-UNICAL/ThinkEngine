@@ -8,6 +8,7 @@ xcopy /f "./bin/Debug/Editor/ThinkEngine.dll" "./ThinkEngine/Assets/Plugins/Thin
 xcopy /f "./bin/Debug//Standalone/ThinkEngine.dll" "./ThinkEngine/Assets/Plugins/" /Y
 xcopy /f "./bin/Debug/Editor/Antlr4.Runtime.Standard.dll" "./ThinkEngine/Assets/Plugins/ThinkEngineDLL/" /Y
 xcopy /f "./bin/Debug/dlv2.exe" "./ThinkEngine/StreamingAssets/ThinkEngine/lib/" /Y
+xcopy /f "./bin/Debug/dlv2" "./ThinkEngine/StreamingAssets/ThinkEngine/lib/" /Y
 xcopy /f "./bin/Debug/Editor/ThinkEngine.dll.meta" "./ThinkEngine/Assets/Plugins/ThinkEngineDLL/" /Y
 xcopy /f "./bin/Debug/Standalone/ThinkEngine.dll.meta" "./ThinkEngine/Assets/Plugins/" /Y
 
