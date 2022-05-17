@@ -113,7 +113,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
             while (reason)
             {
                 encoding = GetProgramInstance();
-                foreach (string fileName in Directory.GetFiles(Application.streamingAssetsPath))
+                foreach (string fileName in Directory.GetFiles(Path.Combine(Application.streamingAssetsPath,"ThinkEngine")))
                 {
                     string actualFileName = fileName.Substring(fileName.LastIndexOf(Utility.slash) + 1);
                     if (actualFileName.StartsWith(brain.AIFilesPrefix) && actualFileName.EndsWith(GetCurrentFileExtension()))

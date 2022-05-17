@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using static Mappers.OperationContainer;
 
 namespace Mappers
@@ -35,7 +36,7 @@ namespace Mappers
         {
             if (!SupportedTypes.Contains(currentObject.GetType()))
             {
-                throw new Exception("Type " + currentObject.GetType() + " is not supported as Sensor");
+                Debug.LogError("Type " + currentObject.GetType() + " is not supported as Sensor");
             }
             return "\"" + currentObject+"\"";
         }

@@ -295,7 +295,7 @@ namespace Editors
             {
                 GUI.enabled = false;
                 brainTarget.AIFilesPrefix = Target.gameObject.name+GetAIFilesPrefixSpecifications();
-                EditorGUILayout.TextField("AI Files Pattern", brainTarget.AIFilesPrefix + "*.(asp | pddl | dlp)");
+                EditorGUILayout.TextField("AI Files Pattern", brainTarget.AIFilesPrefix + "*.asp");//(asp | pddl | dlp)");
                 GUI.enabled = true;
             }
             else
@@ -314,6 +314,11 @@ namespace Editors
 
         public override void OnInspectorGUI()
         {
+            if (!CheckSolver())
+            {
+                EditorGUILayout.HelpBox("Please, download the Dlv2 solver suitable for your system. See documentation at \"Downloading the ASP solver\".", MessageType.Error, true);
+                return;
+            }
             IfConfigurationChanged();
             DrawPropertiesExcluding(serializedObject, ExcludedProperties.ToArray());
             EditorGUILayout.BeginHorizontal();
@@ -337,7 +342,22 @@ namespace Editors
             }
         }
 
-       
+        private bool CheckSolver()
+        {
+            string[] libContent = Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "ThinkEngine", "lib"));
+            if (libContent.Length == 0)
+            {
+                return false;
+            }
+            foreach(string filename in libContent)
+            {
+                if (filename.EndsWith(Utility.RunnableExtension))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         protected virtual void IfConfigurationChanged()
         {

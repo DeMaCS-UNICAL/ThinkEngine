@@ -41,11 +41,11 @@ namespace Planner
         {
             if (!PlanState().Equals(State.READY))
             {
-                throw new Exception("Plan not ready to be executed");
+                Debug.LogError("Plan not ready to be executed");
             }
             if (actions.Count == 0)
             {
-                throw new Exception("Empty plan");
+                Debug.LogError("Empty plan");
             }
             Action toReturn = actions[0];
             actions.RemoveAt(0);

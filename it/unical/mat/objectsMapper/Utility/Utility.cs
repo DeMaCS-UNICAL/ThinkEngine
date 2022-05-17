@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 using UnityEngine;
+using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -15,12 +16,13 @@ public static class Utility
 {
     public static  BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
     private static List<string> _triggerMethodsToShow;
-    internal static object _triggerClass;
+    internal static ScriptableObject _triggerClass;
     private static GameObject _hiddenGameObject;
     private static SensorsManager _sensorsManager;
     private static ActuatorsManager _actuatorsManager;
     internal static string slash = Path.DirectorySeparatorChar+"";
-    private static string _triggerClassPath= Path.Combine(".","Assets","Scripts","Trigger.cs");
+    private static string _triggerClassPath= Path.Combine(".","Assets","Scripts","ThinkEngineTrigger.cs");
+    private static string actualTriggerClassPath = "";
     internal static bool prefabsLoaded = false;
     private static MethodInfo[] _triggerMethods;
     internal static string RunnableExtension = Environment.OSVersion.Platform== PlatformID.Win32NT ? ".exe": "";
@@ -61,7 +63,7 @@ public static class Utility
             return _triggerMethodsToShow;
         }
     }
-    internal static object TriggerClass
+    internal static ScriptableObject TriggerClass
     {
         get
         {
@@ -71,7 +73,9 @@ public static class Utility
 #if UNITY_EDITOR
                 if (!EditorApplication.isCompiling)
                 {
-                    _triggerClass = ScriptableObject.CreateInstance("Trigger");
+                    _triggerClass = ScriptableObject.CreateInstance("ThinkEngineTrigger");
+                    MonoScript sourceScriptAsset = MonoScript.FromScriptableObject(_triggerClass);
+                    actualTriggerClassPath = AssetDatabase.GetAssetPath(sourceScriptAsset);
                 }
 #endif
 #if !UNITY_EDITOR
@@ -139,11 +143,11 @@ public static class Utility
         get
         {
             CheckTriggerClass();
+            if (!actualTriggerClassPath.Equals(""))
+            {
+                return actualTriggerClassPath;
+            }
             return _triggerClassPath;
-        }
-        set
-        {
-            _triggerClassPath = value;
         }
     }
 #endregion
@@ -187,14 +191,24 @@ public static class Utility
     internal static void CheckTriggerClass()
     {
 #if UNITY_EDITOR
-        if (!Directory.Exists(Path.Combine("Assets","Scripts")))
+        if(!actualTriggerClassPath.Equals("") && File.Exists(actualTriggerClassPath) && actualTriggerClassPath.EndsWith("ThinkEngineTrigger.cs"))
         {
-            Directory.CreateDirectory(Path.Combine("Assets", "Scripts"));
+            return;
         }
-        if (!File.Exists(_triggerClassPath))
+        if (Directory.Exists(Path.Combine("Assets","Scripts")) && File.Exists(_triggerClassPath))
         {
-            CreateTriggerScript();
+            return;
         }
+        var o = (from assembly in System.AppDomain.CurrentDomain.GetAssemblies()
+                 from type in assembly.GetTypes()
+                 where type.Name == "ThinkEngineTrigger"
+                 select type).FirstOrDefault();
+        if (o != null)
+        {
+            return;
+        }
+        Directory.CreateDirectory(Path.Combine("Assets", "Scripts"));
+        CreateTriggerScript();
 #endif
     }
     private static void CreateTriggerScript()
@@ -205,7 +219,7 @@ public static class Utility
             string triggerClassContent = "using System;\n";
             triggerClassContent += "using UnityEngine;\n\n";
             triggerClassContent += @"// every method of this class without parameters and that returns a bool value can be used to trigger the reasoner.";
-            triggerClassContent += "\n public class Trigger:ScriptableObject{\n\n";
+            triggerClassContent += "\n public class ThinkEngineTrigger:ScriptableObject{\n\n";
             triggerClassContent += "}";
             Byte[] info = new UTF8Encoding(true).GetBytes(triggerClassContent);
             fs.Write(info, 0, info.Length);

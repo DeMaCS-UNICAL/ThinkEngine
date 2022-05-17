@@ -138,7 +138,7 @@ internal abstract class BasicTypeMapper : IDataMapper
         }
         if (!Supports(actualValue.GetType()))
         {
-            throw new Exception("Wrong mapper for property " + property);
+            Debug.LogError("Wrong mapper for property " + property);
         }
 
         List<object> values = ((BasicTypeInfoAndValue)sensor.PropertyInfo[hierarchyLevel]).values;
@@ -153,7 +153,7 @@ internal abstract class BasicTypeMapper : IDataMapper
     {
         if (!SupportedTypes.Contains(information.currentType) || information.residualPropertyHierarchy.Count > 1)
         {
-            throw new Exception("Wrong mapper for property " + information.propertyHierarchy);
+            Debug.LogError("Wrong mapper for property " + information.propertyHierarchy);
         }
         BasicTypeInfoAndValue additionalInfo = new BasicTypeInfoAndValue();
         /*if (!((SensorConfiguration)information.configuration).OperationPerProperty.ContainsKey(information.propertyHierarchy.GetHashCode()))
@@ -180,7 +180,7 @@ internal abstract class BasicTypeMapper : IDataMapper
         }
         if (!(instantiatedSensors is BasicTypeSensor))
         {
-            throw new Exception("Wrong mapper for property " + information.propertyHierarchy);
+            Debug.LogError("Wrong mapper for property " + information.propertyHierarchy);
         }
         return instantiatedSensors;
     }
@@ -197,7 +197,7 @@ internal abstract class BasicTypeMapper : IDataMapper
     {
         if (!SupportedTypes.Contains(information.currentObjectOfTheHierarchy.GetType()) || information.residualPropertyHierarchy.Count > 1)
         {
-            throw new Exception("Wrong mapper for property " + information.propertyHierarchy);
+            Debug.LogError("Wrong mapper for property " + information.propertyHierarchy);
         }
         BasicTypeActuator actuator = new BasicTypeActuator(information.instantiateOn.AddComponent<MonoBehaviourActuator>());
         actuator.actuator.Configure(information, GenerateMapping(information));
@@ -212,7 +212,7 @@ internal abstract class BasicTypeMapper : IDataMapper
         }
         if (!(actuators is BasicTypeActuator))
         {
-            throw new Exception("Wrong mapper for property " + information.propertyHierarchy);
+            Debug.LogError("Wrong mapper for property " + information.propertyHierarchy);
         }
         return actuators;
     }
@@ -220,7 +220,7 @@ internal abstract class BasicTypeMapper : IDataMapper
     {
         if (!SupportedTypes.Contains(currentObject.GetType()) || residualPropertyHierarchy.Count > 1)
         {
-            throw new Exception("Type " + currentObject.GetType() + " is not supported as Sensor");
+            Debug.LogError("Type " + currentObject.GetType() + " is not supported as Sensor");
         }
         valuesForPlaceholders.Add(currentObject);
         return string.Format(actuator.Mapping, valuesForPlaceholders.ToArray()); 
@@ -244,7 +244,7 @@ internal abstract class BasicTypeMapper : IDataMapper
     {
         if (!SupportedTypes.Contains(objectType))
         {
-            throw new Exception("Type " + objectType + " is not supported by " + this.GetType());
+            Debug.LogError("Type " + objectType + " is not supported by " + this.GetType());
         }
         return new Dictionary<MyListString, KeyValuePair<Type, object>>();
     }

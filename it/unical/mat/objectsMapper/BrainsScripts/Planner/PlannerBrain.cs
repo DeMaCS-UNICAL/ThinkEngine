@@ -47,7 +47,7 @@ namespace Planner
                 catch(Exception e)
                 {
                     _priority = previous;
-                    throw e;
+                    Debug.LogError( e);
                 }
             }
         }

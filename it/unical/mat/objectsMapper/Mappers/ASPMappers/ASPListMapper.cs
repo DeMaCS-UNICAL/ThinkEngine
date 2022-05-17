@@ -75,7 +75,11 @@ namespace Mappers.ASPMappers
             ListSensors sensors = new ListSensors();
             if (x == 0)
             {
-                return null;
+                return sensors;
+            }
+            if (actualList[0] == null)
+            {
+                return sensors;
             }
             GenerateMapping(ref information, actualList[0].GetType());
             information.firstPlaceholder++;
@@ -95,6 +99,10 @@ namespace Mappers.ASPMappers
         {
             ListSensors toReturn = new ListSensors();
             if (x == 0)
+            {
+                return toReturn;
+            }
+            if (actualList[0] == null)
             {
                 return toReturn;
             }
@@ -130,7 +138,7 @@ namespace Mappers.ASPMappers
             }
             if (!(instantiatedSensors is ListSensors))
             {
-                throw new Exception("Error in sensors generation.");
+                Debug.LogError("Error in sensors generation.");
             }
             ListSensors sensors = (ListSensors)instantiatedSensors;
             if (sensors.sensorsList.Count == 0)
@@ -176,6 +184,10 @@ namespace Mappers.ASPMappers
             {
                 return actuators;
             }
+            if (actualList[0] == null)
+            {
+                return actuators;
+            }
             GenerateMapping(ref information, actualList[0].GetType());
             information.firstPlaceholder += 1;
             UpdateResidualPropertyHierarchy(information.residualPropertyHierarchy, actualList[0].GetType());
@@ -197,7 +209,7 @@ namespace Mappers.ASPMappers
             }
             if (!(instantiatedActuators is ListActuators))
             {
-                throw new Exception("Error in sensors generation.");
+                Debug.LogError("Error in sensors generation.");
             }
             ListActuators actuators = (ListActuators)instantiatedActuators;
             if (actuators.actuatorsList.Count == 0)
@@ -227,7 +239,10 @@ namespace Mappers.ASPMappers
             {
                 return toReturn;
             }
-
+            if (actualList[0] == null)
+            {
+                return toReturn;
+            }
             Type elementType = actualList[0].GetType();
             if (!information.mappingDone)
             {

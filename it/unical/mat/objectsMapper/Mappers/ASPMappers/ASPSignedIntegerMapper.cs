@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using static Mappers.OperationContainer;
 
 namespace Mappers
@@ -15,7 +16,7 @@ namespace Mappers
         {
             if (values.Count == 0)
             {
-                throw new Exception("No values to compute avg on.");
+                Debug.LogError("No values to compute avg on.");
             }
             long avg = 0;
             foreach (long d in values)
@@ -76,7 +77,7 @@ namespace Mappers
         {
             if (!SupportedTypes.Contains(currentObject.GetType()))
             {
-                throw new Exception("Type " + currentObject.GetType() + " is not supported as Sensor");
+                Debug.LogError("Type " + currentObject.GetType() + " is not supported as Sensor");
             }
             return "" + currentObject + "";
         }

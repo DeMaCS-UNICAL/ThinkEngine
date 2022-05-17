@@ -77,7 +77,11 @@ namespace Mappers.BaseMappers
             ArraySensors sensors = new ArraySensors(x);
             if (x == 0)
             {
-                return null;
+                return sensors;
+            }
+            if(actualArray.GetValue(0) == null)
+            {
+                return sensors;
             }
             Type elementType = actualArray.GetValue(0).GetType();
             GenerateMapping(ref information, elementType);
@@ -97,6 +101,10 @@ namespace Mappers.BaseMappers
         {
             ArraySensors toReturn = new ArraySensors(x);
             if (x == 0)
+            {
+                return toReturn;
+            }
+            if (actualArray.GetValue(0) == null)
             {
                 return toReturn;
             }
@@ -133,7 +141,7 @@ namespace Mappers.BaseMappers
             }
             if (!(instantiatedSensors is ArraySensors))
             {
-                throw new Exception("Error in sensors generation.");
+                Debug.LogError("Error in sensors generation.");
             }
             ArraySensors sensors = (ArraySensors)instantiatedSensors;
             if (sensors.sensorsArray.Length == 0)
@@ -180,6 +188,10 @@ namespace Mappers.BaseMappers
             {
                 return actuators;
             }
+            if (actualArray.GetValue(0) == null)
+            {
+                return actuators;
+            }
             Type elementType = actualArray.GetValue(0).GetType();
             GenerateMapping(ref information, elementType);
             information.firstPlaceholder += 1;
@@ -202,7 +214,7 @@ namespace Mappers.BaseMappers
             }
             if (!(instantiatedActuators is ArrayActuators))
             {
-                throw new Exception("Error in sensors generation.");
+                Debug.LogError("Error in sensors generation.");
             }
             ArrayActuators actuators = (ArrayActuators)instantiatedActuators;
             if (actuators.actuatorsArray.Length == 0)
@@ -227,6 +239,10 @@ namespace Mappers.BaseMappers
             if (x == 0)
             {
                 return toReturn;
+            }
+            if (actualArray.GetValue(0) == null)
+            {
+                return actuators;
             }
             Type elementType = actualArray.GetValue(0).GetType();
             if (!information.mappingDone)
@@ -302,5 +318,6 @@ namespace Mappers.BaseMappers
         {
             return ((Array)actualCollection).GetValue(indexes);
         }
+
     }
 }

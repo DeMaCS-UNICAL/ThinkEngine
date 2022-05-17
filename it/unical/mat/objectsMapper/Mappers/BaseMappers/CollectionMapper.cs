@@ -97,7 +97,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.Mappers.BaseMappers
         {
             if (!Supports(objectType))
             {
-                throw new Exception(objectType + " is not supported.");
+                Debug.LogError(objectType + " is not supported.");
             }
             Type underlyingType = ElementType(objectType);
             MyListString rootName = new MyListString(currentObjectPropertyHierarchy.myStrings);
@@ -115,7 +115,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.Mappers.BaseMappers
                 return;
             }
             string prepend = Placeholders(information);
-            if (!MapperManager.ExistsMapper(elementType))
+            if (!MapperManager.ExistsMapper(elementType) || MapperManager.IsBasic(elementType))
             {
                 prepend = NewASPMapperHelper.AspFormat(information.residualPropertyHierarchy[0]) + "(" + information.temporaryMapping + prepend;
                 string append = ")";

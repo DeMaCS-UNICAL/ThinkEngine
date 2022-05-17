@@ -56,7 +56,7 @@ class ActuatorConfiguration : AbstractConfiguration
         {
             if (!Utility.ActuatorsManager.IsConfigurationNameValid(value, this))
             {
-                throw new Exception("The chosen configuration name cannot be used.");
+                Debug.LogError("The chosen configuration name cannot be used.");
             }
             _configurationName = value;
         }

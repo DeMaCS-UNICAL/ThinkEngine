@@ -75,7 +75,11 @@ namespace Mappers.BaseMappers
             Array2Sensors sensors = new Array2Sensors(x, y);
             if (x == 0 || y==0)
             {
-                return null;
+                return sensors;
+            }
+            if(actualMatrix.GetValue(0, 0) == null)
+            {
+                return sensors;
             }
             Type elementType = actualMatrix.GetValue(0, 0).GetType();
             GenerateMapping(ref information, elementType);
@@ -98,6 +102,10 @@ namespace Mappers.BaseMappers
         {
             Array2Sensors toReturn = new Array2Sensors(x, y);
             if (x == 0 || y==0)
+            {
+                return toReturn;
+            }
+            if (actualMatrix.GetValue(0, 0) == null)
             {
                 return toReturn;
             }
@@ -137,7 +145,7 @@ namespace Mappers.BaseMappers
             }
             if (!(instantiatedSensors is Array2Sensors))
             {
-                throw new Exception("Error in sensors generation.");
+                Debug.LogError("Error in sensors generation.");
             }
             Array2Sensors sensors = (Array2Sensors)instantiatedSensors;
             if (sensors.sensorsMatrix.Length == 0)
@@ -186,6 +194,10 @@ namespace Mappers.BaseMappers
             {
                 return actuators;
             }
+            if (actualMatrix.GetValue(0, 0) == null)
+            {
+                return actuators;
+            }
             Type elementType = actualMatrix.GetValue(0, 0).GetType();
             GenerateMapping(ref information,elementType);
             information.firstPlaceholder += 2;
@@ -211,7 +223,7 @@ namespace Mappers.BaseMappers
             }
             if (!(instantiatedActuators is Array2Actuators))
             {
-                throw new Exception("Error in sensors generation.");
+                Debug.LogError("Error in sensors generation.");
             }
             Array2Actuators actuators = (Array2Actuators)instantiatedActuators;
             if (actuators.actuatorsMatrix.Length == 0)
@@ -237,6 +249,10 @@ namespace Mappers.BaseMappers
             if (x == 0 || y==0)
             {
                 return toReturn;
+            }
+            if (actualMatrix.GetValue(0, 0) == null)
+            {
+                return actuators;
             }
             Type elementType = actualMatrix.GetValue(0,0).GetType();
             if (!information.mappingDone)

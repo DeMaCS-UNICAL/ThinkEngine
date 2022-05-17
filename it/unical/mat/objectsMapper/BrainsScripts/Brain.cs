@@ -52,7 +52,7 @@ namespace Planner
             }
         }
         [SerializeField, HideInInspector]
-        internal string AIFilesPath=  Path.Combine(".","Assets","StreamingAssets");
+        internal string AIFilesPath=  Path.Combine(".","Assets","StreamingAssets","ThinkEngine");
         [SerializeField, HideInInspector]
         internal string AIFilesPrefix;
         [SerializeField, HideInInspector]
@@ -133,7 +133,7 @@ namespace Planner
                 return;
             }
             _fileExtension = "";
-            foreach (string fileName in Directory.GetFiles(Application.streamingAssetsPath))
+            foreach (string fileName in Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "ThinkEngine")))
             {
                 string actualFileName = fileName.Substring(fileName.LastIndexOf(Utility.slash) + 1);
                 if (actualFileName.StartsWith(AIFilesPrefix))
@@ -145,7 +145,7 @@ namespace Planner
                     }
                     else if (!extension.Equals(FileExtension) && SupportedFileExtensions.Contains(extension))
                     {
-                        throw new Exception("Multiple paradigms encoding found. You should either use " + FileExtension + " or " + extension + " for " + AIFilesPrefix);
+                        Debug.LogError("Multiple paradigms encoding found. You should either use " + FileExtension + " or " + extension + " for " + AIFilesPrefix);
                     }
                 }
             }

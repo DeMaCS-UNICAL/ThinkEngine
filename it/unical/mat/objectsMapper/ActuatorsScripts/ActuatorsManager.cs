@@ -113,7 +113,7 @@ internal class ActuatorsManager : MonoBehaviour
         {
             try
             {
-                throw new Exception("Only one ActuatorsManager can be instantiated");
+                Debug.LogError("Only one ActuatorsManager can be instantiated");
             }
             finally
             {
