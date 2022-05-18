@@ -70,18 +70,21 @@ public static class Utility
             CheckTriggerClass();
             if (_triggerClass == null)
             {
-#if UNITY_EDITOR
+                #if UNITY_EDITOR
                 if (!EditorApplication.isCompiling)
                 {
                     _triggerClass = ScriptableObject.CreateInstance("ThinkEngineTrigger");
-                    MonoScript sourceScriptAsset = MonoScript.FromScriptableObject(_triggerClass);
-                    actualTriggerClassPath = AssetDatabase.GetAssetPath(sourceScriptAsset);
+                    
                 }
-#endif
-#if !UNITY_EDITOR
+                #endif
+                #if !UNITY_EDITOR
                 _triggerClass = ScriptableObject.CreateInstance("Trigger");
-#endif
+                #endif
             }
+            #if UNITY_EDITOR
+            MonoScript sourceScriptAsset = MonoScript.FromScriptableObject(_triggerClass);
+            actualTriggerClassPath = AssetDatabase.GetAssetPath(sourceScriptAsset);
+            #endif
             return _triggerClass;
         }
     }
