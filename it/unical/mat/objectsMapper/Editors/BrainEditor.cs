@@ -316,7 +316,7 @@ namespace Editors
         {
             if (!CheckSolver())
             {
-                EditorGUILayout.HelpBox("Please, download the Dlv2 solver suitable for your system. See documentation at \"Downloading the ASP solver\".", MessageType.Error, true);
+                EditorGUILayout.HelpBox("Please, download the Dlv2 solver suitable for your system. See documentation at \"How to add ThinkEngine to an existing project\".", MessageType.Error, true);
                 return;
             }
             IfConfigurationChanged();
