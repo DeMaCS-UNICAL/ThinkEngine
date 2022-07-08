@@ -28,7 +28,15 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         }
         protected override Handler GetHandler()
         {
-            return new DesktopHandler(new DLV2DesktopService(Path.Combine(Application.streamingAssetsPath,"ThinkEngine", "lib","dlv2"+Utility.RunnableExtension)));
+            foreach (string fileName in Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "ThinkEngine","lib")))
+            {
+                string actualFileName = fileName.Substring(fileName.LastIndexOf(Utility.slash) + 1);
+                if (actualFileName.StartsWith("dlv"))
+                {
+                    return new DesktopHandler(new DLV2DesktopService(fileName));
+                }
+            }
+            throw new Exception("Unable to find DVL");
         }
         protected override void OutputParsing(Output o)
         {

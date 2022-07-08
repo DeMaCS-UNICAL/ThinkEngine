@@ -351,7 +351,8 @@ namespace Editors
             }
             foreach(string filename in libContent)
             {
-                if (filename.EndsWith(Utility.RunnableExtension))
+                string actualFileName = filename.Substring(filename.LastIndexOf(Utility.slash) + 1);
+                if (actualFileName.StartsWith("dlv"))
                 {
                     return true;
                 }
