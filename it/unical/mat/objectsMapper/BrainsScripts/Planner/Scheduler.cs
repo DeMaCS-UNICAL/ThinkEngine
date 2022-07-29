@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Planner
+namespace ThinkEngine.Planning
 {
 
     public class Scheduler : MonoBehaviour
@@ -25,7 +25,8 @@ namespace Planner
                 return currentPlan.actions.Count;
             }
         }
-        public bool IsIdle {
+        public bool IsIdle
+        {
             get
             {
                 return _isIdle;
@@ -44,12 +45,12 @@ namespace Planner
 
         internal bool NewPlan(Plan plan)
         {
-            if(currentPlan!=null && currentPlan.IsExecuting)
+            if (currentPlan != null && currentPlan.IsExecuting)
             {
-                    if (planExecutionCoroutine != null)
-                    {
-                        StopCoroutine(planExecutionCoroutine);
-                    }
+                if (planExecutionCoroutine != null)
+                {
+                    StopCoroutine(planExecutionCoroutine);
+                }
             }
             currentPlan = plan;
             planExecutionCoroutine = StartCoroutine(currentPlan.ApplyPlan(this));

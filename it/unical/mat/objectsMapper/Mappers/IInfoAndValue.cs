@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
-using static Mappers.OperationContainer;
+using static ThinkEngine.Mappers.OperationContainer;
 
-interface IInfoAndValue
+namespace ThinkEngine.Mappers
 {
-    object GetValuesForPlaceholders();
+    interface IInfoAndValue
+    {
+        object GetValuesForPlaceholders();
+    }
 }

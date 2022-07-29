@@ -1,16 +1,16 @@
-﻿using Mappers.BaseMappers;
+﻿using ThinkEngine.Mappers.BaseMappers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Mappers.OperationContainer;
+using static ThinkEngine.Mappers.OperationContainer;
 
-namespace Mappers
+namespace ThinkEngine.Mappers
 {
     internal class ASPBoolMapper : BasicTypeMapper
     {
         #region SINGLETON FEATURES
-        
+
         private static IDataMapper _instance;
         public static IDataMapper Instance
         {
@@ -26,10 +26,10 @@ namespace Mappers
         }
 
 
-        private ASPBoolMapper() 
+        private ASPBoolMapper()
         {
             _operationList = new List<Operation>() { Newest, Oldest, Specific_Value, Conjunction, Disjunction };
-            _supportedTypes = new List<Type> { typeof(bool), typeof(Boolean) };
+            _supportedTypes = new List<Type> { typeof(bool), typeof(bool) };
             _convertingType = typeof(bool);
         }
         #endregion
@@ -58,7 +58,7 @@ namespace Mappers
             {
                 Debug.LogError("Type " + currentObject.GetType() + " is not supported as Sensor");
             }
-            return (((bool)currentObject) + "").ToLower();
+            return ((bool)currentObject + "").ToLower();
         }
 
         public override Type GetAggregationTypes(Type type)

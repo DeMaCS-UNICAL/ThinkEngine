@@ -303,7 +303,7 @@
     <Compile Include="it\unical\mat\objectsMapper\Editors\AbstractConfigurationEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Editors\SensorsConfigurationEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\AbstractConfiguration.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\Mappers\IActuators.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Actuator\IActuators.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\InstantiationInformation.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\MapperManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\MonoBehaviourActuator.cs" />
@@ -312,7 +312,7 @@
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\MonoBehaviourSensorsManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SensorConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ObjectTracker.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\Mappers\ISensors.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\ISensors.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\IndexTracker.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\MyListString.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\Utility.cs" />

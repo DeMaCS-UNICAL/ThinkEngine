@@ -5,11 +5,11 @@ using System.Diagnostics;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace Planner
+namespace ThinkEngine.Planning
 {
     public class Plan
     {
-        internal static int counter=0;
+        internal static int counter = 0;
         public int myCount;
         internal List<Action> actions;
         public int priority;
@@ -54,7 +54,7 @@ namespace Planner
         private State PlanState()
         {
             List<Action> toRemove = new List<Action>();
-            while (actions.Count>0)
+            while (actions.Count > 0)
             {
                 State state = actions[0].Prerequisite();
                 if (state == State.SKIP)
@@ -96,16 +96,16 @@ namespace Planner
             _isExecuting = true;
             while (actions.Count > 0)
             {
-                State planState=State.WAIT;
+                State planState = State.WAIT;
                 while (PlanWaiting(ref planState))
                 {
                     yield return null;
                 }
-                if (planState==State.READY)
+                if (planState == State.READY)
                 {
                     Action next = Next();
                     next.Do();
-                    yield return new WaitUntil(()=> next.Done());
+                    yield return new WaitUntil(() => next.Done());
                 }
                 else
                 {
@@ -121,7 +121,7 @@ namespace Planner
         bool PlanWaiting(ref State planState)
         {
             planState = PlanState();
-            return planState==State.WAIT;
+            return planState == State.WAIT;
         }
     }
 

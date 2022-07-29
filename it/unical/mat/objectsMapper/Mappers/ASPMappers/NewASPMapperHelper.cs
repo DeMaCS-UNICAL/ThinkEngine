@@ -1,5 +1,5 @@
 ﻿
-namespace Mappers
+namespace ThinkEngine.Mappers
 {
     public static class NewASPMapperHelper
     {

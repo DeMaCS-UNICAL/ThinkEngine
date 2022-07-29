@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 
-namespace Planner
+namespace ThinkEngine.Planning
 {
     internal interface IActualPlannerBrain
     {

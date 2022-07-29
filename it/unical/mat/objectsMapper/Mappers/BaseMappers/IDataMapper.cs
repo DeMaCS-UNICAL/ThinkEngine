@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Mappers.BaseMappers
+namespace ThinkEngine.Mappers.BaseMappers
 {
     interface IDataMapper
     {

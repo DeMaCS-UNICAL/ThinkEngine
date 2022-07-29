@@ -1,11 +1,11 @@
-﻿using Mappers.BaseMappers;
+﻿using ThinkEngine.Mappers.BaseMappers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Mappers.OperationContainer;
+using static ThinkEngine.Mappers.OperationContainer;
 
-namespace Mappers
+namespace ThinkEngine.Mappers
 {
     internal class ASPCharMapper : BasicTypeMapper
     {

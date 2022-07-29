@@ -1,5 +1,4 @@
-﻿using Mappers;
-using Mappers.BaseMappers;
+﻿using ThinkEngine.Mappers.BaseMappers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace ThinkEngine.it.unical.mat.objectsMapper.Mappers.BaseMappers
+namespace ThinkEngine.Mappers.BaseMappers
 {
     internal abstract class CollectionMapper : IDataMapper
     {

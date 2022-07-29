@@ -2,8 +2,9 @@
 using UnityEngine;
 using System.IO;
 using System.Globalization;
-using Planner;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
+using ThinkEngine;
+using ThinkEngine.Planning;
 
 class Performance : MonoBehaviour
 {

@@ -1,10 +1,11 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using ThinkEngine.Mappers;
 using UnityEditor;
 using UnityEngine;
 
-namespace Editors
+namespace ThinkEngine.Editors
 {
     internal delegate bool ToggleType(string propertyName, bool value);
     [CustomEditor(typeof(AbstractConfiguration))]

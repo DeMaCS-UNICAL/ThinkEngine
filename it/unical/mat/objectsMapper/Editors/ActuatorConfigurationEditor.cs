@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Editors
+namespace ThinkEngine.Editors
 {
     [CustomEditor(typeof(ActuatorConfiguration))]
     class ActuatorConfigurationEditor : AbstractConfigurationEditor

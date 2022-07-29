@@ -8,14 +8,15 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
+using ThinkEngine.Mappers;
 using UnityEngine;
 
-namespace Planner
+namespace ThinkEngine
 {
     [ExecuteAlways, RequireComponent(typeof(IndexTracker))]
-    public abstract class Brain: MonoBehaviour
+    public abstract class Brain : MonoBehaviour
     {
-        internal  string executorName;
+        internal string executorName;
 
         private string _fileExtension;
         internal string FileExtension
@@ -52,7 +53,7 @@ namespace Planner
             }
         }
         [SerializeField, HideInInspector]
-        internal string AIFilesPath=  Path.Combine(".","Assets","StreamingAssets","ThinkEngine");
+        internal string AIFilesPath = Path.Combine(".", "Assets", "StreamingAssets", "ThinkEngine");
         [SerializeField, HideInInspector]
         internal string AIFilesPrefix;
         [SerializeField, HideInInspector]
@@ -63,13 +64,13 @@ namespace Planner
         {
             get
             {
-                if (_AIFileTemplatePath == null || !_AIFileTemplatePath.Equals(Path.Combine(".", "Assets", "Resources", this.GetType().Name+"Template"+AIFilesPrefix+".asp")))
+                if (_AIFileTemplatePath == null || !_AIFileTemplatePath.Equals(Path.Combine(".", "Assets", "Resources", GetType().Name + "Template" + AIFilesPrefix + ".asp")))
                 {
-                    _AIFileTemplatePath = Path.Combine(".","Assets","Resources", this.GetType().Name + "Template" + AIFilesPrefix + ".asp");
-                    
+                    _AIFileTemplatePath = Path.Combine(".", "Assets", "Resources", GetType().Name + "Template" + AIFilesPrefix + ".asp");
+
                     if (!File.Exists(_AIFileTemplatePath))
                     {
-                        if (!Directory.Exists(Path.Combine(".","Assets","Resources")))
+                        if (!Directory.Exists(Path.Combine(".", "Assets", "Resources")))
                         {
                             Directory.CreateDirectory(Path.Combine(".", "Assets", "Resources"));
                         }
@@ -158,7 +159,7 @@ namespace Planner
 
         protected virtual void Update()
         {
-            if (Application.isPlaying &&  reasonerMethod == null)
+            if (Application.isPlaying && reasonerMethod == null)
             {
                 lock (toLock)
                 {
@@ -187,7 +188,7 @@ namespace Planner
         {
             while (true)
             {
-               
+
                 yield return new WaitUntil(() => solverWaiting && SomeConfigurationAvailable() && (bool)reasonerMethod.Invoke(triggerClass, null));
                 lock (toLock)
                 {
@@ -203,7 +204,7 @@ namespace Planner
             {
                 fs.Write("%For runtime instantiated GameObject, only the prefab mapping is provided. Use that one substituting the gameobject name accordingly.\n %Sensors.\n");
                 HashSet<string> seenSensorConfNames = new HashSet<string>();
-                
+
                 foreach (SensorConfiguration sensorConf in Utility.SensorsManager.GetConfigurations(ChosenSensorConfigurations))
                 {
                     if (seenSensorConfNames.Contains(sensorConf.ConfigurationName))
@@ -214,7 +215,7 @@ namespace Planner
                     foreach (MyListString property in sensorConf.ToMapProperties)
                     {
                         //Debug.Log(property);
-                        sensorsAsASP= MapperManager.GetASPTemplate(sensorConf.ConfigurationName, sensorConf.gameObject, property, true);
+                        sensorsAsASP = MapperManager.GetASPTemplate(sensorConf.ConfigurationName, sensorConf.gameObject, property, true);
                         //Debug.Log(sensorsAsASP);
                         fs.Write(ActualSensorEncoding(sensorsAsASP));
                     }
@@ -262,5 +263,5 @@ namespace Planner
             }
         }
     }
-    
+
 }

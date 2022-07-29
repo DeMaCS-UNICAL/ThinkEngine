@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using ThinkEngine.it.unical.mat.objectsMapper.Mappers.BaseMappers;
+using ThinkEngine.Mappers.BaseMappers;
 using UnityEngine;
 
-namespace Mappers.BaseMappers
+namespace ThinkEngine.Mappers.BaseMappers
 {
     class ASPArray2Mapper : CollectionMapper
     {

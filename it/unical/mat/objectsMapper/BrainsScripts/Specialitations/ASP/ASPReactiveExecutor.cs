@@ -8,7 +8,6 @@ using it.unical.mat.embasp.platforms.desktop;
 using it.unical.mat.embasp.@base;
 using it.unical.mat.embasp.languages.asp;
 using UnityEngine;
-using Planner;
 
 namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 {

@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace Mappers
+namespace ThinkEngine.Mappers
 {
     class OperationContainer
     {

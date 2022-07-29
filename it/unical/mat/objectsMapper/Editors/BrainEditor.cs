@@ -1,17 +1,11 @@
 ﻿#if UNITY_EDITOR
-using Planner;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEditor;
-using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-namespace Editors
+namespace ThinkEngine.Editors
 {
     [CustomEditor(typeof(Brain))]
     public class BrainEditor : Editor

@@ -1,11 +1,11 @@
-﻿using Mappers.BaseMappers;
+﻿using ThinkEngine.Mappers.BaseMappers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using ThinkEngine.it.unical.mat.objectsMapper.Mappers.BaseMappers;
+using ThinkEngine..Mappers.BaseMappers;
 using UnityEngine;
 
-namespace Mappers.ASPMappers
+namespace ThinkEngine.Mappers.ASPMappers
 {
     class ASPListMapper : CollectionMapper
     {

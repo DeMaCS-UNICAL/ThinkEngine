@@ -7,10 +7,10 @@ using System.Linq;
 using System.Threading;
 using UnityEngine;
 
-namespace Planner
+namespace ThinkEngine.Planning
 {
-    [RequireComponent(typeof(Scheduler)),RequireComponent(typeof(PlannerBrainsCoordinator))]
-    class PlannerBrain:Brain,IComparable<PlannerBrain>
+    [RequireComponent(typeof(Scheduler)), RequireComponent(typeof(PlannerBrainsCoordinator))]
+    class PlannerBrain : Brain, IComparable<PlannerBrain>
     {
 
         private PlannerBrainsCoordinator _coordinator;
@@ -26,8 +26,8 @@ namespace Planner
             }
         }
 
-        [SerializeField,HideInInspector]
-        private int _priority=-1;
+        [SerializeField, HideInInspector]
+        private int _priority = -1;
         Plan plan;
         [HideInInspector]
         public int Priority
@@ -44,10 +44,10 @@ namespace Planner
                     _priority = value;
                     Coordinator.SetPriority(previous, _priority, this);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     _priority = previous;
-                    Debug.LogError( e);
+                    Debug.LogError(e);
                 }
             }
         }
@@ -73,7 +73,7 @@ namespace Planner
                 return new HashSet<string> { "asp" };
             }
         }
-        
+
         internal void PlanAvailable(object plan)
         {
             Planner.NewPlanAvailable(plan);
@@ -81,7 +81,7 @@ namespace Planner
 
         internal Plan GetPlan()
         {
-            return plan?? new Plan();
+            return plan ?? new Plan();
         }
 
         void Reset()
@@ -98,7 +98,7 @@ namespace Planner
                 yield return StartCoroutine(base.Init());
                 executor = Planner.GetPlannerExecutor(this);
                 executorName = "Solver executor " + gameObject.name + Priority;
-                
+
                 executionThread = new Thread(() =>
                 {
                     Thread.CurrentThread.Name = executorName;
@@ -110,13 +110,13 @@ namespace Planner
         }
         protected override void Update()
         {
-            if (Application.isPlaying && Planner!=null)
+            if (Application.isPlaying && Planner != null)
             {
                 base.Update();
                 if (Planner.IsNewPlanAvailable())
                 {
                     plan = Planner.GetNewPlan();
-                    if (plan!=null)
+                    if (plan != null)
                     {
                         plan.priority = Priority;
                         Coordinator.PlanReady(this);
@@ -145,7 +145,7 @@ namespace Planner
             {
                 return Planner.SpecificFileParts();
             }
-            string toReturn = "%For ASP programs:\n" + (new ASPPlannerBrain()).SpecificFileParts();
+            string toReturn = "%For ASP programs:\n" + new ASPPlannerBrain().SpecificFileParts();
             return toReturn;
         }
     }

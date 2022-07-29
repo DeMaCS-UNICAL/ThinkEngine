@@ -2,7 +2,7 @@
 using it.unical.mat.embasp.languages.asp;
 using it.unical.mat.embasp.platforms.desktop;
 using it.unical.mat.embasp.specializations.dlv2.desktop;
-using Planner;
+using ThinkEnginePlanner;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

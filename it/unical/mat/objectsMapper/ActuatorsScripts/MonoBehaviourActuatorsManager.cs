@@ -1,5 +1,7 @@
 ﻿using Mappers;
 using System.Collections.Generic;
+using ThinkEngine;
+using ThinkEngine.Mappers;
 using UnityEngine;
 
 internal class MonoBehaviourActuatorsManager : MonoBehaviour

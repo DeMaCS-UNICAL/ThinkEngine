@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Planner
+namespace ThinkEngine.Planning
 {
     public class PlannerBrainsCoordinator : MonoBehaviour
     {
@@ -14,15 +14,15 @@ namespace Planner
         private SortedDictionary<int, Plan> plannersLastPlan;
         internal void SetPriority(int previousPriority, int newPriority, PlannerBrain brain)
         {
-            if(!ValidPriority(newPriority))
+            if (!ValidPriority(newPriority))
             {
                 throw new Exception("Planner priority should be between 1 and the number of brains associated to the gameobject");
             }
-            if (ValidPriority(previousPriority) &&  previousPriority != newPriority) 
+            if (ValidPriority(previousPriority) && previousPriority != newPriority)
             {
                 foreach (PlannerBrain currentBrain in GetComponents<PlannerBrain>())
                 {
-                    if (brain!=currentBrain && currentBrain.Priority == newPriority)
+                    if (brain != currentBrain && currentBrain.Priority == newPriority)
                     {
                         currentBrain.Priority = previousPriority;
                     }
@@ -37,7 +37,7 @@ namespace Planner
 
         private bool ValidPriority(int priority)
         {
-            if(priority<0 || priority >= NumberOfBrains())
+            if (priority < 0 || priority >= NumberOfBrains())
             {
                 return false;
             }
@@ -87,7 +87,7 @@ namespace Planner
         {
             //Debug.Log("checking if plan ready");
             //priorityExecuting = NumberOfBrains()+1;
-            while (plannersLastPlan.Count>0 && plannersLastPlan.First().Key<=priorityExecuting)
+            while (plannersLastPlan.Count > 0 && plannersLastPlan.First().Key <= priorityExecuting)
             {
                 //Debug.Log("plan found");
                 KeyValuePair<int, Plan> toExecute = plannersLastPlan.First();
@@ -99,7 +99,7 @@ namespace Planner
                 bool used = scheduler.NewPlan(toExecute.Value);
                 if (used)
                 {
-            //Debug.Log("plan executed");
+                    //Debug.Log("plan executed");
                     plannersLastPlan.Remove(toExecute.Key);
                     priorityExecuting = toExecute.Key;
                     break;
@@ -110,16 +110,16 @@ namespace Planner
         void Start()
         {
             scheduler = GetComponent<Scheduler>();
-            priorityExecuting = NumberOfBrains()+1;
+            priorityExecuting = NumberOfBrains() + 1;
             plannersLastPlan = new SortedDictionary<int, Plan>();
         }
-        
+
 
         internal void RemoveBrain(int priority)
         {
-            foreach(PlannerBrain brain in GetComponents<PlannerBrain>()) 
+            foreach (PlannerBrain brain in GetComponents<PlannerBrain>())
             {
-                if (brain!=null && brain.Priority > priority)
+                if (brain != null && brain.Priority > priority)
                 {
                     brain.Priority--;
                 }

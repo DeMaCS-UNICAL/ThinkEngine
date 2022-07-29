@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ThinkEngine.it.unical.mat.objectsMapper.Mappers.BaseMappers;
+using ThinkEngine..Mappers.BaseMappers;
 using UnityEngine;
 
-namespace Mappers.BaseMappers
+namespace ThinkEngine.Mappers.BaseMappers
 {
     class ASPArrayMapper : CollectionMapper
     {
@@ -79,7 +79,7 @@ namespace Mappers.BaseMappers
             {
                 return sensors;
             }
-            if(actualArray.GetValue(0) == null)
+            if (actualArray.GetValue(0) == null)
             {
                 return sensors;
             }

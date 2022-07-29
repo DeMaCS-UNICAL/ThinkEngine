@@ -1,13 +1,10 @@
 ﻿#if UNITY_EDITOR
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ThinkEngine.Mappers;
 using UnityEditor;
 using UnityEngine;
 
-namespace Editors
+namespace ThinkEngine.Editors
 {
     [CustomEditor(typeof(SensorConfiguration))]
     class SensorsConfigurationEditor : AbstractConfigurationEditor
@@ -15,7 +12,7 @@ namespace Editors
         SensorConfiguration sensorConfiguration;
         void OnDestroy()
         {
-            if (!Application.isPlaying && target == null && go!=null)
+            if (!Application.isPlaying && target == null && go != null)
             {
                 if (go.GetComponent<SensorConfiguration>() == null)
                 {
@@ -36,7 +33,7 @@ namespace Editors
                 if (newOperation != oldOperation)
                 {
                     sensorConfiguration.SetOperationPerProperty(property, newOperation);
-                    if(newOperation == MapperManager.GetAggregationSpecificIndex(propertyType))
+                    if (newOperation == MapperManager.GetAggregationSpecificIndex(propertyType))
                     {
                         string oldValue = sensorConfiguration.SpecificValuePerProperty[propertyIndex];
                         string newValue = EditorGUILayout.TextField("Value to track", oldValue);

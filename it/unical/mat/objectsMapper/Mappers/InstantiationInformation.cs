@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using ThinkEngine.Mappers;
 using UnityEngine;
 
-namespace Mappers
+namespace ThinkEngine.Mappers
 {
-        
+
 
     internal class InstantiationInformation
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ThinkEngine;
 using UnityEngine;
 
 [ExecuteInEditMode,Serializable, RequireComponent(typeof(IndexTracker)), RequireComponent(typeof(MonoBehaviourSensorsManager))]

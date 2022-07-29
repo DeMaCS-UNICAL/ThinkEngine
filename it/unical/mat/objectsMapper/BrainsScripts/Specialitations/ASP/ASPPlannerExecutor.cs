@@ -1,6 +1,5 @@
 ﻿using it.unical.mat.embasp.@base;
 using it.unical.mat.embasp.languages.asp;
-using Planner;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +9,7 @@ using System.Threading.Tasks;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 using UnityEngine;
 
-namespace Planner
+namespace ThinkEngine.Planning
 {
     class ASPPlannerExecutor : ASPExecutor
     {
@@ -22,7 +21,7 @@ namespace Planner
 
         protected override void SpecificAnswerSetOperations(AnswerSet answer)
         {
-                ((PlannerBrain)brain).PlanAvailable(answer);
+            ((PlannerBrain)brain).PlanAvailable(answer);
         }
 
         protected override bool SpecificFactsRetrieving(Brain brain)
@@ -32,7 +31,7 @@ namespace Planner
 
         protected override void SpecificFactsWriting(Brain brain, StreamWriter fs)
         {
-            
+
         }
 
         protected override void SpecificOptions(Handler handler)

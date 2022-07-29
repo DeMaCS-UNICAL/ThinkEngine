@@ -1,180 +1,183 @@
-﻿using Mappers;
+﻿using ThinkEngine.Mappers;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
-class MonoBehaviourSensorsManager:MonoBehaviour
+namespace ThinkEngine
 {
-    private Thread mainThread;
-    Dictionary<MyListString,int> propertiesIndex;
-    Dictionary<int, InstantiationInformation> instantiationInformationForProperty;
-    Dictionary<int, ISensors> monoBehaviourSensorsForProperty;
-    internal bool ready;
-    private int frameToWait;
-    SensorConfiguration[] configurations;
-    internal Dictionary<SensorConfiguration,List<Sensor>> _sensorsForConfigurations;
-    internal Dictionary<SensorConfiguration,List<Sensor>> Sensors
+    class MonoBehaviourSensorsManager : MonoBehaviour
     {
-        get
+        private Thread mainThread;
+        Dictionary<MyListString, int> propertiesIndex;
+        Dictionary<int, InstantiationInformation> instantiationInformationForProperty;
+        Dictionary<int, ISensors> monoBehaviourSensorsForProperty;
+        internal bool ready;
+        private int frameToWait;
+        SensorConfiguration[] configurations;
+        internal Dictionary<SensorConfiguration, List<Sensor>> _sensorsForConfigurations;
+        internal Dictionary<SensorConfiguration, List<Sensor>> Sensors
         {
-            if (_sensorsForConfigurations == null)
+            get
             {
-                _sensorsForConfigurations = new Dictionary<SensorConfiguration, List<Sensor>>();
+                if (_sensorsForConfigurations == null)
+                {
+                    _sensorsForConfigurations = new Dictionary<SensorConfiguration, List<Sensor>>();
+                }
+                return _sensorsForConfigurations;
             }
-            return _sensorsForConfigurations;
         }
-    }
 
-    void OnEnable()
-    {
-        mainThread = System.Threading.Thread.CurrentThread;
-        propertiesIndex = new Dictionary<MyListString, int>();
-        instantiationInformationForProperty = new Dictionary<int, InstantiationInformation>();
-        monoBehaviourSensorsForProperty = new Dictionary<int, ISensors>();
-        foreach(SensorConfiguration configuration in GetComponents<SensorConfiguration>())
+        void OnEnable()
         {
-            Sensors[configuration] = new List<Sensor>();
-            foreach(MyListString property in configuration.ToMapProperties)
+            mainThread = Thread.CurrentThread;
+            propertiesIndex = new Dictionary<MyListString, int>();
+            instantiationInformationForProperty = new Dictionary<int, InstantiationInformation>();
+            monoBehaviourSensorsForProperty = new Dictionary<int, ISensors>();
+            foreach (SensorConfiguration configuration in GetComponents<SensorConfiguration>())
             {
-                int propertyIndex = property.GetHashCode();
-                propertiesIndex[property]=propertyIndex;
-                InstantiationInformation information = new InstantiationInformation()
+                Sensors[configuration] = new List<Sensor>();
+                foreach (MyListString property in configuration.ToMapProperties)
                 {
-                    instantiateOn = gameObject,
-                    currentObjectOfTheHierarchy = gameObject,
-                    propertyHierarchy = new MyListString(property.myStrings),
-                    residualPropertyHierarchy = new MyListString(property.myStrings),
-                    firstPlaceholder=0,
-                    configuration = configuration
-                };
-                instantiationInformationForProperty[propertyIndex]= information;
-                monoBehaviourSensorsForProperty[propertyIndex] = MapperManager.InstantiateSensors(information);
-                if (monoBehaviourSensorsForProperty[propertyIndex] != null)
-                {
-                    Sensors[configuration].AddRange(monoBehaviourSensorsForProperty[propertyIndex].GetSensorsList());
+                    int propertyIndex = property.GetHashCode();
+                    propertiesIndex[property] = propertyIndex;
+                    InstantiationInformation information = new InstantiationInformation()
+                    {
+                        instantiateOn = gameObject,
+                        currentObjectOfTheHierarchy = gameObject,
+                        propertyHierarchy = new MyListString(property.myStrings),
+                        residualPropertyHierarchy = new MyListString(property.myStrings),
+                        firstPlaceholder = 0,
+                        configuration = configuration
+                    };
+                    instantiationInformationForProperty[propertyIndex] = information;
+                    monoBehaviourSensorsForProperty[propertyIndex] = MapperManager.InstantiateSensors(information);
+                    if (monoBehaviourSensorsForProperty[propertyIndex] != null)
+                    {
+                        Sensors[configuration].AddRange(monoBehaviourSensorsForProperty[propertyIndex].GetSensorsList());
+                    }
                 }
             }
+            ready = true;
         }
-        ready = true;
-    }
 
-    internal void Destroy(Sensor monoBehaviourSensor)
-    {
-        if (_sensorsForConfigurations.ContainsKey(monoBehaviourSensor.configuration))
+        internal void Destroy(Sensor monoBehaviourSensor)
         {
-            _sensorsForConfigurations[monoBehaviourSensor.configuration].Remove(monoBehaviourSensor);
-        }
-    }
-
-    internal void ManageSensors()
-    {
-        configurations = GetComponents<SensorConfiguration>();
-
-        foreach (SensorConfiguration configuration in Sensors.Keys)
-        {
-            Sensors[configuration].Clear();
-        }
-        foreach(MyListString property in propertiesIndex.Keys)
-        {
-            int propertyIndex = propertiesIndex[property];
-            ISensors sensors = monoBehaviourSensorsForProperty[propertyIndex];
-            InformationRefresh(propertyIndex);
-            monoBehaviourSensorsForProperty[propertyIndex] = MapperManager.ManageSensors(instantiationInformationForProperty[propertyIndex], sensors);
-            if (monoBehaviourSensorsForProperty[propertyIndex] != null)
+            if (_sensorsForConfigurations.ContainsKey(monoBehaviourSensor.configuration))
             {
-                Sensors[(SensorConfiguration)instantiationInformationForProperty[propertyIndex].configuration].AddRange(monoBehaviourSensorsForProperty[propertyIndex].GetSensorsList());
+                _sensorsForConfigurations[monoBehaviourSensor.configuration].Remove(monoBehaviourSensor);
             }
         }
-    }
-    /*void LateUpdate()
-    {
-        if (!ready)
-        {
-            return;
-        }
-        if (SensorsManager.frameFromLastUpdate >= SensorsManager.updateFrequencyInFrames+frameToWait)
-        {
-            MyLateUpdate();
-            foreach (List<MonoBehaviourSensor> sensorsList in Sensors.Values)
-            {
-                foreach (MonoBehaviourSensor sensor in sensorsList)
-                {
-                    sensor.MyLateUpdate();
-                }
-            }
-        }
-    }*/
-    private void InformationRefresh(int propertyIndex)
-    {
-        instantiationInformationForProperty[propertyIndex].currentObjectOfTheHierarchy = gameObject;
-        instantiationInformationForProperty[propertyIndex].residualPropertyHierarchy = new MyListString(instantiationInformationForProperty[propertyIndex].propertyHierarchy.myStrings);
-        instantiationInformationForProperty[propertyIndex].firstPlaceholder = 0;
-    }
 
-    internal bool ExistsConfigurationOtherThan(string name, SensorConfiguration newSensorConfiguration)
-    {
-        foreach (SensorConfiguration configuration in GetComponents<SensorConfiguration>())
-        {
-            if (configuration != newSensorConfiguration && configuration.ConfigurationName.Equals(name))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    internal SensorConfiguration GetConfiguration(string confName)
-    {
-        if (mainThread== null || mainThread.Equals(System.Threading.Thread.CurrentThread))
+        internal void ManageSensors()
         {
             configurations = GetComponents<SensorConfiguration>();
-        }
-        if (configurations == null || configurations.Length == 0)
-        {
-            if(Application.isPlaying)
-            { 
-                Destroy(this);
+
+            foreach (SensorConfiguration configuration in Sensors.Keys)
+            {
+                Sensors[configuration].Clear();
             }
-            else{
-                DestroyImmediate(this);
+            foreach (MyListString property in propertiesIndex.Keys)
+            {
+                int propertyIndex = propertiesIndex[property];
+                ISensors sensors = monoBehaviourSensorsForProperty[propertyIndex];
+                InformationRefresh(propertyIndex);
+                monoBehaviourSensorsForProperty[propertyIndex] = MapperManager.ManageSensors(instantiationInformationForProperty[propertyIndex], sensors);
+                if (monoBehaviourSensorsForProperty[propertyIndex] != null)
+                {
+                    Sensors[(SensorConfiguration)instantiationInformationForProperty[propertyIndex].configuration].AddRange(monoBehaviourSensorsForProperty[propertyIndex].GetSensorsList());
+                }
+            }
+        }
+        /*void LateUpdate()
+        {
+            if (!ready)
+            {
+                return;
+            }
+            if (SensorsManager.frameFromLastUpdate >= SensorsManager.updateFrequencyInFrames+frameToWait)
+            {
+                MyLateUpdate();
+                foreach (List<MonoBehaviourSensor> sensorsList in Sensors.Values)
+                {
+                    foreach (MonoBehaviourSensor sensor in sensorsList)
+                    {
+                        sensor.MyLateUpdate();
+                    }
+                }
+            }
+        }*/
+        private void InformationRefresh(int propertyIndex)
+        {
+            instantiationInformationForProperty[propertyIndex].currentObjectOfTheHierarchy = gameObject;
+            instantiationInformationForProperty[propertyIndex].residualPropertyHierarchy = new MyListString(instantiationInformationForProperty[propertyIndex].propertyHierarchy.myStrings);
+            instantiationInformationForProperty[propertyIndex].firstPlaceholder = 0;
+        }
+
+        internal bool ExistsConfigurationOtherThan(string name, SensorConfiguration newSensorConfiguration)
+        {
+            foreach (SensorConfiguration configuration in GetComponents<SensorConfiguration>())
+            {
+                if (configuration != newSensorConfiguration && configuration.ConfigurationName.Equals(name))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        internal SensorConfiguration GetConfiguration(string confName)
+        {
+            if (mainThread == null || mainThread.Equals(Thread.CurrentThread))
+            {
+                configurations = GetComponents<SensorConfiguration>();
+            }
+            if (configurations == null || configurations.Length == 0)
+            {
+                if (Application.isPlaying)
+                {
+                    Destroy(this);
+                }
+                else
+                {
+                    DestroyImmediate(this);
+                }
+                return null;
+            }
+            foreach (SensorConfiguration configuration in configurations)
+            {
+                if (configuration.ConfigurationName.Equals(confName))
+                {
+                    return configuration;
+                }
             }
             return null;
         }
-        foreach (SensorConfiguration configuration in configurations)
-        {
-            if (configuration.ConfigurationName.Equals(confName))
-            {
-                return configuration;
-            }
-        }
-        return null;
-    }
 
-    internal IEnumerable<string> GetAllConfigurationNames()
-    {
-        List<string> toReturn = new List<string>();
-        if (mainThread == null || mainThread.Equals(System.Threading.Thread.CurrentThread))
+        internal IEnumerable<string> GetAllConfigurationNames()
         {
-            configurations = GetComponents<SensorConfiguration>();
-        }
-        if (configurations==null || configurations.Length == 0)
-        {
-            if (Application.isPlaying)
+            List<string> toReturn = new List<string>();
+            if (mainThread == null || mainThread.Equals(Thread.CurrentThread))
             {
-                Destroy(this);
+                configurations = GetComponents<SensorConfiguration>();
             }
-            else
+            if (configurations == null || configurations.Length == 0)
             {
-                DestroyImmediate(this);
+                if (Application.isPlaying)
+                {
+                    Destroy(this);
+                }
+                else
+                {
+                    DestroyImmediate(this);
+                }
+                return toReturn;
+            }
+            foreach (SensorConfiguration configuration in configurations)
+            {
+                toReturn.Add(configuration.ConfigurationName);
             }
             return toReturn;
         }
-        foreach (SensorConfiguration configuration in configurations)
-        {
-            toReturn.Add(configuration.ConfigurationName);
-        }
-        return toReturn;
     }
 }
-

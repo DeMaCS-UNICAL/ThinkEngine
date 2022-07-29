@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Planner
+namespace ThinkEngine.Planning
 {
     public abstract class Action : ScriptableObject, IComparable<Action>
     {
@@ -20,5 +20,5 @@ namespace Planner
             return order.CompareTo(other.order);
         }
     }
-    public enum State { READY, WAIT, SKIP, ABORT};
+    public enum State { READY, WAIT, SKIP, ABORT };
 }

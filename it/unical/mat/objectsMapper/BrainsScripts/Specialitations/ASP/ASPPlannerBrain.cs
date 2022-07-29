@@ -7,11 +7,12 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
+using ThinkEnginePlanner;
 using UnityEngine;
 
-namespace Planner
+namespace ThinkEngine.Planning
 {
-    class ASPPlannerBrain:IActualPlannerBrain
+    class ASPPlannerBrain : IActualPlannerBrain
     {
         Plan plan;
         private bool answerSetAvailable;
@@ -159,7 +160,7 @@ namespace Planner
 
         public void NewPlanAvailable(object plan)
         {
-            if(!(plan is AnswerSet))
+            if (!(plan is AnswerSet))
             {
                 return;
             }
