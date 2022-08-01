@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
 using System.Threading;
-using System.Reflection;
 using System.Collections;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Actuator;
 using BrainsScripts.Specialitations.ASP;
-using ThinkEngine.Mappers;
 
 namespace ThinkEngine
 {

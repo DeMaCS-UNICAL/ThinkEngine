@@ -2,7 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using ThinkEngine..Mappers.BaseMappers;
+using ThinkEngine.Mappers.BaseMappers;
 using UnityEngine;
 
 namespace ThinkEngine.Mappers.ASPMappers

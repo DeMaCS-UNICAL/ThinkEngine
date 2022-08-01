@@ -1,21 +1,23 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
-class IndexTracker:MonoBehaviour
+namespace ThinkEngine
 {
-    private int _currentIndex=-1;
-    internal int CurrentIndex
+    [ExecuteInEditMode]
+    class IndexTracker : MonoBehaviour
     {
-        get
+        private int _currentIndex = -1;
+        internal int CurrentIndex
         {
-            if (_currentIndex == -1)
+            get
             {
-                _currentIndex = GlobalIndexer.assignIndex();
+                if (_currentIndex == -1)
+                {
+                    _currentIndex = GlobalIndexer.assignIndex();
+                }
+                return _currentIndex;
             }
-            return _currentIndex;
         }
+
     }
-
 }
-

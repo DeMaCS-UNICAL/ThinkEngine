@@ -6,240 +6,242 @@ using System.Text;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 using UnityEngine;
 using System.Linq;
-using ThinkEngine;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-
-public static class Utility
+namespace ThinkEngine
 {
-    public static  BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
-    private static List<string> _triggerMethodsToShow;
-    internal static ScriptableObject _triggerClass;
-    private static GameObject _hiddenGameObject;
-    private static SensorsManager _sensorsManager;
-    private static ActuatorsManager _actuatorsManager;
-    internal static string slash = Path.DirectorySeparatorChar+"";
-    private static string _triggerClassPath= Path.Combine(".","Assets","Scripts","ThinkEngineTrigger.cs");
-    private static string actualTriggerClassPath = "";
-    internal static bool prefabsLoaded = false;
-    private static MethodInfo[] _triggerMethods;
-    internal static string RunnableExtension = Environment.OSVersion.Platform== PlatformID.Win32NT ? ".exe": "";
 
-    private static MethodInfo[] TriggerMethods
+
+    public static class Utility
     {
-        get
+        public static BindingFlags BindingAttr = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static;
+        private static List<string> _triggerMethodsToShow;
+        internal static ScriptableObject _triggerClass;
+        private static GameObject _hiddenGameObject;
+        private static SensorsManager _sensorsManager;
+        private static ActuatorsManager _actuatorsManager;
+        internal static string slash = Path.DirectorySeparatorChar + "";
+        private static string _triggerClassPath = Path.Combine(".", "Assets", "Scripts", "ThinkEngineTrigger.cs");
+        private static string actualTriggerClassPath = "";
+        internal static bool prefabsLoaded = false;
+        private static MethodInfo[] _triggerMethods;
+        internal static string RunnableExtension = Environment.OSVersion.Platform == PlatformID.Win32NT ? ".exe" : "";
+
+        private static MethodInfo[] TriggerMethods
         {
-            if (_triggerMethods == null)
+            get
             {
-                try
+                if (_triggerMethods == null)
                 {
-                    _triggerMethods = TriggerClass.GetType().GetMethods(BindingAttr);
+                    try
+                    {
+                        _triggerMethods = TriggerClass.GetType().GetMethods(BindingAttr);
+                    }
+                    catch
+                    {
+                        return new MethodInfo[0];
+                    }
                 }
-                catch
-                {
-                    return new MethodInfo[0];
-                }
+                return _triggerMethods;
             }
-            return _triggerMethods;
         }
-    }
-    #region Properties
+        #region Properties
 
-    public static bool UpdatingSensors
-    {
-        get
+        public static bool UpdatingSensors
         {
-            return Executor.Reading(); ;
-        }
-    }
-    internal static List<string> TriggerMethodsToShow
-    {
-        get
-        {
-            CheckTriggerClass();
-            _triggerMethodsToShow = FindMethodsToShow();
-            return _triggerMethodsToShow;
-        }
-    }
-    internal static ScriptableObject TriggerClass
-    {
-        get
-        {
-            CheckTriggerClass();
-            if (_triggerClass == null)
+            get
             {
-                #if UNITY_EDITOR
-                if (!EditorApplication.isCompiling)
+                return Executor.Reading(); ;
+            }
+        }
+        internal static List<string> TriggerMethodsToShow
+        {
+            get
+            {
+                CheckTriggerClass();
+                _triggerMethodsToShow = FindMethodsToShow();
+                return _triggerMethodsToShow;
+            }
+        }
+        internal static ScriptableObject TriggerClass
+        {
+            get
+            {
+                CheckTriggerClass();
+                if (_triggerClass == null)
                 {
-                    _triggerClass = ScriptableObject.CreateInstance("ThinkEngineTrigger");
-                    
-                }
-                #endif
-                #if !UNITY_EDITOR
+#if UNITY_EDITOR
+                    if (!EditorApplication.isCompiling)
+                    {
+                        _triggerClass = ScriptableObject.CreateInstance("ThinkEngineTrigger");
+
+                    }
+#endif
+#if !UNITY_EDITOR
                 _triggerClass = ScriptableObject.CreateInstance("Trigger");
-                #endif
-            }
-            #if UNITY_EDITOR
-            MonoScript sourceScriptAsset = MonoScript.FromScriptableObject(_triggerClass);
-            actualTriggerClassPath = AssetDatabase.GetAssetPath(sourceScriptAsset);
-            #endif
-            return _triggerClass;
-        }
-    }
-    internal static GameObject HiddenGameObject
-    {
-        get
-        {
-            if (_hiddenGameObject == null)
-            {
-                _hiddenGameObject = GameObject.Find("ThinkEngineUtility");
-                if (_hiddenGameObject==null)
-                {
-                    _hiddenGameObject = new GameObject("ThinkEngineUtility");
-                    //_hiddenGameObject.hideFlags = HideFlags.HideInHierarchy & HideFlags.HideInInspector;
+#endif
                 }
+#if UNITY_EDITOR
+                MonoScript sourceScriptAsset = MonoScript.FromScriptableObject(_triggerClass);
+                actualTriggerClassPath = AssetDatabase.GetAssetPath(sourceScriptAsset);
+#endif
+                return _triggerClass;
             }
-            return _hiddenGameObject;
         }
-    }
-    internal static bool ManagersDestroyed
-    {
-        get
+        internal static GameObject HiddenGameObject
         {
-            return SensorsManager.destroyed || ActuatorsManager.destroyed;
-        }
-    }
-    internal static SensorsManager SensorsManager
-    {
-        get
-        {
-            if (_sensorsManager == null)
+            get
             {
-                _sensorsManager = HiddenGameObject.GetComponent<SensorsManager>();
+                if (_hiddenGameObject == null)
+                {
+                    _hiddenGameObject = GameObject.Find("ThinkEngineUtility");
+                    if (_hiddenGameObject == null)
+                    {
+                        _hiddenGameObject = new GameObject("ThinkEngineUtility");
+                        //_hiddenGameObject.hideFlags = HideFlags.HideInHierarchy & HideFlags.HideInInspector;
+                    }
+                }
+                return _hiddenGameObject;
+            }
+        }
+        internal static bool ManagersDestroyed
+        {
+            get
+            {
+                return SensorsManager.destroyed || ActuatorsManager.destroyed;
+            }
+        }
+        internal static SensorsManager SensorsManager
+        {
+            get
+            {
                 if (_sensorsManager == null)
                 {
-                    _sensorsManager = HiddenGameObject.AddComponent<SensorsManager>();
+                    _sensorsManager = HiddenGameObject.GetComponent<SensorsManager>();
+                    if (_sensorsManager == null)
+                    {
+                        _sensorsManager = HiddenGameObject.AddComponent<SensorsManager>();
+                    }
                 }
+                return _sensorsManager;
             }
-            return _sensorsManager;
         }
-    }
-    internal static ActuatorsManager ActuatorsManager
-    {
-        get
+        internal static ActuatorsManager ActuatorsManager
         {
-            if (_actuatorsManager == null)
+            get
             {
-                _actuatorsManager = HiddenGameObject.GetComponent<ActuatorsManager>();
                 if (_actuatorsManager == null)
                 {
-                    _actuatorsManager = HiddenGameObject.AddComponent<ActuatorsManager>();
+                    _actuatorsManager = HiddenGameObject.GetComponent<ActuatorsManager>();
+                    if (_actuatorsManager == null)
+                    {
+                        _actuatorsManager = HiddenGameObject.AddComponent<ActuatorsManager>();
+                    }
+                }
+                return _actuatorsManager;
+            }
+        }
+        internal static string TriggerClassPath
+        {
+            get
+            {
+                CheckTriggerClass();
+                if (!actualTriggerClassPath.Equals(""))
+                {
+                    return actualTriggerClassPath;
+                }
+                return _triggerClassPath;
+            }
+        }
+        #endregion
+        private static List<string> FindMethodsToShow()
+        {
+            List<string> toReturn = new List<string>();
+            foreach (MethodInfo mI in TriggerMethods)
+            {
+                if (mI.ReturnType == typeof(bool) && mI.GetParameters().Length == 0)
+                {
+                    toReturn.Add(mI.Name);
                 }
             }
-            return _actuatorsManager;
+            return toReturn;
         }
-    }
-    internal static string TriggerClassPath
-    {
-        get
+        internal static int GetTriggerMethodIndex(string name)
         {
-            CheckTriggerClass();
-            if (!actualTriggerClassPath.Equals(""))
+            int index = TriggerMethodsToShow.IndexOf(name);
+            if (index != -1)
             {
-                return actualTriggerClassPath;
+                return index;
             }
-            return _triggerClassPath;
+            return TriggerMethodsToShow.Count;
         }
-    }
-#endregion
-    private static List<string> FindMethodsToShow()
-    {
-        List<string> toReturn = new List<string>();
-        foreach (MethodInfo mI in TriggerMethods)
+        internal static MethodInfo GetTriggerMethod(int chosenMethod)
         {
-            if (mI.ReturnType == typeof(bool) && mI.GetParameters().Length == 0)
+            if (chosenMethod > TriggerMethods.Length || chosenMethod < 0)
             {
-                toReturn.Add(mI.Name);
+                return null;
             }
+            return TriggerMethods[chosenMethod];
         }
-        return toReturn;
-    }
-    internal static int GetTriggerMethodIndex(string name)
-    {
-        int index = TriggerMethodsToShow.IndexOf(name);
-        if (index != -1)
+        internal static MethodInfo GetTriggerMethod(string chosenMethod)
         {
-            return index;
+            if (!TriggerMethodsToShow.Contains(chosenMethod))
+            {
+                return null;
+            }
+            return TriggerMethods[TriggerMethodsToShow.IndexOf(chosenMethod)];
         }
-        return TriggerMethodsToShow.Count;
-    }
-    internal static MethodInfo GetTriggerMethod(int chosenMethod)
-    {
-        if (chosenMethod > TriggerMethods.Length || chosenMethod < 0)
+        internal static void CheckTriggerClass()
         {
-            return null;
-        }
-        return TriggerMethods[chosenMethod];
-    }
-    internal static MethodInfo GetTriggerMethod(string chosenMethod)
-    {
-        if (!TriggerMethodsToShow.Contains(chosenMethod))
-        {
-            return null;
-        }
-        return TriggerMethods[TriggerMethodsToShow.IndexOf(chosenMethod)];
-    }
-    internal static void CheckTriggerClass()
-    {
 #if UNITY_EDITOR
-        if(!actualTriggerClassPath.Equals("") && File.Exists(actualTriggerClassPath) && actualTriggerClassPath.EndsWith("ThinkEngineTrigger.cs"))
-        {
-            return;
-        }
-        if (Directory.Exists(Path.Combine("Assets","Scripts")) && File.Exists(_triggerClassPath))
-        {
-            return;
-        }
-        var o = (from assembly in System.AppDomain.CurrentDomain.GetAssemblies()
-                 from type in assembly.GetTypes()
-                 where type.Name == "ThinkEngineTrigger"
-                 select type).FirstOrDefault();
-        if (o != null)
-        {
-            return;
-        }
-        Directory.CreateDirectory(Path.Combine("Assets", "Scripts"));
-        CreateTriggerScript();
+            if (!actualTriggerClassPath.Equals("") && File.Exists(actualTriggerClassPath) && actualTriggerClassPath.EndsWith("ThinkEngineTrigger.cs"))
+            {
+                return;
+            }
+            if (Directory.Exists(Path.Combine("Assets", "Scripts")) && File.Exists(_triggerClassPath))
+            {
+                return;
+            }
+            var o = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                     from type in assembly.GetTypes()
+                     where type.Name == "ThinkEngineTrigger"
+                     select type).FirstOrDefault();
+            if (o != null)
+            {
+                return;
+            }
+            Directory.CreateDirectory(Path.Combine("Assets", "Scripts"));
+            CreateTriggerScript();
 #endif
-    }
-    private static void CreateTriggerScript()
-    {
-#if UNITY_EDITOR
-        using (FileStream fs = File.Create(_triggerClassPath))
-        {
-            string triggerClassContent = "using System;\n";
-            triggerClassContent += "using UnityEngine;\n\n";
-            triggerClassContent += @"// every method of this class without parameters and that returns a bool value can be used to trigger the reasoner.";
-            triggerClassContent += "\n public class ThinkEngineTrigger:ScriptableObject{\n\n";
-            triggerClassContent += "}";
-            Byte[] info = new UTF8Encoding(true).GetBytes(triggerClassContent);
-            fs.Write(info, 0, info.Length);
-            fs.Close();
         }
+        private static void CreateTriggerScript()
+        {
+#if UNITY_EDITOR
+            using (FileStream fs = File.Create(_triggerClassPath))
+            {
+                string triggerClassContent = "using System;\n";
+                triggerClassContent += "using UnityEngine;\n\n";
+                triggerClassContent += @"// every method of this class without parameters and that returns a bool value can be used to trigger the reasoner.";
+                triggerClassContent += "\n public class ThinkEngineTrigger:ScriptableObject{\n\n";
+                triggerClassContent += "}";
+                byte[] info = new UTF8Encoding(true).GetBytes(triggerClassContent);
+                fs.Write(info, 0, info.Length);
+                fs.Close();
+            }
 
-        UnityEditor.AssetDatabase.Refresh();
+            AssetDatabase.Refresh();
 #endif
-    }
-    internal static void LoadPrefabs()
-    {
-        if (!prefabsLoaded)
+        }
+        internal static void LoadPrefabs()
         {
-            Resources.LoadAll("");
-            prefabsLoaded = true;
+            if (!prefabsLoaded)
+            {
+                Resources.LoadAll("");
+                prefabsLoaded = true;
+            }
         }
     }
 }
-
