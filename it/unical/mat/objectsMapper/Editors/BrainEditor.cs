@@ -338,7 +338,7 @@ namespace ThinkEngine.Editors
 
         private bool CheckSolver()
         {
-            string[] libContent = Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "ThinkEngine", "lib"));
+            string[] libContent = Directory.GetFiles(Path.Combine(Utility.StreamingAssetsContent, "lib"));
             if (libContent.Length == 0)
             {
                 return false;
@@ -346,7 +346,7 @@ namespace ThinkEngine.Editors
             foreach(string filename in libContent)
             {
                 string actualFileName = filename.Substring(filename.LastIndexOf(Utility.slash) + 1);
-                if (actualFileName.StartsWith("dlv"))
+                if (actualFileName.StartsWith("dlv") && actualFileName.EndsWith(Utility.RunnableExtension))
                 {
                     return true;
                 }

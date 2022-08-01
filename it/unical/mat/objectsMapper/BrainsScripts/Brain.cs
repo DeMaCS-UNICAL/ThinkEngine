@@ -53,7 +53,7 @@ namespace ThinkEngine
             }
         }
         [SerializeField, HideInInspector]
-        internal string AIFilesPath = Path.Combine(".", "Assets", "StreamingAssets", "ThinkEngine");
+        internal string AIFilesPath = Utility.StreamingAssetsContent;
         [SerializeField, HideInInspector]
         internal string AIFilesPrefix;
         [SerializeField, HideInInspector]
@@ -64,15 +64,15 @@ namespace ThinkEngine
         {
             get
             {
-                if (_AIFileTemplatePath == null || !_AIFileTemplatePath.Equals(Path.Combine(".", "Assets", "Resources", GetType().Name + "Template" + AIFilesPrefix + ".asp")))
+                if (_AIFileTemplatePath == null || !_AIFileTemplatePath.Equals(Path.Combine(Utility.TemplatesFolder, GetType().Name + "Template" + AIFilesPrefix + ".asp")))
                 {
-                    _AIFileTemplatePath = Path.Combine(".", "Assets", "Resources", GetType().Name + "Template" + AIFilesPrefix + ".asp");
+                    _AIFileTemplatePath = Path.Combine(Utility.TemplatesFolder, GetType().Name + "Template" + AIFilesPrefix + ".asp");
 
                     if (!File.Exists(_AIFileTemplatePath))
                     {
-                        if (!Directory.Exists(Path.Combine(".", "Assets", "Resources")))
+                        if (!Directory.Exists(Utility.TemplatesFolder))
                         {
-                            Directory.CreateDirectory(Path.Combine(".", "Assets", "Resources"));
+                            Directory.CreateDirectory(Utility.TemplatesFolder);
                         }
                         File.Create(_AIFileTemplatePath);
                     }
@@ -134,7 +134,7 @@ namespace ThinkEngine
                 return;
             }
             _fileExtension = "";
-            foreach (string fileName in Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "ThinkEngine")))
+            foreach (string fileName in Directory.GetFiles(Utility.StreamingAssetsContent))
             {
                 string actualFileName = fileName.Substring(fileName.LastIndexOf(Utility.slash) + 1);
                 if (actualFileName.StartsWith(AIFilesPrefix))

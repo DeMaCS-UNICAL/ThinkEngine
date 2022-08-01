@@ -27,10 +27,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         }
         protected override Handler GetHandler()
         {
-            foreach (string fileName in Directory.GetFiles(Path.Combine(Application.streamingAssetsPath, "ThinkEngine","lib")))
+            foreach (string fileName in Directory.GetFiles(Path.Combine(Utility.StreamingAssetsContent,"lib")))
             {
                 string actualFileName = fileName.Substring(fileName.LastIndexOf(Utility.slash) + 1);
-                if (actualFileName.StartsWith("dlv"))
+                if (actualFileName.StartsWith("dlv") && actualFileName.EndsWith(Utility.RunnableExtension))
                 {
                     return new DesktopHandler(new DLV2DesktopService(fileName));
                 }

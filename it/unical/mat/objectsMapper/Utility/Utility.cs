@@ -24,12 +24,14 @@ namespace ThinkEngine
         private static SensorsManager _sensorsManager;
         private static ActuatorsManager _actuatorsManager;
         internal static string slash = Path.DirectorySeparatorChar + "";
-        private static string _triggerClassPath = Path.Combine(".", "Assets", "Scripts", "ThinkEngineTrigger.cs");
+        internal static string ThinkEngineBaseFolder = Path.Combine(".", "Assets", "ThinkEngineer", "ThinkEngine");
+        private static string _triggerClassPath = Path.Combine(ThinkEngineBaseFolder,"Scripts", "ThinkEngineTrigger.cs");
         private static string actualTriggerClassPath = "";
         internal static bool prefabsLoaded = false;
         private static MethodInfo[] _triggerMethods;
         internal static string RunnableExtension = Environment.OSVersion.Platform == PlatformID.Win32NT ? ".exe" : "";
-
+        internal static string StreamingAssetsContent = Path.Combine(Application.streamingAssetsPath, "ThinkEngineer", "ThinkEngine");
+        internal static string TemplatesFolder = Path.Combine(ThinkEngineBaseFolder, "Templates");
         private static MethodInfo[] TriggerMethods
         {
             get
@@ -201,7 +203,7 @@ namespace ThinkEngine
             {
                 return;
             }
-            if (Directory.Exists(Path.Combine("Assets", "Scripts")) && File.Exists(_triggerClassPath))
+            if (Directory.Exists(Path.Combine(ThinkEngineBaseFolder, "Scripts")) && File.Exists(_triggerClassPath))
             {
                 return;
             }
@@ -213,7 +215,7 @@ namespace ThinkEngine
             {
                 return;
             }
-            Directory.CreateDirectory(Path.Combine("Assets", "Scripts"));
+            Directory.CreateDirectory(Path.Combine(ThinkEngineBaseFolder, "Scripts"));
             CreateTriggerScript();
 #endif
         }
@@ -224,9 +226,10 @@ namespace ThinkEngine
             {
                 string triggerClassContent = "using System;\n";
                 triggerClassContent += "using UnityEngine;\n\n";
-                triggerClassContent += @"// every method of this class without parameters and that returns a bool value can be used to trigger the reasoner.";
-                triggerClassContent += "\n public class ThinkEngineTrigger:ScriptableObject{\n\n";
-                triggerClassContent += "}";
+                triggerClassContent += @"// every method of this class without parameters and that returns a bool value can be used to trigger the reasoner.\n";
+                triggerClassContent += "namespace ThinkEngine \n{\n";
+                triggerClassContent += "\t public class ThinkEngineTrigger:ScriptableObject\n{\n\n";
+                triggerClassContent += "\t}\n}";
                 byte[] info = new UTF8Encoding(true).GetBytes(triggerClassContent);
                 fs.Write(info, 0, info.Length);
                 fs.Close();
