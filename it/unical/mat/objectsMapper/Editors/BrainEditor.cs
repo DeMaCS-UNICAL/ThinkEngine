@@ -165,7 +165,7 @@ namespace ThinkEngine.Editors
             }
             if (GUILayout.Button("Show in explorer"))
             {
-                EditorUtility.OpenWithDefaultApp(Path.Combine(".", "Assets", "Resources"));
+                EditorUtility.OpenWithDefaultApp(Utility.TemplatesFolder);
             }
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.HelpBox("Generating a new file will delete the previous template!", MessageType.Warning);
@@ -288,7 +288,7 @@ namespace ThinkEngine.Editors
             }
             if (GUILayout.Button("Open AI Files folder"))
             {
-                EditorUtility.RevealInFinder(brainTarget.AIFilesPath);
+                EditorUtility.OpenWithDefaultApp(Path.Combine(brainTarget.AIFilesPath));
             }
             EditorGUILayout.EndHorizontal();
             if (!brainTarget.prefabBrain)
@@ -322,7 +322,7 @@ namespace ThinkEngine.Editors
             Target.maintainInputFile = EditorGUILayout.Toggle("Maintain input file", Target.maintainInputFile);
             if (GUILayout.Button("Open input folder"))
             {
-                EditorUtility.RevealInFinder(Path.Combine(Path.GetTempPath(),"ThinkEngineFacts"+Utility.slash));
+                EditorUtility.OpenWithDefaultApp(Path.Combine(Path.GetTempPath(),"ThinkEngineFacts"));
             }
             EditorGUILayout.Space();
             EditorGUILayout.EndHorizontal();

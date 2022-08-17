@@ -122,6 +122,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 }
                 if (encoding.FilesPaths.Count == 0)
                 {
+                    Debug.LogError("Couldn't find an encoding in "+brain.AIFilesPath);
                     continue;
                 }
                 lock (brain.toLock)
