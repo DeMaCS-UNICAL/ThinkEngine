@@ -68,6 +68,13 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     SpecificAnswerSetOperations(answer);
                 }
             }
+            else
+            {
+                if (brain.debug)
+                {
+                    Debug.Log(o.OutputString);
+                }
+            }
         }
         protected abstract void SpecificAnswerSetOperations(AnswerSet answer);
     }

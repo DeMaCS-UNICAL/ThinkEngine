@@ -281,10 +281,16 @@ namespace ThinkEngine.Editors
         }
         private void ShowNotEditableInformations()
         {
-            GUI.enabled = false;
-            EditorGUILayout.TextField("Trigger Script Path", Utility.TriggerClassPath);
-            EditorGUILayout.TextField("AI Files Path", brainTarget.AIFilesPath);
-            GUI.enabled = true;
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Trigger Script"))
+            {
+                System.Diagnostics.Process.Start(Path.Combine(".", Utility.TriggerClassPath));
+            }
+            if (GUILayout.Button("Open AI Files folder"))
+            {
+                EditorUtility.RevealInFinder(brainTarget.AIFilesPath);
+            }
+            EditorGUILayout.EndHorizontal();
             if (!brainTarget.prefabBrain)
             {
                 GUI.enabled = false;
@@ -296,9 +302,6 @@ namespace ThinkEngine.Editors
             {
                 ConfigurePrefabAIFile();
             }
-            GUI.enabled = false;
-            EditorGUILayout.TextField("AI Template File Path", brainTarget.AIFileTemplatePath);
-            GUI.enabled = true;
         }
 
         protected virtual string GetAIFilesPrefixSpecifications() 
