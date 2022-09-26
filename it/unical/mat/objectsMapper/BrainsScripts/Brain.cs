@@ -17,7 +17,14 @@ namespace ThinkEngine
     public abstract class Brain : MonoBehaviour
     {
         internal string executorName;
-
+        internal string SolverName
+        {
+            get
+            {
+                return SolversChecker.GetSolverName(solverIndex);
+            }
+        }
+        
         private string _fileExtension;
         internal string FileExtension
         {
@@ -60,6 +67,8 @@ namespace ThinkEngine
         protected string _AIFileTemplatePath;
         [SerializeField, HideInInspector]
         internal bool prefabBrain;
+        [SerializeField, HideInInspector]
+        internal int solverIndex = 0;
         internal string AIFileTemplatePath
         {
             get

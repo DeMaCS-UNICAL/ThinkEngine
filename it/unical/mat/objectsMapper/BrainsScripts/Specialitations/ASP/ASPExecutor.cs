@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ThinkEngine;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -27,15 +28,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         }
         protected override Handler GetHandler()
         {
-            foreach (string fileName in Directory.GetFiles(Path.Combine(Utility.StreamingAssetsContent,"lib")))
-            {
-                string actualFileName = fileName.Substring(fileName.LastIndexOf(Utility.slash) + 1);
-                if (actualFileName.StartsWith("dlv") && actualFileName.EndsWith(Utility.RunnableExtension))
-                {
-                    return new DesktopHandler(new DLV2DesktopService(fileName));
-                }
-            }
-            throw new Exception("Unable to find DVL");
+            return SolversChecker.GetHandler(brain);
         }
         protected override void OutputParsing(Output o)
         {

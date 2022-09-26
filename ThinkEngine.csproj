@@ -315,6 +315,7 @@
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\ISensors.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\IndexTracker.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\MyListString.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Utility\SolversChecker.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\Utility.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Performance.cs" />
     <Compile Include="it\unical\mat\objectsMapper\FieldOrProperty.cs" />

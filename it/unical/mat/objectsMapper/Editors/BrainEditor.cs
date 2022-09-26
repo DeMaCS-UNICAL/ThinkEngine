@@ -14,6 +14,7 @@ namespace ThinkEngine.Editors
         protected List<string> _methodsToShow;
         protected List<string> _sensorsConfigurationNames;
         protected Dictionary<string, bool> _toggledSensorsConfigurations;
+        protected Dictionary<string, bool> _availableSolvers;
         Brain brainTarget;
         protected virtual Brain Target
         {
@@ -75,6 +76,17 @@ namespace ThinkEngine.Editors
                     _toggledSensorsConfigurations = new Dictionary<string, bool>();
                 }
                 return _toggledSensorsConfigurations;
+            }
+        }
+        protected Dictionary<string, bool> AvailableSolvers
+        {
+            get
+            {
+                if (_availableSolvers == null)
+                {
+                    _availableSolvers = new Dictionary<string, bool>();
+                }
+                return _availableSolvers;
             }
         }
         protected virtual void OnEnable()
@@ -313,7 +325,7 @@ namespace ThinkEngine.Editors
         {
             if (!CheckSolver())
             {
-                EditorGUILayout.HelpBox("Please, download the Dlv2 solver suitable for your system. See documentation at \"How to add ThinkEngine to an existing project\".", MessageType.Error, true);
+                EditorGUILayout.HelpBox("Please, download a compatible solver suitable for your system. See documentation at \"How to add ThinkEngine to an existing project\".", MessageType.Error, true);
                 return;
             }
             IfConfigurationChanged();
@@ -325,6 +337,10 @@ namespace ThinkEngine.Editors
                 EditorUtility.OpenWithDefaultApp(Path.Combine(Path.GetTempPath(),"ThinkEngineFacts"));
             }
             EditorGUILayout.Space();
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Chose the solver you want to use.");
+            brainTarget.solverIndex = EditorGUILayout.Popup(brainTarget.solverIndex, SolversChecker.AvailableSolvers().ToArray());
             EditorGUILayout.EndHorizontal();
             ShowSpecificFields();
             ShowNotEditableInformations();
@@ -341,20 +357,10 @@ namespace ThinkEngine.Editors
 
         private bool CheckSolver()
         {
-            string[] libContent = Directory.GetFiles(Path.Combine(Utility.StreamingAssetsContent, "lib"));
-            if (libContent.Length == 0)
-            {
-                return false;
-            }
-            foreach(string filename in libContent)
-            {
-                string actualFileName = filename.Substring(filename.LastIndexOf(Utility.slash) + 1);
-                if (actualFileName.StartsWith("dlv") && actualFileName.EndsWith(Utility.RunnableExtension))
-                {
-                    return true;
-                }
-            }
-            return false;
+            List<string> available = SolversChecker.AvailableSolvers();
+            AvailableSolvers["dlv"] = available.Contains("DLV");
+            AvailableSolvers["clingo"] = available.Contains("Clingo");
+            return AvailableSolvers.ContainsValue(true);
         }
 
         protected virtual void IfConfigurationChanged()
