@@ -111,6 +111,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 
             while (reason)
             {
+                if (!SolversChecker.CheckSolver(this, brain.SolverName))
+                {
+                    return;
+                }
                 encoding = GetProgramInstance();
                 foreach (string fileName in Directory.GetFiles(Utility.StreamingAssetsContent))
                 {
@@ -175,7 +179,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     }
                     Performance.WriteOnFile("facts executor", stopwatch.ElapsedMilliseconds);
                     Handler handler = GetHandler();
-                    InputProgram facts = new ASPInputProgram();
+                    InputProgram facts = GetInputProgram();
                     facts.AddFilesPath(factsPath);
                     handler.AddProgram(encoding);
                     handler.AddProgram(facts);
@@ -222,6 +226,8 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 
         }
 
+        protected abstract InputProgram GetInputProgram();
+        internal abstract bool TestSolver();
         protected abstract void OutputParsing(Output o);
 
         protected abstract Handler GetHandler();

@@ -3,6 +3,7 @@ using it.unical.mat.embasp.languages.asp;
 using it.unical.mat.embasp.platforms.desktop;
 using it.unical.mat.embasp.specializations.dlv2.desktop;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -67,6 +68,38 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 {
                     Debug.Log(o.OutputString);
                 }
+            }
+        }
+        protected override InputProgram GetInputProgram()
+        {
+            return new ASPInputProgram();
+        }
+        internal override bool TestSolver()
+        {
+            try
+            {
+                ASPInputProgram program = new ASPInputProgram();
+                program.AddProgram("a :- b.");
+                program.AddProgram("b.");
+                Handler handler = SolversChecker.GetHandler(brain);
+                handler.AddProgram(program);
+                Output output = handler.StartSync();
+                Debug.Log("error: "+output.ErrorsString);
+                Debug.Log("out: "+output.OutputString);
+                List<string> aS = new List<string>();
+                aS.AddRange(((AnswerSets)output).Answersets[0].GetAnswerSet());
+                if (aS.Remove("b") && aS.Remove("a") && aS.Count == 0)
+                {
+                    return true;
+                }
+                Debug.LogError("Sorry,the " + brain.SolverName + " solver is not working properly. Check that you downloaded the right file.");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(ex.ToString());
+                Debug.LogError("Sorry,the " + brain.SolverName + " solver is not working properly. Check that you downloaded the right file.");
+                return false;
             }
         }
         protected abstract void SpecificAnswerSetOperations(AnswerSet answer);

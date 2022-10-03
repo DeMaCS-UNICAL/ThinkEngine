@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 using UnityEngine;
 
 namespace ThinkEngine
@@ -63,7 +64,7 @@ namespace ThinkEngine
             availableSolvers.Sort();
             return availableSolvers;
         }
-        internal static bool CheckSolver(string solverName)
+        internal static bool CheckSolver(Executor executor, string solverName)
         {
             string[] libContent = Directory.GetFiles(Path.Combine(Utility.StreamingAssetsContent, "lib"));
             if (libContent.Length == 0)
@@ -73,13 +74,12 @@ namespace ThinkEngine
             foreach (string filename in libContent)
             {
                 string actualFileName = filename.Substring(filename.LastIndexOf(Utility.slash) + 1);
-                if ((actualFileName.StartsWith("dlv") || actualFileName.StartsWith("clingo")) && actualFileName.EndsWith(Utility.RunnableExtension))
+                if (actualFileName.StartsWith(solverName) && actualFileName.EndsWith(Utility.RunnableExtension))
                 {
-                    return true;
+                    return executor.TestSolver();
                 }
             }
             return false;
-            throw new NotImplementedException();
         }
     }
 }
