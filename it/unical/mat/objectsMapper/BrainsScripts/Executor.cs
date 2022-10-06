@@ -178,7 +178,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                         fs.Close();
                     }
                     Performance.WriteOnFile("facts executor", stopwatch.ElapsedMilliseconds);
-                    Handler handler = GetHandler();
+                    Handler handler = GetHandler(out string file);
                     InputProgram facts = GetInputProgram();
                     facts.AddFilesPath(factsPath);
                     handler.AddProgram(encoding);
@@ -230,7 +230,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         internal abstract bool TestSolver();
         protected abstract void OutputParsing(Output o);
 
-        protected abstract Handler GetHandler();
+        protected abstract Handler GetHandler(out string file);
 
         protected abstract string GetCurrentFileExtension();
         protected abstract InputProgram GetProgramInstance();

@@ -16,7 +16,7 @@ namespace ThinkEngine
     internal static class SolversChecker
     {
 
-        internal static Handler GetHandler(Brain brain)
+        internal static Handler GetHandler(Brain brain, out string filePath)
         {
             foreach (string fileName in Directory.GetFiles(Path.Combine(Utility.StreamingAssetsContent, "lib")))
             {
@@ -25,10 +25,12 @@ namespace ThinkEngine
                 {
                     if (brain.SolverName.Equals("dlv"))
                     {
+                        filePath = fileName;
                         return new DesktopHandler(new DLV2DesktopService(fileName));
                     }
                     else if (brain.SolverName.Equals("clingo"))
                     {
+                        filePath = fileName;
                         return new DesktopHandler(new ClingoDesktopService(fileName));
                     }
                 }

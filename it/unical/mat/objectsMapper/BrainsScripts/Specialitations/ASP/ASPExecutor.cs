@@ -27,9 +27,9 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         {
             return ".asp";
         }
-        protected override Handler GetHandler()
+        protected override Handler GetHandler(out string file)
         {
-            return SolversChecker.GetHandler(brain);
+            return SolversChecker.GetHandler(brain, out file);
         }
         protected override void OutputParsing(Output o)
         {
@@ -76,12 +76,13 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         }
         internal override bool TestSolver()
         {
+            string file="";
             try
             {
                 ASPInputProgram program = new ASPInputProgram();
                 program.AddProgram("a :- b.");
                 program.AddProgram("b.");
-                Handler handler = SolversChecker.GetHandler(brain);
+                Handler handler = GetHandler(out file);
                 handler.AddProgram(program);
                 Output output = handler.StartSync();
                 Debug.Log("error: "+output.ErrorsString);
@@ -92,13 +93,13 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 {
                     return true;
                 }
-                Debug.LogError("Sorry,the " + brain.SolverName + " solver is not working properly. Check that you downloaded the right file.");
+                Debug.LogError("Sorry,the " + brain.SolverName + " solver is not working properly. Check that you downloaded the right file\n"+file);
                 return false;
             }
             catch (Exception ex)
             {
                 Debug.LogError(ex.ToString());
-                Debug.LogError("Sorry,the " + brain.SolverName + " solver is not working properly. Check that you downloaded the right file.");
+                Debug.LogError("Sorry,the " + brain.SolverName + " solver is not working properly. Check that you downloaded the right file\n" + file);
                 return false;
             }
         }
