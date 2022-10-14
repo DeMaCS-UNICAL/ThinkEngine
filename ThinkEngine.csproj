@@ -206,6 +206,8 @@
     <Compile Include="it\unical\mat\embaspTool\embasp\specializations\dlv\DLVFilterOption.cs" />
     <Compile Include="it\unical\mat\embaspTool\embasp\specializations\idlv\desktop\IDLVDesktopService.cs" />
     <Compile Include="it\unical\mat\embaspTool\embasp\specializations\idlv\IDLVMinimalModels.cs" />
+    <Compile Include="it\unical\mat\embaspTool\embasp\specializations\incremental_dlv2\IncrementalDLV2DesktopHandler.cs" />
+    <Compile Include="it\unical\mat\embaspTool\embasp\specializations\incremental_dlv2\IncrementalDLV2DesktopService.cs" />
     <Compile Include="it\unical\mat\embaspTool\embasp\specializations\solver_planning_domains\desktop\SPDDesktopService.cs" />
     <Compile Include="it\unical\mat\embaspTool\embasp\specializations\solver_planning_domains\SPDPlan.cs" />
     <Compile Include="it\unical\mat\embaspTool\embasp\specializations\solver_planning_domains\SPDUtility.cs" />

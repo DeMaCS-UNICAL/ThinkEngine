@@ -34,9 +34,11 @@ namespace ThinkEngine.Planning
 
         }
 
-        protected override void SpecificOptions(Handler handler)
+        protected override List<OptionDescriptor> SpecificOptions()
         {
-            handler.AddOption(new OptionDescriptor("--filter=applyAction/2,actionArgument/3 "));
+            List<OptionDescriptor> options = new List<OptionDescriptor>();
+            options.Add(new OptionDescriptor("--filter=applyAction/2,actionArgument/3 "));
+            return options;
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 using ThinkEngine.Mappers;
+using ThinkEngine.Planning;
 using UnityEngine;
 
 namespace ThinkEngine
@@ -16,12 +17,13 @@ namespace ThinkEngine
     [ExecuteAlways, RequireComponent(typeof(IndexTracker))]
     public abstract class Brain : MonoBehaviour
     {
+        internal enum SOLVER { Clingo, DLV2, Incremental_DLV2 }
         internal string executorName;
         internal string SolverName
         {
             get
             {
-                return SolversChecker.GetSolverName(solverIndex);
+                return SolversChecker.GetSolverName(solverEnum);
             }
         }
         
@@ -44,6 +46,7 @@ namespace ThinkEngine
         protected abstract HashSet<string> SupportedFileExtensions { get; }
         public bool enableBrain = true;
         public bool debug = true;
+        internal bool incremental = false;
         [SerializeField, HideInInspector]
         internal bool maintainInputFile;
         [SerializeField, HideInInspector]
@@ -68,7 +71,7 @@ namespace ThinkEngine
         [SerializeField, HideInInspector]
         internal bool prefabBrain;
         [SerializeField, HideInInspector]
-        internal int solverIndex = 0;
+        internal SOLVER solverEnum;
         internal string AIFileTemplatePath
         {
             get
@@ -262,13 +265,16 @@ namespace ThinkEngine
         }
         void OnApplicationQuit()
         {
+            Debug.Log("Application quit: "+((PlannerBrain)this).Priority);
             if (executor != null)
             {
                 executor.reason = false;
+                Executor.die = true;
                 lock (toLock)
                 {
                     Monitor.Pulse(toLock);
                 }
+                Thread.Sleep(500);
             }
         }
     }

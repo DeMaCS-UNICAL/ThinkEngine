@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ThinkEngine.Planning;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -50,6 +51,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         InputProgram encoding;
         private static object toLock = new object();
         internal static bool _canRead=false;
+        internal static bool die = false;
         
         private static int _readingSensors=0;
         internal bool solverDone;
@@ -57,7 +59,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         {
             lock (toLock)
             {
-                if (!_canRead)
+                while (!_canRead && !die)
                 {
                     Monitor.Wait(toLock);
                 }
@@ -76,6 +78,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
             lock (toLock)
             {
                 _canRead = false;
+                die = true;
                 Monitor.PulseAll(toLock);
             }
         }
@@ -109,34 +112,43 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
             }
             reason = true;
 
+            encoding = GetProgramInstance();
+            foreach (string fileName in Directory.GetFiles(Utility.StreamingAssetsContent))
+            {
+                string actualFileName = fileName.Substring(fileName.LastIndexOf(Utility.slash) + 1);
+                if (actualFileName.StartsWith(brain.AIFilesPrefix) && (actualFileName.EndsWith(GetCurrentFileExtension()) || actualFileName.EndsWith(".py")))
+                {
+                    encoding.AddFilesPath(fileName);
+                }
+            }
+
+            if (encoding.FilesPaths.Count == 0)
+            {
+                Debug.LogError("Couldn't find an encoding in " + brain.AIFilesPath);
+                reason=false;
+            }
+            Handler handler = GetHandler(out string file);
+            if (!SolversChecker.CheckSolver(this, brain.SolverName))
+            {
+                handler.Quit();
+                return;
+            }
+            handler.AddProgram(encoding, true);
             while (reason)
             {
-                if (!SolversChecker.CheckSolver(this, brain.SolverName))
-                {
-                    return;
-                }
-                encoding = GetProgramInstance();
-                foreach (string fileName in Directory.GetFiles(Utility.StreamingAssetsContent))
-                {
-                    string actualFileName = fileName.Substring(fileName.LastIndexOf(Utility.slash) + 1);
-                    if (actualFileName.StartsWith(brain.AIFilesPrefix) && (actualFileName.EndsWith(GetCurrentFileExtension()) || actualFileName.EndsWith(".py")))
-                    {
-                        encoding.AddFilesPath(fileName);
-                    }
-                }
-                if (encoding.FilesPaths.Count == 0)
-                {
-                    Debug.LogError("Couldn't find an encoding in "+brain.AIFilesPath);
-                    continue;
-                }
+                
                 lock (brain.toLock)
                 {
                     if (brain.reasonerMethod != null)
                     {
                         brain.solverWaiting = true;
-                        Monitor.Wait(brain.toLock);
-                        if (!reason)
+                        while (brain.solverWaiting && !die)
                         {
+                            Monitor.Wait(brain.toLock);
+                        }
+                        if (!reason || die)
+                        {
+                            KillProcess(handler);
                             return;
                         }
 
@@ -149,24 +161,34 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                         if (brain.missingData)
                         {
                             brain.solverWaiting = true;
-                            Monitor.Wait(brain.toLock);
+                            while(brain.solverWaiting && !die) 
+                            { 
+                                Monitor.Wait(brain.toLock);
+                            }
                         }
+                    }
+                    if(!reason || die)
+                    {
+                        KillProcess(handler);
+                        return;
                     }
                     if (!SpecificFactsRetrieving(brain))
                     {
-
+                        KillProcess(handler);
                         return;
                     }
                     IncrementReadingSensors();
-                    if (!_canRead)
+                    if (!_canRead || !reason || die)
                     {
+                        KillProcess(handler);
                         return;
                     }
                     stopwatch.Restart();
                     SensorsManager.ReturnSensorsMappings(brain);
                     DecreaseReadingSensors();
-                    if (!reason)
+                    if (!reason || die)
                     {
+                        KillProcess(handler);
                         return;
                     }
                     factsPath = Path.Combine(Path.GetTempPath(),"ThinkEngineFacts",Path.GetRandomFileName()+".txt");
@@ -178,32 +200,37 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                         fs.Close();
                     }
                     Performance.WriteOnFile("facts executor", stopwatch.ElapsedMilliseconds);
-                    Handler handler = GetHandler(out string file);
+
                     InputProgram facts = GetInputProgram();
                     facts.AddFilesPath(factsPath);
-                    handler.AddProgram(encoding);
+                    if (!brain.incremental)
+                    {
+                        handler = GetHandler(out string s);
+                        handler.AddProgram(encoding);
+                    }
                     handler.AddProgram(facts);
                     if (!brain.debug)
                     {
-                        SpecificOptions(handler);
+                        foreach(OptionDescriptor option in SpecificOptions())
+                        {
+                            handler.AddOption(option);
+                        }
                     }
                     stopwatch.Restart();
 
                     //Debug.Log("running dlv");
                     stopwatch.Restart();
-                    if (!reason)
+                    if (!reason || die)
                     {
+                        KillProcess(handler);
                         return;
                     }
                     handler.StartAsync(new MyCallBack(this));
                     while (!solverDone)
                     {
-                        if (!reason)
+                        if (!reason || die)
                         {
-                            if(handler is DesktopHandler dh)
-                            {
-                                dh.StopProcess();
-                            }
+                            KillProcess(handler);
                             return;
                         }
                     }
@@ -218,24 +245,31 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     }
                     else
                     {
-                        reason = false;
+                        KillProcess(handler);
+                        return;
                     }
                 }
 
             }
+            KillProcess(handler);
+        }
 
+        private static void KillProcess(Handler handler)
+        {
+            handler.Quit();
+            handler.StopProcess();
         }
 
         protected abstract InputProgram GetInputProgram();
         internal abstract bool TestSolver();
         protected abstract void OutputParsing(Output o);
 
-        protected abstract Handler GetHandler(out string file);
+        protected abstract Handler GetHandler(out string file, bool test=false);
 
         protected abstract string GetCurrentFileExtension();
         protected abstract InputProgram GetProgramInstance();
         protected abstract void SpecificFactsWriting(Brain brain, StreamWriter fs);
         protected abstract bool SpecificFactsRetrieving(Brain brain);
-        protected abstract void SpecificOptions(Handler handler);
+        protected abstract List<OptionDescriptor> SpecificOptions();
     }
 }

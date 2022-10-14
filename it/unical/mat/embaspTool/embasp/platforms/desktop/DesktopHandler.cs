@@ -22,7 +22,7 @@ namespace it.unical.mat.embasp.platforms.desktop
             IList<OptionDescriptor> input_options = CollectOptions(option_index);
             service.StartAsync(c, input_programs, input_options);
         }
-        public void StopProcess()
+        public override void StopProcess()
         {
             try
             {

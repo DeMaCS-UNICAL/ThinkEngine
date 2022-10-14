@@ -8,6 +8,7 @@ using it.unical.mat.embasp.platforms.desktop;
 using it.unical.mat.embasp.@base;
 using it.unical.mat.embasp.languages.asp;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 {
@@ -34,10 +35,11 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         {
             fs.Write(((ReactiveBrain)brain).objectsIndexes);
         }
-
-        protected override void SpecificOptions(Handler handler)
+        protected override List<OptionDescriptor> SpecificOptions()
         {
-            handler.AddOption(new OptionDescriptor("--filter=setOnActuator/1 "));
+            List<OptionDescriptor> options = new List<OptionDescriptor>();
+            options.Add(new OptionDescriptor("--filter=setOnActuator/1 "));
+            return options;
         }
        
 

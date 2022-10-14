@@ -86,6 +86,8 @@ namespace it.unical.mat.embasp.languages.asp
 
         public void StoreCost(int level, int weight)
         {
+            //TODO: why not .Add??
+            //answersets[answersets.Count - 1].LevelWeight[level]= weight;
             answersets[answersets.Count - 1].LevelWeight.Add(level, weight);
         }
     }

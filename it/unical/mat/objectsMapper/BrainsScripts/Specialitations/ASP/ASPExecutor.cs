@@ -27,9 +27,14 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         {
             return ".asp";
         }
-        protected override Handler GetHandler(out string file)
+        protected override Handler GetHandler(out string file, bool test=false)
         {
-            return SolversChecker.GetHandler(brain, out file);
+            List<OptionDescriptor> options = new List<OptionDescriptor>();
+            if (!brain.debug && !test)
+            {
+                options.AddRange(SpecificOptions());
+            }
+            return SolversChecker.GetHandler(brain, out file, options);
         }
         protected override void OutputParsing(Output o)
         {
@@ -79,22 +84,11 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
             string file="";
             try
             {
-                ASPInputProgram program = new ASPInputProgram();
-                program.AddProgram("a :- b.");
-                program.AddProgram("b.");
-                Handler handler = GetHandler(out file);
-                handler.AddProgram(program);
-                Output output = handler.StartSync();
-                Debug.Log("error: "+output.ErrorsString);
-                Debug.Log("out: "+output.OutputString);
-                List<string> aS = new List<string>();
-                aS.AddRange(((AnswerSets)output).Answersets[0].GetAnswerSet());
-                if (aS.Remove("b") && aS.Remove("a") && aS.Count == 0)
+                if (!brain.incremental)
                 {
-                    return true;
+                    return StandardSolver(out file);
                 }
-                Debug.LogError("Sorry,the " + brain.SolverName + " solver is not working properly. Check that you downloaded the right file\n"+file);
-                return false;
+                return IncrementalSolver(out file);
             }
             catch (Exception ex)
             {
@@ -103,6 +97,76 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 return false;
             }
         }
+
+        private bool IncrementalSolver(out string file)
+        {
+            Handler handler = GetHandler(out file, true);
+            string encodingPath = Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", Path.GetRandomFileName() + ".txt");
+            try
+            {
+                using (StreamWriter fs = new StreamWriter(encodingPath, true))
+                {
+                    fs.Write("a.");
+                    fs.Write("b:-a.");
+                    fs.Close();
+                }
+                ASPInputProgram program = new ASPInputProgram();
+                program.AddFilesPath(encodingPath);
+                handler.AddProgram(program, true);
+                int cont = 0;
+                while (cont < 2)
+                {
+                    cont++;
+                    Output output = handler.StartSync();
+                    List<string> aS = new List<string>();
+                    if(!(output is AnswerSets))
+                    {
+                        return false;
+                    }
+                    if (((AnswerSets)output).Answersets.Count == 0)
+                    {
+                        return false;
+                    }
+                    aS.AddRange(((AnswerSets)output).Answersets[0].GetAnswerSet());
+                    if (!aS.Remove("b") || !aS.Remove("a") || aS.Count != 0)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                return false;
+            }
+            finally
+            {
+                File.Delete(encodingPath);
+                handler.Quit();
+            }
+        }
+
+        private bool StandardSolver(out string file)
+        {
+            ASPInputProgram program = new ASPInputProgram();
+            program.AddProgram("a :- b.");
+            program.AddProgram("b.");
+            Handler handler = GetHandler(out file);
+            handler.AddProgram(program);
+            Output output = handler.StartSync();
+            Debug.Log("error: " + output.ErrorsString);
+            Debug.Log("out: " + output.OutputString);
+            List<string> aS = new List<string>();
+            aS.AddRange(((AnswerSets)output).Answersets[0].GetAnswerSet());
+            if (aS.Remove("b") && aS.Remove("a") && aS.Count == 0)
+            {
+                return true;
+            }
+            Debug.LogError("Sorry,the " + brain.SolverName + " solver is not working properly. Check that you downloaded the right file\n" + file);
+            return false;
+        }
+
         protected abstract void SpecificAnswerSetOperations(AnswerSet answer);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace it.unical.mat.embasp.@base
 {
@@ -22,7 +23,7 @@ namespace it.unical.mat.embasp.@base
             return current_value;
         }
 
-        public virtual int AddProgram(InputProgram program)
+        public virtual int AddProgram(InputProgram program, bool v=false)
         {
             int last_index = programs.Count;
             int current_value = last_index;
@@ -101,5 +102,7 @@ namespace it.unical.mat.embasp.@base
         public virtual Output StartSync() => StartSync((IList<int>)null, (IList<int>)null);
 
         public virtual Output StartSync(IList<int> program_index, IList<int> option_index) => null;
+        public virtual void Quit() { }
+        public virtual void StopProcess() { }
     }
 }

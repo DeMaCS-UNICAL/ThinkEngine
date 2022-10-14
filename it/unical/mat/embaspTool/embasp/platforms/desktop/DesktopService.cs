@@ -28,10 +28,16 @@ namespace it.unical.mat.embasp.platforms.desktop
 
         public void StartAsync(ICallback callback, IList<InputProgram> programs, IList<OptionDescriptor> options)
         {
-            new Thread(() =>
+            try
             {
-                callback.Callback(StartSync(programs, options));
-            }).Start();
+                new Thread(() =>
+                {
+                    callback.Callback(StartSync(programs, options));
+                }).Start();
+            }catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError(ex);
+            }
         }
 
         public virtual Output StartSync(IList<InputProgram> programs, IList<OptionDescriptor> options)
@@ -138,6 +144,18 @@ namespace it.unical.mat.embasp.platforms.desktop
 
         }
 
-      
+        protected internal virtual FileStream WriteToFile(string pFilename, string sb)
+        {
+            string filename = System.IO.Path.GetTempPath() + pFilename + Guid.NewGuid().ToString() + ".tmp";
+            FileStream tempFile = File.Create(filename);
+            tempFile.Close();
+            System.IO.StreamWriter bw = new System.IO.StreamWriter(filename, append: true);
+            bw.Write(sb);
+            bw.Close();
+            return tempFile;
+        }
+
+        public virtual void LoadProgram(InputProgram program, bool v) { }
+        public virtual void StopGrounderProcess() { }
     }
 }

@@ -226,8 +226,8 @@ namespace ThinkEngine
             {
                 string triggerClassContent = "using System;\n";
                 triggerClassContent += "using UnityEngine;\n\n";
-                triggerClassContent += @"// every method of this class without parameters and that returns a bool value can be used to trigger the reasoner.\n";
-                triggerClassContent += "namespace ThinkEngine \n{\n";
+                triggerClassContent += @"// every method of this class without parameters and that returns a bool value can be used to trigger the reasoner.";
+                triggerClassContent += "\n namespace ThinkEngine \n{\n";
                 triggerClassContent += "\t public class ThinkEngineTrigger:ScriptableObject\n{\n\n";
                 triggerClassContent += "\t}\n}";
                 byte[] info = new UTF8Encoding(true).GetBytes(triggerClassContent);

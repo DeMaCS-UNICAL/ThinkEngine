@@ -1,9 +1,11 @@
 ﻿#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using static ThinkEngine.Brain;
 
 namespace ThinkEngine.Editors
 {
@@ -339,8 +341,8 @@ namespace ThinkEngine.Editors
             EditorGUILayout.Space();
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Chose the solver you want to use.");
-            brainTarget.solverIndex = EditorGUILayout.Popup(brainTarget.solverIndex, SolversChecker.AvailableSolvers().ToArray());
+            GUIContent label = new GUIContent("Choose the solver");
+            brainTarget.solverEnum = (SOLVER)EditorGUILayout.EnumPopup(label, brainTarget.solverEnum, CheckIfAvailable,true);
             EditorGUILayout.EndHorizontal();
             ShowSpecificFields();
             ShowNotEditableInformations();
@@ -355,11 +357,17 @@ namespace ThinkEngine.Editors
             }
         }
 
+        bool CheckIfAvailable(Enum solver)
+        {
+            return SolversChecker.AvailableSolvers().Contains((SOLVER)solver);
+        }
+
         private bool CheckSolver()
         {
-            List<string> available = SolversChecker.AvailableSolvers();
-            AvailableSolvers["dlv"] = available.Contains("DLV");
-            AvailableSolvers["clingo"] = available.Contains("Clingo");
+            List<SOLVER> available = SolversChecker.AvailableSolvers();
+            AvailableSolvers["dlv"] = available.Contains(SOLVER.DLV2);
+            AvailableSolvers["clingo"] = available.Contains(SOLVER.Clingo);
+            AvailableSolvers["clingo"] = available.Contains(SOLVER.Incremental_DLV2);
             return AvailableSolvers.ContainsValue(true);
         }
 
