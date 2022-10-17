@@ -35,7 +35,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     UnityEngine.Debug.LogError(o.ErrorsString + " " + o.OutputString);
                 }
                 Performance.WriteOnFile("solver "+executor.brain.executorName, executor.stopwatch.ElapsedMilliseconds);
-                executor.stopwatch.Stop();
+                executor.stopwatch.Restart();
                 executor.OutputParsing(o);
                 if (!executor.brain.maintainInputFile)
                 {
@@ -44,6 +44,8 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 executor.solverDone = true;
             }
         }
+        int lastSensorIteration = -1;
+
         protected Brain brain;
         protected string factsPath;
         protected readonly Stopwatch stopwatch = new Stopwatch();
@@ -177,6 +179,11 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                         KillProcess(handler);
                         return;
                     }
+                    if (lastSensorIteration >= SensorsManager.iteration)
+                    {
+                        continue;
+                    }
+                    lastSensorIteration=SensorsManager.iteration;
                     IncrementReadingSensors();
                     if (!_canRead || !reason || die)
                     {
@@ -185,6 +192,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     }
                     stopwatch.Restart();
                     SensorsManager.ReturnSensorsMappings(brain);
+
                     DecreaseReadingSensors();
                     if (!reason || die)
                     {
@@ -199,8 +207,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                         fs.Write(brain.sensorsMapping);
                         fs.Close();
                     }
-                    Performance.WriteOnFile("facts executor", stopwatch.ElapsedMilliseconds);
-
+                    if (brain.debug)
+                    {
+                        Debug.Log(factsPath);
+                    }
                     InputProgram facts = GetInputProgram();
                     facts.AddFilesPath(factsPath);
                     if (!brain.incremental)
@@ -216,15 +226,14 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                             handler.AddOption(option);
                         }
                     }
-                    stopwatch.Restart();
 
                     //Debug.Log("running dlv");
-                    stopwatch.Restart();
                     if (!reason || die)
                     {
                         KillProcess(handler);
                         return;
                     }
+                    stopwatch.Restart();
                     handler.StartAsync(new MyCallBack(this));
                     while (!solverDone)
                     {

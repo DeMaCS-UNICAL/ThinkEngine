@@ -55,7 +55,6 @@ namespace it.unical.mat.embasp.specializations.incrementalIDLV.desktop
                 solver_process.StartInfo.RedirectStandardError = true;
                 //process.OutputDataReceived += ProcessOutputDataHandler;
                 solver_process.ErrorDataReceived += new DataReceivedEventHandler(ProcessErrorDataHandler);
-                UnityEngine.Debug.Log("Starting incremental");
                 solver_process.Start();
                 solver_process.BeginErrorReadLine();
                 //process.BeginOutputReadLine();
@@ -72,7 +71,10 @@ namespace it.unical.mat.embasp.specializations.incrementalIDLV.desktop
         private void ProcessErrorDataHandler(object sender, DataReceivedEventArgs e)
         {
             //GetOutput("", e.Data);
-            UnityEngine.Debug.Log(e.Data + "    ERROR!");
+            if (e.Data != null)
+            {
+                UnityEngine.Debug.Log(e.Data + "    ERROR!");
+            }
             error = e.Data;
         }
 
@@ -123,7 +125,6 @@ namespace it.unical.mat.embasp.specializations.incrementalIDLV.desktop
             {
                 if (programs.Count > 0)
                 {
-                UnityEngine.Debug.Log("running");
                     writer.WriteLine("<run/>");
                 }
                 while (error.Equals("") &&!solverOutput.EndsWith("<END>\n") && !solver_process.HasExited)

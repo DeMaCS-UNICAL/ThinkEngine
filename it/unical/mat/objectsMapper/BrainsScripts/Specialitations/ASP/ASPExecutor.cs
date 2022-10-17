@@ -39,7 +39,6 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         protected override void OutputParsing(Output o)
         {
             AnswerSets answers = (AnswerSets)o;
-            stopwatch.Stop();
             if (answers.Answersets.Count > 0)
             {
                 if (answers.GetOptimalAnswerSets().Count > 0)
@@ -48,7 +47,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     AnswerSet answer = answers.GetOptimalAnswerSets()[0];
                     if (brain.debug)
                     {
-                        Debug.Log("Computed AnswerSet:\n" + string.Join(" ; ", answer.GetAnswerSet()));
+                        Debug.Log(brain.executorName+" Computed AnswerSet:\n" + string.Join(" ; ", answer.GetAnswerSet()));
                         foreach(int level in answer.LevelWeight.Keys)
                         {
                             Debug.Log("level " + level + " cost " + answer.LevelWeight[level]);
@@ -62,7 +61,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     AnswerSet answer = answers.answersets[0];
                     if (brain.debug)
                     {
-                        Debug.Log("Computed AnswerSet:\n" + string.Join(" ; ", answer.GetAnswerSet()));
+                        Debug.Log(brain.executorName + "Computed AnswerSet:\n" + string.Join(" ; ", answer.GetAnswerSet()));
                     }
                     SpecificAnswerSetOperations(answer);
                 }
@@ -71,7 +70,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
             {
                 if (brain.debug)
                 {
-                    Debug.Log(o.OutputString);
+                    Debug.Log(brain.executorName+" "+o.OutputString);
                 }
             }
         }

@@ -38,6 +38,7 @@ namespace ThinkEngine
         internal static int frameCount = 0;
         internal static bool destroyed;
         internal static MonoBehaviourSensorsManager[] monoBehaviourManagers;
+        internal static int iteration=0;
         private static Dictionary<Brain, List<string>> InstantiatedSensors
         {
             get
@@ -212,7 +213,10 @@ namespace ThinkEngine
                 updatedSensors = 0;
                 Stopwatch localWatch = new Stopwatch();
                 watch.Start();
-                yield return new WaitUntil(() => Executor.CanRead(false));
+                while (!Executor.CanRead(false))
+                {
+                    yield return null;
+                }
                 monoBehaviourManagers = RetrieveSensorsManagers();
                 for (int i = 0; i < monoBehaviourManagers.Length; i++)
                 {
@@ -258,6 +262,7 @@ namespace ThinkEngine
                 }
                 MS = watch.ElapsedMilliseconds;
                 watch.Reset();
+                iteration++;
                 Executor.CanRead(true);
                 yield return null;
             }

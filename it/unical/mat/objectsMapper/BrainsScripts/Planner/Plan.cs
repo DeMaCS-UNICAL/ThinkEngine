@@ -74,11 +74,6 @@ namespace ThinkEngine.Planning
             return !PlanState().Equals(State.ABORT);
         }
 
-        internal bool IsReadyToExecute()
-        {
-            return PlanState().Equals(State.READY);
-        }
-
         internal IEnumerator ApplyPlan(Scheduler scheduler)
         {
             if (actions.Count == 0)
