@@ -46,7 +46,10 @@ namespace ThinkEngine
                     };
                     instantiationInformationForProperty[propertyIndex] = information;
                     monoBehaviourActuatorsForProperty[propertyIndex] = MapperManager.InstantiateActuators(information);
-                    Actuators[configuration].AddRange(monoBehaviourActuatorsForProperty[propertyIndex].GetActuatorsList());
+                    if (monoBehaviourActuatorsForProperty[propertyIndex] != null)
+                    {
+                        Actuators[configuration].AddRange(monoBehaviourActuatorsForProperty[propertyIndex].GetActuatorsList());
+                    }
                 }
             }
             ready = true;
@@ -63,7 +66,10 @@ namespace ThinkEngine
                 IActuators actuators = monoBehaviourActuatorsForProperty[propertyIndex];
                 InformationRefresh(propertyIndex);
                 monoBehaviourActuatorsForProperty[propertyIndex] = MapperManager.ManageActuators(instantiationInformationForProperty[propertyIndex], actuators);
-                Actuators[(ActuatorConfiguration)instantiationInformationForProperty[propertyIndex].configuration].AddRange(monoBehaviourActuatorsForProperty[propertyIndex].GetActuatorsList());
+                if (monoBehaviourActuatorsForProperty[propertyIndex] != null)
+                {
+                    Actuators[(ActuatorConfiguration)instantiationInformationForProperty[propertyIndex].configuration].AddRange(monoBehaviourActuatorsForProperty[propertyIndex].GetActuatorsList());
+                }
             }
         }
 

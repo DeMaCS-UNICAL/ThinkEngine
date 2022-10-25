@@ -109,10 +109,10 @@ namespace ThinkEngine
                     currentType = currentObject.GetType();
                     return metMappers[currentObject.GetType()];
                 }
-                else
+                /*else
                 {
-                    //Debug.Log("non esiste il mapper per l'oggetto " + currentObject);
-                }
+                    Debug.Log("non esiste il mapper per l'oggetto " + currentObject);
+                }*/
             }
             //Debug.Log(residualPropertyHierarchy.ToString());
             while (residualPropertyHierarchy.Count > 0)
