@@ -58,7 +58,7 @@ namespace ThinkEngine
             property = new MyListString(information.propertyHierarchy.myStrings);
             PropertyInfo.AddRange(information.hierarchyInfo);
             int index = GetComponent<IndexTracker>().CurrentIndex;
-            _mapping = "setOnActuator(" + NewASPMapperHelper.AspFormat(configurationName) + "(" + NewASPMapperHelper.AspFormat(gameObject.name) + ",objectIndex(" + index + ")," + mapping + "))";
+            _mapping = "setOnActuator(" + ASPMapperHelper.AspFormat(configurationName) + "(" + ASPMapperHelper.AspFormat(gameObject.name) + ",objectIndex(" + index + ")," + mapping + "))";
             List<object> temp = new List<object>();
             for (int i = 0; i < PropertyInfo.Count; i++)
             {

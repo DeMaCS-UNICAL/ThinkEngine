@@ -87,7 +87,7 @@ namespace ThinkEngine
             string append = "";
             for (int i = information.prependMapping.Count; i < upTo; i++)
             {
-                prepend += NewASPMapperHelper.AspFormat(information.propertyHierarchy[i]) + "(";
+                prepend += ASPMapperHelper.AspFormat(information.propertyHierarchy[i]) + "(";
                 append = ")" + append;
             }
             if (!prepend.Equals(""))
@@ -331,7 +331,7 @@ namespace ThinkEngine
                 information.currentObjectOfTheHierarchy = null;
                 information.residualPropertyHierarchy = new MyListString(propertyHierarchy.GetRange(1, propertyHierarchy.Count - 1).myStrings);
                 information.firstPlaceholder = 0;
-                information.prependMapping.Add(NewASPMapperHelper.AspFormat(propertyHierarchy[0]) + "(");
+                information.prependMapping.Add(ASPMapperHelper.AspFormat(propertyHierarchy[0]) + "(");
                 information.appendMapping.Insert(0, ")");
                 mapper = RetrieveAdditionalInformationByType(ref information, true);
             }
@@ -374,8 +374,8 @@ namespace ThinkEngine
 
         private static void CompleteMapping(string configurationName, GameObject gameObject, bool isSensor, ref string partialMapping)
         {
-            string cleanConfigurationName = NewASPMapperHelper.AspFormat(configurationName);
-            partialMapping = cleanConfigurationName + "(" + NewASPMapperHelper.AspFormat(gameObject.name) + ",objectIndex(Index)," + partialMapping;
+            string cleanConfigurationName = ASPMapperHelper.AspFormat(configurationName);
+            partialMapping = cleanConfigurationName + "(" + ASPMapperHelper.AspFormat(gameObject.name) + ",objectIndex(Index)," + partialMapping;
             partialMapping += ")";
             if (!isSensor)
             {

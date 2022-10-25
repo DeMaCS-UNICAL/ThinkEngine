@@ -48,7 +48,7 @@ namespace ThinkEngine
                 information.instantiateOn.AddComponent<IndexTracker>();
             }
             int index = information.instantiateOn.GetComponent<IndexTracker>().CurrentIndex;
-            _mapping = NewASPMapperHelper.AspFormat(configuration.ConfigurationName) + "(" + NewASPMapperHelper.AspFormat(gameObject.name) + ",objectIndex(" + index + ")," + mapping + ")." + Environment.NewLine;
+            _mapping = ASPMapperHelper.AspFormat(configuration.ConfigurationName) + "(" + ASPMapperHelper.AspFormat(gameObject.name) + ",objectIndex(" + index + ")," + mapping + ")." + Environment.NewLine;
             ready = true;
         }
         internal void UpdateValue()

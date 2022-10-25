@@ -1,7 +1,7 @@
 ﻿
 namespace ThinkEngine.Mappers
 {
-    public static class NewASPMapperHelper
+    public static class ASPMapperHelper
     {
         internal static string AspFormat(string hierarchyLevel)
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using ThinkEngine.Mappers;
 using UnityEngine;
 
 namespace ThinkEngine
@@ -70,7 +71,7 @@ namespace ThinkEngine
             int count = 0;
             do
             {
-                name = char.ToLower(gameObject.name[0]).ToString() + gameObject.name.Substring(1) + "Actuator" + toAppend;
+                name =ASPMapperHelper.AspFormat(gameObject.name)+ "Actuator" + toAppend;
                 toAppend += count;
                 count++;
             }

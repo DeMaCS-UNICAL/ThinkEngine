@@ -297,7 +297,7 @@
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPSignedIntegerMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPStringMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPUnsignedIntegerMapper.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\NewASPMapperHelper.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPMapperHelper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\BaseMappers\BasicTypeMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\BaseMappers\CollectionMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\BaseMappers\IDataMapper.cs" />

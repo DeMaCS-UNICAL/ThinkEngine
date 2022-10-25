@@ -266,7 +266,7 @@ namespace ThinkEngine.Mappers
                 string append = "";
                 for (int i = 0; i < information.residualPropertyHierarchy.Count; i++)
                 {
-                    prepend += NewASPMapperHelper.AspFormat(information.residualPropertyHierarchy[i]) + "(";
+                    prepend += ASPMapperHelper.AspFormat(information.residualPropertyHierarchy[i]) + "(";
                     append = ")" + append;
 
                 }

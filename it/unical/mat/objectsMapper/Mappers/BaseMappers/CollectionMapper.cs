@@ -116,7 +116,7 @@ namespace ThinkEngine.Mappers.BaseMappers
             string prepend = Placeholders(information);
             if (!MapperManager.ExistsMapper(elementType) || MapperManager.IsBasic(elementType))
             {
-                prepend = NewASPMapperHelper.AspFormat(information.residualPropertyHierarchy[0]) + "(" + information.temporaryMapping + prepend;
+                prepend = ASPMapperHelper.AspFormat(information.residualPropertyHierarchy[0]) + "(" + information.temporaryMapping + prepend;
                 string append = ")";
                 information.prependMapping.Add(prepend);
                 information.appendMapping.Insert(0, append);
