@@ -8,6 +8,8 @@ namespace ThinkEngine
     [ExecuteInEditMode, Serializable, RequireComponent(typeof(IndexTracker)), RequireComponent(typeof(MonoBehaviourSensorsManager))]
     class SensorConfiguration : AbstractConfiguration, ISerializationCallbackReceiver
     {
+        public bool isInvariant;
+        public bool isFixedSize;
         [SerializeField, HideInInspector]
         internal List<int> operationPerPropertyIndexes;
         [SerializeField, HideInInspector]

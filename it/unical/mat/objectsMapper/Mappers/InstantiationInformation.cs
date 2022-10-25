@@ -21,8 +21,9 @@ namespace ThinkEngine.Mappers
         internal List<string> prependMapping;
         internal List<string> appendMapping;
         internal string temporaryMapping;
+        internal bool invariant;
 
-        
+
         internal InstantiationInformation()
         {
             hierarchyInfo = new List<IInfoAndValue>();
@@ -44,6 +45,7 @@ namespace ThinkEngine.Mappers
             currentType = original.currentType;
             mappingDone = original.mappingDone;
             temporaryMapping = original.temporaryMapping;
+            invariant = original.invariant;
         }
         internal string Mapping()
         {

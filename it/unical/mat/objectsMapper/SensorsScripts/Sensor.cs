@@ -9,6 +9,8 @@ namespace ThinkEngine
 {
     class Sensor
     {
+        internal bool invariant;
+        private bool first=true;
         GameObject gameObject;
         MonoBehaviourSensorsManager manager;
         internal SensorConfiguration configuration;
@@ -49,6 +51,7 @@ namespace ThinkEngine
             }
             int index = information.instantiateOn.GetComponent<IndexTracker>().CurrentIndex;
             _mapping = ASPMapperHelper.AspFormat(configuration.ConfigurationName) + "(" + ASPMapperHelper.AspFormat(gameObject.name) + ",objectIndex(" + index + ")," + mapping + ")." + Environment.NewLine;
+            invariant = information.invariant;
             ready = true;
         }
         internal void UpdateValue()
@@ -57,7 +60,11 @@ namespace ThinkEngine
             {
                 return;
             }
-            MapperManager.UpdateSensor(this, gameObject, new MyListString(property.myStrings), 0);
+            if (!invariant || first)
+            {
+                first = false;
+                MapperManager.UpdateSensor(this, gameObject, new MyListString(property.myStrings), 0);
+            }
         }
 
 

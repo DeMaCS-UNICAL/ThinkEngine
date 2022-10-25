@@ -208,6 +208,7 @@ namespace ThinkEngine
         }
         IEnumerator SensorsUpdate()
         {
+            bool first = true;
             while (true)
             {
                 updatedSensors = 0;
@@ -222,7 +223,7 @@ namespace ThinkEngine
                 {
                     MonoBehaviourSensorsManager manager = monoBehaviourManagers[i];
                     watch.Start();
-                    if (manager != null)
+                    if (manager != null && manager.ready)
                     {
                         manager.ManageSensors();
                         if (watch.ElapsedMilliseconds > MAX_MS)
@@ -265,6 +266,7 @@ namespace ThinkEngine
                 iteration++;
                 Executor.CanRead(true);
                 yield return null;
+                first = false;
             }
         }
 

@@ -20,6 +20,12 @@ namespace ThinkEngine.Editors
                 }
             }
         }
+        override public void OnInspectorGUI()
+        {
+            DrawPropertiesExcluding(serializedObject, new string[] { });
+            serializedObject.ApplyModifiedProperties();
+            base.OnInspectorGUI();
+        }
         protected override void SpecificFields(MyListString property)
         {
             sensorConfiguration = configuration as SensorConfiguration;

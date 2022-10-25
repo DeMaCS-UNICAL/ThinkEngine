@@ -8,6 +8,7 @@ namespace ThinkEngine
 {
     class MonoBehaviourSensorsManager : MonoBehaviour
     {
+        List<MyListString> invariantSensors;
         private Thread mainThread;
         Dictionary<MyListString, int> propertiesIndex;
         Dictionary<int, InstantiationInformation> instantiationInformationForProperty;
@@ -28,8 +29,9 @@ namespace ThinkEngine
             }
         }
 
-        void OnEnable()
+        void Start()
         {
+            invariantSensors = new List<MyListString>();
             mainThread = Thread.CurrentThread;
             propertiesIndex = new Dictionary<MyListString, int>();
             instantiationInformationForProperty = new Dictionary<int, InstantiationInformation>();
@@ -39,6 +41,10 @@ namespace ThinkEngine
                 Sensors[configuration] = new List<Sensor>();
                 foreach (MyListString property in configuration.ToMapProperties)
                 {
+                    if (configuration.isInvariant || configuration.isFixedSize)
+                    {
+                        invariantSensors.Add(property);
+                    }
                     int propertyIndex = property.GetHashCode();
                     propertiesIndex[property] = propertyIndex;
                     InstantiationInformation information = new InstantiationInformation()
@@ -48,7 +54,8 @@ namespace ThinkEngine
                         propertyHierarchy = new MyListString(property.myStrings),
                         residualPropertyHierarchy = new MyListString(property.myStrings),
                         firstPlaceholder = 0,
-                        configuration = configuration
+                        configuration = configuration,
+                        invariant = configuration.isInvariant
                     };
                     instantiationInformationForProperty[propertyIndex] = information;
                     monoBehaviourSensorsForProperty[propertyIndex] = MapperManager.InstantiateSensors(information);
@@ -75,10 +82,18 @@ namespace ThinkEngine
 
             foreach (SensorConfiguration configuration in Sensors.Keys)
             {
+                if (configuration.isFixedSize || configuration.isInvariant)
+                {
+                    continue;
+                }
                 Sensors[configuration].Clear();
             }
             foreach (MyListString property in propertiesIndex.Keys)
             {
+                if (invariantSensors.Contains(property))
+                {
+                    continue;
+                }
                 int propertyIndex = propertiesIndex[property];
                 ISensors sensors = monoBehaviourSensorsForProperty[propertyIndex];
                 InformationRefresh(propertyIndex);
