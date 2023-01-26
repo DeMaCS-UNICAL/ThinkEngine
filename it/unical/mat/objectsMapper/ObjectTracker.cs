@@ -13,7 +13,7 @@ namespace ThinkEngine
 
         Dictionary<int, object> propertiesValue; //for each property index, there is the actual instantiation of the property (if not null)
         Dictionary<int, Type> propertiesType;//for each property index, there is the type of the property
-
+        Dictionary<int, PropertyFeatures> propertiesFeatures;
         internal Type PropertyType(MyListString property)
         {
             CheckPropertyExistence(property);

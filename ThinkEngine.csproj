@@ -310,6 +310,7 @@
     <Compile Include="it\unical\mat\objectsMapper\Mappers\MapperManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\MonoBehaviourActuator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\OperationContainer.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\PropertyFeatures.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Sensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\MonoBehaviourSensorsManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SensorConfiguration.cs" />
