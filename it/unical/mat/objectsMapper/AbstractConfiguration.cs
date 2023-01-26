@@ -38,6 +38,8 @@ namespace ThinkEngine
         }
         [SerializeField, HideInInspector]
         internal List<MyListString> _toMapProperties;
+        [SerializeField, HideInInspector]
+        internal List<PropertyFeatures> propertyFeatures;
         internal List<MyListString> ToMapProperties
         {
             get
@@ -80,6 +82,7 @@ namespace ThinkEngine
             _objectTracker = new ObjectTracker(gameObject);
             SavedProperties = new List<MyListString>();
             ToMapProperties = new List<MyListString>();
+            propertyFeatures = new List<PropertyFeatures>();
         }
         internal bool IsPropertySelected(MyListString property)
         {
@@ -94,6 +97,7 @@ namespace ThinkEngine
                 if (ObjectTracker.IsFinal(property))
                 {
                     ToMapProperties.Add(property);
+                    propertyFeatures.Add(new PropertyFeatures(gameObject, property));
                 }
             }
             else
@@ -103,6 +107,7 @@ namespace ThinkEngine
                 if (ToMapProperties.Contains(property))
                 {
                     ToMapProperties.Remove(property);
+                    propertyFeatures.RemoveAll(x => x.property.Equals(property));
                 }
             }
         }

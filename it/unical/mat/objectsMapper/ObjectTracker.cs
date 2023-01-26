@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using ThinkEngine.it.unical.mat.objectsMapper;
 using ThinkEngine.Mappers;
+using UnityEngine;
 
 namespace ThinkEngine
 {
@@ -9,30 +11,26 @@ namespace ThinkEngine
         public delegate Dictionary<MyListString, KeyValuePair<Type, object>> RetrieveProperties(Type t, MyListString currentHierarchy, object currentObject = null);
 
         Dictionary<MyListString, int> propertiesIndex;
-        Dictionary<int, List<MyListString>> derivedProperties; //for each property index, there is the list of the properties of the property; 
-
-        Dictionary<int, object> propertiesValue; //for each property index, there is the actual instantiation of the property (if not null)
-        Dictionary<int, Type> propertiesType;//for each property index, there is the type of the property
-        Dictionary<int, PropertyFeatures> propertiesFeatures;
+        object rootObject;
+        internal Dictionary<int, PropertyDetails> propertiesDetails;
         internal Type PropertyType(MyListString property)
         {
             CheckPropertyExistence(property);
-            return propertiesType[propertiesIndex[property]];
+            return propertiesDetails[propertiesIndex[property]].propertyType;
         }
 
         public ObjectTracker(object root, bool nullObject = false)
         {
             propertiesIndex = new Dictionary<MyListString, int>();
-            derivedProperties = new Dictionary<int, List<MyListString>>();
-            propertiesValue = new Dictionary<int, object>();
-            propertiesType = new Dictionary<int, Type>();
+            propertiesDetails = new Dictionary<int, PropertyDetails>();
             if (root == null || nullObject && !(root is Type))
             {
                 throw new Exception("Invalid parameters.");
             }
             if (!nullObject)
             {
-                propertiesValue.Add(int.MinValue, root);
+
+                rootObject = root;
                 RetrieveObjectProperties(root);
             }
             else
@@ -66,9 +64,9 @@ namespace ThinkEngine
             if (propertiesIndex.ContainsKey(memberName) || GetMemberProperties(memberName.GetRange(0, memberName.Count - 1)) != null)
             {
                 int index = propertiesIndex[memberName];
-                if (derivedProperties.ContainsKey(index) || RetrieveMemberProperties(memberName))
+                if (propertiesDetails[index].derivedProperties.Count>0 || RetrieveMemberProperties(memberName))
                 {
-                    return derivedProperties[index];
+                    return propertiesDetails[index].derivedProperties;
                 }
             }
             throw new Exception("Property " + memberName + " does not exist.");
@@ -81,22 +79,24 @@ namespace ThinkEngine
                 throw new Exception("Property " + memberName + " not yet discovered.");
             }
             int memberIndex = propertiesIndex[memberName];
-            if (derivedProperties.ContainsKey(memberIndex))
+            PropertyDetails details = propertiesDetails[memberIndex];
+            if (details.derivedProperties.Count > 0)
             {
                 return true;
             }
-            if (propertiesValue.ContainsKey(memberIndex) && propertiesValue[memberIndex] != null)
+            if (details.propertyValue != null)
             {
-                derivedProperties.Add(memberIndex, RetrieveObjectProperties(propertiesValue[memberIndex], memberName));
+                details.derivedProperties.AddRange(RetrieveObjectProperties(details.propertyValue, memberName));
                 return true;
             }
-            if (propertiesType.ContainsKey(memberIndex))
+            if (details.propertyType!=null)
             {
-                derivedProperties.Add(memberIndex, RetrieveTypeProperties(propertiesType[memberIndex], memberName));
+                details.derivedProperties.AddRange(RetrieveTypeProperties(details.propertyType, memberName));
                 return true;
             }
             return false;
         }
+
         private List<MyListString> RetrieveObjectProperties(object currentObject, MyListString fatherName = null)
         {
             if (currentObject == null)
@@ -120,7 +120,10 @@ namespace ThinkEngine
                 {
                     int index = GetIndex(property);
                     propertiesIndex.Add(property, index);
-                    propertiesType.Add(index, retrievedProperties[property].Key);
+                    PropertyDetails details = propertiesDetails[index];
+                    details.propertyType = retrievedProperties[property].Key;
+                    details.propertyValue = retrievedProperties[property].Value;
+                    /*
                     if (!propertiesValue.ContainsValue(retrievedProperties[property].Value))
                     {
                         propertiesValue.Add(index, retrievedProperties[property].Value);
@@ -129,6 +132,7 @@ namespace ThinkEngine
                     {
                         propertiesValue.Add(index, null);
                     }
+                    *///TO CHECK FOR BUGS!
                 }
                 toReturn.Add(property);
             }
@@ -155,7 +159,7 @@ namespace ThinkEngine
         internal bool IsPropertyExpandable(MyListString property)
         {
             CheckPropertyExistence(property);
-            return MapperManager.IsTypeExpandable(propertiesType[propertiesIndex[property]]);
+            return MapperManager.IsTypeExpandable(propertiesDetails[propertiesIndex[property]].propertyType);
         }
     }
 }
