@@ -154,6 +154,8 @@ namespace ThinkEngine
         }
         void Update()
         {
+            frameCount++;
+            frameCount++;
             if (Application.isPlaying)
             {
                 if (MOVING_AVG_FRAMES.Count > 30)
@@ -211,6 +213,7 @@ namespace ThinkEngine
             bool first = true;
             while (true)
             {
+                Debug.Log("Start update " + frameCount);
                 updatedSensors = 0;
                 Stopwatch localWatch = new Stopwatch();
                 watch.Start();
@@ -265,6 +268,7 @@ namespace ThinkEngine
                 watch.Reset();
                 iteration++;
                 Executor.CanRead(true);
+                Debug.Log("End update " + frameCount);
                 yield return null;
                 first = false;
             }
