@@ -21,6 +21,8 @@ namespace ThinkEngine
         internal int operation;
         [SerializeField,HideInInspector]
         internal string specifValue;
+        [SerializeField, HideInInspector]
+        internal int counter;//for atLeast and count operations
 
         internal int GetPropertyIndex { get; }
         internal string PropertyName

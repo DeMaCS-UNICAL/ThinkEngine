@@ -112,8 +112,8 @@ namespace ThinkEngine
             }
         }
 
-        protected abstract void PropertyDeleted(MyListString property);
-        protected abstract void PropertySelected(MyListString property);
+        protected virtual void PropertyDeleted(MyListString property) { }
+        protected virtual void PropertySelected(MyListString property) { }
         internal abstract bool IsAValidName(string temporaryName);
     }
 }

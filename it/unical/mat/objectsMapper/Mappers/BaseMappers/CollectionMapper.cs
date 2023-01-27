@@ -68,11 +68,11 @@ namespace ThinkEngine.Mappers.BaseMappers
         }
         public abstract bool Supports(Type t);
         protected abstract Type ElementType(Type type);
-        public int GetAggregationSpecificIndex(Type type)
-        {
-            return MapperManager.GetAggregationSpecificIndex(ElementType(type));
-        }
 
+        public List<int> GetAggregationStreamOperationsIndexes(Type type)
+        {
+            return MapperManager.GetAggregationStreamOperationsIndexes(ElementType(type));
+        }
         public Type GetAggregationTypes(Type type = null)
         {
             return MapperManager.GetAggregationTypes(ElementType(type));
@@ -217,9 +217,5 @@ namespace ThinkEngine.Mappers.BaseMappers
         protected abstract string Placeholders(InstantiationInformation information);
 
 
-        public List<OperationContainer.Operation> OperationList()
-        {
-            throw new NotSupportedException();
-        }
     }
 }

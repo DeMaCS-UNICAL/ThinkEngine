@@ -62,6 +62,7 @@ namespace ThinkEngine
             return mapper;
         }
 
+        
         internal static IDataMapper GetMapper(Type type)
         {
             return ExistsMapper(type) ? metMappers[type] : null;
@@ -250,17 +251,18 @@ namespace ThinkEngine
             }
             return null;
         }
-        internal static int GetAggregationSpecificIndex(Type type)
+        internal static List<int> GetAggregationStreamOperationsIndexes(Type type)
         {
             if (ExistsMapper(type))
             {
                 if (metMappers[type].NeedsAggregates(type))
                 {
-                    return metMappers[type].GetAggregationSpecificIndex(type);
+                    return metMappers[type].GetAggregationStreamOperationsIndexes(type);
                 }
             }
-            return -1;
+            return new List<int>();
         }
+
         private static Dictionary<MyListString, KeyValuePair<Type, object>> RetrieveGeneralProperties(Type objectType, MyListString currentObjectPropertyHierarchy, object currentObject)
         {
             if (currentObject != null && !currentObject.GetType().Equals(objectType))

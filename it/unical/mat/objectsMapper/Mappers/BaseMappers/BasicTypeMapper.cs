@@ -13,8 +13,11 @@ namespace ThinkEngine.Mappers
         private class BasicTypeInfoAndValue : IInfoAndValue
         {
             internal Operation operation;
-            internal string specificValue;
+            internal object specificValue;
             internal List<object> values;
+            internal int counter;
+            internal int windowSize;
+
             internal BasicTypeInfoAndValue()
             {
                 values = new List<object>();
@@ -24,7 +27,7 @@ namespace ThinkEngine.Mappers
             {
                 if (values[0] != null)
                 {
-                    return GetMapper(values[0].GetType()).BasicMap(operation(values));
+                    return GetMapper(values[0].GetType()).BasicMap(operation(values, specificValue, counter));
                 }
                 return null;
             }
@@ -68,9 +71,10 @@ namespace ThinkEngine.Mappers
         }
         #endregion
         #region ENUMS
-        internal enum NumericOperations { Newest, Oldest, Specific_Value, Max, Min, Avg };
-        internal enum BoolOperations { Newest, Oldest, Specific_Value, Conjunction, Disjunction };
-        internal enum StringOperations { Newest, Oldest, Specific_Value };
+        internal enum NumericOperations { Newest, Oldest,  Always, Count, AtLeast, Max, Min, Avg };
+        internal enum BoolOperations { Newest, Oldest, Always, Count, AtLeast, Conjunction, Disjunction };
+        internal enum StringOperations { Newest, Oldest, Always, Count, AtLeast };
+
         #endregion
 
         private static BasicTypeMapper GetMapper(Type type)
@@ -103,7 +107,50 @@ namespace ThinkEngine.Mappers
         {
             return _operationList;
         }
-        internal static object Oldest(IList values)
+        internal static object Always(IList values, object value, int counter=0)
+        {
+            foreach(object o in values)
+            {
+                if (o != value)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        internal static object Count(IList values, object value, int counter)
+        {
+            int count = 0;
+            foreach (object o in values)
+            {
+                if (o == value)
+                {
+                    count++;
+                }
+                if (count > counter)
+                {
+                    return false;
+                }
+            }
+            return count == counter;
+        }
+        internal static object AtLeast(IList values, object value, int counter)
+        {
+            int count = 0;
+            foreach (object o in values)
+            {
+                if (o == value)
+                {
+                    count++;
+                }
+                if (count >= counter)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        internal static object Oldest(IList values, object value = null, int counter = 0)
         {
             if (values.Count == 0)
             {
@@ -111,17 +158,13 @@ namespace ThinkEngine.Mappers
             }
             return values[0];
         }
-        internal static object Newest(IList values)
+        internal static object Newest(IList values, object value = null, int counter = 0)
         {
             if (values.Count == 0)
             {
                 return null;
             }
             return values[values.Count - 1];
-        }
-        internal static object Specific_Value(IList values)
-        {
-            throw new NotSupportedException();
         }
 
         public bool IsFinal(Type t)
@@ -144,7 +187,7 @@ namespace ThinkEngine.Mappers
             }
 
             List<object> values = ((BasicTypeInfoAndValue)sensor.PropertyInfo[hierarchyLevel]).values;
-            if (values.Count == 200)
+            if (values.Count == ((BasicTypeInfoAndValue)sensor.PropertyInfo[hierarchyLevel]).windowSize)
             {
                 values.RemoveAt(0);
             }
@@ -162,13 +205,16 @@ namespace ThinkEngine.Mappers
             {
                 Debug.Log(information.propertyHierarchy);
             }*/
-            int operationIndex = ((SensorConfiguration)information.configuration).OperationPerProperty[information.propertyHierarchy.GetHashCode()];
+            PropertyFeatures propertyFeatures = ((SensorConfiguration)information.configuration).propertyFeatures[information.propertyHierarchy.GetHashCode()];
+            int operationIndex = propertyFeatures.operation;
             additionalInfo.operation = OperationList()[operationIndex];
-            if (operationIndex == GetAggregationSpecificIndex())
+            if (GetAggregationStreamOperationsIndexes().Contains(operationIndex))
             {
-                additionalInfo.specificValue = ((SensorConfiguration)information.configuration).SpecificValuePerProperty[information.propertyHierarchy.GetHashCode()];
+                additionalInfo.counter = propertyFeatures.counter;
+                additionalInfo.specificValue = Convert.ChangeType(propertyFeatures.specifValue, ConvertingType);
             }
             BasicTypeSensor sensor = new BasicTypeSensor(new Sensor());
+            additionalInfo.windowSize = propertyFeatures.windowWidth;
             additionalInfo.values.Add(Convert.ChangeType(information.currentObjectOfTheHierarchy, ConvertingType));
             information.hierarchyInfo.Add(additionalInfo);
             sensor.sensor.Configure(information, GenerateMapping(information));
@@ -186,9 +232,10 @@ namespace ThinkEngine.Mappers
             }
             return instantiatedSensors;
         }
-        public int GetAggregationSpecificIndex(Type type = null)
+
+        public List<int> GetAggregationStreamOperationsIndexes(Type type = null)
         {
-            return 2;
+            return new List<int> { 2, 3, 4 };
         }
         public bool IsTypeExpandable(Type type)
         {
@@ -284,6 +331,7 @@ namespace ThinkEngine.Mappers
 
 
         public abstract string BasicMap(object value);
+
 
 
 
