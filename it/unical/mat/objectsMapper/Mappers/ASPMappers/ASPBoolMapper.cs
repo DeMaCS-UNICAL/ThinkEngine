@@ -28,13 +28,13 @@ namespace ThinkEngine.Mappers
 
         private ASPBoolMapper()
         {
-            _operationList = new List<Operation>() { Newest, Oldest, Specific_Value, Conjunction, Disjunction };
+            _operationList = new List<Operation>() { Newest, Oldest, Always, Count, AtLeast, Conjunction, Disjunction };
             _supportedTypes = new List<Type> { typeof(bool), typeof(bool) };
             _convertingType = typeof(bool);
         }
         #endregion
 
-        internal static object Conjunction(IList values)
+        internal static object Conjunction(IList values, object value = null, int counter = 0)
         {
             bool conj = true;
             foreach (bool v in values)
@@ -43,7 +43,7 @@ namespace ThinkEngine.Mappers
             }
             return conj;
         }
-        internal static object Disjunction(IList values)
+        internal static object Disjunction(IList values, object value = null, int counter = 0)
         {
             bool conj = true;
             foreach (bool v in values)
