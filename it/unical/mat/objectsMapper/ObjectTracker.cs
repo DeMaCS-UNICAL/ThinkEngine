@@ -11,7 +11,7 @@ namespace ThinkEngine
         public delegate Dictionary<MyListString, KeyValuePair<Type, object>> RetrieveProperties(Type t, MyListString currentHierarchy, object currentObject = null);
 
         Dictionary<MyListString, int> propertiesIndex;
-        object rootObject;
+        GameObject rootObject;
         internal Dictionary<int, PropertyDetails> propertiesDetails;
         internal Type PropertyType(MyListString property)
         {
@@ -30,7 +30,7 @@ namespace ThinkEngine
             if (!nullObject)
             {
 
-                rootObject = root;
+                rootObject = (GameObject)root;
                 RetrieveObjectProperties(root);
             }
             else
@@ -120,6 +120,7 @@ namespace ThinkEngine
                 {
                     int index = GetIndex(property);
                     propertiesIndex.Add(property, index);
+                    propertiesDetails.Add(index, new PropertyDetails( property));
                     PropertyDetails details = propertiesDetails[index];
                     details.propertyType = retrievedProperties[property].Key;
                     details.propertyValue = retrievedProperties[property].Value;

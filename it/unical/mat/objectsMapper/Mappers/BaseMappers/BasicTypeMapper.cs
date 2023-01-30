@@ -205,7 +205,7 @@ namespace ThinkEngine.Mappers
             {
                 Debug.Log(information.propertyHierarchy);
             }*/
-            PropertyFeatures propertyFeatures = ((SensorConfiguration)information.configuration).propertyFeatures[information.propertyHierarchy.GetHashCode()];
+            PropertyFeatures propertyFeatures = ((SensorConfiguration)information.configuration).PropertyFeatures.Find(x => x.property.Equals(information.propertyHierarchy));
             int operationIndex = propertyFeatures.operation;
             additionalInfo.operation = OperationList()[operationIndex];
             if (GetAggregationStreamOperationsIndexes().Contains(operationIndex))
@@ -235,7 +235,7 @@ namespace ThinkEngine.Mappers
 
         public List<int> GetAggregationStreamOperationsIndexes(Type type = null)
         {
-            return new List<int> { 2, 3, 4 };
+            return new List<int>() { 2, 3, 4 };
         }
         public bool IsTypeExpandable(Type type)
         {

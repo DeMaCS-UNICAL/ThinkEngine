@@ -13,6 +13,11 @@ namespace ThinkEngine.Editors
         private bool configurePropertyMode;
         private MyListString actualProperty;
 
+        void Reset()
+        {
+            sensorConfiguration = target as SensorConfiguration;
+            base.Reset();
+        }
         void OnDestroy()
         {
             if (!Application.isPlaying && target == null && go != null)
@@ -39,7 +44,9 @@ namespace ThinkEngine.Editors
 
         private void ConfigureProperty()
         {
-            PropertyFeatures features = configuration.propertyFeatures[actualProperty.GetHashCode()];
+            Debug.Log(actualProperty);
+            PropertyFeatures features = configuration.PropertyFeatures.Find(x => x.property.Equals(actualProperty));
+            Debug.Log(features);
             features.PropertyName = EditorGUILayout.TextField("Name:", features.PropertyName);
             features.windowWidth = EditorGUILayout.IntSlider("Aggregation Window:", features.windowWidth, 1, 200);
             ShowOperationChoice(features);
@@ -63,29 +70,30 @@ namespace ThinkEngine.Editors
                 if (newOperation != oldOperation)
                 {
                     sensorConfiguration.SetOperationPerProperty(actualProperty, newOperation);
-                    if (MapperManager.GetAggregationStreamOperationsIndexes(propertyType).Contains(newOperation) )
+                }
+                if (MapperManager.GetAggregationStreamOperationsIndexes(propertyType).Contains(newOperation) )
+                {
+                    string oldValue = features.specifValue;
+                    string newValue = EditorGUILayout.TextField("Value to track", oldValue);
+                    if (!oldValue.Equals(newValue))
                     {
-                        string oldValue = features.specifValue;
-                        string newValue = EditorGUILayout.TextField("Value to track", oldValue);
-                        if (!oldValue.Equals(newValue))
+                        try
                         {
-                            try
-                            {
-                                Convert.ChangeType(features.specifValue, propertyType);
-                                sensorConfiguration.SetSpecificValuePerProperty(actualProperty, newValue);
-                            }
-                            catch
-                            {
-                                Debug.LogError(newValue + " value not valid for property of type " + propertyType);
-                            }
+                            Convert.ChangeType(features.specifValue, propertyType);
+                            sensorConfiguration.SetSpecificValuePerProperty(actualProperty, newValue);
                         }
-                        int oldCounter = features.counter;
-                        int newCounter = EditorGUILayout.IntSlider("Steps", oldCounter,1, features.windowWidth);
-                        if (!oldCounter.Equals(newCounter))
+                        catch
                         {
-                            sensorConfiguration.SetCounterPerProperty(actualProperty, newCounter);
+                            Debug.LogError(newValue + " value not valid for property of type " + propertyType);
                         }
                     }
+                    int oldCounter = features.counter;
+                    int newCounter = EditorGUILayout.IntSlider("Steps", oldCounter,1, features.windowWidth);
+                    if (!oldCounter.Equals(newCounter))
+                    {
+                        sensorConfiguration.SetCounterPerProperty(actualProperty, newCounter);
+                    }
+                    
                 }
             }
         }

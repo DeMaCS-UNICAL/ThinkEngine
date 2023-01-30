@@ -45,11 +45,15 @@ namespace ThinkEngine
 
         private void ValidateNameAndAssign(string value)
         {
+            if(_propertyName == value)
+            {
+                return;
+            }
             if (usedNameProperty.Contains(value.GetHashCode()))
             {
                 throw new Exception("InvalidName");
             }
-            if(!_propertyName.Equals("") && usedNameProperty.Contains(_propertyName.GetHashCode()))
+            if(_propertyName!=null && usedNameProperty.Contains(_propertyName.GetHashCode()))
             {
                 usedNameProperty.Remove(_propertyName.GetHashCode());
             }
@@ -63,6 +67,7 @@ namespace ThinkEngine
             string prefix = goName;
             string suffix ="";
             int count = 0;
+            Debug.Log(property);
             if (property.Count > 0)
             {
                 count = property.Count - 1;
@@ -73,6 +78,7 @@ namespace ThinkEngine
                 try
                 {
                     PropertyName = prefix + suffix;
+                    break;
                 }
                 catch (Exception e)
                 {

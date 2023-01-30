@@ -48,7 +48,7 @@ namespace ThinkEngine
             {
                 throw new Exception("Property not selected");
             }
-            propertyFeatures.Find(x => x.property.Equals(property)).operation = operation;
+            PropertyFeatures.Find(x => x.property.Equals(property)).operation = operation;
         }
         internal void SetSpecificValuePerProperty(MyListString property, string value)
         {
@@ -56,7 +56,7 @@ namespace ThinkEngine
             {
                 throw new Exception("Property not selected");
             }
-            propertyFeatures.Find(x => x.property.Equals(property)).specifValue = value;
+            PropertyFeatures.Find(x => x.property.Equals(property)).specifValue = value;
 
         }
 
@@ -66,7 +66,7 @@ namespace ThinkEngine
             {
                 throw new Exception("Property not selected");
             }
-            propertyFeatures.Find(x => x.property.Equals(actualProperty)).counter = newCounter;
+            PropertyFeatures.Find(x => x.property.Equals(actualProperty)).counter = newCounter;
         }
 
         internal override bool IsSensor()
