@@ -12,7 +12,7 @@ namespace ThinkEngine.Editors
         SensorConfiguration sensorConfiguration;
         private bool configurePropertyMode;
         private MyListString actualProperty;
-
+        string tempPropertyName;
         void Reset()
         {
             sensorConfiguration = target as SensorConfiguration;
@@ -44,14 +44,31 @@ namespace ThinkEngine.Editors
 
         private void ConfigureProperty()
         {
-            Debug.Log(actualProperty);
+            EditorGUILayout.HelpBox("Configure advanced feature of the property",MessageType.Info);
             PropertyFeatures features = configuration.PropertyFeatures.Find(x => x.property.Equals(actualProperty));
-            Debug.Log(features);
-            features.PropertyName = EditorGUILayout.TextField("Name:", features.PropertyName);
+            EditorGUILayout.BeginHorizontal();
+            tempPropertyName = EditorGUILayout.TextField("Property Name:", tempPropertyName);
+            if (GUILayout.Button("Save"))
+            {
+                try
+                {
+                    features.PropertyName = tempPropertyName;
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message == "InvalidName")
+                    {
+                        Debug.LogError("The name " + tempPropertyName + " can not be used.");
+                        tempPropertyName = features.PropertyName;
+                        GUI.FocusControl(null);
+                    }
+                }
+            }
+            EditorGUILayout.EndHorizontal();
             features.windowWidth = EditorGUILayout.IntSlider("Aggregation Window:", features.windowWidth, 1, 200);
             ShowOperationChoice(features);
             serializedObject.ApplyModifiedProperties();
-            if (GUILayout.Button("Done"))
+            if (GUILayout.Button("Done", GUILayout.Width(200)))
             {
                 configurePropertyMode = false;
                 actualProperty = null;
@@ -66,7 +83,12 @@ namespace ThinkEngine.Editors
                 int oldOperation = features.operation;
                 Type propertyType = sensorConfiguration.ObjectTracker.PropertyType(actualProperty);
                 string[] displayedOptions = Enum.GetNames(MapperManager.GetAggregationTypes(propertyType));
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.Space();
                 int newOperation = EditorGUILayout.Popup(oldOperation, displayedOptions);
+                EditorGUILayout.Space();
+                EditorGUILayout.EndHorizontal();
+
                 if (newOperation != oldOperation)
                 {
                     sensorConfiguration.SetOperationPerProperty(actualProperty, newOperation);
@@ -74,13 +96,17 @@ namespace ThinkEngine.Editors
                 if (MapperManager.GetAggregationStreamOperationsIndexes(propertyType).Contains(newOperation) )
                 {
                     string oldValue = features.specifValue;
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.Space();
                     string newValue = EditorGUILayout.TextField("Value to track", oldValue);
+                    EditorGUILayout.Space();
+                    EditorGUILayout.EndHorizontal();
                     if (!oldValue.Equals(newValue))
                     {
                         try
                         {
                             Convert.ChangeType(features.specifValue, propertyType);
-                            sensorConfiguration.SetSpecificValuePerProperty(actualProperty, newValue);
+                            features.specifValue = newValue;
                         }
                         catch
                         {
@@ -88,10 +114,14 @@ namespace ThinkEngine.Editors
                         }
                     }
                     int oldCounter = features.counter;
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.Space();
                     int newCounter = EditorGUILayout.IntSlider("Steps", oldCounter,1, features.windowWidth);
+                    EditorGUILayout.Space();
+                    EditorGUILayout.EndHorizontal();
                     if (!oldCounter.Equals(newCounter))
                     {
-                        sensorConfiguration.SetCounterPerProperty(actualProperty, newCounter);
+                        features.counter = newCounter;
                     }
                     
                 }
@@ -104,6 +134,7 @@ namespace ThinkEngine.Editors
             {
                 configurePropertyMode = true;
                 actualProperty = property;
+                tempPropertyName = configuration.PropertyFeatures.Find(x => x.property.Equals(actualProperty)).PropertyName;
             }
         }
             /*

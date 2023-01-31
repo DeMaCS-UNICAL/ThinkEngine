@@ -47,16 +47,19 @@ namespace ThinkEngine
         {
             if(_propertyName == value)
             {
+                Debug.Log("SAME VALUE! "+_propertyName+" "+value);
                 return;
             }
             if (usedNameProperty.Contains(value.GetHashCode()))
             {
+                Debug.Log("THROWING!");
                 throw new Exception("InvalidName");
             }
-            if(_propertyName!=null && usedNameProperty.Contains(_propertyName.GetHashCode()))
+            if(_propertyName!=null && usedNameProperty.Contains(propertyNameHash))
             {
-                usedNameProperty.Remove(_propertyName.GetHashCode());
+                usedNameProperty.Remove(propertyNameHash);
             }
+            Debug.Log("setting _property_name to " + value);
             _propertyName = value;
             propertyNameHash = PropertyName.GetHashCode();
             usedNameProperty.Add(propertyNameHash);
@@ -103,14 +106,18 @@ namespace ThinkEngine
             }
         }
 
+        internal void Remove()
+        {
+            usedNameProperty.Remove(propertyNameHash);
+        }
+
         public void OnBeforeSerialize()
         {
-            
         }
 
         public void OnAfterDeserialize()
         {
-            usedNameProperty.Add(_propertyName.GetHashCode());
+            usedNameProperty.Add(propertyNameHash);
         }
     }
 }

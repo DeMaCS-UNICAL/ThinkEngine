@@ -11,6 +11,7 @@ namespace ThinkEngine
         public bool isInvariant;
         public bool isFixedSize;
 
+        
         internal override string ConfigurationName
         {
             set

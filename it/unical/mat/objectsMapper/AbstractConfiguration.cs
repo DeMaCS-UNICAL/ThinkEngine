@@ -84,7 +84,14 @@ namespace ThinkEngine
             }
             set { }
         }
+        void OnDestroy()
+        {
+            foreach (PropertyFeatures property in _propertyFeatures)
+            {
+                property.Remove();
+            }
 
+        }
         internal void RefreshObjectTracker()
         {
             _objectTracker = new ObjectTracker(gameObject);
