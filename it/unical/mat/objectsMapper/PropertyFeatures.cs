@@ -25,7 +25,7 @@ namespace ThinkEngine
         internal int counter;//for atLeast and count operations
 
         internal int GetPropertyIndex { get; }
-        internal string PropertyName
+        internal string PropertyAlias
         {
             get
             {
@@ -61,7 +61,7 @@ namespace ThinkEngine
             }
             Debug.Log("setting _property_name to " + value);
             _propertyName = value;
-            propertyNameHash = PropertyName.GetHashCode();
+            propertyNameHash = PropertyAlias.GetHashCode();
             usedNameProperty.Add(propertyNameHash);
         }
 
@@ -80,7 +80,7 @@ namespace ThinkEngine
             {
                 try
                 {
-                    PropertyName = prefix + suffix;
+                    PropertyAlias = prefix + suffix;
                     break;
                 }
                 catch (Exception e)

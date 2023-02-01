@@ -44,6 +44,7 @@ namespace ThinkEngine
             manager = gameObject.GetComponent<MonoBehaviourSensorsManager>();
             configuration = (SensorConfiguration)information.configuration;
             property = new MyListString(information.propertyHierarchy.myStrings);
+            PropertyFeatures features = ((SensorConfiguration)information.configuration).PropertyFeatures.Find(x => x.property == property);
             PropertyInfo.AddRange(information.hierarchyInfo);
             if (information.instantiateOn.GetComponent<IndexTracker>() == null)
             {
@@ -51,6 +52,7 @@ namespace ThinkEngine
             }
             int index = information.instantiateOn.GetComponent<IndexTracker>().CurrentIndex;
             _mapping = ASPMapperHelper.AspFormat(configuration.ConfigurationName) + "(" + ASPMapperHelper.AspFormat(gameObject.name) + ",objectIndex(" + index + ")," + mapping + ")." + Environment.NewLine;
+            //_mapping = ASPMapperHelper.AspFormat(features.PropertyAlias) + "(objectIndex(" + index + ")," + mapping + ")." + Environment.NewLine;
             invariant = information.invariant;
             ready = true;
         }

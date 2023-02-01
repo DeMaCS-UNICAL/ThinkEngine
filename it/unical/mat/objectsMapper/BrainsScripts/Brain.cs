@@ -17,6 +17,8 @@ namespace ThinkEngine
     [ExecuteAlways, RequireComponent(typeof(IndexTracker))]
     public abstract class Brain : MonoBehaviour
     {
+        [SerializeField, HideInInspector]
+        bool borning=true;
         internal enum SOLVER { Clingo, DLV2, Incremental_DLV2 }
         internal string executorName;
         internal string SolverName
@@ -127,6 +129,11 @@ namespace ThinkEngine
         void OnEnable()
         {
             originalName = gameObject.name;
+            if (borning)
+            {
+                solverEnum = SolversChecker.AvailableSolvers()[0];
+            }
+            borning = false;
         }
 
         protected virtual void Start()

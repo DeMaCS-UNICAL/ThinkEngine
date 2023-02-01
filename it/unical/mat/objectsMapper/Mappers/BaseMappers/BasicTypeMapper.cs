@@ -27,7 +27,8 @@ namespace ThinkEngine.Mappers
             {
                 if (values[0] != null)
                 {
-                    return GetMapper(values[0].GetType()).BasicMap(operation(values, specificValue, counter));
+                    object operationResult = operation(values, specificValue, counter);
+                    return GetMapper(operationResult.GetType()).BasicMap(operationResult);
                 }
                 return null;
             }

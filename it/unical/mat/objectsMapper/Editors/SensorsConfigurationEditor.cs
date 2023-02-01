@@ -47,19 +47,19 @@ namespace ThinkEngine.Editors
             EditorGUILayout.HelpBox("Configure advanced feature of the property",MessageType.Info);
             PropertyFeatures features = configuration.PropertyFeatures.Find(x => x.property.Equals(actualProperty));
             EditorGUILayout.BeginHorizontal();
-            tempPropertyName = EditorGUILayout.TextField("Property Name:", tempPropertyName);
+            tempPropertyName = EditorGUILayout.TextField("Property Alias:", tempPropertyName);
             if (GUILayout.Button("Save"))
             {
                 try
                 {
-                    features.PropertyName = tempPropertyName;
+                    features.PropertyAlias = tempPropertyName;
                 }
                 catch (Exception ex)
                 {
                     if (ex.Message == "InvalidName")
                     {
                         Debug.LogError("The name " + tempPropertyName + " can not be used.");
-                        tempPropertyName = features.PropertyName;
+                        tempPropertyName = features.PropertyAlias;
                         GUI.FocusControl(null);
                     }
                 }
@@ -105,7 +105,7 @@ namespace ThinkEngine.Editors
                     {
                         try
                         {
-                            Convert.ChangeType(features.specifValue, propertyType);
+                            Convert.ChangeType(newValue, propertyType);
                             features.specifValue = newValue;
                         }
                         catch
@@ -134,7 +134,7 @@ namespace ThinkEngine.Editors
             {
                 configurePropertyMode = true;
                 actualProperty = property;
-                tempPropertyName = configuration.PropertyFeatures.Find(x => x.property.Equals(actualProperty)).PropertyName;
+                tempPropertyName = configuration.PropertyFeatures.Find(x => x.property.Equals(actualProperty)).PropertyAlias;
             }
         }
             /*
