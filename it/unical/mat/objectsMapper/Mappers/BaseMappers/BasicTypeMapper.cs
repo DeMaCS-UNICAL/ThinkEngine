@@ -308,7 +308,7 @@ namespace ThinkEngine.Mappers
         }
         protected string GenerateMapping(InstantiationInformation information)
         {
-            if (!information.mappingDone)
+            /*if (!information.mappingDone)
             {
                 string prepend = "";
                 string append = "";
@@ -321,6 +321,12 @@ namespace ThinkEngine.Mappers
                 prepend += "{" + information.firstPlaceholder + "}";
                 information.prependMapping.Add(prepend);
                 information.appendMapping.Insert(0, append);
+                information.mappingDone = true;
+            }
+            return information.Mapping();*/
+            if (!information.mappingDone)
+            {
+                information.prependMapping.Add("{" + information.firstPlaceholder + "}");
                 information.mappingDone = true;
             }
             return information.Mapping();

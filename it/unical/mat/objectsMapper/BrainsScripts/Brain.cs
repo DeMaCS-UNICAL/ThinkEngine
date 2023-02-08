@@ -231,10 +231,10 @@ namespace ThinkEngine
                         continue;
                     }
                     seenSensorConfNames.Add(sensorConf.ConfigurationName);
-                    foreach (MyListString property in sensorConf.ToMapProperties)
+                    foreach (PropertyFeatures features in sensorConf.PropertyFeatures)
                     {
                         //Debug.Log(property);
-                        sensorsAsASP = MapperManager.GetASPTemplate(sensorConf.ConfigurationName, sensorConf.gameObject, property, true);
+                        sensorsAsASP = MapperManager.GetASPTemplate(features.PropertyAlias, sensorConf.gameObject, features.property, true);
                         //Debug.Log(sensorsAsASP);
                         fs.Write(ActualSensorEncoding(sensorsAsASP));
                     }

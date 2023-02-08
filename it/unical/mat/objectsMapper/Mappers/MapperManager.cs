@@ -316,7 +316,7 @@ namespace ThinkEngine
             return toReturn;
         }
 
-        internal static string GetASPTemplate(string configurationName, GameObject gameObject, MyListString propertyHierarchy, bool isSensor = false)
+        internal static string GetASPTemplate(string propertyAlias, GameObject gameObject, MyListString propertyHierarchy, bool isSensor = false)
         {
             InstantiationInformation information = new InstantiationInformation
             {
@@ -333,8 +333,8 @@ namespace ThinkEngine
                 information.currentObjectOfTheHierarchy = null;
                 information.residualPropertyHierarchy = new MyListString(propertyHierarchy.GetRange(1, propertyHierarchy.Count - 1).myStrings);
                 information.firstPlaceholder = 0;
-                information.prependMapping.Add(ASPMapperHelper.AspFormat(propertyHierarchy[0]) + "(");
-                information.appendMapping.Insert(0, ")");
+                //information.prependMapping.Add(ASPMapperHelper.AspFormat(propertyHierarchy[0]) + "(");
+                //information.appendMapping.Insert(0, ")");
                 mapper = RetrieveAdditionalInformationByType(ref information, true);
             }
             if (mapper != null)
@@ -344,7 +344,7 @@ namespace ThinkEngine
                     information.currentType = information.currentObjectOfTheHierarchy.GetType();
                 }
                 string partial = mapper.GetASPTemplate(ref information, new List<string>());
-                CompleteMapping(configurationName, gameObject, isSensor, ref partial);
+                CompleteMapping(propertyAlias, gameObject, isSensor, ref partial);
                 return partial;
             }
             information.prependMapping.Clear();
@@ -374,15 +374,15 @@ namespace ThinkEngine
             return "";
         }
 
-        private static void CompleteMapping(string configurationName, GameObject gameObject, bool isSensor, ref string partialMapping)
+        private static void CompleteMapping(string propertyAlias, GameObject gameObject, bool isSensor, ref string partialMapping)
         {
-            string cleanConfigurationName = ASPMapperHelper.AspFormat(configurationName);
-            partialMapping = cleanConfigurationName + "(" + ASPMapperHelper.AspFormat(gameObject.name) + ",objectIndex(Index)," + partialMapping;
+            string cleanPropertyAlias = ASPMapperHelper.AspFormat(propertyAlias);
+            partialMapping = cleanPropertyAlias + "(" + ASPMapperHelper.AspFormat(gameObject.name) + ",objectIndex(Index)," + partialMapping;
             partialMapping += ")";
             if (!isSensor)
             {
                 partialMapping = "setOnActuator(" + partialMapping;
-                partialMapping += ") :-objectIndex(" + cleanConfigurationName + ", Index), .";
+                partialMapping += ") :-objectIndex(" + cleanPropertyAlias + ", Index), .";
             }
             else
             {

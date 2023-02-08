@@ -8,15 +8,15 @@ namespace ThinkEngine
     [Serializable]
     internal class PropertyFeatures : ISerializationCallbackReceiver
     {
-        private static HashSet<int> usedNameProperty = new HashSet<int>();
+        private static HashSet<int> usedPropertyAlias = new HashSet<int>();
         [SerializeField,HideInInspector]
         internal MyListString property;
         [SerializeField,HideInInspector]
         internal int windowWidth = 200;
         [SerializeField,HideInInspector]
-        private string _propertyName;
+        private string _propertyAlias;
         [SerializeField,HideInInspector]
-        private int propertyNameHash;
+        private int propertyAliasHash;
         [SerializeField,HideInInspector]
         internal int operation;
         [SerializeField,HideInInspector]
@@ -29,7 +29,7 @@ namespace ThinkEngine
         {
             get
             {
-                return _propertyName;
+                return _propertyAlias;
             }
             set
             {
@@ -45,24 +45,24 @@ namespace ThinkEngine
 
         private void ValidateNameAndAssign(string value)
         {
-            if(_propertyName == value)
+            if(_propertyAlias == value)
             {
-                Debug.Log("SAME VALUE! "+_propertyName+" "+value);
+                Debug.Log("SAME VALUE! "+_propertyAlias+" "+value);
                 return;
             }
-            if (usedNameProperty.Contains(value.GetHashCode()))
+            if (usedPropertyAlias.Contains(value.GetHashCode()))
             {
                 Debug.Log("THROWING!");
                 throw new Exception("InvalidName");
             }
-            if(_propertyName!=null && usedNameProperty.Contains(propertyNameHash))
+            if(_propertyAlias!=null && usedPropertyAlias.Contains(propertyAliasHash))
             {
-                usedNameProperty.Remove(propertyNameHash);
+                usedPropertyAlias.Remove(propertyAliasHash);
             }
             Debug.Log("setting _property_name to " + value);
-            _propertyName = value;
-            propertyNameHash = PropertyAlias.GetHashCode();
-            usedNameProperty.Add(propertyNameHash);
+            _propertyAlias = value;
+            propertyAliasHash = PropertyAlias.GetHashCode();
+            usedPropertyAlias.Add(propertyAliasHash);
         }
 
         private void GeneratePropertyName(string goName)
@@ -108,7 +108,7 @@ namespace ThinkEngine
 
         internal void Remove()
         {
-            usedNameProperty.Remove(propertyNameHash);
+            usedPropertyAlias.Remove(propertyAliasHash);
         }
 
         public void OnBeforeSerialize()
@@ -117,7 +117,7 @@ namespace ThinkEngine
 
         public void OnAfterDeserialize()
         {
-            usedNameProperty.Add(propertyNameHash);
+            usedPropertyAlias.Add(propertyAliasHash);
         }
     }
 }

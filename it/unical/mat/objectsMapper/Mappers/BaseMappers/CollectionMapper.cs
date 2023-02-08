@@ -109,6 +109,7 @@ namespace ThinkEngine.Mappers.BaseMappers
 
         protected void GenerateMapping(ref InstantiationInformation information, Type elementType)
         {
+            /*
             if (information.mappingDone)
             {
                 return;
@@ -120,6 +121,22 @@ namespace ThinkEngine.Mappers.BaseMappers
                 string append = ")";
                 information.prependMapping.Add(prepend);
                 information.appendMapping.Insert(0, append);
+                information.temporaryMapping = "";
+            }
+            else
+            {
+                information.temporaryMapping += prepend;
+            }
+            */
+            if (information.mappingDone)
+            {
+                return;
+            }
+            string prepend = Placeholders(information);
+            if (!MapperManager.ExistsMapper(elementType) || MapperManager.IsBasic(elementType))
+            {
+                prepend = information.temporaryMapping + prepend;
+                information.prependMapping.Add(prepend);
                 information.temporaryMapping = "";
             }
             else

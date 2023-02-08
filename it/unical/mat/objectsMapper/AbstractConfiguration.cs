@@ -137,5 +137,6 @@ namespace ThinkEngine
         protected virtual void PropertyDeleted(MyListString property) { }
         protected virtual void PropertySelected(MyListString property) { }
         internal abstract bool IsAValidName(string temporaryName);
+
     }
 }
