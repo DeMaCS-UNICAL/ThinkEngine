@@ -54,7 +54,7 @@ namespace ThinkEngine.Mappers.BaseMappers
                 return _instance;
             }
         }
-        protected override Type ElementType(Type type)
+        public override Type ElementType(Type type)
         {
             return type.GetElementType();
         }
