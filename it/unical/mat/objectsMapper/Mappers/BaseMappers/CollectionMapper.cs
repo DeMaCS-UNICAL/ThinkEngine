@@ -67,7 +67,7 @@ namespace ThinkEngine.Mappers.BaseMappers
 
         }
         public abstract bool Supports(Type t);
-        protected abstract Type ElementType(Type type);
+        public abstract Type ElementType(Type type);
 
         public List<int> GetAggregationStreamOperationsIndexes(Type type)
         {
