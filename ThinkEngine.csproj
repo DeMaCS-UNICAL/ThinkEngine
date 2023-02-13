@@ -265,6 +265,7 @@
     <Compile Include="it\unical\mat\embaspTool\parsers\pddl\solver_planning_domains\SPDGrammarParser.cs" />
     <Compile Include="it\unical\mat\embaspTool\parsers\pddl\solver_planning_domains\SPDGrammarVisitor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Actuator\IActualReactiveBrain.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\DCS\DCSBrain.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Executor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Planner\Plan.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Specialitations\ASP\ASPReactiveBrain.cs" />
