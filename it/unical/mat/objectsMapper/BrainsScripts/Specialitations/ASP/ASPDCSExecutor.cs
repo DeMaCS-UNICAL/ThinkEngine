@@ -6,29 +6,39 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS;
+using UnityEngine;
 
 namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.ASP
 {
     internal class ASPDCSExecutor : ASPExecutor
     {
+
+        public ASPDCSExecutor(DCSBrain dCSBrain)
+        {
+            brain = dCSBrain;
+        }
+
         protected override void SpecificAnswerSetOperations(AnswerSet answer)
         {
-            throw new NotImplementedException();
+            ((DCSBrain)brain).ContentReady(answer);
         }
 
         protected override bool SpecificFactsRetrieving(Brain brain)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         protected override void SpecificFactsWriting(Brain brain, StreamWriter fs)
         {
-            throw new NotImplementedException();
+            fs.Write(((DCSBrain)brain).PrefabFacts()) ;
         }
 
         protected override List<OptionDescriptor> SpecificOptions()
         {
-            throw new NotImplementedException();
+            List<OptionDescriptor> options = new List<OptionDescriptor>();
+            options.Add(new OptionDescriptor("--filter=instantiatePrefab/4"));
+            return options;
         }
     }
 }
