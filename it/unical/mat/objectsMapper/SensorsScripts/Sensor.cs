@@ -10,13 +10,13 @@ namespace ThinkEngine
     class Sensor
     {
         internal bool invariant;
-        private bool first=true;
-        GameObject gameObject;
+        protected bool first=true; //GMDG private
+        protected GameObject gameObject; //GMDG default
         MonoBehaviourSensorsManager manager;
         internal SensorConfiguration configuration;
         private MyListString property;
         private List<IInfoAndValue> _propertyInfo;
-        private bool ready;
+        protected bool ready; //GMDG private
         internal List<IInfoAndValue> PropertyInfo
         {
             get

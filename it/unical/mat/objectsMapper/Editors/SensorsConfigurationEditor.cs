@@ -25,6 +25,13 @@ namespace ThinkEngine.Editors
             DrawPropertiesExcluding(serializedObject, new string[] { });
             serializedObject.ApplyModifiedProperties();
             base.OnInspectorGUI();
+            // GMDG
+            bool generate = GUILayout.Button("Generate Sensors Code");
+            if (generate && configuration.ToMapProperties.Count > 0)
+            {
+                CodeGeneration.GenerateCode(configuration.ToMapProperties, configuration.gameObject, configuration);
+            }
+            // GMDG
         }
         protected override void SpecificFields(MyListString property)
         {
