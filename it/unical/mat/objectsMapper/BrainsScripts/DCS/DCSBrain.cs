@@ -14,7 +14,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
     internal class DCSBrain : Brain
     {
         public bool done { get; private set; }
-        public List<GameObject> instantiablePrefabs;
+        public List<DCSPrefabConfigurator> instantiablePrefabs;
 
         IActualDCSBrain _dcsBrain;
         IActualDCSBrain DcsBrain

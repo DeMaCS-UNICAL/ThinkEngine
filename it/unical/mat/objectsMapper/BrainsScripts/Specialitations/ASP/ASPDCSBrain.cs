@@ -43,7 +43,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
                             if (brain.instantiablePrefabs.Count > index)
                             {
                                 PrefabInstantiator instantiator = new PrefabInstantiator();
-                                instantiator.toInstantiate = brain.instantiablePrefabs[index];
+                                instantiator.toInstantiate = brain.instantiablePrefabs[index].gameObject;
                                 float.TryParse(values[1], out instantiator.x);
                                 float.TryParse(values[2], out instantiator.y);
                                 float.TryParse(values[3], out instantiator.z);
@@ -67,7 +67,8 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
                 facts = "";
                 for(int i=0; i< brain.instantiablePrefabs.Count;i++)
                 {
-                    facts += "prefab("+i+",SOMETHING)."+Environment.NewLine;
+                    string currentMappings = brain.instantiablePrefabs[i].GetComponent<DCSPrefabConfigurator>().Mapping();
+                    facts += string.Format(currentMappings,i);
                 }
             }
             return facts;
@@ -75,7 +76,12 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
 
         public string SpecificFileParts()
         {
-            throw new NotImplementedException();
+            string toReturn = "";
+            toReturn += "% Facts assiociated with instantiable DCS Prefab"+Environment.NewLine;
+            toReturn += "% "+DCSPrefabConfigurator.Facts;
+            toReturn += "% Predicates for Prefab instantiation. PrefabListIndex is the index"+Environment.NewLine;
+            toReturn += "% instantiatePrefab(PrefabListIndex,X,Y,Z)." + Environment.NewLine;
+            return toReturn;
         }
     }
 }
