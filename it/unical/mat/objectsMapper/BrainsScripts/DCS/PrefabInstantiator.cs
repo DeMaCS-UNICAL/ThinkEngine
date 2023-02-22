@@ -7,15 +7,43 @@ using UnityEngine;
 
 namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
 {
-    internal class PrefabInstantiator
+    [DisallowMultipleComponent]
+    internal class PrefabInstantiator : MonoBehaviour
     {
-        internal GameObject toInstantiate;
-        internal float x, y, z;
+        internal Dictionary<DCSBrain, List<int>> toInstantiate;
+        internal Dictionary<DCSBrain, List<Vector3>> instantiationPositions;
+        internal Dictionary<DCSBrain, List<Quaternion>> instantiationRotations;
 
 
-        internal void Instantiate()
+        void OnEnable()
         {
-            GameObject.Instantiate(toInstantiate,new Vector3(x,y,z), new Quaternion());
+            toInstantiate = new Dictionary<DCSBrain, List<int>>();
+            instantiationPositions = new Dictionary<DCSBrain, List<Vector3>>();
+            instantiationRotations = new Dictionary<DCSBrain, List<Quaternion>>();
+        }
+        internal void InstantiatePrefab(DCSBrain brain, int index, Vector3 position, Quaternion rotation)
+        {
+            if (!toInstantiate.ContainsKey(brain))
+            {
+                toInstantiate[brain]=new List<int>();
+                instantiationPositions[brain]=new List<Vector3>();
+                instantiationRotations[brain]=new List<Quaternion>();
+            }
+            toInstantiate[brain].Add(index);
+            instantiationPositions[brain].Add(position);
+            instantiationRotations[brain].Add(rotation);
+        }
+
+        void Update()
+        {
+            foreach(DCSBrain brain in toInstantiate.Keys)
+            {
+                for(int i =0; i<toInstantiate[brain].Count; i++)
+                {
+                    Instantiate(brain.instantiablePrefabs[toInstantiate[brain][i]], instantiationPositions[brain][i], instantiationRotations[brain][i]);
+                }
+            }
+            toInstantiate.Clear();
         }
     }
 }

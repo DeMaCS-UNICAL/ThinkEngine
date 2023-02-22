@@ -78,7 +78,7 @@ namespace ThinkEngine.Mappers
 
         #endregion
 
-        private static BasicTypeMapper GetMapper(Type type)
+        internal static BasicTypeMapper GetMapper(Type type)
         {
             IDataMapper mapper = MapperManager.GetMapper(type);
             if (mapper is BasicTypeMapper mapper1)

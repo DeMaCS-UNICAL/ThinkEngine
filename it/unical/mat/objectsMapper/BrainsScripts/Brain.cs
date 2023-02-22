@@ -272,7 +272,6 @@ namespace ThinkEngine
         }
         void OnApplicationQuit()
         {
-            Debug.Log("Application quit: "+((PlannerBrain)this).Priority);
             if (executor != null)
             {
                 executor.reason = false;

@@ -13,9 +13,9 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
 {
     internal class DCSBrain : Brain
     {
-        public bool done { get; private set; }
+        public bool done { get; private set;}
         public List<DCSPrefabConfigurator> instantiablePrefabs;
-
+        string prefabFacts="";
         IActualDCSBrain _dcsBrain;
         IActualDCSBrain DcsBrain
         {
@@ -43,8 +43,9 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
             {
                 yield return StartCoroutine(base.Init());
                 executor = DcsBrain.GetDCSExecutor(this);
+                Utility.AddPrefabInstantiator();
                 executorName = "Solver executor " + gameObject.name;
-
+                prefabFacts = DcsBrain.PrefabFacts(this);
                 executionThread = new Thread(() =>
                 {
                     Thread.CurrentThread.Name = executorName;
@@ -57,11 +58,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
 
         internal string PrefabFacts()
         {
-            if (DcsBrain != null)
-            {
-                return DcsBrain.PrefabFacts(this);
-            }
-            return "";
+            return prefabFacts;
         }
 
         protected override HashSet<string> SupportedFileExtensions
@@ -74,7 +71,12 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
 
         protected override string SpecificFileParts()
         {
-            throw new NotImplementedException();
+            if (DcsBrain != null)
+            {
+                return DcsBrain.SpecificFileParts();
+            }
+            string toReturn = "%For ASP programs:\n" + new ASPDCSBrain().SpecificFileParts();
+            return toReturn;
         }
 
         internal override string ActualSensorEncoding(string sensorsAsASP)

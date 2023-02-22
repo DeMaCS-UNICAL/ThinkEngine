@@ -6,6 +6,7 @@ using System.Text;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 using UnityEngine;
 using System.Linq;
+using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -23,12 +24,23 @@ namespace ThinkEngine
         private static GameObject _hiddenGameObject;
         private static SensorsManager _sensorsManager;
         private static ActuatorsManager _actuatorsManager;
+        private static PrefabInstantiator _prefabInstantiator;
         internal static string slash = Path.DirectorySeparatorChar + "";
         internal static string ThinkEngineBaseFolder = Path.Combine(".", "Assets", "ThinkEngineer", "ThinkEngine");
         private static string _triggerClassPath = Path.Combine(ThinkEngineBaseFolder,"Scripts", "ThinkEngineTrigger.cs");
         private static string actualTriggerClassPath = "";
         internal static bool prefabsLoaded = false;
         private static MethodInfo[] _triggerMethods;
+
+        internal static void AddPrefabInstantiator()
+        {
+            if (PrefabInstantiator == null)
+            {
+                throw new Exception("Something went wrong with PrefabInstantiator");
+            }
+            return;
+        }
+
         internal static string RunnableExtension = Environment.OSVersion.Platform == PlatformID.Win32NT ? ".exe" : "";
         internal static string StreamingAssetsContent = Path.Combine(Application.streamingAssetsPath, "ThinkEngineer", "ThinkEngine");
         internal static string TemplatesFolder = Path.Combine(ThinkEngineBaseFolder, "Templates");
@@ -144,6 +156,21 @@ namespace ThinkEngine
                     }
                 }
                 return _actuatorsManager;
+            }
+        }
+        internal static PrefabInstantiator PrefabInstantiator
+        {
+            get
+            {
+                if (_prefabInstantiator == null)
+                {
+                    _prefabInstantiator = HiddenGameObject.GetComponent<PrefabInstantiator>();
+                    if (_prefabInstantiator == null)
+                    {
+                        _prefabInstantiator = HiddenGameObject.AddComponent<PrefabInstantiator>();
+                    }
+                }
+                return _prefabInstantiator;
             }
         }
         internal static string TriggerClassPath

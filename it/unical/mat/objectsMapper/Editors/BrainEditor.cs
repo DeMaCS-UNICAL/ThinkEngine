@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -9,7 +10,7 @@ using static ThinkEngine.Brain;
 
 namespace ThinkEngine.Editors
 {
-    [CustomEditor(typeof(Brain))]
+    [CustomEditor(typeof(Brain),true)]
     public class BrainEditor : Editor
     {
         protected List<string> _excludedProperties;

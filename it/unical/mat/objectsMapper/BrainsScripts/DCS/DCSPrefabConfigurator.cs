@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ThinkEngine.Mappers;
 using UnityEngine;
 
 namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
@@ -27,35 +28,41 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
             {
                 if(_facts == null)
                 {
-                    _facts = "prefabName(Index,Name)."+Environment.NewLine;
-                    _facts += "isDangerous(Index,Bool)." + Environment.NewLine;
-                    _facts += "isWalkable(Index,Bool)." + Environment.NewLine;
-                    _facts += "isObstacle(Index,Bool)." + Environment.NewLine;
-                    _facts += "canFloat(Index,Bool)." + Environment.NewLine;
-                    _facts += "isStackable(Index,Bool)." + Environment.NewLine;
-                    _facts += "minDistanceFromGround(Index,Int)." + Environment.NewLine;
-                    _facts += "neededSpaceUp(Index,Int)." + Environment.NewLine;
-                    _facts += "neededSpaceDown(Index,Int)." + Environment.NewLine;
-                    _facts += "neededSpaceLeft(Index,Int)." + Environment.NewLine;
-                    _facts += "neededSpaceRight(Index,Int)." + Environment.NewLine;
+                    _facts = "%prefabName(Index,Name)."+Environment.NewLine;
+                    _facts += "%isDangerous(Index,Bool)." + Environment.NewLine;
+                    _facts += "%isWalkable(Index,Bool)." + Environment.NewLine;
+                    _facts += "%isObstacle(Index,Bool)." + Environment.NewLine;
+                    _facts += "%canFloat(Index,Bool)." + Environment.NewLine;
+                    _facts += "%isStackable(Index,Bool)." + Environment.NewLine;
+                    _facts += "%minDistanceFromGround(Index,Int)." + Environment.NewLine;
+                    _facts += "%neededSpaceUp(Index,Int)." + Environment.NewLine;
+                    _facts += "%neededSpaceDown(Index,Int)." + Environment.NewLine;
+                    _facts += "%neededSpaceLeft(Index,Int)." + Environment.NewLine;
+                    _facts += "%neededSpaceRight(Index,Int)." + Environment.NewLine;
                 }
+                return _facts;
             }
         }
         internal string Mapping()
         {
             List<string> maps = new List<string>();
-            maps.Add("prefabName({0}," + gameObject.name+")");
-            maps.Add("isDangerous({0}," + isDangerous+")");
-            maps.Add("isWalkable({0}," + isWalkable + ")");
-            maps.Add("isObstacle({0}," + isObstacle + ")");
-            maps.Add("canFloat({0}," + canFloat + ")");
-            maps.Add("isStackable({0}," + isStackable + ")");
-            maps.Add("minDistanceFromGround({0}," + minDistanceFromGround + ")");
-            maps.Add("neededSpaceUp({0}," + neededSpaceUp + ")");
-            maps.Add("neededSpaceDown({0}," + neededSpaceDown + ")");
-            maps.Add("neededSpaceLeft({0}," + neededSpaceLeft + ")");
-            maps.Add("neededSpaceRight({0}," + neededSpaceRight + ")");
+            maps.Add("prefabName({0}," + PropertyMap(gameObject.name)+")");
+            maps.Add("isDangerous({0}," + PropertyMap(isDangerous) +")");
+            maps.Add("isWalkable({0}," + PropertyMap(isWalkable) + ")");
+            maps.Add("isObstacle({0}," + PropertyMap(isObstacle) + ")");
+            maps.Add("canFloat({0}," + PropertyMap(canFloat) + ")");
+            maps.Add("isStackable({0}," + PropertyMap(isStackable) + ")");
+            maps.Add("minDistanceFromGround({0}," + PropertyMap(minDistanceFromGround) + ")");
+            maps.Add("neededSpaceUp({0}," + PropertyMap(neededSpaceUp) + ")");
+            maps.Add("neededSpaceDown({0}," + PropertyMap(neededSpaceDown) + ")");
+            maps.Add("neededSpaceLeft({0}," + PropertyMap(neededSpaceLeft) + ")");
+            maps.Add("neededSpaceRight({0}," + PropertyMap(neededSpaceRight) + ").");
             return string.Join("."+Environment.NewLine, maps);
+        }
+
+        private string PropertyMap(object obj)
+        {
+            return BasicTypeMapper.GetMapper(obj.GetType()).BasicMap(obj);
         }
 
     }
