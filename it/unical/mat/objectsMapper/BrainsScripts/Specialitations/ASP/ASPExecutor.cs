@@ -43,12 +43,11 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
             {
                 if (answers.GetOptimalAnswerSets().Count > 0)
                 {
-                    
-                    AnswerSet answer = answers.GetOptimalAnswerSets()[0];
+                    AnswerSet answer = GetOptimal(answers);
                     if (brain.debug)
                     {
-                        Debug.Log(brain.executorName+" Computed AnswerSet:\n" + string.Join(" ; ", answer.GetAnswerSet()));
-                        foreach(int level in answer.LevelWeight.Keys)
+                        Debug.Log(brain.executorName + " Computed AnswerSet:\n" + string.Join(" ; ", answer.GetAnswerSet()));
+                        foreach (int level in answer.LevelWeight.Keys)
                         {
                             Debug.Log("level " + level + " cost " + answer.LevelWeight[level]);
                         }
@@ -58,7 +57,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 }
                 else
                 {
-                    AnswerSet answer = answers.answersets[0];
+                    AnswerSet answer = GetAnswerSet(answers);
                     if (brain.debug)
                     {
                         Debug.Log(brain.executorName + "Computed AnswerSet:\n" + string.Join(" ; ", answer.GetAnswerSet()));
@@ -74,6 +73,17 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 }
             }
         }
+
+        protected virtual  AnswerSet GetAnswerSet(AnswerSets answers)
+        {
+            return answers.answersets[0];
+        }
+
+        protected  virtual  AnswerSet GetOptimal(AnswerSets answers)
+        {
+            return answers.GetOptimalAnswerSets()[0];
+        }
+
         protected override InputProgram GetInputProgram()
         {
             return new ASPInputProgram();

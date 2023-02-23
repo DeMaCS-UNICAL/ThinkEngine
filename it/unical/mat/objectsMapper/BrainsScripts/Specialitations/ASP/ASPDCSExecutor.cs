@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS;
 using UnityEngine;
+using Random = System.Random;
 
 namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.ASP
 {
@@ -39,6 +40,15 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
             List<OptionDescriptor> options = new List<OptionDescriptor>();
             options.Add(new OptionDescriptor("--filter=instantiatePrefab/4"));
             return options;
+        }
+        protected override AnswerSet GetAnswerSet(AnswerSets answers)
+        {
+            return answers.answersets[new Random().Next(answers.answersets.Count)];
+        }
+        protected override AnswerSet GetOptimal(AnswerSets answers)
+        {
+            IList<AnswerSet> answerSets = answers.GetOptimalAnswerSets();
+            return answerSets[new Random().Next(answerSets.Count)];
         }
     }
 }
