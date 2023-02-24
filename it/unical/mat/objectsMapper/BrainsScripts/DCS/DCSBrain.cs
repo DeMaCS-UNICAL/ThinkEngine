@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -15,6 +16,14 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
     {
         public bool done { get; private set;}
         public List<DCSPrefabConfigurator> instantiablePrefabs;
+        internal List<string> factsToAdd;
+        internal string FactsToAdd
+        {
+            get
+            {
+                return string.Join(Environment.NewLine, factsToAdd)+Environment.NewLine;
+            }
+        }
         string prefabFacts="";
         IActualDCSBrain _dcsBrain;
         IActualDCSBrain DcsBrain
@@ -36,11 +45,31 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
         {
             DcsBrain.ContentReady(content, this);
         }
-
+        internal void AddFact(string fact)
+        {
+            if (!factsToAdd.Contains(fact))
+            {
+                factsToAdd.Add(fact+".");
+            }
+        }
+        internal void DeleteFact(string fact)
+        {
+            string toRemve=fact+".";
+            if (factsToAdd.Contains(toRemve))
+            {
+                factsToAdd.Remove(toRemve);
+            }
+        }
+        internal void UpdateFact(string factToDelete,string factToAdd)
+        {
+            DeleteFact(factToDelete);
+            AddFact(factToAdd); 
+        }
         protected override IEnumerator Init()
         {
             if (DcsBrain != null)
             {
+                factsToAdd = new List<string>();
                 yield return StartCoroutine(base.Init());
                 executor = DcsBrain.GetDCSExecutor(this);
                 Utility.AddPrefabInstantiator();
@@ -55,6 +84,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
                 executionThread.Start();
             }
         }
+
 
         internal string PrefabFacts()
         {

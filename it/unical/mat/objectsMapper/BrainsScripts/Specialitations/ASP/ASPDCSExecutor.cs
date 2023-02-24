@@ -22,6 +22,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
 
         protected override void SpecificAnswerSetOperations(AnswerSet answer)
         {
+            
             ((DCSBrain)brain).ContentReady(answer);
         }
 
@@ -32,13 +33,14 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
 
         protected override void SpecificFactsWriting(Brain brain, StreamWriter fs)
         {
+            fs.Write(((DCSBrain)brain).FactsToAdd);
             fs.Write(((DCSBrain)brain).PrefabFacts()) ;
         }
 
         protected override List<OptionDescriptor> SpecificOptions()
         {
             List<OptionDescriptor> options = new List<OptionDescriptor>();
-            options.Add(new OptionDescriptor("--filter=instantiatePrefab/4"));
+            options.Add(new OptionDescriptor("--filter=instantiatePrefab/4,toPersists/2,Add/1,Delete/1,Update/2"));
             return options;
         }
         protected override AnswerSet GetAnswerSet(AnswerSets answers)

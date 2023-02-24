@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS;
 using UnityEngine;
@@ -12,9 +13,18 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
     internal class ASPDCSBrain : IActualDCSBrain
     {
         string facts;
-        void Start()
+        string updatePattern = @"^Update\(([^, ()]+(\([^()]*\)[^,()]*)?)+,?([^, ()]+(\([^()]*\)[^,()]*)?)+\)$";
+        Regex _regex;
+        Regex Regex
         {
-
+            get
+            {
+                if(_regex == null)
+                {
+                    _regex = new Regex(updatePattern);
+                }
+                return _regex;
+            }
         }
         public string ActualSensorEncoding(string sensorsAsASP)
         {
@@ -60,6 +70,26 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
                     }
 
                 }
+                else if (literal.StartsWith("Add("))
+                {
+                    string temp = literal.Remove(0, 4);
+                    temp = temp.Remove(temp.Length - 1, 1);
+                    brain.AddFact(temp);
+                }
+                else if (literal.StartsWith("Delete("))
+                {
+                    string temp = literal.Remove(0, 7);
+                    temp = temp.Remove(temp.Length - 1, 1);
+                    brain.DeleteFact(temp);
+                }
+                else if (literal.StartsWith("Update("))
+                {
+                    Match match = Regex.Match(literal);
+                    if (match.Success)
+                    {
+                        brain.UpdateFact(match.Groups[1].Value,match.Groups[3].Value);
+                    }
+                }
             }
         }
 
@@ -91,5 +121,6 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
             toReturn += "% instantiatePrefab(PrefabListIndex,PX,PY,PZ, RX, RY, RZ, RW)." + Environment.NewLine;
             return toReturn;
         }
+
     }
 }
