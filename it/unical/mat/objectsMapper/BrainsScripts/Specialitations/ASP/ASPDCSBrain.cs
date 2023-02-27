@@ -74,23 +74,27 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
                 {
                     string temp = literal.Remove(0, 4);
                     temp = temp.Remove(temp.Length - 1, 1);
-                    brain.AddFact(temp);
+                    //brain.AddFact(temp);
+                    brain.FactsToAdd(temp);
                 }
                 else if (literal.StartsWith("Delete("))
                 {
                     string temp = literal.Remove(0, 7);
                     temp = temp.Remove(temp.Length - 1, 1);
-                    brain.DeleteFact(temp);
+                    //brain.DeleteFact(temp);
+                    brain.FactsToDelete(temp);
                 }
                 else if (literal.StartsWith("Update("))
                 {
                     Match match = Regex.Match(literal);
                     if (match.Success)
                     {
-                        brain.UpdateFact(match.Groups[1].Value,match.Groups[3].Value);
+                        //brain.UpdateFact(match.Groups[1].Value,match.Groups[3].Value);
+                        brain.FactsToUpdate(match.Groups[1].Value, match.Groups[3].Value);
                     }
                 }
             }
+            brain.ApplyChangesToFacts();
         }
 
         public Executor GetDCSExecutor(DCSBrain dCSBrain)

@@ -16,8 +16,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
     {
         public bool done { get; private set;}
         public List<DCSPrefabConfigurator> instantiablePrefabs;
-        internal List<string> factsToAdd;
-        internal string FactsToAdd
+        List<string> factsToAdd;
+        List<string> tempToAdd;
+        List<string> tempToDelete;
+        internal string FactsToAddList
         {
             get
             {
@@ -41,35 +43,13 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
             }
         }
 
-        internal void ContentReady(object content)
-        {
-            DcsBrain.ContentReady(content, this);
-        }
-        internal void AddFact(string fact)
-        {
-            if (!factsToAdd.Contains(fact))
-            {
-                factsToAdd.Add(fact+".");
-            }
-        }
-        internal void DeleteFact(string fact)
-        {
-            string toRemve=fact+".";
-            if (factsToAdd.Contains(toRemve))
-            {
-                factsToAdd.Remove(toRemve);
-            }
-        }
-        internal void UpdateFact(string factToDelete,string factToAdd)
-        {
-            DeleteFact(factToDelete);
-            AddFact(factToAdd); 
-        }
         protected override IEnumerator Init()
         {
             if (DcsBrain != null)
             {
                 factsToAdd = new List<string>();
+                tempToAdd = new List<string>();
+                tempToDelete = new List<string>();
                 yield return StartCoroutine(base.Init());
                 executor = DcsBrain.GetDCSExecutor(this);
                 Utility.AddPrefabInstantiator();
@@ -86,6 +66,55 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
         }
 
 
+        internal void ContentReady(object content)
+        {
+            DcsBrain.ContentReady(content, this);
+        }
+
+        internal void FactsToAdd(string temp)
+        {
+            tempToAdd.Add(temp);
+        }
+
+        internal void FactsToDelete(string temp)
+        {
+            tempToDelete.Add(temp);
+
+        }
+
+        internal void FactsToUpdate(string value1, string value2)
+        {
+            tempToDelete.Add(value1);
+            tempToAdd.Add(value2);
+        }
+        internal void AddFact(string fact)
+        {
+            if (!factsToAdd.Contains(fact))
+            {
+                factsToAdd.Add(fact+".");
+            }
+        }
+        internal void DeleteFact(string fact)
+        {
+            string toRemve=fact+".";
+            if (factsToAdd.Contains(toRemve))
+            {
+                factsToAdd.Remove(toRemve);
+            }
+        }
+        internal void ApplyChangesToFacts()
+        {
+            foreach(string fact in tempToDelete)
+            {
+                DeleteFact(fact);
+            }
+            tempToDelete.Clear();
+            foreach (string fact in tempToAdd)
+            {
+                AddFact(fact);
+            }
+            tempToAdd.Clear();
+        }
         internal string PrefabFacts()
         {
             return prefabFacts;
@@ -109,6 +138,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
             return toReturn;
         }
 
+
         internal override string ActualSensorEncoding(string sensorsAsASP)
         {
             if (DcsBrain != null)
@@ -117,5 +147,6 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
             }
             return sensorsAsASP;
         }
+
     }
 }
