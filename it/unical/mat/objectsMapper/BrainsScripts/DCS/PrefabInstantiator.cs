@@ -10,40 +10,37 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
     [DisallowMultipleComponent]
     internal class PrefabInstantiator : MonoBehaviour
     {
-        internal Dictionary<DCSBrain, List<int>> toInstantiate;
-        internal Dictionary<DCSBrain, List<Vector3>> instantiationPositions;
-        internal Dictionary<DCSBrain, List<Quaternion>> instantiationRotations;
+        internal List<int> toInstantiate;
+        internal List<Vector3> instantiationPositions;
+        internal List<Quaternion> instantiationRotations;
 
 
         void OnEnable()
         {
-            toInstantiate = new Dictionary<DCSBrain, List<int>>();
-            instantiationPositions = new Dictionary<DCSBrain, List<Vector3>>();
-            instantiationRotations = new Dictionary<DCSBrain, List<Quaternion>>();
+            toInstantiate = new List<int>();
+            instantiationPositions = new List<Vector3>();
+            instantiationRotations = new List<Quaternion>();
         }
-        internal void InstantiatePrefab(DCSBrain brain, int index, Vector3 position, Quaternion rotation)
+        internal void InstantiatePrefab(int index, Vector3 position, Quaternion rotation)
         {
-            if (!toInstantiate.ContainsKey(brain))
+            lock (this)
             {
-                toInstantiate[brain]=new List<int>();
-                instantiationPositions[brain]=new List<Vector3>();
-                instantiationRotations[brain]=new List<Quaternion>();
+                toInstantiate.Add(index);
+                instantiationPositions.Add(position);
+                instantiationRotations.Add(rotation);
             }
-            toInstantiate[brain].Add(index);
-            instantiationPositions[brain].Add(position);
-            instantiationRotations[brain].Add(rotation);
         }
 
         void Update()
         {
-            foreach(DCSBrain brain in toInstantiate.Keys)
+            lock (this)
             {
-                for(int i =0; i<toInstantiate[brain].Count; i++)
+                for (int i = 0; i < toInstantiate.Count; i++)
                 {
-                    Instantiate(brain.instantiablePrefabs[toInstantiate[brain][i]], instantiationPositions[brain][i], instantiationRotations[brain][i]);
+                    Instantiate(DCSPrefabConfigurator.instances[toInstantiate[i]], instantiationPositions[i], instantiationRotations[i]);
                 }
+                toInstantiate.Clear();
             }
-            toInstantiate.Clear();
         }
     }
 }

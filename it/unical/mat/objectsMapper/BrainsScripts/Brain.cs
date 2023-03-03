@@ -170,7 +170,7 @@ namespace ThinkEngine
                 }
             }
 
-            if (FileExtension.Equals(""))
+            if (_fileExtension == "")
             {
                 _fileExtension = null;
             }
@@ -219,7 +219,7 @@ namespace ThinkEngine
         internal virtual void GenerateFile()
         {
             string sensorsAsASP;
-            using (StreamWriter fs = File.CreateText(AIFileTemplatePath))
+            using (StreamWriter fs = new StreamWriter(AIFileTemplatePath))
             {
                 fs.Write("%For runtime instantiated GameObject, only the prefab mapping is provided. Use that one substituting the gameobject name accordingly.\n %Sensors.\n");
                 HashSet<string> seenSensorConfNames = new HashSet<string>();

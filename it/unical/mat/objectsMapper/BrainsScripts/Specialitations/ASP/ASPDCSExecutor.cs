@@ -14,15 +14,17 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
 {
     internal class ASPDCSExecutor : ASPExecutor
     {
-
+        bool firstDone;
+        string dataPath;
         public ASPDCSExecutor(DCSBrain dCSBrain)
         {
             brain = dCSBrain;
+            dataPath = Application.dataPath;
         }
 
         protected override void SpecificAnswerSetOperations(AnswerSet answer)
         {
-            
+            firstDone = true;
             ((DCSBrain)brain).ContentReady(answer);
         }
 
@@ -33,14 +35,22 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
 
         protected override void SpecificFactsWriting(Brain brain, StreamWriter fs)
         {
-            fs.Write(((DCSBrain)brain).FactsToAdd);
-            fs.Write(((DCSBrain)brain).PrefabFacts()) ;
+            DCSBrain brain1 = ((DCSBrain)brain);
+            fs.Write(brain1.FactsForExecutor);
+            fs.Write(brain1.PrefabFacts()) ;
+            if (!firstDone)
+            {
+                using (StreamReader sr = new StreamReader(brain1.initAIFile))
+                {
+                    fs.WriteLine(sr.ReadToEnd());
+                }
+            }
         }
 
         protected override List<OptionDescriptor> SpecificOptions()
         {
             List<OptionDescriptor> options = new List<OptionDescriptor>();
-            options.Add(new OptionDescriptor("--filter=instantiatePrefab/4,toPersists/2,Add/1,Delete/1,Update/2"));
+            options.Add(new OptionDescriptor("--filter=instantiatePrefab/4,Add/1,Delete/1,Update/2 -n="+((DCSBrain)brain).numberOfAnswerSet));
             return options;
         }
         protected override AnswerSet GetAnswerSet(AnswerSets answers)
@@ -51,6 +61,13 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
         {
             IList<AnswerSet> answerSets = answers.GetOptimalAnswerSets();
             return answerSets[new Random().Next(answerSets.Count)];
+        }
+        protected override void AddFileToEncoding(string fileName)
+        {
+            if (fileName != Path.Combine(dataPath,((DCSBrain)brain).initAIFile))
+            {
+                base.AddFileToEncoding(fileName);
+            }
         }
     }
 }

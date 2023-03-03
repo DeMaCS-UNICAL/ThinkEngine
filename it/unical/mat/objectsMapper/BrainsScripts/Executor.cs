@@ -120,7 +120,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 string actualFileName = fileName.Substring(fileName.LastIndexOf(Utility.slash) + 1);
                 if (actualFileName.StartsWith(brain.AIFilesPrefix) && (actualFileName.EndsWith(GetCurrentFileExtension()) || actualFileName.EndsWith(".py")))
                 {
-                    encoding.AddFilesPath(fileName);
+                    AddFileToEncoding(fileName);
                 }
             }
 
@@ -261,6 +261,11 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
 
             }
             KillProcess(handler);
+        }
+
+        protected virtual void AddFileToEncoding(string fileName)
+        {
+            encoding.AddFilesPath(fileName);
         }
 
         private static void KillProcess(Handler handler)

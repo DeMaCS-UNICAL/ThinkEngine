@@ -8,20 +8,42 @@ using UnityEngine;
 
 namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
 {
-    [DisallowMultipleComponent]
+    [DisallowMultipleComponent, ExecuteInEditMode, Serializable]
     public class DCSPrefabConfigurator:MonoBehaviour
     {
+        internal static Dictionary<int, DCSPrefabConfigurator> instances = new Dictionary<int, DCSPrefabConfigurator>();
+        public int index;
         public bool isDangerous;
         public bool isWalkable;
         public bool isObstacle;
         public bool canFloat;
         public bool isStackable;
-        public int minDistanceFromGround = 0;
-        public int neededSpaceUp = 0;
-        public int neededSpaceDown = 0;
-        public int neededSpaceLeft = 0;
-        public int neededSpaceRight = 0;
+        public bool cannotBeTopped;
+        public bool cannotBeTop;
+        public List<DCSPrefabConfigurator> canBeToppedBy;
+        public List<DCSPrefabConfigurator> canBeSidedBy;
+        public List<DCSPrefabConfigurator> bestSidedBy;
         internal static string _facts;
+
+        void Awake()
+        {
+            
+            if (canBeSidedBy == null)
+            {
+                canBeSidedBy = new List<DCSPrefabConfigurator>();
+                canBeToppedBy = new List<DCSPrefabConfigurator>();
+                bestSidedBy = new List<DCSPrefabConfigurator>();
+            }
+        }
+        internal void Init()
+        {
+            if (gameObject.activeInHierarchy)
+            {
+                enabled = false;
+            }
+            index = gameObject.GetInstanceID();
+            instances[index] = this;
+        }
         internal static string Facts
         {
             get
@@ -29,16 +51,16 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
                 if(_facts == null)
                 {
                     _facts = "%prefabName(Index,Name)."+Environment.NewLine;
-                    _facts += "%isDangerous(Index,Bool)." + Environment.NewLine;
-                    _facts += "%isWalkable(Index,Bool)." + Environment.NewLine;
-                    _facts += "%isObstacle(Index,Bool)." + Environment.NewLine;
-                    _facts += "%canFloat(Index,Bool)." + Environment.NewLine;
-                    _facts += "%isStackable(Index,Bool)." + Environment.NewLine;
-                    _facts += "%minDistanceFromGround(Index,Int)." + Environment.NewLine;
-                    _facts += "%neededSpaceUp(Index,Int)." + Environment.NewLine;
-                    _facts += "%neededSpaceDown(Index,Int)." + Environment.NewLine;
-                    _facts += "%neededSpaceLeft(Index,Int)." + Environment.NewLine;
-                    _facts += "%neededSpaceRight(Index,Int)." + Environment.NewLine;
+                    _facts += "%isDangerous(Index)." + Environment.NewLine;
+                    _facts += "%isWalkable(Index)." + Environment.NewLine;
+                    _facts += "%isObstacle(Index)." + Environment.NewLine;
+                    _facts += "%canFloat(Index)." + Environment.NewLine;
+                    _facts += "%isStackable(Index)." + Environment.NewLine;
+                    _facts += "%cannotBeTopped(Index)." + Environment.NewLine;
+                    _facts += "%cannotBeTop(Index)." + Environment.NewLine;
+                    _facts += "%canBeToppedBy(BottomIndex,PossibleTopperIndex)." + Environment.NewLine;
+                    _facts += "%canBeSidedBy(Index,PossibleSiderIndex)." + Environment.NewLine;
+                    _facts += "%bestSidedBy(Index,PossibleSiderIndex)." + Environment.NewLine;
                 }
                 return _facts;
             }
@@ -46,18 +68,57 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
         internal string Mapping()
         {
             List<string> maps = new List<string>();
-            maps.Add("prefabName({0}," + PropertyMap(gameObject.name)+")");
-            maps.Add("isDangerous({0}," + PropertyMap(isDangerous) +")");
-            maps.Add("isWalkable({0}," + PropertyMap(isWalkable) + ")");
-            maps.Add("isObstacle({0}," + PropertyMap(isObstacle) + ")");
-            maps.Add("canFloat({0}," + PropertyMap(canFloat) + ")");
-            maps.Add("isStackable({0}," + PropertyMap(isStackable) + ")");
-            maps.Add("minDistanceFromGround({0}," + PropertyMap(minDistanceFromGround) + ")");
-            maps.Add("neededSpaceUp({0}," + PropertyMap(neededSpaceUp) + ")");
-            maps.Add("neededSpaceDown({0}," + PropertyMap(neededSpaceDown) + ")");
-            maps.Add("neededSpaceLeft({0}," + PropertyMap(neededSpaceLeft) + ")");
-            maps.Add("neededSpaceRight({0}," + PropertyMap(neededSpaceRight) + ").");
-            return string.Join("."+Environment.NewLine, maps);
+            maps.Add("prefabName("+index+"," + PropertyMap(gameObject.name)+")");
+            if (isDangerous)
+            {
+                maps.Add("isDangerous("+index+")");
+            }
+            if (isWalkable)
+            {
+                maps.Add("isWalkable(" + index + ")");
+            }
+            if (isObstacle)
+            {
+                maps.Add("isObstacle(" + index + ")");
+            }
+            if (canFloat)
+            {
+                maps.Add("canFloat(" + index + ")");
+            }
+            if (isStackable)
+            {
+                maps.Add("isStackable(" + index + ")");
+            }
+            if (cannotBeTopped)
+            {
+                maps.Add("cannotBeTopped(" + index + ")");
+            }
+            if (cannotBeTop)
+            {
+                maps.Add("cannotBeTop(" + index + ")");
+            }
+            if (canBeToppedBy.Count>0)
+            {
+                foreach (DCSPrefabConfigurator prefab in canBeToppedBy)
+                {
+                    maps.Add("cannotBeTopped("+index+","+prefab.index+")");
+                }
+            }
+            if (canBeSidedBy.Count > 0)
+            {
+                foreach (DCSPrefabConfigurator prefab in canBeSidedBy)
+                {
+                    maps.Add("canBeSidedBy(" + index + "," + prefab.index + ")");
+                }
+            }
+            if (bestSidedBy.Count > 0)
+            {
+                foreach (DCSPrefabConfigurator prefab in bestSidedBy)
+                {
+                    maps.Add("bestSidedBy(" + index + "," + prefab.index + ")");
+                }
+            }
+            return string.Join("."+Environment.NewLine, maps)+"."+Environment.NewLine;
         }
 
         private string PropertyMap(object obj)

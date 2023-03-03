@@ -198,6 +198,8 @@ namespace ThinkEngine.Editors
             EditorGUILayout.LabelField("In scene Sensor Configurations", EditorStyles.boldLabel);
             ShowConfigurations(SensorsConfigurationNames, ToggledSensorsConfigurations);
         }
+
+
         protected void ShowConfigurations(List<string> configurationNames, Dictionary<string, bool> toggledConfigurations, bool checkIfDisableGUI = false)
         {
             foreach (string confName in configurationNames)

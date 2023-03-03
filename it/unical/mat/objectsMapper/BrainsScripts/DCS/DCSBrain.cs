@@ -15,11 +15,13 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
     internal class DCSBrain : Brain
     {
         public bool done { get; private set;}
-        public List<DCSPrefabConfigurator> instantiablePrefabs;
-        List<string> factsToAdd;
+        public List<DCSPrefabConfigurator> instantiablePrefabs = new List<DCSPrefabConfigurator>();
+        HashSet<string> factsToAdd;
         List<string> tempToAdd;
         List<string> tempToDelete;
-        internal string FactsToAddList
+        public int numberOfAnswerSet;
+
+        internal string FactsForExecutor
         {
             get
             {
@@ -28,6 +30,9 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
         }
         string prefabFacts="";
         IActualDCSBrain _dcsBrain;
+        [SerializeField,HideInInspector]
+        internal string initAIFile;
+
         IActualDCSBrain DcsBrain
         {
             get
@@ -42,12 +47,18 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
                 return _dcsBrain;
             }
         }
-
+        void Awake()
+        {
+            foreach(DCSPrefabConfigurator configurator in instantiablePrefabs)
+            {
+                configurator.Init();
+            }
+        }
         protected override IEnumerator Init()
         {
             if (DcsBrain != null)
             {
-                factsToAdd = new List<string>();
+                factsToAdd = new HashSet<string>();
                 tempToAdd = new List<string>();
                 tempToDelete = new List<string>();
                 yield return StartCoroutine(base.Init());

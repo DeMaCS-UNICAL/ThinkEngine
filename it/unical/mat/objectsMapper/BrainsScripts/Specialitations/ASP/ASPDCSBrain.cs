@@ -54,7 +54,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
                     {
                         if (int.TryParse(values[0], out int index))
                         {
-                            if (brain.instantiablePrefabs.Count > index)
+                            if (DCSPrefabConfigurator.instances.ContainsKey(index))
                             {
                                 PrefabInstantiator instantiator = Utility.PrefabInstantiator;
                                 float.TryParse(values[1], out float pX);
@@ -64,7 +64,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
                                 float.TryParse(values[2], out float rY);
                                 float.TryParse(values[3], out float rZ);
                                 float.TryParse(values[3], out float rW);
-                                instantiator.InstantiatePrefab(brain, index, new Vector3(pX,pY,pZ), new Quaternion(rX,rY,rZ,rW));
+                                instantiator.InstantiatePrefab( index, new Vector3(pX,pY,pZ), new Quaternion(rX,rY,rZ,rW));
                             }
                         }
                     }
@@ -107,10 +107,9 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
             if(facts == null)
             {
                 facts = "";
-                for(int i=0; i< brain.instantiablePrefabs.Count;i++)
+                foreach(DCSPrefabConfigurator configurator in DCSPrefabConfigurator.instances.Values)
                 {
-                    string currentMappings = brain.instantiablePrefabs[i].GetComponent<DCSPrefabConfigurator>().Mapping();
-                    facts += string.Format(currentMappings,i);
+                    facts += configurator.Mapping();
                 }
             }
             return facts;

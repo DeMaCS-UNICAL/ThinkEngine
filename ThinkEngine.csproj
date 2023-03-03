@@ -288,6 +288,7 @@
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Actuator\ReactiveBrain.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Specialitations\ASP\ASPReactiveExecutor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorsManager.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Editors\DCSBrainEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Editors\ReactiveBrainEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Editors\BrainEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Editors\PlannerBrainEditor.cs" />
