@@ -17,6 +17,8 @@ namespace ThinkEngine
     [ExecuteAlways, RequireComponent(typeof(IndexTracker))]
     public abstract class Brain : MonoBehaviour
     {
+        [SerializeField, HideInInspector]
+        bool borning=true;
         internal enum SOLVER { Clingo, DLV2, Incremental_DLV2 }
         internal string executorName;
         internal string SolverName
@@ -127,6 +129,11 @@ namespace ThinkEngine
         void OnEnable()
         {
             originalName = gameObject.name;
+            if (borning)
+            {
+                solverEnum = SolversChecker.AvailableSolvers()[0];
+            }
+            borning = false;
         }
 
         protected virtual void Start()
@@ -224,10 +231,10 @@ namespace ThinkEngine
                         continue;
                     }
                     seenSensorConfNames.Add(sensorConf.ConfigurationName);
-                    foreach (MyListString property in sensorConf.ToMapProperties)
+                    foreach (PropertyFeatures features in sensorConf.PropertyFeatures)
                     {
                         //Debug.Log(property);
-                        sensorsAsASP = MapperManager.GetASPTemplate(sensorConf.ConfigurationName, sensorConf.gameObject, property, true);
+                        sensorsAsASP = MapperManager.GetASPTemplate(features.PropertyAlias, sensorConf.gameObject, features.property, true);
                         //Debug.Log(sensorsAsASP);
                         fs.Write(ActualSensorEncoding(sensorsAsASP));
                     }

@@ -38,6 +38,23 @@ namespace ThinkEngine
         }
         [SerializeField, HideInInspector]
         internal List<MyListString> _toMapProperties;
+        [SerializeField, HideInInspector]
+        internal List<PropertyFeatures> _propertyFeatures;
+        internal List<PropertyFeatures> PropertyFeatures
+        {
+            get
+            {
+                if (_propertyFeatures == null)
+                {
+                    _propertyFeatures = new List<PropertyFeatures>();
+                }
+                return _propertyFeatures;
+            }
+            set
+            {
+                _propertyFeatures = value;
+            }
+        }
         internal List<MyListString> ToMapProperties
         {
             get
@@ -67,7 +84,14 @@ namespace ThinkEngine
             }
             set { }
         }
+        void OnDestroy()
+        {
+            foreach (PropertyFeatures property in _propertyFeatures)
+            {
+                property.Remove();
+            }
 
+        }
         internal void RefreshObjectTracker()
         {
             _objectTracker = new ObjectTracker(gameObject);
@@ -80,6 +104,7 @@ namespace ThinkEngine
             _objectTracker = new ObjectTracker(gameObject);
             SavedProperties = new List<MyListString>();
             ToMapProperties = new List<MyListString>();
+            PropertyFeatures = new List<PropertyFeatures>();
         }
         internal bool IsPropertySelected(MyListString property)
         {
@@ -94,6 +119,7 @@ namespace ThinkEngine
                 if (ObjectTracker.IsFinal(property))
                 {
                     ToMapProperties.Add(property);
+                    PropertyFeatures.Add(new PropertyFeatures(gameObject, property));
                 }
             }
             else
@@ -103,12 +129,14 @@ namespace ThinkEngine
                 if (ToMapProperties.Contains(property))
                 {
                     ToMapProperties.Remove(property);
+                    PropertyFeatures.RemoveAll(x => x.property.Equals(property));
                 }
             }
         }
 
-        protected abstract void PropertyDeleted(MyListString property);
-        protected abstract void PropertySelected(MyListString property);
+        protected virtual void PropertyDeleted(MyListString property) { }
+        protected virtual void PropertySelected(MyListString property) { }
         internal abstract bool IsAValidName(string temporaryName);
+
     }
 }
