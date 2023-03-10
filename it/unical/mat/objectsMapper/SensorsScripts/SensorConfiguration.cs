@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using ThinkEngine.Mappers;
+using UnityEditor;
 using UnityEngine;
 
 namespace ThinkEngine
@@ -11,7 +13,85 @@ namespace ThinkEngine
         public bool isInvariant;
         public bool isFixedSize;
 
-        
+       
+        //GMDG
+        //This array contains the types of the sensor assiated with "this" SensorConfiguration
+
+        [SerializeField]
+        private List<SerializableSystemType> _serializableSensorsTypes = new List<SerializableSystemType>();
+
+        internal List<string> _sensorsTypesNames = new List<string>();
+        private List<Sensor> _sensorsInstances = new List<Sensor>();
+
+        [SerializeField]
+        List<MonoScript> _scripts = new List<MonoScript>();
+
+        internal void AddSensorType(Type sensorType)
+        {
+            SerializableSystemType serializableSensorType = new SerializableSystemType(sensorType);
+
+            if (_serializableSensorsTypes.Contains(serializableSensorType)) return;
+
+            _serializableSensorsTypes.Add(serializableSensorType);
+        }
+
+        void Awake()
+        {
+            if(Application.isPlaying)
+            {
+                /*foreach (SerializableSystemType serializableSensorType in _serializableSensorsTypes)
+                {
+                    _sensorsInstances.Add((Sensor)serializableSensorType.SystemType.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null));
+                    //_sensorsTypes.Add(serializableSensorType.SystemType);
+                }*/
+                /*foreach(Type sensorType in _sensorsTypes)
+                {
+                    sensorType.GetMethod("Istantiate").Invoke(null, null);
+                }*/
+                foreach(MonoScript script in _scripts)
+                {
+                    Type type = Type.GetType(script.GetClass()?.AssemblyQualifiedName);
+                    _sensorsInstances.Add((Sensor)type.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null));
+                }
+                foreach (Sensor instance in _sensorsInstances)
+                {
+                    instance.Initialize(gameObject);
+                }
+            }
+        }
+
+        void OnEnable()
+        {
+            if (Application.isPlaying)
+            {
+                SensorsManager.SubscribeSensors(_sensorsInstances);
+            }
+        }
+
+        void OnDisable()
+        {
+            if (Application.isPlaying)
+            {
+                SensorsManager.UnsubscribeSensors(_sensorsInstances);
+            }
+        }
+
+        void OnDestroy()
+        {
+            if (Application.isPlaying)
+            {
+                /*foreach (Type sensorType in _sensorsTypes)
+                {
+                    sensorType.GetMethod("Destroy").Invoke(null, null);
+                }*/
+                foreach(Sensor instance in _sensorsInstances)
+                {
+                    instance.Destroy();
+                }
+            }
+        }
+        //GMDG
+
         internal override string ConfigurationName
         {
             set
@@ -29,6 +109,12 @@ namespace ThinkEngine
             }
         }
 
+        internal override void Clear()
+        {
+            base.Clear();
+            _serializableSensorsTypes = new List<SerializableSystemType>(); // GMDG
+            _sensorsTypesNames = new List<string>(); // GMDG
+        }
         internal override string GetAutoConfigurationName()
         {
             string name;

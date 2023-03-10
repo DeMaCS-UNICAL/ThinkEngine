@@ -35,7 +35,17 @@ namespace ThinkEngine.Editors
                 DrawPropertiesExcluding(serializedObject, new string[] { });
                 serializedObject.ApplyModifiedProperties();
                 base.OnInspectorGUI();
-            }
+                 bool generate = GUILayout.Button("Generate Sensors Code");
+                if (generate && configuration.ToMapProperties.Count > 0)
+                {
+                    CodeGeneration.GenerateCode(configuration.ToMapProperties, configuration.gameObject, sensorConfiguration);
+                }
+                bool attach = GUILayout.Button("Attach Sensors Code");
+                if (attach && ((SensorConfiguration)configuration)._sensorsTypesNames.Count > 0)
+                {
+                    CodeGeneration.AddingNewTypes(((SensorConfiguration)configuration)._sensorsTypesNames, (SensorConfiguration)configuration);
+                }
+                }
             else
             {
                 ConfigureProperty();
