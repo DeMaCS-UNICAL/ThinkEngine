@@ -17,10 +17,10 @@ namespace ThinkEngine
         private static int gid = 0;
 
         //Paths
-        private static readonly string rootPath = string.Format("{0}{1}", Application.dataPath, "/Scripts");
-        private static readonly string generatedCodeRelativePath = string.Format("Assets/Scripts/GeneratedCode");
-        private static readonly string generatedCodePath = string.Format("{0}/GeneratedCode", rootPath);
-        private static readonly string templateRelativePath = string.Format("{0}", "Assets/Scripts/SensorTemplate.txt");
+        private static readonly string rootPath = string.Format("{0}{1}", Path.Combine(Application.dataPath, "Scripts"));
+        private static readonly string generatedCodeRelativePath = Path.Combine("Assets","Scripts","GeneratedCode");
+        private static readonly string generatedCodePath = string.Format(Path.Combine("{0}","GeneratedCode"), rootPath);
+        private static readonly string templateRelativePath = Path.Combine("Assets","Scripts","SensorTemplate.txt");
 
         //Helping data structures
         private static List<string> propertyHierarchyNames;
