@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using ThinkEngine.Mappers;
+using UnityEditor;
 using UnityEngine;
 
 namespace ThinkEngine
@@ -59,9 +60,11 @@ namespace ThinkEngine
         [SerializeField]
         private List<SerializableSystemType> _serializableSensorsTypes = new List<SerializableSystemType>();
 
-        //private List<Type> _sensorsTypes = new List<Type>();
         internal List<string> _sensorsTypesNames = new List<string>();
         private List<Sensor> _sensorsInstances = new List<Sensor>();
+
+        [SerializeField]
+        List<MonoScript> _scripts = new List<MonoScript>();
 
         internal void AddSensorType(Type sensorType)
         {
@@ -76,16 +79,21 @@ namespace ThinkEngine
         {
             if(Application.isPlaying)
             {
-                foreach (SerializableSystemType serializableSensorType in _serializableSensorsTypes)
+                /*foreach (SerializableSystemType serializableSensorType in _serializableSensorsTypes)
                 {
                     _sensorsInstances.Add((Sensor)serializableSensorType.SystemType.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null));
                     //_sensorsTypes.Add(serializableSensorType.SystemType);
-                }
+                }*/
                 /*foreach(Type sensorType in _sensorsTypes)
                 {
                     sensorType.GetMethod("Istantiate").Invoke(null, null);
                 }*/
-                foreach(Sensor instance in _sensorsInstances)
+                foreach(MonoScript script in _scripts)
+                {
+                    Type type = Type.GetType(script.GetClass()?.AssemblyQualifiedName);
+                    _sensorsInstances.Add((Sensor)type.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null));
+                }
+                foreach (Sensor instance in _sensorsInstances)
                 {
                     instance.Initialize(gameObject);
                 }

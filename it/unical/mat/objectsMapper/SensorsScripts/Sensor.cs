@@ -19,12 +19,6 @@ namespace ThinkEngine
         private List<IInfoAndValue> _propertyInfo;
         protected bool ready; //GMDG private
 
-        //GMDG
-        //Singleton
-        protected static Sensor instance = null;
-
-        //GMDG
-
         internal List<IInfoAndValue> PropertyInfo
         {
             get
