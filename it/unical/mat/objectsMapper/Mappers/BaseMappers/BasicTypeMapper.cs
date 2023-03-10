@@ -162,17 +162,19 @@ namespace ThinkEngine.Mappers
             {
                 Debug.Log(information.propertyHierarchy);
             }*/
+            
             int operationIndex = ((SensorConfiguration)information.configuration).OperationPerProperty[information.propertyHierarchy.GetHashCode()];
             additionalInfo.operation = OperationList()[operationIndex];
             if (operationIndex == GetAggregationSpecificIndex())
             {
                 additionalInfo.specificValue = ((SensorConfiguration)information.configuration).SpecificValuePerProperty[information.propertyHierarchy.GetHashCode()];
             }
-            BasicTypeSensor sensor = new BasicTypeSensor(new Sensor());
+            //BasicTypeSensor sensor = new BasicTypeSensor(new Sensor()); GMDG
             additionalInfo.values.Add(Convert.ChangeType(information.currentObjectOfTheHierarchy, ConvertingType));
             information.hierarchyInfo.Add(additionalInfo);
-            sensor.sensor.Configure(information, GenerateMapping(information));
-            return sensor;
+            //sensor.sensor.Configure(information, GenerateMapping(information)); GMDG
+            //return sensor; GMDG
+            return null;
         }
         public ISensors ManageSensors(InstantiationInformation information, ISensors instantiatedSensors)
         {

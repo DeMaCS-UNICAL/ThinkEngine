@@ -29,7 +29,12 @@ namespace ThinkEngine.Editors
             bool generate = GUILayout.Button("Generate Sensors Code");
             if (generate && configuration.ToMapProperties.Count > 0)
             {
-                CodeGeneration.GenerateCode(configuration.ToMapProperties, configuration.gameObject, configuration);
+                CodeGeneration.GenerateCode(configuration.ToMapProperties, configuration.gameObject, sensorConfiguration);
+            }
+            bool attach = GUILayout.Button("Attach Sensors Code");
+            if (attach && ((SensorConfiguration)configuration)._sensorsTypesNames.Count > 0)
+            {
+                CodeGeneration.AddingNewTypes(((SensorConfiguration)configuration)._sensorsTypesNames, (SensorConfiguration)configuration);
             }
             // GMDG
         }
