@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Reflection;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -77,6 +78,88 @@ namespace ThinkEngine
             return true;
         }
 
+        //GMDG
+        /*
+        private static Dictionary<int, GameObject> _gameObjectSubscribed = new Dictionary<int, GameObject>();
+        private static Dictionary<int, Dictionary<SensorConfiguration, List<INewSensor>>> _sensorSubscribed = new Dictionary<int, Dictionary<SensorConfiguration, List<INewSensor>>>();
+
+        internal static void SubscribeSensor(GameObject gameObject, SensorConfiguration sensorConfiguration, List<INewSensor> listOfSensors)
+        {
+            int gameObjectID = gameObject.GetInstanceID();
+
+            if(!_gameObjectSubscribed.ContainsKey(gameObjectID))
+            {
+                _gameObjectSubscribed.Add(gameObjectID, gameObject);
+            }
+
+            if(!_sensorSubscribed.ContainsKey(gameObjectID))
+            {
+                Dictionary<SensorConfiguration, List<INewSensor>> sensorConfigurationSensors = new Dictionary<SensorConfiguration, List<INewSensor>>();
+                sensorConfigurationSensors.Add(sensorConfiguration, listOfSensors);
+                _sensorSubscribed.Add(gameObjectID, sensorConfigurationSensors);
+            }
+            else if(!_sensorSubscribed[gameObjectID].ContainsKey(sensorConfiguration))
+            {
+                _sensorSubscribed[gameObjectID].Add(sensorConfiguration, listOfSensors);
+            }
+
+            //Otherwise the same sensorconfiguration is already in the data structure
+        }
+
+        internal static void UnsubscribeSensor(GameObject gameObject, SensorConfiguration sensorConfiguration)
+        {
+            int gameObjectID = gameObject.GetInstanceID();
+
+            if (_sensorSubscribed.ContainsKey(gameObjectID))
+            {
+                _sensorSubscribed[gameObjectID].Remove(sensorConfiguration);
+
+                if(_sensorSubscribed[gameObjectID].Count == 0)
+                {
+                    _gameObjectSubscribed.Remove(gameObjectID);
+                }
+            }
+        }
+        */
+
+        //private static List<Type> _sensorsTypes = new List<Type>();
+        private static List<Sensor> _sensorsInstances = new List<Sensor>();
+
+        internal static void SubscribeSensors(List<Sensor> listOfGeneratedSensors)
+        {
+            //_sensorsTypes.AddRange(listOfGeneratedSensors);
+            _sensorsInstances.AddRange(listOfGeneratedSensors);
+        }
+
+        internal static void UnsubscribeSensors(List<Sensor> listOfGeneratedSensors)
+        {
+            /*foreach (Type sensorType in listOfGeneratedSensors)
+            {
+                _sensorsTypes.Remove(sensorType);
+            }*/
+            foreach(Sensor instance in listOfGeneratedSensors)
+            {
+                _sensorsInstances.Remove(instance);
+            }
+        }
+
+        private void Update()
+        {
+            if(Application.isPlaying)
+            {
+                /*foreach(Type sensorType in _sensorsTypes)
+                {
+                    sensorType.GetMethod("ManageSensors").Invoke(null, null);
+                    sensorType.GetMethod("UpdateValue").Invoke(null, null);
+                }*/
+                for(int i = 0; i < _sensorsInstances.Count; i++)
+                {
+                    _sensorsInstances[i].ManageSensor();
+                }
+            }
+        }
+
+        //GMDG
 
         private static ConcurrentQueue<KeyValuePair<Brain, object>> RequestedMappings
         {
@@ -152,7 +235,7 @@ namespace ThinkEngine
                 }
             }
         }
-        void Update()
+        /*void Update()
         {
             if (Application.isPlaying)
             {
@@ -172,7 +255,7 @@ namespace ThinkEngine
                     MAX_MS++;
                 }
             }
-        }
+        }*/
 
         private float FPSAvg()
         {
@@ -188,7 +271,7 @@ namespace ThinkEngine
             return sum / MOVING_AVG_FRAMES.Count;
         }
 
-        void Start()
+        /*void Start()
         {
             MIN_AVG_FPS = Math.Max(Application.targetFrameRate - 2, 58);
             MIN_CURRENT_FPS = Math.Max(Application.targetFrameRate - 10, 50);
@@ -201,12 +284,12 @@ namespace ThinkEngine
                 Reset();
                 StartCoroutine(SensorsUpdate());
             }
-        }
+        }*/
         MonoBehaviourSensorsManager[] RetrieveSensorsManagers()
         {
             return FindObjectsOfType<MonoBehaviourSensorsManager>();
         }
-        IEnumerator SensorsUpdate()
+        /*IEnumerator SensorsUpdate()
         {
             bool first = true;
             while (true)
@@ -268,7 +351,7 @@ namespace ThinkEngine
                 yield return null;
                 first = false;
             }
-        }
+        }*/
 
 
         void OnApplicationQuit()

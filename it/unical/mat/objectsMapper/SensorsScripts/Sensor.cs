@@ -4,19 +4,21 @@ using System.Collections.Generic;
 using System.Linq;
 using ThinkEngine.Mappers;
 using UnityEngine;
+using System.Reflection;
 
 namespace ThinkEngine
 {
-    class Sensor
+    internal abstract class Sensor
     {
         internal bool invariant;
-        private bool first=true;
-        GameObject gameObject;
-        MonoBehaviourSensorsManager manager;
+        protected bool first=true; //GMDG private
+        protected GameObject gameObject; //GMDG default (private)
+        MonoBehaviourSensorsManager manager; //GMDG not necessary
         internal SensorConfiguration configuration;
         private MyListString property;
         private List<IInfoAndValue> _propertyInfo;
-        private bool ready;
+        protected bool ready; //GMDG private
+
         internal List<IInfoAndValue> PropertyInfo
         {
             get
@@ -56,6 +58,8 @@ namespace ThinkEngine
             invariant = information.invariant;
             ready = true;
         }
+
+        /*
         internal void UpdateValue()
         {
             if (!ready)
@@ -68,7 +72,7 @@ namespace ThinkEngine
                 MapperManager.UpdateSensor(this, gameObject, new MyListString(property.myStrings), 0);
             }
         }
-
+        */
 
         internal string Map()
         {
@@ -103,9 +107,19 @@ namespace ThinkEngine
             }
         }
 
+        /*
         internal void Destroy()
         {
             manager.Destroy(this);
-        }
+        }*/
+
+
+        //GMDG
+        internal abstract void Initialize(GameObject gameObject);
+
+        internal abstract void Destroy();
+
+        internal abstract void ManageSensor();
+        //GMDG
     }
 }

@@ -214,12 +214,13 @@ namespace ThinkEngine.Mappers
                 additionalInfo.counter = propertyFeatures.counter;
                 additionalInfo.specificValue = Convert.ChangeType(propertyFeatures.specifValue, ConvertingType);
             }
-            BasicTypeSensor sensor = new BasicTypeSensor(new Sensor());
             additionalInfo.windowSize = propertyFeatures.windowWidth;
+            //BasicTypeSensor sensor = new BasicTypeSensor(new Sensor()); GMDG
             additionalInfo.values.Add(Convert.ChangeType(information.currentObjectOfTheHierarchy, ConvertingType));
             information.hierarchyInfo.Add(additionalInfo);
-            sensor.sensor.Configure(information, GenerateMapping(information));
-            return sensor;
+            //sensor.sensor.Configure(information, GenerateMapping(information)); GMDG
+            //return sensor; GMDG
+            return null;
         }
         public ISensors ManageSensors(InstantiationInformation information, ISensors instantiatedSensors)
         {
