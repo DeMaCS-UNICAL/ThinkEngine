@@ -149,7 +149,7 @@ namespace ThinkEngine.Editors
                 {
                     configuration.ToggleProperty(property, isActive);
                 }
-                if (isActive && needsSpecifications)
+                if (isActive && !IsExpandable(property))//TODO: this way, you can't select a subrange of a collection
                 {
                     SpecificFields(property);
                 }

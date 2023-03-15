@@ -83,7 +83,7 @@ namespace ThinkEngine
         }
         private static void GenerateMapping(ref InstantiationInformation information)
         {
-            int upTo = information.propertyHierarchy.Count - information.residualPropertyHierarchy.Count;
+           /* int upTo = information.propertyHierarchy.Count - information.residualPropertyHierarchy.Count;
             string prepend = "";
             string append = "";
             for (int i = information.prependMapping.Count; i < upTo; i++)
@@ -96,7 +96,7 @@ namespace ThinkEngine
                 information.prependMapping.Add(prepend);
                 information.appendMapping.Add(append);
             }
-
+           */
         }
         internal static IDataMapper RetrieveMapper(ref MyListString residualPropertyHierarchy, ref object currentObject, out Type currentType)
         {
