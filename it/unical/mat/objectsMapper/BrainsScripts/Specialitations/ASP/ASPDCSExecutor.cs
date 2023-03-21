@@ -16,16 +16,24 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
     {
         bool firstDone;
         string dataPath;
-        public ASPDCSExecutor(DCSBrain dCSBrain)
+        string bK_file_path;
+        public ASPDCSExecutor(ContentBrain dCSBrain)
         {
             brain = dCSBrain;
+            bK_file_path = Path.Combine(Utility.StreamingAssetsContent, dCSBrain.name + "_BackgroundKnowledge__ThinkEngine.asp");
             dataPath = Application.dataPath;
+            using (StreamWriter fs = new StreamWriter(bK_file_path))
+            {
+                fs.WriteLine(dCSBrain.PrefabFacts());
+                fs.WriteLine("height(" + dCSBrain.sceneHeight + ")."+Environment.NewLine);
+            }
+            
         }
 
         protected override void SpecificAnswerSetOperations(AnswerSet answer)
         {
             firstDone = true;
-            ((DCSBrain)brain).ContentReady(answer);
+            ((ContentBrain)brain).ContentReady(answer);
         }
 
         protected override bool SpecificFactsRetrieving(Brain brain)
@@ -35,39 +43,48 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
 
         protected override void SpecificFactsWriting(Brain brain, StreamWriter fs)
         {
-            DCSBrain brain1 = ((DCSBrain)brain);
+            ContentBrain brain1 = ((ContentBrain)brain);
             fs.Write(brain1.FactsForExecutor);
-            fs.Write(brain1.PrefabFacts()) ;
+            //fs.Write(brain1.PrefabFacts()) ;
             if (!firstDone)
             {
                 using (StreamReader sr = new StreamReader(brain1.initAIFile))
                 {
                     fs.WriteLine(sr.ReadToEnd());
                 }
+                fs.WriteLine("current_stripe(" + brain1.initialStripe + ")."+Environment.NewLine);
             }
         }
 
         protected override List<OptionDescriptor> SpecificOptions()
         {
             List<OptionDescriptor> options = new List<OptionDescriptor>();
-            options.Add(new OptionDescriptor("--filter=instantiatePrefab/4,Add/1,Delete/1,Update/2 -n="+((DCSBrain)brain).numberOfAnswerSet));
+            options.Add(new OptionDescriptor("--filter=instantiatePrefab/4,Add/1,Delete/1,Update/2 -n="+((ContentBrain)brain).numberOfAnswerSet));
             return options;
         }
         protected override AnswerSet GetAnswerSet(AnswerSets answers)
         {
+            Debug.Log(answers.answersets.Count);
             return answers.answersets[new Random().Next(answers.answersets.Count)];
         }
         protected override AnswerSet GetOptimal(AnswerSets answers)
         {
+            Debug.Log(answers.answersets.Count);
             IList<AnswerSet> answerSets = answers.GetOptimalAnswerSets();
             return answerSets[new Random().Next(answerSets.Count)];
         }
         protected override void AddFileToEncoding(string fileName)
         {
-            if (fileName != Path.Combine(dataPath,((DCSBrain)brain).initAIFile))
+            string temp1 = fileName.Replace('\\', '/');
+            string temp2 = Path.Combine(dataPath, ((ContentBrain)brain).initAIFile.Substring(7)).Replace('\\', '/');
+            if (temp1 != temp2)
             {
                 base.AddFileToEncoding(fileName);
             }
+        }
+        protected override void CleanUpOperations()
+        {
+            //File.Delete(bK_file_path);
         }
     }
 }

@@ -31,7 +31,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
             return sensorsAsASP;
         }
 
-        public void ContentReady(object content, DCSBrain brain)
+        public void ContentReady(object content, ContentBrain brain)
         {
             if (!(content is AnswerSet))
             {
@@ -40,11 +40,13 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
             AnswerSetAvailable((AnswerSet)content, brain);
         }
 
-        private void AnswerSetAvailable(AnswerSet content, DCSBrain brain)
+        private void AnswerSetAvailable(AnswerSet content, ContentBrain brain)
         {
             foreach (string literal in content.GetAnswerSet())
             {
-                string substring = "instantiatePrefab(";
+                float tileWidth = brain.tileWidth;
+                float tileHeight = brain.tileHeight;
+                /*string substring = "instantiatePrefab(";
                 if (literal.StartsWith(substring))
                 {
                     string temp = literal.Substring(substring.Length);
@@ -68,7 +70,28 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
                             }
                         }
                     }
-
+                
+                }*/
+                PrefabInstantiator instantiator = Utility.PrefabInstantiator;
+                string substring = "current_asset(";
+                if (literal.StartsWith(substring))
+                {
+                    string temp = literal.Substring(substring.Length);
+                    temp = temp.Remove(temp.Length - 1, 1);
+                    string[] values = temp.Split(',');
+                    if (values.Length == 3)
+                    {
+                        if (int.TryParse(values[0], out int stripe) && int.TryParse(values[1], out int tile) && int.TryParse(values[2], out int index))
+                        {
+                            if (ContentPrefabConfigurator.instances.ContainsKey(index))
+                            {
+                                float pX = stripe * tileWidth-tileWidth/2;
+                                float pY = brain.sceneHeight*tileHeight - tile * tileHeight+tileHeight/2;
+                                //Debug.Log("Requisting to instantiate in " + pX + " " + pY);
+                                instantiator.InstantiatePrefab(index, new Vector3(pX, pY, 0), new Quaternion(0, 0, 0, 0));
+                            }
+                        }
+                    }
                 }
                 else if (literal.StartsWith("Add("))
                 {
@@ -97,17 +120,17 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
             brain.ApplyChangesToFacts();
         }
 
-        public Executor GetDCSExecutor(DCSBrain dCSBrain)
+        public Executor GetDCSExecutor(ContentBrain dCSBrain)
         {
             return new ASPDCSExecutor(dCSBrain);
         }
 
-        public string PrefabFacts(DCSBrain brain)
+        public string PrefabFacts(ContentBrain brain)
         {
             if(facts == null)
             {
                 facts = "";
-                foreach(DCSPrefabConfigurator configurator in DCSPrefabConfigurator.instances.Values)
+                foreach(ContentPrefabConfigurator configurator in ContentPrefabConfigurator.instances.Values)
                 {
                     facts += configurator.Mapping();
                 }
@@ -119,7 +142,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
         {
             string toReturn = "";
             toReturn += "% Facts assiociated with instantiable DCS Prefab"+Environment.NewLine;
-            toReturn += DCSPrefabConfigurator.Facts;
+            toReturn += ContentPrefabConfigurator.Facts;
             toReturn += "% Predicates for Prefab instantiation. PrefabListIndex is the index of the Prefabs list of the Brain, PX PY PZ reflect the position of the instantiation while RX RY RZ RW represent the rotation."+Environment.NewLine;
             toReturn += "% instantiatePrefab(PrefabListIndex,PX,PY,PZ, RX, RY, RZ, RW)." + Environment.NewLine;
             return toReturn;

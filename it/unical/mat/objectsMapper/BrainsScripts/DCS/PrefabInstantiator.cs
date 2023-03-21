@@ -37,9 +37,13 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
             {
                 for (int i = 0; i < toInstantiate.Count; i++)
                 {
-                    Instantiate(DCSPrefabConfigurator.instances[toInstantiate[i]], instantiationPositions[i], instantiationRotations[i]);
+                    //Debug.Log(ContentPrefabConfigurator.GetPrefab(toInstantiate[i]).gameObject.name + " in " + instantiationPositions[i]);
+
+                    Instantiate(ContentPrefabConfigurator.GetPrefab(toInstantiate[i]), instantiationPositions[i], instantiationRotations[i]);
                 }
                 toInstantiate.Clear();
+                instantiationPositions.Clear();
+                instantiationRotations.Clear();
             }
         }
     }

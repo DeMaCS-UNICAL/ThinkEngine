@@ -268,10 +268,16 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
             encoding.AddFilesPath(fileName);
         }
 
-        private static void KillProcess(Handler handler)
+        private void KillProcess(Handler handler)
         {
+            CleanUpOperations();
             handler.Quit();
             handler.StopProcess();
+        }
+
+        protected virtual void CleanUpOperations()
+        {
+            
         }
 
         protected abstract InputProgram GetInputProgram();

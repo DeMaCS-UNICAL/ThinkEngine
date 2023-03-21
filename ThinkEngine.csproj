@@ -265,8 +265,8 @@
     <Compile Include="it\unical\mat\embaspTool\parsers\pddl\solver_planning_domains\SPDGrammarParser.cs" />
     <Compile Include="it\unical\mat\embaspTool\parsers\pddl\solver_planning_domains\SPDGrammarVisitor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Actuator\IActualReactiveBrain.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\DCS\DCSBrain.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\DCS\DCSPrefabConfigurator.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\DCS\ContentBrain.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\DCS\ContentPrefabConfigurator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\DCS\IActualDCSBrain.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\DCS\PrefabInstantiator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Executor.cs" />
@@ -288,7 +288,7 @@
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Actuator\ReactiveBrain.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Specialitations\ASP\ASPReactiveExecutor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorsManager.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\Editors\DCSBrainEditor.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Editors\ContentBrainEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Editors\ReactiveBrainEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Editors\BrainEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Editors\PlannerBrainEditor.cs" />

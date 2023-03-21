@@ -10,8 +10,8 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
     {
         string ActualSensorEncoding(string sensorsAsASP);
         string SpecificFileParts();
-        Executor GetDCSExecutor(DCSBrain dCSBrain);
-        string PrefabFacts(DCSBrain dCSBrain);
-        void ContentReady(object content, DCSBrain brain);
+        Executor GetDCSExecutor(ContentBrain dCSBrain);
+        string PrefabFacts(ContentBrain dCSBrain);
+        void ContentReady(object content, ContentBrain brain);
     }
 }

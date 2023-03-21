@@ -12,14 +12,19 @@ using UnityEngine;
 
 namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
 {
-    internal class DCSBrain : Brain
+    internal class ContentBrain : Brain
     {
-        public bool done { get; private set;}
-        public List<DCSPrefabConfigurator> instantiablePrefabs = new List<DCSPrefabConfigurator>();
+        //public bool done { get; private set;}
+        public float tileWidth=1;
+        public float tileHeight=1;
+        public int initialStripe=1;
+        public int sceneHeight=10;
+        public List<ContentPrefabConfigurator> instantiablePrefabs = new List<ContentPrefabConfigurator>();
         HashSet<string> factsToAdd;
         List<string> tempToAdd;
         List<string> tempToDelete;
         public int numberOfAnswerSet;
+        public bool debugBK;
 
         internal string FactsForExecutor
         {
@@ -32,7 +37,8 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
         IActualDCSBrain _dcsBrain;
         [SerializeField,HideInInspector]
         internal string initAIFile;
-
+        [SerializeField, HideInInspector]
+        internal string custom_bk_file_path;
         IActualDCSBrain DcsBrain
         {
             get
@@ -49,9 +55,9 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
         }
         void Awake()
         {
-            foreach(DCSPrefabConfigurator configurator in instantiablePrefabs)
+            foreach(ContentPrefabConfigurator configurator in instantiablePrefabs)
             {
-                configurator.Init();
+                configurator.Init(debugBK);
             }
         }
         protected override IEnumerator Init()
@@ -62,10 +68,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
                 tempToAdd = new List<string>();
                 tempToDelete = new List<string>();
                 yield return StartCoroutine(base.Init());
+                prefabFacts = DcsBrain.PrefabFacts(this);
                 executor = DcsBrain.GetDCSExecutor(this);
                 Utility.AddPrefabInstantiator();
                 executorName = "Solver executor " + gameObject.name;
-                prefabFacts = DcsBrain.PrefabFacts(this);
                 executionThread = new Thread(() =>
                 {
                     Thread.CurrentThread.Name = executorName;
