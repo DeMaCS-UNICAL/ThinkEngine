@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using ThinkEngine.Mappers;
@@ -11,10 +12,15 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
     [DisallowMultipleComponent, ExecuteInEditMode, Serializable]
     public class ContentPrefabConfigurator:MonoBehaviour
     {
+        [AttributeUsage(AttributeTargets.Field)]
+        public class Mappable : Attribute
+        {
+        }
+
         internal static Dictionary<int, ContentPrefabConfigurator> instances = new Dictionary<int, ContentPrefabConfigurator>();
         private static bool first=true;
         public int index;
-        public bool isDangerous;
+        /*public bool isDangerous;
         public bool isWalkable;
         public bool isObstacle;
         public bool canFloat;
@@ -23,19 +29,19 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
         public bool cannotBeTop;
         public List<ContentPrefabConfigurator> canBeToppedBy;
         public List<ContentPrefabConfigurator> canBeSidedBy;
-        public List<ContentPrefabConfigurator> bestSidedBy;
+        public List<ContentPrefabConfigurator> bestSidedBy;*/
         internal static string _facts;
         internal bool debug;
 
         void Awake()
         {
             
-            if (canBeSidedBy == null)
+            /*if (canBeSidedBy == null)
             {
                 canBeSidedBy = new List<ContentPrefabConfigurator>();
                 canBeToppedBy = new List<ContentPrefabConfigurator>();
                 bestSidedBy = new List<ContentPrefabConfigurator>();
-            }
+            }*/
         }
 
         internal static GameObject GetPrefab(int v)
@@ -77,6 +83,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
                 return _facts;
             }
         }
+        /*
         internal string Mapping()
         {
             List<string> maps = new List<string>();
@@ -127,10 +134,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
                     }
                     //maps.Add("compatible(" + index + ",-1"  + ",direction(0,-1))");
                 }
-                /*if (cannotBeTop)
+                if (cannotBeTop)
                 {
                     maps.Add("cannotBeTop(" + index + ")");
-                }*/
+                }
                 if (canBeToppedBy.Count > 0)
                 {
                     foreach (ContentPrefabConfigurator prefab in canBeToppedBy)
@@ -158,8 +165,59 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
             first = false;
             return string.Join("."+Environment.NewLine, maps)+"."+Environment.NewLine;
         }
-
-        private string PropertyMap(object obj)
+*/
+        internal string Mapping()
+        {
+            List<string> maps = new List<string>();
+            if (first)
+            {
+                maps.Add("prefabName(-1,\"Empty\")");
+                maps.Add("prefabName(-2,\"NotPassable\")");
+            }
+            maps.Add("prefabName(" + index + ",\"" + gameObject.name + "\")");
+            if (!debug)
+            {
+                if (first)
+                {
+                    maps.Add("has_property(-1,passable)");
+                    maps.Add("leftright(\"Empty\",\"Empty\")");
+                    maps.Add("leftright(\"NotPassable\",\"NotPassable\")");
+                    maps.Add("abovebelow(\"Empty\",\"Empty\")");
+                }
+                foreach (FieldInfo info in GetType().GetFields())
+                {
+                    if (Attribute.IsDefined(info, typeof(Mappable)))
+                    {
+                        object value = info.GetValue(this);
+                        BasicTypeMapper basicTypeMapper = BasicTypeMapper.GetMapper(value.GetType());
+                        if (basicTypeMapper != null)
+                        {
+                            if (value is bool boolValue)
+                            {
+                                if (boolValue)
+                                {
+                                    maps.Add("has_property(" + index + "," + info.Name + ")");
+                                }
+                            }
+                            else
+                            {
+                                maps.Add("has_property(" + index + "," + info.Name + "," + basicTypeMapper.BasicMap(value) + ")");
+                            }
+                        }
+                        else if(value is List<ContentPrefabConfigurator> prefabList)
+                        {
+                            foreach(ContentPrefabConfigurator prefab in prefabList)
+                            {
+                                maps.Add(ASPMapperHelper.AspFormat(info.Name) + "(" + index + "," + prefab.index + ")");
+                            }
+                        }
+                    }
+                }
+            }
+            first = false;
+            return string.Join("." + Environment.NewLine, maps) + "." + Environment.NewLine;
+        }
+            private string PropertyMap(object obj)
         {
             return BasicTypeMapper.GetMapper(obj.GetType()).BasicMap(obj);
         }

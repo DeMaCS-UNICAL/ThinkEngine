@@ -46,32 +46,6 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
             {
                 float tileWidth = brain.tileWidth;
                 float tileHeight = brain.tileHeight;
-                /*string substring = "instantiatePrefab(";
-                if (literal.StartsWith(substring))
-                {
-                    string temp = literal.Substring(substring.Length);
-                    temp = temp.Remove(temp.Length - 1, 1);
-                    string[] values = temp.Split(',');
-                    if (values.Length > 0)
-                    {
-                        if (int.TryParse(values[0], out int index))
-                        {
-                            if (DCSPrefabConfigurator.instances.ContainsKey(index))
-                            {
-                                PrefabInstantiator instantiator = Utility.PrefabInstantiator;
-                                float.TryParse(values[1], out float pX);
-                                float.TryParse(values[2], out float pY);
-                                float.TryParse(values[3], out float pZ);
-                                float.TryParse(values[1], out float rX);
-                                float.TryParse(values[2], out float rY);
-                                float.TryParse(values[3], out float rZ);
-                                float.TryParse(values[3], out float rW);
-                                instantiator.InstantiatePrefab( index, new Vector3(pX,pY,pZ), new Quaternion(rX,rY,rZ,rW));
-                            }
-                        }
-                    }
-                
-                }*/
                 PrefabInstantiator instantiator = Utility.PrefabInstantiator;
                 string substring = "current_asset(";
                 if (literal.StartsWith(substring))
@@ -90,6 +64,41 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
                                 //Debug.Log("Requisting to instantiate in " + pX + " " + pY);
                                 instantiator.InstantiatePrefab(index, new Vector3(pX, pY, 0), new Quaternion(0, 0, 0, 0));
                             }
+                        }
+                    }
+                }
+                else if (literal.StartsWith("reachable(tile("))
+                {
+                    substring = "reachable(tile(";
+                    string temp = literal.Substring(substring.Length);
+                    temp = temp.Remove(temp.Length - 2, 2);
+                    string[] values = temp.Split(',');
+                    if (values.Length == 2)
+                    {
+                        if (int.TryParse(values[0], out int stripe) && int.TryParse(values[1], out int tile))
+                        {
+                                float pX = stripe * tileWidth - tileWidth / 2;
+                                float pY = brain.sceneHeight * tileHeight - tile * tileHeight + tileHeight / 2;
+                                //Debug.Log("Requisting to instantiate in " + pX + " " + pY);
+                                instantiator.InstantiateCircle(new Vector3(pX, pY, 0),"reach");
+                        }
+                    }
+                }
+                else if (literal.StartsWith("has_state(tile("))
+                {
+                    substring = "has_state(tile(";
+                    string temp = literal.Substring(substring.Length);
+                    temp = temp.Remove(temp.Length - 1, 1);
+                    string[] values = temp.Split(',');
+                    if (values.Length == 3)
+                    {
+                        values[1] = values[1].Remove(values[1].Length-1);
+                        if (int.TryParse(values[0], out int stripe) && int.TryParse(values[1], out int tile))
+                        {
+                            float pX = stripe * tileWidth - tileWidth / 2;
+                            float pY = brain.sceneHeight * tileHeight - tile * tileHeight + tileHeight / 2;
+                            //Debug.Log("Requisting to instantiate in " + pX + " " + pY);
+                            instantiator.InstantiateCircle(new Vector3(pX, pY, 0), values[2]);
                         }
                     }
                 }
