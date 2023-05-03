@@ -9,4 +9,4 @@ xcopy /f "./Antlr4.Runtime.Standard.dll" "../ThinkEnginePlugin/Assets/Plugins/Th
 xcopy /f "../dlv2.exe" "../ThinkEnginePlugin/Assets/StreamingAssets/lib/" /Y
 xcopy /f "./ThinkEngine.dll.meta" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
 xcopy /f "../Standalone/ThinkEngine.dll.meta" "../ThinkEnginePlugin/Assets/Plugins/" /Y
-xcopy /f "./SensorTemplae.txt" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
+xcopy /f "./SensorTemplate.txt" "../ThinkEnginePlugin/Assets/Plugins/ThinkEngineDLL/" /Y
