@@ -158,7 +158,7 @@ namespace ThinkEngine
                 return _actuatorsManager;
             }
         }
-        internal static PrefabInstantiator PrefabInstantiator
+        public static PrefabInstantiator PrefabInstantiator
         {
             get
             {

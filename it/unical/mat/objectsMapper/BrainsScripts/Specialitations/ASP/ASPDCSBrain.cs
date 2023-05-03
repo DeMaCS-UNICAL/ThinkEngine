@@ -47,73 +47,40 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
                 float tileWidth = brain.tileWidth;
                 float tileHeight = brain.tileHeight;
                 PrefabInstantiator instantiator = Utility.PrefabInstantiator;
-                string substring = "current_asset(";
-                if (literal.StartsWith(substring))
+                if (literal.StartsWith("custom_instantiation("))
                 {
-                    string temp = literal.Substring(substring.Length);
-                    temp = temp.Remove(temp.Length - 1, 1);
-                    string[] values = temp.Split(',');
-                    if (values.Length == 3)
+                    CustomInstantiator customInst = brain.customInstantiator;
+                    if (customInst  != null)
                     {
-                        if (int.TryParse(values[0], out int stripe) && int.TryParse(values[1], out int tile) && int.TryParse(values[2], out int index))
-                        {
-                            if (ContentPrefabConfigurator.instances.ContainsKey(index))
-                            {
-                                float pX = stripe * tileWidth-tileWidth/2;
-                                float pY = brain.sceneHeight*tileHeight - tile * tileHeight+tileHeight/2;
-                                //Debug.Log("Requisting to instantiate in " + pX + " " + pY);
-                                instantiator.InstantiatePrefab(index, new Vector3(pX, pY, 0), new Quaternion(0, 0, 0, 0));
-                            }
-                        }
+                        customInst.ParseLiteral(literal);
                     }
+                    else
+                    {
+                        Debug.LogError("custom_instantiation required but a CustomInstantiator is missing.");
+                    }
+                }
+                /*else if (literal.StartsWith("current_asset("))
+                {
+                    CheckCurrentAsset(brain, literal, tileWidth, tileHeight, instantiator);
                 }
                 else if (literal.StartsWith("reachable(tile("))
                 {
-                    substring = "reachable(tile(";
-                    string temp = literal.Substring(substring.Length);
-                    temp = temp.Remove(temp.Length - 2, 2);
-                    string[] values = temp.Split(',');
-                    if (values.Length == 2)
-                    {
-                        if (int.TryParse(values[0], out int stripe) && int.TryParse(values[1], out int tile))
-                        {
-                                float pX = stripe * tileWidth - tileWidth / 2;
-                                float pY = brain.sceneHeight * tileHeight - tile * tileHeight + tileHeight / 2;
-                                //Debug.Log("Requisting to instantiate in " + pX + " " + pY);
-                                instantiator.InstantiateCircle(new Vector3(pX, pY, 0),"reach");
-                        }
-                    }
+                    CheckReachable(brain, literal, tileWidth, tileHeight, instantiator);
                 }
                 else if (literal.StartsWith("has_state(tile("))
                 {
-                    substring = "has_state(tile(";
-                    string temp = literal.Substring(substring.Length);
-                    temp = temp.Remove(temp.Length - 1, 1);
-                    string[] values = temp.Split(',');
-                    if (values.Length == 3)
-                    {
-                        values[1] = values[1].Remove(values[1].Length-1);
-                        if (int.TryParse(values[0], out int stripe) && int.TryParse(values[1], out int tile))
-                        {
-                            float pX = stripe * tileWidth - tileWidth / 2;
-                            float pY = brain.sceneHeight * tileHeight - tile * tileHeight + tileHeight / 2;
-                            //Debug.Log("Requisting to instantiate in " + pX + " " + pY);
-                            instantiator.InstantiateCircle(new Vector3(pX, pY, 0), values[2]);
-                        }
-                    }
-                }
+                    CheckHasState(brain, literal, tileWidth, tileHeight, instantiator);
+                }*/
                 else if (literal.StartsWith("Add("))
                 {
                     string temp = literal.Remove(0, 4);
                     temp = temp.Remove(temp.Length - 1, 1);
-                    //brain.AddFact(temp);
                     brain.FactsToAdd(temp);
                 }
                 else if (literal.StartsWith("Delete("))
                 {
                     string temp = literal.Remove(0, 7);
                     temp = temp.Remove(temp.Length - 1, 1);
-                    //brain.DeleteFact(temp);
                     brain.FactsToDelete(temp);
                 }
                 else if (literal.StartsWith("Update("))
@@ -121,14 +88,77 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
                     Match match = Regex.Match(literal);
                     if (match.Success)
                     {
-                        //brain.UpdateFact(match.Groups[1].Value,match.Groups[3].Value);
                         brain.FactsToUpdate(match.Groups[1].Value, match.Groups[3].Value);
                     }
                 }
             }
             brain.ApplyChangesToFacts();
         }
+        /*
+        private static string CheckHasState(ContentBrain brain, string literal, float tileWidth, float tileHeight, PrefabInstantiator instantiator)
+        {
+            string substring = "has_state(tile(";
+            string temp = literal.Substring(substring.Length);
+            temp = temp.Remove(temp.Length - 1, 1);
+            string[] values = temp.Split(',');
+            if (values.Length == 3)
+            {
+                values[1] = values[1].Remove(values[1].Length - 1);
+                if (int.TryParse(values[0], out int stripe) && int.TryParse(values[1], out int tile))
+                {
+                    float pX = stripe * tileWidth - tileWidth / 2;
+                    float pY = brain.sceneHeight * tileHeight - tile * tileHeight + tileHeight / 2;
+                    //Debug.Log("Requisting to instantiate in " + pX + " " + pY);
+                    instantiator.InstantiateCircle(new Vector3(pX, pY, 0), values[2]);
+                }
+            }
 
+            return substring;
+        }
+
+        private static string CheckReachable(ContentBrain brain, string literal, float tileWidth, float tileHeight, PrefabInstantiator instantiator)
+        {
+            string substring = "reachable(tile(";
+            string temp = literal.Substring(substring.Length);
+            temp = temp.Remove(temp.Length - 2, 2);
+            string[] values = temp.Split(',');
+            if (values.Length == 2)
+            {
+                if (int.TryParse(values[0], out int stripe) && int.TryParse(values[1], out int tile))
+                {
+                    float pX = stripe * tileWidth - tileWidth / 2;
+                    float pY = brain.sceneHeight * tileHeight - tile * tileHeight + tileHeight / 2;
+                    //Debug.Log("Requisting to instantiate in " + pX + " " + pY);
+                    instantiator.InstantiateCircle(new Vector3(pX, pY, 0), "reach");
+                }
+            }
+
+            return substring;
+        }
+
+        private static string CheckCurrentAsset(ContentBrain brain, string literal, float tileWidth, float tileHeight, PrefabInstantiator instantiator)
+        {
+            string substring = "current_asset(";
+            string temp = literal.Substring(substring.Length);
+            temp = temp.Remove(temp.Length - 1, 1);
+            string[] values = temp.Split(',');
+            if (values.Length == 3)
+            {
+                if (int.TryParse(values[0], out int stripe) && int.TryParse(values[1], out int tile) && int.TryParse(values[2], out int index))
+                {
+                    if (ContentPrefabConfigurator.instances.ContainsKey(index))
+                    {
+                        float pX = stripe * tileWidth - tileWidth / 2;
+                        float pY = brain.sceneHeight * tileHeight - tile * tileHeight + tileHeight / 2;
+                        //Debug.Log("Requisting to instantiate in " + pX + " " + pY);
+                        instantiator.InstantiatePrefab(index, new Vector3(pX, pY, 0), new Quaternion(0, 0, 0, 0));
+                    }
+                }
+            }
+
+            return substring;
+        }
+        */
         public Executor GetDCSExecutor(ContentBrain dCSBrain)
         {
             return new ASPDCSExecutor(dCSBrain);

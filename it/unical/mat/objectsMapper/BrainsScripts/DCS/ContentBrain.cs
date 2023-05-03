@@ -25,6 +25,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
         List<string> tempToDelete;
         public int numberOfAnswerSet;
         public bool debugBK;
+        internal CustomInstantiator customInstantiator;
         internal string FactsForExecutor
         {
             get
@@ -58,6 +59,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
             {
                 configurator.Init(debugBK);
             }
+            customInstantiator = GetComponent<CustomInstantiator>();
         }
         protected override IEnumerator Init()
         {

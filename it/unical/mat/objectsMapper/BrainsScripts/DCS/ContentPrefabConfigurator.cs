@@ -17,7 +17,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
         {
         }
 
-        internal static Dictionary<int, ContentPrefabConfigurator> instances = new Dictionary<int, ContentPrefabConfigurator>();
+        public static Dictionary<int, ContentPrefabConfigurator> instances = new Dictionary<int, ContentPrefabConfigurator>();
         private static bool first=true;
         public int index;
         /*public bool isDangerous;

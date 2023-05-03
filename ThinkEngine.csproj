@@ -283,6 +283,7 @@
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Planner\PlannerBrainsCoordinator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Specialitations\ASP\ASPPlannerExecutor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Planner\Scheduler.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\DCS\CustomInstantiator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Editors\ActuatorConfigurationEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\MonoBehaviourActuatorsManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Actuator\ReactiveBrain.cs" />
