@@ -38,7 +38,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         protected override List<OptionDescriptor> SpecificOptions()
         {
             List<OptionDescriptor> options = new List<OptionDescriptor>();
-            options.Add(new OptionDescriptor("--filter=setOnActuator/1 "));
+            if (!brain.debug)
+            {
+                options.Add(new OptionDescriptor("--filter=setOnActuator/1 "));
+            }
             return options;
         }
        

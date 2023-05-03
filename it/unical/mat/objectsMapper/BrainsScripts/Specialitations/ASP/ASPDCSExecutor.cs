@@ -59,18 +59,26 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
         protected override List<OptionDescriptor> SpecificOptions()
         {
             List<OptionDescriptor> options = new List<OptionDescriptor>();
-            options.Add(new OptionDescriptor("--filter=instantiatePrefab/4,Add/1,Delete/1,Update/2 -n="+((ContentBrain)brain).numberOfAnswerSet));
+            if (!brain.debug)
+            {
+                options.Add(new OptionDescriptor("--filter=instantiatePrefab/4,Add/1,Delete/1,Update/2 -n " + ((ContentBrain)brain).numberOfAnswerSet));
+            }
+            else
+            {
+                Debug.Log("Adding -n "+ ((ContentBrain)brain).numberOfAnswerSet);
+                options.Add(new OptionDescriptor("-n " + ((ContentBrain)brain).numberOfAnswerSet));
+            }
             return options;
         }
         protected override AnswerSet GetAnswerSet(AnswerSets answers)
         {
-            Debug.Log(answers.answersets.Count);
+            Debug.Log("No optimal: "+answers.answersets.Count);
             return answers.answersets[new Random().Next(answers.answersets.Count)];
         }
         protected override AnswerSet GetOptimal(AnswerSets answers)
         {
-            Debug.Log(answers.answersets.Count);
             IList<AnswerSet> answerSets = answers.GetOptimalAnswerSets();
+            Debug.Log("Optimal: "+answerSets.Count);
             return answerSets[new Random().Next(answerSets.Count)];
         }
         protected override void AddFileToEncoding(string fileName)

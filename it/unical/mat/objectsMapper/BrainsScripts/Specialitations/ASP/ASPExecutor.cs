@@ -30,7 +30,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         protected override Handler GetHandler(out string file, bool test=false)
         {
             List<OptionDescriptor> options = new List<OptionDescriptor>();
-            if (!brain.debug && !test)
+            if (!test)
             {
                 options.AddRange(SpecificOptions());
             }

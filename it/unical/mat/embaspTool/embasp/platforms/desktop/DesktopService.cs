@@ -102,7 +102,6 @@ namespace it.unical.mat.embasp.platforms.desktop
                     options_string.Append(this.load_from_STDIN_option);
                     stringBuffer.Append(this.load_from_STDIN_option);
                 }
-
                 Console.Error.WriteLine(stringBuffer.ToString());
                 solver_process.EnableRaisingEvents = true;
                 solver_process.StartInfo.Arguments = @options_string.ToString();

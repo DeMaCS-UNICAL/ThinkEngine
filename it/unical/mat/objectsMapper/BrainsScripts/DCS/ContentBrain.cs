@@ -25,7 +25,6 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
         List<string> tempToDelete;
         public int numberOfAnswerSet;
         public bool debugBK;
-
         internal string FactsForExecutor
         {
             get
