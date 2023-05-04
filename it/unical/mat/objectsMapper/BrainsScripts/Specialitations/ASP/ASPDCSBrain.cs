@@ -14,16 +14,29 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
     {
         string facts;
         string updatePattern = @"^Update\(([^, ()]+(\([^()]*\)[^,()]*)?)+,?([^, ()]+(\([^()]*\)[^,()]*)?)+\)$";
-        Regex _regex;
-        Regex Regex
+        string customInstantiationPattern = @"([^()]+)(\(([^, ()]+(\([^()]*\))?)(,([^, ()]+(\([^()]*\))?))*\))*";
+        Regex _updateRegex;
+        Regex UpdateRegex
         {
             get
             {
-                if(_regex == null)
+                if(_updateRegex == null)
                 {
-                    _regex = new Regex(updatePattern);
+                    _updateRegex = new Regex(updatePattern);
                 }
-                return _regex;
+                return _updateRegex;
+            }
+        }
+        Regex _customInstRegex;
+        Regex CustomInstRegex
+        {
+            get
+            {
+                if (_customInstRegex == null)
+                {
+                    _customInstRegex = new Regex(customInstantiationPattern);
+                }
+                return _customInstRegex;
             }
         }
         public string ActualSensorEncoding(string sensorsAsASP)
@@ -49,10 +62,22 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
                 PrefabInstantiator instantiator = Utility.PrefabInstantiator;
                 if (literal.StartsWith("custom_instantiation("))
                 {
+                    string toMatch = literal.Substring(21, literal.Length - 22);
                     CustomInstantiator customInst = brain.customInstantiator;
                     if (customInst  != null)
                     {
-                        customInst.ParseLiteral(literal);
+                        Match match = CustomInstRegex.Match(toMatch);
+                        if (match.Success)
+                        {
+                            string[] arguments = new string[match.Groups[6].Captures.Count+1];
+                            arguments[0] = match.Groups[3].Value;
+                            for (int i=0; i<match.Groups[6].Captures.Count;i++)
+                            {
+                                arguments[i+1] = match.Groups[6].Captures[i].Value;
+                            }
+                            customInst.ParseLiteral(match.Groups[1].Value,arguments);
+                        }
+                        //customInst.ParseLiteral(literal);
                     }
                     else
                     {
@@ -85,7 +110,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
                 }
                 else if (literal.StartsWith("Update("))
                 {
-                    Match match = Regex.Match(literal);
+                    Match match = UpdateRegex.Match(literal);
                     if (match.Success)
                     {
                         brain.FactsToUpdate(match.Groups[1].Value, match.Groups[3].Value);

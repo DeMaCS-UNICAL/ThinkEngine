@@ -4,7 +4,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
 {
     public class CustomInstantiator: MonoBehaviour
     {
-        public virtual void ParseLiteral(string literal)
+        public virtual void ParseLiteral(string predicateName, string[] arguments)
         {
 
         }
