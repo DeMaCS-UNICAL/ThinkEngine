@@ -67,7 +67,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
             }
         }
 
-        public void InstantiateCircle(Vector3 vector3, string s)
+        public void InstantiateByName(Vector3 vector3, string s)
         {
             instantiateByNamePositions.Add(vector3);
             instantiateByName.Add(s);
