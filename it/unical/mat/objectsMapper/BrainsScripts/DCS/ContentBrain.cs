@@ -24,7 +24,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
         List<string> tempToAdd;
         List<string> tempToDelete;
         public int numberOfAnswerSet;
-        public bool debugBK;
+        public bool useCustomBK;
         internal CustomInstantiator customInstantiator;
         internal string FactsForExecutor
         {
@@ -57,7 +57,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
         {
             foreach(ContentPrefabConfigurator configurator in instantiablePrefabs)
             {
-                configurator.Init(debugBK);
+                configurator.Init(useCustomBK);
             }
             customInstantiator = GetComponent<CustomInstantiator>();
         }

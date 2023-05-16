@@ -15,6 +15,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
     internal class ASPDCSExecutor : ASPExecutor
     {
         bool firstDone;
+        bool custom_bk_addedd;
         string dataPath;
         string bK_file_path;
         public ASPDCSExecutor(ContentBrain dCSBrain)
@@ -48,10 +49,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
             //fs.Write(brain1.PrefabFacts()) ;
             if (!firstDone)
             {
-                using (StreamReader sr = new StreamReader(brain1.initAIFile))
-                {
-                    fs.WriteLine(sr.ReadToEnd());
-                }
+                fs.WriteLine(new StreamReader(brain1.initAIFile).ReadToEnd());
                 fs.WriteLine("current_stripe(" + brain1.initialStripe + ")."+Environment.NewLine);
             }
         }
@@ -83,6 +81,11 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.
         }
         protected override void AddFileToEncoding(string fileName)
         {
+            if (((ContentBrain)brain).useCustomBK && !custom_bk_addedd)
+            {
+                custom_bk_addedd = true;
+                base.AddFileToEncoding(((ContentBrain)brain).custom_bk_file_path);
+            }
             string temp1 = fileName.Replace('\\', '/');
             string temp2 = Path.Combine(dataPath, ((ContentBrain)brain).initAIFile.Substring(7)).Replace('\\', '/');
             if (temp1 != temp2)

@@ -41,24 +41,31 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.Editors
                     brain.initAIFile = "Assets" + temp.Substring(Application.dataPath.Length);
                 }
             }
-            if (brain.custom_bk_file_path == null)
+            if (brain.useCustomBK)
             {
-                EditorGUILayout.HelpBox("You don't have a custom background knowledge file for your Declarative Content Specification AI. You can add one by clicking on the button.", MessageType.Info);
+                if (brain.custom_bk_file_path == null)
+                {
+                    EditorGUILayout.HelpBox("You don't have a custom background knowledge file for your Declarative Content Specification AI. You can add one by clicking on the button.", MessageType.Info);
+                }
+                else
+                {
+                    using (new EditorGUI.DisabledScope())
+                    {
+                        EditorGUILayout.TextField("Custom Background Knowledge File path", brain.custom_bk_file_path);
+                    }
+                }
+                if (GUILayout.Button("Choose BK File", GUILayout.Width(150)))
+                {
+                    string temp = EditorUtility.OpenFilePanel("Choose Background Knowledge File", Utility.StreamingAssetsContent, ((ContentBrain)target).FileExtension);
+                    if (temp.StartsWith(Application.dataPath))
+                    {
+                        brain.custom_bk_file_path = "Assets" + temp.Substring(Application.dataPath.Length);
+                    }
+                }
             }
             else
             {
-                using (new EditorGUI.DisabledScope())
-                {
-                    EditorGUILayout.TextField("Custom Background Knowledge File path", brain.custom_bk_file_path);
-                }
-            }
-            if (GUILayout.Button("Choose BK File", GUILayout.Width(150)))
-            {
-                string temp = EditorUtility.OpenFilePanel("Choose Background Knowledge File", Utility.StreamingAssetsContent, ((ContentBrain)target).FileExtension);
-                if (temp.StartsWith(Application.dataPath))
-                {
-                    brain.custom_bk_file_path = "Assets" + temp.Substring(Application.dataPath.Length);
-                }
+                brain.custom_bk_file_path = null;
             }
         }
     }
