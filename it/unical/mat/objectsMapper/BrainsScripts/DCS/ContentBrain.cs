@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.ASP;
+using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specializations.ASP;
 using UnityEngine;
 
 namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS

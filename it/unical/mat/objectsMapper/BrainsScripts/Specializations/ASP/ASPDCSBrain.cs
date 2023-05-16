@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS;
 using UnityEngine;
 
-namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.ASP
+namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specializations.ASP
 {
     internal class ASPDCSBrain : IActualDCSBrain
     {

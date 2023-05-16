@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.ASP
+namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specializations.ASP
 {
     public class CustomInstantiator: MonoBehaviour
     {

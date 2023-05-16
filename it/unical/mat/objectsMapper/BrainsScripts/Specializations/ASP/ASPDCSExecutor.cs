@@ -10,7 +10,7 @@ using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS;
 using UnityEngine;
 using Random = System.Random;
 
-namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specialitations.ASP
+namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specializations.ASP
 {
     internal class ASPDCSExecutor : ASPExecutor
     {
