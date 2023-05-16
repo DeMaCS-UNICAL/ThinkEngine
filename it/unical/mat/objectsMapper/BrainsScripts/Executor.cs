@@ -20,12 +20,15 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         private class MyCallBack : ICallback
         {
             Executor executor;
+            Stopwatch sw;
             public MyCallBack(Executor executor)
             {
                 this.executor = executor;
+                sw = Stopwatch.StartNew();
             }
             public void Callback(Output o)
             {
+                Debug.LogWarning(executor.brain.AIFilesPrefix + " computation done. " + sw.ElapsedMilliseconds +"ms from start.");
                 if (!executor.reason)
                 {
                     return;
@@ -113,8 +116,14 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 Directory.CreateDirectory(Path.GetTempPath() + @"ThinkEngineFacts" + Utility.slash);
             }
             reason = true;
-
+            MyCallBack callback = new MyCallBack(this);
             encoding = GetProgramInstance();
+            Handler handler = GetHandler(out string file);
+            if (!SolversChecker.CheckSolver(this, brain.SolverName))
+            {
+                handler.Quit();
+                return;
+            }
             foreach (string fileName in Directory.GetFiles(Utility.StreamingAssetsContent))
             {
                 string actualFileName = fileName.Substring(fileName.LastIndexOf(Utility.slash) + 1);
@@ -129,11 +138,22 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                 Debug.LogError("Couldn't find an encoding in " + brain.AIFilesPath);
                 reason=false;
             }
-            Handler handler = GetHandler(out string file);
-            if (!SolversChecker.CheckSolver(this, brain.SolverName))
+            else
             {
-                handler.Quit();
-                return;
+                Debug.Log("incremental? " + brain.incremental);
+                if (brain.incremental)
+                {
+                    string allEncodings = Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", Path.GetRandomFileName() + ".asp");
+                    using (StreamWriter fs = new StreamWriter(allEncodings, true))
+                    {
+                        foreach(string fileName in encoding.FilesPaths)
+                        {
+                            fs.Write(new StreamReader(fileName).ReadToEnd());
+                        }
+                    }
+                    encoding.FilesPaths.Clear();
+                    encoding.AddFilesPath(allEncodings);
+                }
             }
             handler.AddProgram(encoding, true);
             while (reason)
@@ -231,7 +251,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                         return;
                     }
                     stopwatch.Restart();
-                    handler.StartAsync(new MyCallBack(this));
+                    handler.StartAsync(callback);
                     while (!solverDone)
                     {
                         if (!reason || die)

@@ -44,7 +44,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.DCS
             }*/
         }
 
-        internal static GameObject GetPrefab(int v)
+        public static GameObject GetPrefab(int v)
         {
             return instances[v].gameObject;
         }
