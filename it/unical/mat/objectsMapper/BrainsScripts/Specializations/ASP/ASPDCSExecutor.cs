@@ -59,7 +59,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts.Specializations.
             List<OptionDescriptor> options = new List<OptionDescriptor>();
             if (!brain.debug)
             {
-                options.Add(new OptionDescriptor("--filter=instantiatePrefab/4,Add/1,Delete/1,Update/2 -n " + ((ContentBrain)brain).numberOfAnswerSet));
+                options.Add(new OptionDescriptor("--filter=custom_instantiation/1,instantiatePrefab/4,Add/1,Delete/1,Update/2 -n " + ((ContentBrain)brain).numberOfAnswerSet));
             }
             else
             {
