@@ -128,6 +128,10 @@ namespace ThinkEngine
         {
             originalName = gameObject.name;
         }
+        void Awake()
+        {
+            AIFilesPath = Utility.StreamingAssetsContent;
+        }
 
         protected virtual void Start()
         {
