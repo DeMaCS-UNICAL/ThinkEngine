@@ -18,44 +18,23 @@ namespace ThinkEngine
         //This array contains the types of the sensor assiated with "this" SensorConfiguration
 
         [SerializeField]
-        private List<SerializableSystemType> _serializableSensorsTypes = new List<SerializableSystemType>();
+        private List<SerializableSensorType> _serializableSensorsTypes = new List<SerializableSensorType>();
 
-        internal List<string> _sensorsTypesNames = new List<string>();
         private List<Sensor> _sensorsInstances = new List<Sensor>();
-
-        [SerializeField]
-        List<MonoScript> _scripts = new List<MonoScript>();
-
-        internal void AddSensorType(Type sensorType)
-        {
-            SerializableSystemType serializableSensorType = new SerializableSystemType(sensorType);
-
-            if (_serializableSensorsTypes.Contains(serializableSensorType)) return;
-
-            _serializableSensorsTypes.Add(serializableSensorType);
-        }
 
         void Awake()
         {
             if(Application.isPlaying)
             {
-                /*foreach (SerializableSystemType serializableSensorType in _serializableSensorsTypes)
+                foreach (SerializableSensorType serializableSensorType in _serializableSensorsTypes)
                 {
-                    _sensorsInstances.Add((Sensor)serializableSensorType.SystemType.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null));
-                    //_sensorsTypes.Add(serializableSensorType.SystemType);
-                }*/
-                /*foreach(Type sensorType in _sensorsTypes)
-                {
-                    sensorType.GetMethod("Istantiate").Invoke(null, null);
-                }*/
-                foreach(MonoScript script in _scripts)
-                {
-                    Type type = Type.GetType(script.GetClass()?.AssemblyQualifiedName);
-                    _sensorsInstances.Add((Sensor)type.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null));
+ //                   _sensorsInstances.Add((Sensor)serializableSensorType.ScriptType.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null));
+                    _sensorsInstances.Add((Sensor)Activator.CreateInstance(serializableSensorType.ScriptType));
+
                 }
                 foreach (Sensor instance in _sensorsInstances)
                 {
-                    instance.Initialize(gameObject);
+                    instance.Initialize(this);
                 }
             }
         }
@@ -80,10 +59,6 @@ namespace ThinkEngine
         {
             if (Application.isPlaying)
             {
-                /*foreach (Type sensorType in _sensorsTypes)
-                {
-                    sensorType.GetMethod("Destroy").Invoke(null, null);
-                }*/
                 foreach(Sensor instance in _sensorsInstances)
                 {
                     instance.Destroy();
@@ -112,8 +87,7 @@ namespace ThinkEngine
         internal override void Clear()
         {
             base.Clear();
-            _serializableSensorsTypes = new List<SerializableSystemType>(); // GMDG
-            _sensorsTypesNames = new List<string>(); // GMDG
+            _serializableSensorsTypes = new List<SerializableSensorType>(); // GMDG
         }
         internal override string GetAutoConfigurationName()
         {
@@ -143,7 +117,7 @@ namespace ThinkEngine
             {
                 throw new Exception("Property not selected");
             }
-            PropertyFeatures.Find(x => x.property.Equals(property)).specifValue = value;
+            PropertyFeatures.Find(x => x.property.Equals(property)).specificValue = value;
 
         }
 

@@ -78,7 +78,7 @@ namespace ThinkEngine.Mappers
 
         #endregion
 
-        private static BasicTypeMapper GetMapper(Type type)
+        public static BasicTypeMapper GetMapper(Type type) // GMDG: (before it was private)
         {
             IDataMapper mapper = MapperManager.GetMapper(type);
             if (mapper is BasicTypeMapper mapper1)
@@ -212,7 +212,7 @@ namespace ThinkEngine.Mappers
             if (GetAggregationStreamOperationsIndexes().Contains(operationIndex))
             {
                 additionalInfo.counter = propertyFeatures.counter;
-                additionalInfo.specificValue = Convert.ChangeType(propertyFeatures.specifValue, ConvertingType);
+                additionalInfo.specificValue = Convert.ChangeType(propertyFeatures.specificValue, ConvertingType);
             }
             additionalInfo.windowSize = propertyFeatures.windowWidth;
             //BasicTypeSensor sensor = new BasicTypeSensor(new Sensor()); GMDG

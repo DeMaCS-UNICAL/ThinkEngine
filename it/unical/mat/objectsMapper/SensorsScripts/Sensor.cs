@@ -17,7 +17,7 @@ namespace ThinkEngine
         internal SensorConfiguration configuration;
         private MyListString property;
         private List<IInfoAndValue> _propertyInfo;
-        protected bool ready; //GMDG private
+        protected bool ready; //GMDG private, default value false
 
         internal List<IInfoAndValue> PropertyInfo
         {
@@ -30,7 +30,7 @@ namespace ThinkEngine
                 return _propertyInfo;
             }
         }
-        private string _mapping;
+        protected string _mapping;
         internal string Mapping
         {
             get
@@ -73,7 +73,7 @@ namespace ThinkEngine
             }
         }
         */
-
+        /*
         internal string Map()
         {
             //VELOCIZZA EVITANDO COPIE!!
@@ -105,7 +105,7 @@ namespace ThinkEngine
             {
                 return "";
             }
-        }
+        }*/
 
         /*
         internal void Destroy()
@@ -115,11 +115,15 @@ namespace ThinkEngine
 
 
         //GMDG
-        internal abstract void Initialize(GameObject gameObject);
+        protected string mappingTemplate = string.Empty;
+
+        internal abstract void Initialize(SensorConfiguration sensorConfiguration);
 
         internal abstract void Destroy();
 
-        internal abstract void ManageSensor();
+        internal abstract void Update();
+
+        internal abstract string Map();
         //GMDG
     }
 }

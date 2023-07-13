@@ -38,14 +38,9 @@ namespace ThinkEngine.Editors
                  bool generate = GUILayout.Button("Generate Sensors Code");
                 if (generate && configuration.ToMapProperties.Count > 0)
                 {
-                    CodeGeneration.GenerateCode(configuration.ToMapProperties, configuration.gameObject, sensorConfiguration);
+                    CodeGenerator.GenerateCode(configuration.ToMapProperties, configuration.gameObject, sensorConfiguration);
                 }
-                bool attach = GUILayout.Button("Attach Sensors Code");
-                if (attach && ((SensorConfiguration)configuration)._sensorsTypesNames.Count > 0)
-                {
-                    CodeGeneration.AddingNewTypes(((SensorConfiguration)configuration)._sensorsTypesNames, (SensorConfiguration)configuration);
-                }
-                }
+            }
             else
             {
                 ConfigureProperty();
@@ -105,7 +100,7 @@ namespace ThinkEngine.Editors
                 }
                 if (MapperManager.GetAggregationStreamOperationsIndexes(propertyType).Contains(newOperation) )
                 {
-                    string oldValue = features.specifValue;
+                    string oldValue = features.specificValue;
                     EditorGUILayout.BeginHorizontal();
                     EditorGUILayout.Space();
                     string newValue = EditorGUILayout.TextField("Value to track", oldValue);
@@ -116,7 +111,7 @@ namespace ThinkEngine.Editors
                         try
                         {
                             Convert.ChangeType(newValue, propertyType);
-                            features.specifValue = newValue;
+                            features.specificValue = newValue;
                         }
                         catch
                         {

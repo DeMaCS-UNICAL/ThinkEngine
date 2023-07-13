@@ -20,7 +20,7 @@ namespace ThinkEngine
         [SerializeField,HideInInspector]
         internal int operation;
         [SerializeField,HideInInspector]
-        internal string specifValue;
+        internal string specificValue;
         [SerializeField, HideInInspector]
         internal int counter;//for atLeast and count operations
 
