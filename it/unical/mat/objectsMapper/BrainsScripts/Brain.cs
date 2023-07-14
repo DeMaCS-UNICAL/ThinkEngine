@@ -135,6 +135,10 @@ namespace ThinkEngine
             }
             borning = false;
         }
+        void Awake()
+        {
+            AIFilesPath = Utility.StreamingAssetsContent;
+        }
 
         protected virtual void Start()
         {
