@@ -25,7 +25,7 @@ namespace ThinkEngine.Mappers
         }
         private ASPCharMapper()
         {
-            _operationList = new List<Operation>() { Newest, Oldest, Specific_Value };
+            _operationList = new List<Operation>() { Newest, Oldest, Always, Count, AtLeast };
             _supportedTypes = new List<Type> { typeof(char) };
             _convertingType = typeof(char);
         }

@@ -4,19 +4,21 @@ using System.Collections.Generic;
 using System.Linq;
 using ThinkEngine.Mappers;
 using UnityEngine;
+using System.Reflection;
 
 namespace ThinkEngine
 {
-    class Sensor
+    internal abstract class Sensor
     {
         internal bool invariant;
-        private bool first=true;
-        GameObject gameObject;
-        MonoBehaviourSensorsManager manager;
+        protected bool first=true; //GMDG private
+        protected GameObject gameObject; //GMDG default (private)
+        MonoBehaviourSensorsManager manager; //GMDG not necessary
         internal SensorConfiguration configuration;
         private MyListString property;
         private List<IInfoAndValue> _propertyInfo;
-        private bool ready;
+        protected bool ready; //GMDG private, default value false
+
         internal List<IInfoAndValue> PropertyInfo
         {
             get
@@ -28,7 +30,7 @@ namespace ThinkEngine
                 return _propertyInfo;
             }
         }
-        private string _mapping;
+        protected string _mapping;
         internal string Mapping
         {
             get
@@ -44,16 +46,20 @@ namespace ThinkEngine
             manager = gameObject.GetComponent<MonoBehaviourSensorsManager>();
             configuration = (SensorConfiguration)information.configuration;
             property = new MyListString(information.propertyHierarchy.myStrings);
+            PropertyFeatures features = information.configuration.PropertyFeatures.Find(x => x.property.Equals(property));
             PropertyInfo.AddRange(information.hierarchyInfo);
             if (information.instantiateOn.GetComponent<IndexTracker>() == null)
             {
                 information.instantiateOn.AddComponent<IndexTracker>();
             }
             int index = information.instantiateOn.GetComponent<IndexTracker>().CurrentIndex;
-            _mapping = ASPMapperHelper.AspFormat(configuration.ConfigurationName) + "(" + ASPMapperHelper.AspFormat(gameObject.name) + ",objectIndex(" + index + ")," + mapping + ")." + Environment.NewLine;
+            //_mapping = ASPMapperHelper.AspFormat(configuration.ConfigurationName) + "(" + ASPMapperHelper.AspFormat(gameObject.name) + ",objectIndex(" + index + ")," + mapping + ")." + Environment.NewLine;
+            _mapping = ASPMapperHelper.AspFormat(features.PropertyAlias) + "(" + ASPMapperHelper.AspFormat(gameObject.name) + ",objectIndex(" + index + ")," + mapping + ")." + Environment.NewLine;
             invariant = information.invariant;
             ready = true;
         }
+
+        /*
         internal void UpdateValue()
         {
             if (!ready)
@@ -66,8 +72,8 @@ namespace ThinkEngine
                 MapperManager.UpdateSensor(this, gameObject, new MyListString(property.myStrings), 0);
             }
         }
-
-
+        */
+        /*
         internal string Map()
         {
             //VELOCIZZA EVITANDO COPIE!!
@@ -99,11 +105,25 @@ namespace ThinkEngine
             {
                 return "";
             }
-        }
+        }*/
 
+        /*
         internal void Destroy()
         {
             manager.Destroy(this);
-        }
+        }*/
+
+
+        //GMDG
+        protected string mappingTemplate = string.Empty;
+
+        internal abstract void Initialize(SensorConfiguration sensorConfiguration);
+
+        internal abstract void Destroy();
+
+        internal abstract void Update();
+
+        internal abstract string Map();
+        //GMDG
     }
 }

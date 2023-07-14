@@ -1,56 +1,72 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using ThinkEngine.Mappers;
+using UnityEditor;
 using UnityEngine;
 
 namespace ThinkEngine
 {
     [ExecuteInEditMode, Serializable, RequireComponent(typeof(IndexTracker)), RequireComponent(typeof(MonoBehaviourSensorsManager))]
-    class SensorConfiguration : AbstractConfiguration, ISerializationCallbackReceiver
+    class SensorConfiguration : AbstractConfiguration//, ISerializationCallbackReceiver
     {
         public bool isInvariant;
         public bool isFixedSize;
-        [SerializeField, HideInInspector]
-        internal List<int> operationPerPropertyIndexes;
-        [SerializeField, HideInInspector]
-        internal List<int> operationPerPropertyOperations;
-        [SerializeField, HideInInspector]
-        internal List<int> specificValuePerPropertyIndexes;
-        [SerializeField, HideInInspector]
-        internal List<string> specificValuePerPropertyValues;
-        internal Dictionary<int, int> _operationPerProperty;
-        internal Dictionary<int, int> OperationPerProperty
+
+       
+        //GMDG
+        //This array contains the types of the sensor assiated with "this" SensorConfiguration
+
+        [SerializeField]
+        private List<SerializableSensorType> _serializableSensorsTypes = new List<SerializableSensorType>();
+
+        private List<Sensor> _sensorsInstances = new List<Sensor>();
+
+        void Awake()
         {
-            get
+            if(Application.isPlaying)
             {
-                if (_operationPerProperty == null)
+                foreach (SerializableSensorType serializableSensorType in _serializableSensorsTypes)
                 {
-                    _operationPerProperty = new Dictionary<int, int>();
+ //                   _sensorsInstances.Add((Sensor)serializableSensorType.ScriptType.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null));
+                    _sensorsInstances.Add((Sensor)Activator.CreateInstance(serializableSensorType.ScriptType));
+
                 }
-                return _operationPerProperty;
-            }
-            set
-            {
-                _operationPerProperty = value;
+                foreach (Sensor instance in _sensorsInstances)
+                {
+                    instance.Initialize(this);
+                }
             }
         }
-        [SerializeField, HideInInspector]
-        internal Dictionary<int, string> _specificValuePerProperty;
-        internal Dictionary<int, string> SpecificValuePerProperty
+
+        void OnEnable()
         {
-            get
+            if (Application.isPlaying)
             {
-                if (_specificValuePerProperty == null)
-                {
-                    _specificValuePerProperty = new Dictionary<int, string>();
-                }
-                return _specificValuePerProperty;
-            }
-            set
-            {
-                _specificValuePerProperty = value;
+                SensorsManager.SubscribeSensors(_sensorsInstances);
             }
         }
+
+        void OnDisable()
+        {
+            if (Application.isPlaying)
+            {
+                SensorsManager.UnsubscribeSensors(_sensorsInstances);
+            }
+        }
+
+        void OnDestroy()
+        {
+            if (Application.isPlaying)
+            {
+                foreach(Sensor instance in _sensorsInstances)
+                {
+                    instance.Destroy();
+                }
+            }
+        }
+        //GMDG
+
         internal override string ConfigurationName
         {
             set
@@ -71,8 +87,7 @@ namespace ThinkEngine
         internal override void Clear()
         {
             base.Clear();
-            OperationPerProperty = new Dictionary<int, int>();
-            SpecificValuePerProperty = new Dictionary<int, string>();
+            _serializableSensorsTypes = new List<SerializableSensorType>(); // GMDG
         }
         internal override string GetAutoConfigurationName()
         {
@@ -94,7 +109,7 @@ namespace ThinkEngine
             {
                 throw new Exception("Property not selected");
             }
-            OperationPerProperty[property.GetHashCode()] = operation;
+            PropertyFeatures.Find(x => x.property.Equals(property)).operation = operation;
         }
         internal void SetSpecificValuePerProperty(MyListString property, string value)
         {
@@ -102,56 +117,66 @@ namespace ThinkEngine
             {
                 throw new Exception("Property not selected");
             }
-            SpecificValuePerProperty[property.GetHashCode()] = value;
+            PropertyFeatures.Find(x => x.property.Equals(property)).specificValue = value;
 
         }
+
+        internal void SetCounterPerProperty(MyListString actualProperty, int newCounter)
+        {
+            if (!SavedProperties.Contains(actualProperty))
+            {
+                throw new Exception("Property not selected");
+            }
+            PropertyFeatures.Find(x => x.property.Equals(actualProperty)).counter = newCounter;
+        }
+
         internal override bool IsSensor()
         {
             return true;
         }
-        protected override void PropertySelected(MyListString property)
-        {
-            OperationPerProperty[property.GetHashCode()] = 0;
-            SpecificValuePerProperty[property.GetHashCode()] = "";
-        }
-        protected override void PropertyDeleted(MyListString property)
-        {
-            OperationPerProperty.Remove(property.GetHashCode());
-            SpecificValuePerProperty.Remove(property.GetHashCode());
-        }
+        /*
+protected override void PropertySelected(MyListString property)
+{
+   propertyFeatures.Find(x => x.property.Equals(property)).operation = 0;
+   propertyFeatures.Find(x => x.property.Equals(property)).specifValue = "";
+}
+protected override void PropertyDeleted(MyListString property)
+{
 
-        public void OnBeforeSerialize()
-        {
-            operationPerPropertyIndexes = new List<int>();
-            operationPerPropertyOperations = new List<int>();
-            specificValuePerPropertyIndexes = new List<int>();
-            specificValuePerPropertyValues = new List<string>();
-            foreach (int key in OperationPerProperty.Keys)
-            {
-                operationPerPropertyIndexes.Add(key);
-                operationPerPropertyOperations.Add(OperationPerProperty[key]);
-            }
-            foreach (int key in SpecificValuePerProperty.Keys)
-            {
-                specificValuePerPropertyIndexes.Add(key);
-                specificValuePerPropertyValues.Add(SpecificValuePerProperty[key]);
-            }
-        }
+}
 
-        public void OnAfterDeserialize()
-        {
-            OperationPerProperty = new Dictionary<int, int>();
-            SpecificValuePerProperty = new Dictionary<int, string>();
-            for (int i = 0; i < operationPerPropertyIndexes.Count; i++)
-            {
-                OperationPerProperty.Add(operationPerPropertyIndexes[i], operationPerPropertyOperations[i]);
-            }
-            for (int i = 0; i < specificValuePerPropertyIndexes.Count; i++)
-            {
-                SpecificValuePerProperty.Add(specificValuePerPropertyIndexes[i], specificValuePerPropertyValues[i]);
-            }
-        }
+public void OnBeforeSerialize()
+{
+   operationPerPropertyIndexes = new List<int>();
+   operationPerPropertyOperations = new List<int>();
+   specificValuePerPropertyIndexes = new List<int>();
+   specificValuePerPropertyValues = new List<string>();
+   foreach (int key in OperationPerProperty.Keys)
+   {
+       operationPerPropertyIndexes.Add(key);
+       operationPerPropertyOperations.Add(OperationPerProperty[key]);
+   }
+   foreach (int key in SpecificValuePerProperty.Keys)
+   {
+       specificValuePerPropertyIndexes.Add(key);
+       specificValuePerPropertyValues.Add(SpecificValuePerProperty[key]);
+   }
+}
 
+public void OnAfterDeserialize()
+{
+   OperationPerProperty = new Dictionary<int, int>();
+   SpecificValuePerProperty = new Dictionary<int, string>();
+   for (int i = 0; i < operationPerPropertyIndexes.Count; i++)
+   {
+       OperationPerProperty.Add(operationPerPropertyIndexes[i], operationPerPropertyOperations[i]);
+   }
+   for (int i = 0; i < specificValuePerPropertyIndexes.Count; i++)
+   {
+       SpecificValuePerProperty.Add(specificValuePerPropertyIndexes[i], specificValuePerPropertyValues[i]);
+   }
+}
+*/
         internal override bool IsAValidName(string temporaryName)
         {
             return temporaryName.Equals(ConfigurationName) || Utility.SensorsManager.IsConfigurationNameValid(temporaryName, this);
