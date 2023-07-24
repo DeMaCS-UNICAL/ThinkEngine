@@ -108,6 +108,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         }
         internal virtual void Run()
         {
+            int facts_id=0;
             if (!Directory.Exists(Path.GetTempPath() + @"ThinkEngineFacts"+Utility.slash))
             {
                 Directory.CreateDirectory(Path.GetTempPath() + @"ThinkEngineFacts" + Utility.slash);
