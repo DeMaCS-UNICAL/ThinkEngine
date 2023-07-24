@@ -239,11 +239,21 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                         handler.AddProgram(encoding);
                     }
                     handler.AddProgram(facts);
-                    foreach(OptionDescriptor option in SpecificOptions())
+
+                    for (int i = 0; i < brain.solver_options.Count; i++)
+                    {
+                        handler.AddOption(new OptionDescriptor(brain.solver_options[i]));
+
+                    }
+                    foreach (OptionDescriptor option in SpecificOptions())
                     {
                         handler.AddOption(option);
                     }
 
+                    foreach(OptionDescriptor option in handler.options.Values)
+                    {
+                        Debug.Log(option.Options);
+                    }
                     //Debug.Log("running dlv");
                     if (!reason || die)
                     {

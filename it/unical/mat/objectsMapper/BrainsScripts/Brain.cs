@@ -48,6 +48,7 @@ namespace ThinkEngine
         protected abstract HashSet<string> SupportedFileExtensions { get; }
         public bool enableBrain = true;
         public bool debug = true;
+        public List<string> solver_options = new List<string>();
         internal bool incremental = false;
         [SerializeField, HideInInspector]
         internal bool maintainInputFile;
