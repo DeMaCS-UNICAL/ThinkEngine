@@ -12,7 +12,7 @@ namespace ThinkEngine.Mappers
 {
     internal class ASPSignedIntegerMapper : BasicTypeMapper
     {
-        private static object Avg(IList values)
+        private static object Avg(IList values, object value = null, int counter = 0)
         {
             if (values.Count == 0)
             {
@@ -26,7 +26,7 @@ namespace ThinkEngine.Mappers
             avg /= (long)values.Count;
             return avg;
         }
-        private static object Min(IList values)
+        private static object Min(IList values, object value = null, int counter = 0)
         {
             long min = long.MaxValue;
             foreach (long v in values)
@@ -38,7 +38,7 @@ namespace ThinkEngine.Mappers
             }
             return min;
         }
-        private static object Max(IList values)
+        private static object Max(IList values, object value = null, int counter = 0)
         {
             long max = long.MinValue;
             foreach (long v in values)
@@ -67,7 +67,7 @@ namespace ThinkEngine.Mappers
         }
         private ASPSignedIntegerMapper()
         {
-            _operationList = new List<Operation>() { Newest, Oldest, Specific_Value, Max, Min, Avg };
+            _operationList = new List<Operation>() { Newest, Oldest, Always, Count, AtLeast, Max, Min, Avg };
             _supportedTypes= new List<Type> { typeof(sbyte), typeof(short), typeof(int), typeof(long) };
             _convertingType = typeof(long);
         }

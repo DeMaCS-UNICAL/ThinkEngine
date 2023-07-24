@@ -9,7 +9,7 @@ namespace ThinkEngine.Mappers
 {
     internal class ASPUnsignedIntegerMapper : BasicTypeMapper
     {
-        private static object Avg(IList values)
+        private static object Avg(IList values, object value = null, int counter = 0)
         {
             if (values.Count == 0)
             {
@@ -23,7 +23,7 @@ namespace ThinkEngine.Mappers
             avg /= (ulong)values.Count;
             return avg;
         }
-        private static object Min(IList values)
+        private static object Min(IList values, object value = null, int counter = 0)
         {
             ulong min = ulong.MaxValue;
             foreach (ulong v in values)
@@ -35,7 +35,7 @@ namespace ThinkEngine.Mappers
             }
             return min;
         }
-        private static object Max(IList values)
+        private static object Max(IList values, object value = null, int counter = 0)
         {
             ulong max = ulong.MinValue;
             foreach (ulong v in values)
@@ -63,7 +63,7 @@ namespace ThinkEngine.Mappers
         }
         private ASPUnsignedIntegerMapper() 
         {
-            _operationList = new List<Operation>() { Newest, Oldest, Specific_Value, Max, Min, Avg };
+            _operationList = new List<Operation>() { Newest, Oldest, Always, Count, AtLeast, Max, Min, Avg };
             _supportedTypes = new List<Type> { typeof(byte), typeof(ushort), typeof(uint), typeof(ulong) };
             _convertingType = typeof(ulong);
         }

@@ -11,8 +11,7 @@ namespace ThinkEngine.Mappers.BaseMappers
         bool Supports(Type type);
         bool IsFinal(Type t);
         Type GetAggregationTypes(Type type = null);
-        int GetAggregationSpecificIndex(Type type);
-
+        List<int> GetAggregationStreamOperationsIndexes(Type type);
         Dictionary<MyListString, KeyValuePair<Type, object>> RetrieveProperties(Type objectType, MyListString currentObjectPropertyHierarchy, object currentObject);
         ISensors InstantiateSensors(InstantiationInformation information);
         void UpdateSensor(Sensor sensor, object currentObject, MyListString residualPropertyHierarchy, int level);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Reflection;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -77,6 +78,35 @@ namespace ThinkEngine
             return true;
         }
 
+        //GMDG
+        private static List<Sensor> _sensorsInstances = new List<Sensor>();
+
+        internal static void SubscribeSensors(List<Sensor> listOfGeneratedSensors)
+        {
+            _sensorsInstances.AddRange(listOfGeneratedSensors);
+        }
+
+        internal static void UnsubscribeSensors(List<Sensor> listOfGeneratedSensors)
+        {
+            foreach(Sensor instance in listOfGeneratedSensors)
+            {
+                _sensorsInstances.Remove(instance);
+            }
+        }
+
+        private void Update()
+        {
+            if(Application.isPlaying)
+            {
+                for(int i = 0; i < _sensorsInstances.Count; i++)
+                {
+                    _sensorsInstances[i].Update();
+                    Debug.Log(_sensorsInstances[i].Map());
+                }
+            }
+        }
+
+        //GMDG
 
         private static ConcurrentQueue<KeyValuePair<Brain, object>> RequestedMappings
         {
@@ -152,7 +182,7 @@ namespace ThinkEngine
                 }
             }
         }
-        void Update()
+        /*void Update()
         {
             if (Application.isPlaying)
             {
@@ -172,7 +202,7 @@ namespace ThinkEngine
                     MAX_MS++;
                 }
             }
-        }
+        }*/
 
         private float FPSAvg()
         {
@@ -188,7 +218,7 @@ namespace ThinkEngine
             return sum / MOVING_AVG_FRAMES.Count;
         }
 
-        void Start()
+        /*void Start()
         {
             MIN_AVG_FPS = Math.Max(Application.targetFrameRate - 2, 58);
             MIN_CURRENT_FPS = Math.Max(Application.targetFrameRate - 10, 50);
@@ -201,12 +231,12 @@ namespace ThinkEngine
                 Reset();
                 StartCoroutine(SensorsUpdate());
             }
-        }
+        }*/
         MonoBehaviourSensorsManager[] RetrieveSensorsManagers()
         {
             return FindObjectsOfType<MonoBehaviourSensorsManager>();
         }
-        IEnumerator SensorsUpdate()
+        /*IEnumerator SensorsUpdate()
         {
             bool first = true;
             while (true)
@@ -268,7 +298,7 @@ namespace ThinkEngine
                 yield return null;
                 first = false;
             }
-        }
+        }*/
 
 
         void OnApplicationQuit()
