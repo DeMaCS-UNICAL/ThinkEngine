@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ThinkEngine.Mappers;
 using ThinkEngine.Planning;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -200,7 +201,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                         KillProcess(handler);
                         return;
                     }
-                    factsPath = Path.Combine(Path.GetTempPath(),"ThinkEngineFacts",Path.GetRandomFileName()+".txt");
+                    factsPath = Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", brain.brainName + "_" + ASPMapperHelper.AspFormat(System.DateTime.Now.ToString()) + "_" + (facts_id++) + ".txt");
 
                     using (StreamWriter fs = new StreamWriter(factsPath, true))
                     {

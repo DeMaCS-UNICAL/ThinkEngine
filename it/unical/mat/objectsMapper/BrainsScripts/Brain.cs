@@ -126,6 +126,7 @@ namespace ThinkEngine
         internal Executor executor;
         internal bool solverWaiting;
         public List<string> solver_options;
+        internal string brainName;
 
         void OnEnable()
         {
@@ -257,6 +258,7 @@ namespace ThinkEngine
             {
                 yield return new WaitUntil(() => !originalName.Equals(gameObject.name));
             }
+            brainName=gameObject.name;
             PrepareSensors();
             if (!SomeConfigurationAvailable())
             {
