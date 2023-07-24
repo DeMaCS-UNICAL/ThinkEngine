@@ -123,6 +123,7 @@ namespace ThinkEngine
         protected Thread executionThread;
         internal Executor executor;
         internal bool solverWaiting;
+        public List<string> solver_options;
 
         void OnEnable()
         {

@@ -219,6 +219,12 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                         handler.AddProgram(encoding);
                     }
                     handler.AddProgram(facts);
+
+                    for (int i = 0; i < brain.solver_options.Count; i++)
+                    {
+                        handler.AddOption(new OptionDescriptor(brain.solver_options[i]));
+
+                    }
                     if (!brain.debug)
                     {
                         foreach(OptionDescriptor option in SpecificOptions())
