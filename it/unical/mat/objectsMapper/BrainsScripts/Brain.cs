@@ -121,6 +121,7 @@ namespace ThinkEngine
         internal string sensorsMapping;
         internal bool sensorsConfigurationsChanged;
         protected string originalName;
+        internal string brainName;
         internal MethodInfo reasonerMethod;
         internal bool missingData;
         protected Thread executionThread;
@@ -253,6 +254,7 @@ namespace ThinkEngine
             {
                 yield return new WaitUntil(() => !originalName.Equals(gameObject.name));
             }
+            brainName = gameObject.name;
             PrepareSensors();
             if (!SomeConfigurationAvailable())
             {
