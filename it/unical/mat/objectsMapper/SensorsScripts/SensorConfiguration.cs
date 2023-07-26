@@ -43,7 +43,7 @@ namespace ThinkEngine
         {
             if (Application.isPlaying)
             {
-                SensorsManager.SubscribeSensors(_sensorsInstances);
+                SensorsManager.SubscribeSensors(_sensorsInstances, ConfigurationName);
             }
         }
 
@@ -51,7 +51,7 @@ namespace ThinkEngine
         {
             if (Application.isPlaying)
             {
-                SensorsManager.UnsubscribeSensors(_sensorsInstances);
+                SensorsManager.UnsubscribeSensors(_sensorsInstances, ConfigurationName);
             }
         }
 

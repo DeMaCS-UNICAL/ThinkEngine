@@ -79,18 +79,30 @@ namespace ThinkEngine
         }
 
         //GMDG
-        private static List<Sensor> _sensorsInstances = new List<Sensor>();
+        private static Dictionary<string, List<Sensor>> _sensorsInstances = new Dictionary<string, List<Sensor>>();    
+        //private static List<Sensor> _sensorsInstances = new List<Sensor>();
 
-        internal static void SubscribeSensors(List<Sensor> listOfGeneratedSensors)
+        internal static void SubscribeSensors(List<Sensor> listOfGeneratedSensors, string configurationName)
         {
-            _sensorsInstances.AddRange(listOfGeneratedSensors);
+            if(_sensorsInstances.ContainsKey(configurationName))
+            {
+                _sensorsInstances[configurationName].AddRange(listOfGeneratedSensors);
+            }
+            else
+            {
+                _sensorsInstances[configurationName] = listOfGeneratedSensors;
+            }
         }
 
-        internal static void UnsubscribeSensors(List<Sensor> listOfGeneratedSensors)
+        internal static void UnsubscribeSensors(List<Sensor> listOfGeneratedSensors, string configurationName)
         {
-            foreach(Sensor instance in listOfGeneratedSensors)
+            for(int i = 0; i < listOfGeneratedSensors.Count; i++) 
             {
-                _sensorsInstances.Remove(instance);
+                _sensorsInstances[configurationName].Remove(listOfGeneratedSensors[i]);
+            }
+            if (_sensorsInstances[configurationName].Count <= 0) 
+            {
+                _sensorsInstances.Remove(configurationName);
             }
         }
 
@@ -98,10 +110,13 @@ namespace ThinkEngine
         {
             if(Application.isPlaying)
             {
-                for(int i = 0; i < _sensorsInstances.Count; i++)
+                foreach(List<Sensor> sensors in _sensorsInstances.Values)
                 {
-                    _sensorsInstances[i].Update();
-                    Debug.Log(_sensorsInstances[i].Map());
+                    for (int i = 0; i < sensors.Count; i++)
+                    {
+                        sensors[i].Update();
+                        sensors[i].Map();
+                    }
                 }
             }
         }
@@ -397,18 +412,7 @@ namespace ThinkEngine
             List<Sensor> sensors = new List<Sensor>();
             foreach (string sensorConf in InstantiatedSensors[brain])
             {
-                foreach (MonoBehaviourSensorsManager monobehaviourManager in monoBehaviourManagers)
-                {
-                    if (monobehaviourManager == null || !monobehaviourManager.ready)
-                    {
-                        continue;
-                    }
-                    SensorConfiguration currentConfiguration = monobehaviourManager.GetConfiguration(sensorConf);
-                    if (currentConfiguration != null)
-                    {
-                        sensors.AddRange(monobehaviourManager.Sensors[currentConfiguration]);
-                    }
-                }
+                sensors.AddRange(_sensorsInstances[sensorConf]);
             }
             return sensors;
         }
