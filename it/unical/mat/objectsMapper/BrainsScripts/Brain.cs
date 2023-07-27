@@ -125,6 +125,8 @@ namespace ThinkEngine
         protected Thread executionThread;
         internal Executor executor;
         internal bool solverWaiting;
+        public List<string> solver_options;
+        internal string brainName;
 
         void OnEnable()
         {
@@ -235,7 +237,7 @@ namespace ThinkEngine
                         continue;
                     }
                     seenSensorConfNames.Add(sensorConf.ConfigurationName);
-                    foreach (PropertyFeatures features in sensorConf.PropertyFeatures)
+                    foreach (PropertyFeatures features in sensorConf.PropertyFeaturesList)
                     {
                         //Debug.Log(property);
                         sensorsAsASP = MapperManager.GetASPTemplate(features.PropertyAlias, sensorConf.gameObject, features.property, true);
@@ -256,6 +258,7 @@ namespace ThinkEngine
             {
                 yield return new WaitUntil(() => !originalName.Equals(gameObject.name));
             }
+            brainName=gameObject.name;
             PrepareSensors();
             if (!SomeConfigurationAvailable())
             {

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ThinkEngine.Mappers;
 using ThinkEngine.Planning;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -108,6 +109,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         }
         internal virtual void Run()
         {
+            int facts_id=0;
             if (!Directory.Exists(Path.GetTempPath() + @"ThinkEngineFacts"+Utility.slash))
             {
                 Directory.CreateDirectory(Path.GetTempPath() + @"ThinkEngineFacts" + Utility.slash);
@@ -199,7 +201,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                         KillProcess(handler);
                         return;
                     }
-                    factsPath = Path.Combine(Path.GetTempPath(),"ThinkEngineFacts",Path.GetRandomFileName()+".txt");
+                    factsPath = Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", brain.brainName + "_" + ASPMapperHelper.AspFormat(System.DateTime.Now.ToString()) + "_" + (facts_id++) + ".txt");
 
                     using (StreamWriter fs = new StreamWriter(factsPath, true))
                     {
@@ -219,6 +221,12 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                         handler.AddProgram(encoding);
                     }
                     handler.AddProgram(facts);
+
+                    for (int i = 0; i < brain.solver_options.Count; i++)
+                    {
+                        handler.AddOption(new OptionDescriptor(brain.solver_options[i]));
+
+                    }
                     if (!brain.debug)
                     {
                         foreach(OptionDescriptor option in SpecificOptions())
