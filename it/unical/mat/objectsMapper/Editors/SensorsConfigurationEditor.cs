@@ -18,16 +18,6 @@ namespace ThinkEngine.Editors
             sensorConfiguration = target as SensorConfiguration;
             base.Reset();
         }
-        void OnDestroy()
-        {
-            if (!Application.isPlaying && target == null && go != null)
-            {
-                if (go.GetComponent<SensorConfiguration>() == null)
-                {
-                    DestroyImmediate(go.GetComponent<MonoBehaviourSensorsManager>());
-                }
-            }
-        }
         override public void OnInspectorGUI()
         {
             if (!configurePropertyMode)
@@ -50,7 +40,7 @@ namespace ThinkEngine.Editors
         private void ConfigureProperty()
         {
             EditorGUILayout.HelpBox("Configure advanced feature of the property",MessageType.Info);
-            PropertyFeatures features = configuration.PropertyFeatures.Find(x => x.property.Equals(actualProperty));
+            PropertyFeatures features = configuration.PropertyFeaturesList.Find(x => x.property.Equals(actualProperty));
             EditorGUILayout.BeginHorizontal();
             tempPropertyName = EditorGUILayout.TextField("Property Alias:", tempPropertyName);
             if (GUILayout.Button("Save"))
@@ -139,7 +129,7 @@ namespace ThinkEngine.Editors
             {
                 configurePropertyMode = true;
                 actualProperty = property;
-                tempPropertyName = configuration.PropertyFeatures.Find(x => x.property.Equals(actualProperty)).PropertyAlias;
+                tempPropertyName = configuration.PropertyFeaturesList.Find(x => x.property.Equals(actualProperty)).PropertyAlias;
             }
         }
             /*

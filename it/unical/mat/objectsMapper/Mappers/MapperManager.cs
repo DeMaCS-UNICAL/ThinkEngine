@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace ThinkEngine
 {
-    internal class MapperManager
+    public class MapperManager
     {
 
         static readonly ConcurrentDictionary<Type, IDataMapper> metMappers; //each type that is supported for sensors is associated with the actual data mapper 
@@ -63,7 +63,7 @@ namespace ThinkEngine
         }
 
         
-        internal static IDataMapper GetMapper(Type type)
+        public static IDataMapper GetMapper(Type type)
         {
             return ExistsMapper(type) ? metMappers[type] : null;
         }

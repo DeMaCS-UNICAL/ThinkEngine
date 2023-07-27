@@ -314,7 +314,6 @@
     <Compile Include="it\unical\mat\objectsMapper\PropertyDetails.cs" />
     <Compile Include="it\unical\mat\objectsMapper\PropertyFeatures.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Sensor.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\MonoBehaviourSensorsManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SensorConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ObjectTracker.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\ISensors.cs" />
