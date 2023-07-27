@@ -191,5 +191,6 @@ public void OnAfterDeserialize()
         {
             return temporaryName.Equals(ConfigurationName) || Utility.SensorsManager.IsConfigurationNameValid(temporaryName, this);
         }
+
     }
 }

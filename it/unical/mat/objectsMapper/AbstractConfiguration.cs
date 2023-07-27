@@ -119,7 +119,7 @@ namespace ThinkEngine
                 if (ObjectTracker.IsFinal(property))
                 {
                     ToMapProperties.Add(property);
-                    PropertyFeaturesList.Add(new PropertyFeatures(gameObject, property));
+                    PropertyFeaturesList.Add(new PropertyFeatures(ConfigurationName, property));
                 }
             }
             else
@@ -132,6 +132,21 @@ namespace ThinkEngine
                     PropertyFeatures p =PropertyFeaturesList.Find(x => x.property.Equals(property));
                     p.Remove();
                     PropertyFeaturesList.Remove(p) ;
+                }
+            }
+        }
+
+        internal void RefreshDefaultPropertiesAlias()
+        {
+            foreach(PropertyFeatures p in PropertyFeaturesList)
+            {
+                Debug.Log(p.PropertyAlias);
+                if(p.configurationName != "")
+                {
+                    Debug.Log("changing " + p.PropertyAlias);
+                    p.PropertyAlias = ConfigurationName+ p.PropertyAlias.Substring(p.configurationName.Length);
+                    p.configurationName = ConfigurationName;
+                    Debug.Log("changed " + p.PropertyAlias);
                 }
             }
         }
