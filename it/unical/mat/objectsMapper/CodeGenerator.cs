@@ -313,8 +313,15 @@ namespace ThinkEngine
             {
                 addedText = string.Concat(addedText, "" +
                     string.Format("" +
-                    "{0}object operationResult = operation(values, specificValue, counter);{1}" +
-                    "{0}return string.Format(mappingTemplate, BasicTypeMapper.GetMapper(operationResult.GetType()).BasicMap(operationResult));", GetTabs(1), Environment.NewLine));
+                    "{0}object operationResult = operation(values, specificValue, counter);{2}" +
+                    "{0}if(operationResult != null){2}"+
+                    "{0}{{{2}" +
+                        "{1}return string.Format(mappingTemplate, BasicTypeMapper.GetMapper(operationResult.GetType()).BasicMap(operationResult));{2}"+
+                    "{0}}}{2}"+
+                    "{0}else{2}"+
+                    "{0}{{{2}" +
+                        "{1}return \"\";{2}" +
+                    "{0}}}", GetTabs(1),GetTabs(2), Environment.NewLine));
             }
             else if (mapperType.IsSubclassOf(typeof(CollectionMapper)))
             {
