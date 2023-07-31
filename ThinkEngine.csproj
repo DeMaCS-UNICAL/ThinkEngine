@@ -286,8 +286,8 @@
     <Compile Include="it\unical\mat\objectsMapper\Editors\ReactiveBrainEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Editors\BrainEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Editors\PlannerBrainEditor.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\GlobalIndexer.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\ActuatorConfiguration.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\ITestingBuild.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPArray2Mapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPArrayMapper.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\ASPMappers\ASPBoolMapper.cs" />
@@ -311,6 +311,7 @@
     <Compile Include="it\unical\mat\objectsMapper\Mappers\MapperManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\MonoBehaviourActuator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\OperationContainer.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Printer.cs" />
     <Compile Include="it\unical\mat\objectsMapper\PropertyDetails.cs" />
     <Compile Include="it\unical\mat\objectsMapper\PropertyFeatures.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Sensor.cs" />
@@ -318,7 +319,6 @@
     <Compile Include="it\unical\mat\objectsMapper\ObjectTracker.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\ISensors.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SerializableSensorType.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\Utility\IndexTracker.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\MyListString.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\SolversChecker.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\Utility.cs" />

@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace ThinkEngine
 {
-    [ExecuteAlways, RequireComponent(typeof(IndexTracker))]
+    [ExecuteAlways]
     public abstract class Brain : MonoBehaviour
     {
         [SerializeField, HideInInspector]
@@ -88,7 +88,6 @@ namespace ThinkEngine
                         {
                             Directory.CreateDirectory(Utility.TemplatesFolder);
                         }
-                        File.Create(_AIFileTemplatePath);
                     }
                 }
                 return _AIFileTemplatePath;
@@ -282,7 +281,6 @@ namespace ThinkEngine
         }
         void OnApplicationQuit()
         {
-            Debug.Log("Application quit: "+((PlannerBrain)this).Priority);
             if (executor != null)
             {
                 executor.reason = false;
