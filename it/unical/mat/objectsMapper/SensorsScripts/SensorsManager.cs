@@ -98,14 +98,16 @@ namespace ThinkEngine
 
         internal static void UnsubscribeSensors(List<Sensor> listOfGeneratedSensors, string configurationName)
         {
-            for(int i = 0; i < listOfGeneratedSensors.Count; i++) 
-            {
-                _sensorsInstances[configurationName].Remove(listOfGeneratedSensors[i]);
-            }
+            if(!_sensorsInstances.ContainsKey(configurationName))
+                return;
+            
+            _sensorsInstances[configurationName].RemoveAll(sensor => listOfGeneratedSensors.Contains(sensor));
+            
+
             if (_sensorsInstances[configurationName].Count <= 0) 
             {
                 _sensorsInstances.Remove(configurationName);
-            }
+            } 
         }
 
         private void Update()

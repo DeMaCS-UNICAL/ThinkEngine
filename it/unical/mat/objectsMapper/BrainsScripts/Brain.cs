@@ -68,31 +68,11 @@ namespace ThinkEngine
         internal string AIFilesPath = Utility.StreamingAssetsContent;
         [SerializeField]
         internal List<string> AIFilesPrefix;
-        [SerializeField, HideInInspector]
-        protected string _AIFileTemplatePath;
+        
         [SerializeField, HideInInspector]
         internal bool prefabBrain;
         [SerializeField, HideInInspector]
         internal SOLVER solverEnum;
-        internal string AIFileTemplatePath
-        {
-            get
-            {
-                if (_AIFileTemplatePath == null || !_AIFileTemplatePath.Equals(Path.Combine(Utility.TemplatesFolder, GetType().Name + "Template" + AIFilesPrefix + ".asp")))
-                {
-                    _AIFileTemplatePath = Path.Combine(Utility.TemplatesFolder, GetType().Name + "Template" + AIFilesPrefix + ".asp");
-
-                    if (!File.Exists(_AIFileTemplatePath))
-                    {
-                        if (!Directory.Exists(Utility.TemplatesFolder))
-                        {
-                            Directory.CreateDirectory(Utility.TemplatesFolder);
-                        }
-                    }
-                }
-                return _AIFileTemplatePath;
-            }
-        }
         [SerializeField, HideInInspector]
         protected string _executeReasonerOn;
         internal string ExecuteReasonerOn
@@ -224,10 +204,28 @@ namespace ThinkEngine
                 }
             }
         }
+        
+        internal string GetAIFileTemplatePath() {
+            string aiFileName = gameObject.name;
+            // if(AIFilesPrefix != null && AIFilesPrefix.Count > 0) {
+            //     aiFileName = string.Join("-", AIFilesPrefix);
+            // }
+            var brainIndex = GetComponents(GetType()).ToList().IndexOf(this);
+            
+
+            aiFileName += GetType().Name + brainIndex + "Template.asp";
+            var aiFileTemplatePath = Path.Combine(Utility.TemplatesFolder, aiFileName);
+            return aiFileTemplatePath;
+        }
+
         internal virtual void GenerateFile()
         {
             string sensorsAsASP;
-            using (StreamWriter fs = File.CreateText(AIFileTemplatePath))
+            
+            if (!Directory.Exists(Utility.TemplatesFolder)) 
+                Directory.CreateDirectory(Utility.TemplatesFolder);
+
+            using (StreamWriter fs = new StreamWriter(GetAIFileTemplatePath()))
             {
                 fs.Write("%For runtime instantiated GameObject, only the prefab mapping is provided. Use that one substituting the gameobject name accordingly.\n %Sensors.\n");
                 HashSet<string> seenSensorConfNames = new HashSet<string>();
