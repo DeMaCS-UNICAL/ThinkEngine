@@ -211,6 +211,7 @@ namespace ThinkEngine
             {
                 addedText = string.Concat(addedText,
                     string.Format("" +
+                    "{0}int index = gameObject.GetInstanceID();{1}" +
                     "{0}mapper = (BasicTypeMapper)MapperManager.GetMapper(typeof({3}));{1}" +
                     "{0}operation = mapper.OperationList()[{2}];{1}" +
                     "{0}counter = {4};{1}", GetTabs(1), Environment.NewLine, currentPropertyFeatures.operation, TypeNameOrAlias(((CollectionMapper)mapper).ElementType(finalType)), currentPropertyFeatures.counter));
