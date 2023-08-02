@@ -81,7 +81,7 @@ namespace ThinkEngine
 
                 mapperType = mapper.GetType();
 
-                sensorName = GenerateSensorName(sensorConfiguration);
+                sensorName = GenerateSensorName(currentPropertyFeatures.PropertyAlias);
 
                 //Debug.Log(string.Join(", ", propertyHierarchyNames));
                 //Debug.Log(string.Join(", ", propertyHierarchyTypeNames));
@@ -118,14 +118,15 @@ namespace ThinkEngine
         }
 
         #region TEXT_GENERATION
-        private static string GenerateSensorName(SensorConfiguration sensorConfiguration)
+        private static string GenerateSensorName(string propertyName)
         {
-            string sensorName = string.Format(sensorConfiguration.ConfigurationName + "{0}", gid);
+            /*string sensorName = string.Format(sensorConfiguration.ConfigurationName + "{0}", gid);
             gid++;
 
             sensorName = char.ToUpper(sensorName[0]) + sensorName.Substring(1);
 
-            return sensorName;
+            return sensorName;*/
+            return propertyName;
         }
 
         private static string CreateText(string text)
@@ -221,59 +222,69 @@ namespace ThinkEngine
         {
             string addedText = string.Empty;
 
-            string mapping = string.Empty;
-            int index = currentSensorConfiguration.gameObject.GetInstanceID();
-
+            string mapping = ASPMapperHelper.AspFormat(currentPropertyFeatures.PropertyAlias) + "(" + ASPMapperHelper.AspFormat(currentSensorConfiguration.gameObject.name) + ",objectIndex(\"+index+\"),";
+            int mappingIndex = 1;
+            Type leafType = null;
+            foreach(Type t in iDataMapperTypes.FindAll(x=>x!=null))
+            {
+                if (t.Equals(typeof(ASPListMapper)) || t.Equals(typeof(ASPArrayMapper)))
+                {
+                    mapping += "{" + (mappingIndex++) + "},";
+                }
+                else
+                {
+                    mapping += "{" + (mappingIndex++) + "},{" + (mappingIndex++) + "},";
+                }
+            }
+            mapping += "{0}).";
             if (mapperType.IsSubclassOf(typeof(BasicTypeMapper)))
             {
-                addedText = string.Concat(addedText,
-                    string.Format("" +
-                    "{0}int index = gameObject.GetInstanceID();{1}" +
-                    "{0}mapper = (BasicTypeMapper)MapperManager.GetMapper(typeof({3}));{1}" +
-                    "{0}operation = mapper.OperationList()[{2}];{1}" +
-                    "{0}counter = {4};{1}", GetTabs(1), Environment.NewLine, currentPropertyFeatures.operation, TypeNameOrAlias(finalType), currentPropertyFeatures.counter));
+                leafType = finalType;
 
-                mapping = currentPropertyFeatures.PropertyAlias + "(" + ASPMapperHelper.AspFormat(currentSensorConfiguration.gameObject.name) + ",objectIndex(\"+index+\")," + "{0}" + ").";
-                addedText = string.Concat(addedText,
-                    string.Format("" +
-                    "{0}mappingTemplate = \"{1}\" + Environment.NewLine;{2}", GetTabs(1), mapping, Environment.NewLine));
             }
             else if (mapperType.IsSubclassOf(typeof(CollectionMapper)))
             {
-                addedText = string.Concat(addedText,
-                    string.Format("" +
-                    "{0}int index = gameObject.GetInstanceID();{1}" +
-                    "{0}mapper = (BasicTypeMapper)MapperManager.GetMapper(typeof({3}));{1}" +
-                    "{0}operation = mapper.OperationList()[{2}];{1}" +
-                    "{0}counter = {4};{1}", GetTabs(1), Environment.NewLine, currentPropertyFeatures.operation, TypeNameOrAlias(((CollectionMapper)mapper).ElementType(finalType)), currentPropertyFeatures.counter));
+                leafType = ((CollectionMapper)mapper).ElementType(finalType);
 
+            }
 
-                if (mapperType.Equals(typeof(ASPArrayMapper)))
+            addedText = string.Concat(addedText,
+                string.Format("" +
+                "{0}int index = gameObject.GetInstanceID();{1}" +
+                "{0}mapper = (BasicTypeMapper)MapperManager.GetMapper(typeof({3}));{1}" +
+                "{0}operation = mapper.OperationList()[{2}];{1}" +
+                "{0}counter = {4};{1}", GetTabs(1), Environment.NewLine, currentPropertyFeatures.operation, TypeNameOrAlias(leafType), currentPropertyFeatures.counter));
+
+            addedText = string.Concat(addedText,
+                string.Format("" +
+                "{0}mappingTemplate = \"{1}\" + Environment.NewLine;{2}", GetTabs(1), mapping, Environment.NewLine));
+           /* { 
+                addedText = string.Concat(addedText, GetOperationToTargetProperty(1));
+                if (mapperType.Equals(typeof(ASPArrayMapper)) || mapperType.Equals(typeof(ASPListMapper)))
                 {
-                    mapping = ASPMapperHelper.AspFormat(currentPropertyFeatures.PropertyAlias) + "(" + ASPMapperHelper.AspFormat(currentSensorConfiguration.gameObject.name) + ",objectIndex(\"+index+\")," + "{0},{1}" + ").";
-                    addedText = string.Concat(addedText,
-                        string.Format("" +
-                        "{0}mappingTemplate = \"{1}\" + Environment.NewLine;{2}", GetTabs(1), mapping, Environment.NewLine));
+                    string collectionSizeField;
+                    if (mapperType.Equals(typeof(ASPArrayMapper)))
+                    {
+                        collectionSizeField = "Length";
+                    }
+                    else
+                    {
+                        collectionSizeField = "Count";
 
-                    addedText = string.Concat(addedText, GetOperationToTargetProperty(1));
-
+                    }
                     addedText = string.Concat(addedText, "" +
                         string.Format("" +
-                        "{0}for(int i = 0; i < {1}{2}.Length; i++)\n" +
+                        "{0}for(int i = 0; i < {1}{2}."+collectionSizeField+"; i++)\n" +
                         "{0}{{\n" +
                             "{3}indicies.Add((i));\n" +
                             "{3}isIndexActive.Add(true);\n" +
                             "{3}values.Add(new List<{4}>());\n" +
-                        "{0}}}\n", GetTabs(1), propertyHierarchyNames[propertyHierarchyNames.Count - 1], propertyHierarchyNames.Count - 1, GetTabs(2), TypeNameOrAlias(((CollectionMapper)mapper).ElementType(finalType))));
+                        "{0}}}\n", GetTabs(1), propertyHierarchyNames[propertyHierarchyNames.Count - 1], propertyHierarchyNames.Count - 1, GetTabs(2), TypeNameOrAlias(leafType)));
                 }
                 else if (mapperType.Equals(typeof(ASPArray2Mapper)))
                 {
-                    mapping = ASPMapperHelper.AspFormat(currentPropertyFeatures.PropertyAlias) + "(" + ASPMapperHelper.AspFormat(currentSensorConfiguration.gameObject.name) + ",objectIndex(\"+index+\")," + "{0},{1},{2}" + ").";
-                    addedText = string.Concat(addedText,
-                        string.Format("" +
-                        "{0}mappingTemplate = \"{1}\" + Environment.NewLine;{2}", GetTabs(1), mapping, Environment.NewLine));
+                    mapping += "{1},{2}";
 
-                    addedText = string.Concat(addedText, GetOperationToTargetProperty(1));
 
                     addedText = string.Concat(addedText, "" +
                         string.Format("" +
@@ -285,28 +296,10 @@ namespace ThinkEngine
                                 "{4}isIndexActive.Add(true);\n" +
                                 "{4}values.Add(new List<{5}>());\n" +
                             "{3}}}\n" +
-                        "{0}}}\n", GetTabs(1), propertyHierarchyNames[propertyHierarchyNames.Count - 1], propertyHierarchyNames.Count - 1, GetTabs(2), GetTabs(3), TypeNameOrAlias(((CollectionMapper)mapper).ElementType(finalType))));
-                }
-                else if (mapperType.Equals(typeof(ASPListMapper)))
-                {
-                    mapping = ASPMapperHelper.AspFormat(currentPropertyFeatures.PropertyAlias) + "(" + ASPMapperHelper.AspFormat(currentSensorConfiguration.gameObject.name) + ",objectIndex(\"+index+\")," + "{0},{1}" + ").";
-                    addedText = string.Concat(addedText,
-                        string.Format("" +
-                        "{0}mappingTemplate = \"{1}\" + Environment.NewLine;{2}", GetTabs(1), mapping, Environment.NewLine));
-
-                    addedText = string.Concat(addedText, GetOperationToTargetProperty(1));
-
-                    addedText = string.Concat(addedText, "" +
-                        string.Format("" +
-                        "{0}for(int i = 0; i < {1}{2}.Count; i++)\n" +
-                        "{0}{{\n" +
-                            "{3}indicies.Add((i));\n" +
-                            "{3}isIndexActive.Add(true);\n" +
-                            "{3}values.Add(new List<{4}>());\n" +
-                        "{0}}}\n", GetTabs(1), propertyHierarchyNames[propertyHierarchyNames.Count - 1], propertyHierarchyNames.Count - 1, GetTabs(2), TypeNameOrAlias(((CollectionMapper)mapper).ElementType(finalType))));
+                        "{0}}}\n", GetTabs(1), propertyHierarchyNames[propertyHierarchyNames.Count - 1], propertyHierarchyNames.Count - 1, GetTabs(2), GetTabs(3), TypeNameOrAlias(leafType)));
                 }
             }
-
+           */
             if (currentPropertyFeatures.specificValue != null)
             {
                 if (!currentPropertyFeatures.specificValue.Equals(""))
@@ -343,8 +336,7 @@ namespace ThinkEngine
         private static string ReplaceMap(string text)
         {
             string addedText = string.Empty;
-
-            if (mapperType.IsSubclassOf(typeof(BasicTypeMapper)))
+            if (iDataMapperTypes.FindAll(x=>x!=null).Count==0)
             {
                 addedText = string.Concat(addedText, "" +
                     string.Format("" +
@@ -358,7 +350,7 @@ namespace ThinkEngine
                         "{1}return \"\";{2}" +
                     "{0}}}", GetTabs(1), GetTabs(2), Environment.NewLine));
             }
-            else if (mapperType.IsSubclassOf(typeof(CollectionMapper)))
+            else
             {
                 string indicies = string.Empty;
 
@@ -370,7 +362,34 @@ namespace ThinkEngine
                 {
                     indicies = " indicies[i].Item1, indicies[i].Item2,";
                 }
+                int forCounter = 0;
+                string prefix = string.Format("" +
+                        "{0}string mapping = string.Empty;{1}", GetTabs(forCounter + 1), Environment.NewLine);
+                string suffix = "";
+                for (int i=0; i < iDataMapperTypes.Count; i++)
+                {
+                    if (iDataMapperTypes[i] == null) continue;
+                    prefix = string.Concat(prefix,
+                        string.Format("" +
+                        "{0}for( int i{1}=0; i{1}<values{2}.Count;i{1}++){3}"+
+                        "{0}{{{3}", GetTabs(forCounter+1),forCounter, GetBrackets(forCounter), Environment.NewLine));
+                    suffix = string.Concat(string.Format("{0}}}{1}", GetTabs(forCounter+1), Environment.NewLine),suffix);
+                    forCounter++;
 
+                }
+                prefix = string.Concat(prefix,
+                        string.Format("" +
+                        "{0}object operationResult = operation(values{4}, specificValue, counter);{3}" +
+                        "{0}if(operationResult != null){3}" +
+                        "{0}{{{3}" +
+                            "{2}mapping = string.Concat(mapping, string.Format(mappingTemplate, BasicTypeMapper.GetMapper(operationResult.GetType()).BasicMap(operationResult),{5}));{3}" +
+                        "{0}}}{3}" +
+                        "{0}else{3}" +
+                        "{0}{{{3}" +
+                            "{2}mapping = string.Concat(mapping, string.Format(\"{{0}}\", Environment.NewLine));{3}" +
+                        "{0}}}{3}",GetTabs(forCounter+1),GetTabs(forCounter),GetTabs(forCounter+2),Environment.NewLine,GetBrackets(forCounter-1),GetIndices(forCounter)));
+                addedText = string.Concat(prefix, suffix,string.Format("{0}return mapping;{1}", GetTabs(1), Environment.NewLine));
+                /*
                 addedText = string.Concat(addedText, "" +
                     string.Format("" +
                     "{0}string mapping = string.Empty;{1}" +
@@ -388,9 +407,30 @@ namespace ThinkEngine
                         "{2}}}{1}" +
                     "{0}}}{1}" +
                     "{0}return mapping;", GetTabs(1), Environment.NewLine, GetTabs(2), indicies, GetTabs(3)));
+                */
             }
 
             return text.Replace("MAP", addedText);
+        }
+
+        private static object GetIndices(int forCounter)
+        {
+            string toReturn = "";
+            for(int i=0; i<forCounter-1; i++)
+            {
+                toReturn += "i" + i + ",";
+            }
+            return toReturn + "i"+(forCounter-1);
+        }
+
+        private static string GetBrackets(int v)
+        {
+            string toReturn = "";
+            for(int i=0; i < v; i++)
+            {
+                toReturn+="[i"+i+"]";
+            }
+            return toReturn;
         }
 
         private static string CheckIfSensorNeedsManaging()
@@ -445,7 +485,6 @@ namespace ThinkEngine
 
             return text;
         }
-
         private static string GetOperationToTargetProperty(int baseOfTabs)
         {
             string text = string.Empty;
@@ -508,6 +547,18 @@ namespace ThinkEngine
             return text;
         }
 
+
+        private static string GetLists(int n, string type)
+        {
+            string lists = "";
+            string close = "";
+            for(int i=0; i < n; i++)
+            {
+                lists += "List<";
+                close += ">";
+            }
+            return lists+type+close;
+        }
         private static string GetTabs(int count)
         {
             int baseCount = 2;
@@ -648,9 +699,9 @@ namespace ThinkEngine
             while (property.Count > 0)
             {
                 currentProperty = property[0];
-                Debug.Log("Property: " + currentProperty);
+                //Debug.Log("Property: " + currentProperty);
                 currentObjectValue = RetrieveProperty(currentObjectValue, currentProperty, currentType, out currentType);
-                Debug.Log("Type: " + currentType);
+                //Debug.Log("Type: " + currentType);
                 IDataMapper tempMapper = MapperManager.GetMapper(currentType);
                 if (tempMapper != null)
                 {
@@ -664,10 +715,10 @@ namespace ThinkEngine
                 Type tempType = currentType;
                 if (mapper != null && mapper is CollectionMapper collectionMapper)
                 {
-                    Debug.Log("Found a CollectionMapper");
+                    //Debug.Log("Found a CollectionMapper");
                     iDataMapperTypes.Add(mapper.GetType());
                     currentType = collectionMapper.ElementType(currentType);
-                    Debug.Log("The new currentType is " + currentType);
+                    //Debug.Log("The new currentType is " + currentType.Name);
                 }
                 else
                 {
@@ -692,7 +743,7 @@ namespace ThinkEngine
                     arePropertiesComponent.Add(tempType.IsSubclassOf(typeof(Component)));
                     arePropertiesPrimitive.Add(tempType.IsPrimitive);
                     property.RemoveAt(0);
-                    if (property.Count > 0 && currentType.ToString() == property[0])
+                    if (property.Count > 0 && currentType.Name == property[0])
                     {
                         property.RemoveAt(0);
                     }
@@ -751,6 +802,7 @@ namespace ThinkEngine
             string currentProperty = string.Empty;
             while (property.Count > 0)
             {
+                //Debug.Log(property);
                 currentProperty = property[0];
                 currentType = RetrievePropertyByType(currentProperty, currentType);
                 //Debug.Log("Current Type= " + currentType);
@@ -772,10 +824,10 @@ namespace ThinkEngine
                     }
                     if (mapper != null && mapper is CollectionMapper collectionMapper)
                     {
-                        Debug.Log("Found a CollectionMapper");
+                        //Debug.Log("Found a CollectionMapper");
                         iDataMapperTypes.Add(mapper.GetType());
                         currentType = collectionMapper.ElementType(currentType);
-                        Debug.Log("The new currentType is " + currentType);
+                        //Debug.Log("The new currentType is " + currentType.Name);
                     }
                     else
                     {
@@ -787,7 +839,7 @@ namespace ThinkEngine
                     arePropertiesComponent.Add(tempType.IsSubclassOf(typeof(Component)));
                     arePropertiesPrimitive.Add(tempType.IsPrimitive);
                     property.RemoveAt(0);
-                    if (property.Count > 0 && currentType.ToString() == property[0])
+                    if (property.Count > 0 && currentType.Name == property[0])
                     {
                         property.RemoveAt(0);
                     }
