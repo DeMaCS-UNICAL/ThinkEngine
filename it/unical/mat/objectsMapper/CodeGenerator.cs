@@ -29,6 +29,7 @@ namespace ThinkEngine
         private static List<string> propertyHierarchyTypeNamespaces;
         private static List<bool> arePropertiesComponent; //knows if the relative property is a component or a property/field
         private static List<bool> arePropertiesPrimitive;
+        private static List<Type> iDataMapperTypes; // null if the property is not a collection
 
         //Helping variables
         private static string sensorName;
@@ -62,6 +63,7 @@ namespace ThinkEngine
                 propertyHierarchyTypeNamespaces = new List<string>();
                 arePropertiesComponent = new List<bool>(); //knows if the relative property is a component or a property/field
                 arePropertiesPrimitive = new List<bool>();
+                iDataMapperTypes = new List<Type>();
 
                 object currentObjectValue = objectValue;
 
@@ -96,17 +98,17 @@ namespace ThinkEngine
                 }
                 string content = CreateText(templateTextFile.text);
                 string path = Path.Combine(generatedCodePath, sensorName + ".cs");
-                
+
                 // confirm overwrite
                 if (File.Exists(path) && !EditorUtility.DisplayDialog(string.Format("Generated code file already exists in {0}", generatedCodeRelativePath), "Do you want to overwite it?", "Yes", "No"))
                 {
                     return;
                 }
-                
+
                 // create folder if not exists
-                if (!Directory.Exists(generatedCodePath)) 
+                if (!Directory.Exists(generatedCodePath))
                     Directory.CreateDirectory(generatedCodePath);
-                
+
                 File.WriteAllText(path, content);
 
                 // Refresh the unity asset database
@@ -347,14 +349,14 @@ namespace ThinkEngine
                 addedText = string.Concat(addedText, "" +
                     string.Format("" +
                     "{0}object operationResult = operation(values, specificValue, counter);{2}" +
-                    "{0}if(operationResult != null){2}"+
+                    "{0}if(operationResult != null){2}" +
                     "{0}{{{2}" +
-                        "{1}return string.Format(mappingTemplate, BasicTypeMapper.GetMapper(operationResult.GetType()).BasicMap(operationResult));{2}"+
-                    "{0}}}{2}"+
-                    "{0}else{2}"+
+                        "{1}return string.Format(mappingTemplate, BasicTypeMapper.GetMapper(operationResult.GetType()).BasicMap(operationResult));{2}" +
+                    "{0}}}{2}" +
+                    "{0}else{2}" +
                     "{0}{{{2}" +
                         "{1}return \"\";{2}" +
-                    "{0}}}", GetTabs(1),GetTabs(2), Environment.NewLine));
+                    "{0}}}", GetTabs(1), GetTabs(2), Environment.NewLine));
             }
             else if (mapperType.IsSubclassOf(typeof(CollectionMapper)))
             {
@@ -646,30 +648,34 @@ namespace ThinkEngine
             while (property.Count > 0)
             {
                 currentProperty = property[0];
-                //Debug.Log("Property: " + currentProperty);
+                Debug.Log("Property: " + currentProperty);
                 currentObjectValue = RetrieveProperty(currentObjectValue, currentProperty, currentType, out currentType);
-                //Debug.Log("Type: " + currentType);
-                if (mapper == null)
+                Debug.Log("Type: " + currentType);
+                IDataMapper tempMapper = MapperManager.GetMapper(currentType);
+                if (tempMapper != null)
                 {
-                    IDataMapper tempMapper = MapperManager.GetMapper(currentType);
-                    if (tempMapper != null)
-                    {
-                        mapper = tempMapper;
-                    }
+                    mapper = tempMapper;
                 }
                 //Debug.Log("Mapper: " + mapper);
                 //Debug.Log("Current Object Value= " + (currentObjectValue == null? "NULL":currentObjectValue.GetType()) );
-                propertyHierarchyNames.Add(currentProperty);
-                propertyHierarchyTypeNames.Add(TypeNameOrAlias(currentType));
-                propertyHierarchyTypeNamespaces.Add(currentType.Namespace);
-                arePropertiesComponent.Add(currentType.IsSubclassOf(typeof(Component)));
-                arePropertiesPrimitive.Add(currentType.IsPrimitive);
 
-                property.RemoveAt(0);
 
+                bool returnFalse = currentObjectValue == null && !ReachPropertyByReflectionByType(property, currentType, out finalType, out mapper);
+                Type tempType = currentType;
+                if (mapper != null && mapper is CollectionMapper collectionMapper)
+                {
+                    Debug.Log("Found a CollectionMapper");
+                    iDataMapperTypes.Add(mapper.GetType());
+                    currentType = collectionMapper.ElementType(currentType);
+                    Debug.Log("The new currentType is " + currentType);
+                }
+                else
+                {
+                    iDataMapperTypes.Add(null);
+                }
                 if (currentObjectValue == null)
                 {
-                    if (!ReachPropertyByReflectionByType(property, currentType, out finalType, out mapper))
+                    if (returnFalse)
                     {
                         //Object 's value is null. Is this a problem?
                         Debug.LogError(string.Format("Couldn't find {0}'s objectValue (null) during reflection!", currentProperty));
@@ -680,10 +686,19 @@ namespace ThinkEngine
                 }
                 else
                 {
-
+                    propertyHierarchyNames.Add(currentProperty);
+                    propertyHierarchyTypeNames.Add(TypeNameOrAlias(tempType));
+                    propertyHierarchyTypeNamespaces.Add(tempType.Namespace);
+                    arePropertiesComponent.Add(tempType.IsSubclassOf(typeof(Component)));
+                    arePropertiesPrimitive.Add(tempType.IsPrimitive);
+                    property.RemoveAt(0);
+                    if (property.Count > 0 && currentType.ToString() == property[0])
+                    {
+                        property.RemoveAt(0);
+                    }
                     if (property.Count == 0)
                     {
-                        finalType = currentType;
+                        finalType = tempType;
                     }
                 }
             }
@@ -749,27 +764,38 @@ namespace ThinkEngine
                 }
                 else
                 {
-                    if (mapper == null)
+                    Type tempType = currentType;
+                    IDataMapper tempMapper = MapperManager.GetMapper(currentType);
+                    if (tempMapper != null)
                     {
-                        IDataMapper tempMapper = MapperManager.GetMapper(currentType);
-                        if (tempMapper != null)
-                        {
-                            mapper = tempMapper;
-                        }
+                        mapper = tempMapper;
                     }
-
-                    propertyHierarchyNames.Add(currentProperty);
-                    propertyHierarchyTypeNames.Add(TypeNameOrAlias(currentType));
-                    propertyHierarchyTypeNamespaces.Add(currentType.Namespace);
-                    arePropertiesComponent.Add(currentType.IsSubclassOf(typeof(Component)));
-                    arePropertiesPrimitive.Add(currentType.IsPrimitive);
-
-                    if (property.Count == 1)
+                    if (mapper != null && mapper is CollectionMapper collectionMapper)
                     {
-                        finalType = currentType;
+                        Debug.Log("Found a CollectionMapper");
+                        iDataMapperTypes.Add(mapper.GetType());
+                        currentType = collectionMapper.ElementType(currentType);
+                        Debug.Log("The new currentType is " + currentType);
+                    }
+                    else
+                    {
+                        iDataMapperTypes.Add(null);
+                    }
+                    propertyHierarchyNames.Add(currentProperty);
+                    propertyHierarchyTypeNames.Add(TypeNameOrAlias(tempType));
+                    propertyHierarchyTypeNamespaces.Add(tempType.Namespace);
+                    arePropertiesComponent.Add(tempType.IsSubclassOf(typeof(Component)));
+                    arePropertiesPrimitive.Add(tempType.IsPrimitive);
+                    property.RemoveAt(0);
+                    if (property.Count > 0 && currentType.ToString() == property[0])
+                    {
+                        property.RemoveAt(0);
+                    }
+                    if (property.Count == 0)
+                    {
+                        finalType = tempType;
                     }
                 }
-                property.RemoveAt(0);
             }
             return true;
         }
