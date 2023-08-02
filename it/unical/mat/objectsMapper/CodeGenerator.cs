@@ -81,11 +81,12 @@ namespace ThinkEngine
 
                 sensorName = GenerateSensorName(sensorConfiguration);
 
-                Debug.Log(string.Join(", ", propertyHierarchyNames));
-                Debug.Log(string.Join(", ", propertyHierarchyTypeNames));
-                Debug.Log(string.Join(", ", propertyHierarchyTypeNamespaces));
-                Debug.Log(string.Join(", ", arePropertiesComponent));
-                Debug.Log(string.Join(", ", arePropertiesPrimitive));
+                //Debug.Log(string.Join(", ", propertyHierarchyNames));
+                //Debug.Log(string.Join(", ", propertyHierarchyTypeNames));
+                //Debug.Log(string.Join(", ", propertyHierarchyTypeNamespaces));
+                //Debug.Log(string.Join(", ", arePropertiesComponent));
+                //Debug.Log(string.Join(", ", arePropertiesPrimitive));
+                //Debug.Log(mapperType);
 
                 TextAsset templateTextFile = AssetDatabase.LoadAssetAtPath(templateRelativePath, typeof(TextAsset)) as TextAsset;
                 if (templateTextFile == null)
@@ -375,9 +376,16 @@ namespace ThinkEngine
                     "{0}{{{1}" +
                         "{2}if(!isIndexActive[i]) continue;{1}" +
                         "{2}object operationResult = operation(values[i], specificValue, counter);{1}" +
-                        "{2}mapping = string.Concat(mapping, string.Format(mappingTemplate,{3} BasicTypeMapper.GetMapper(operationResult.GetType()).BasicMap(operationResult)));{1}" +
+                        "{2}if(operationResult != null){1}" +
+                        "{2}{{{1}" +
+                            "{4}mapping = string.Concat(mapping, string.Format(mappingTemplate,{3} BasicTypeMapper.GetMapper(operationResult.GetType()).BasicMap(operationResult)));{1}" +
+                        "{2}}}{1}" +
+                        "{2}else{1}" +
+                        "{2}{{{1}" +
+                            "{4}mapping = string.Concat(mapping, string.Format(\"{{0}}\", Environment.NewLine));{1}" +
+                        "{2}}}{1}" +
                     "{0}}}{1}" +
-                    "{0}return mapping;", GetTabs(1), Environment.NewLine, GetTabs(2), indicies));
+                    "{0}return mapping;", GetTabs(1), Environment.NewLine, GetTabs(2), indicies, GetTabs(3)));
             }
 
             return text.Replace("MAP", addedText);
@@ -423,6 +431,7 @@ namespace ThinkEngine
                             "{1}if({3} == null && isIndexActive[i])\n" +
                             "{1}{{\n" +
                                 "{2}isIndexActive[i] = false;\n" +
+                                "{2}values[i].Clear();\n" +
                             "{1}}}\n" +
                             "{1}else if({3} != null && !isIndexActive[i])\n" +
                             "{1}{{\n" +
@@ -476,8 +485,20 @@ namespace ThinkEngine
 
                 if (arePropertiesPrimitive[i]) continue;
 
-                text = string.Concat(text, "" +
-                    string.Format("{0}if({1}{2} == null) return;\n", GetTabs(baseOfTabs), propertyHierarchyNames[i], i));
+                if (i == propertyHierarchyNames.Count - 1)
+                {
+                    text = string.Concat(text, "" +
+                        string.Format("" +
+                        "{0}if({2}{3} == null){4}" +
+                        "{0}{{{4}" +
+                            "{1}values.Clear();{4}" +
+                        "{0}}}{4}", GetTabs(baseOfTabs), GetTabs(baseOfTabs + 1), propertyHierarchyNames[i], i, Environment.NewLine));
+                }
+                else
+                {
+                    text = string.Concat(text, "" +
+                        string.Format("{0}if({1}{2} == null) return;{3}", GetTabs(baseOfTabs), propertyHierarchyNames[i], i, Environment.NewLine));
+                }
             }
 
             text = string.Concat(text, "\n");
@@ -625,8 +646,9 @@ namespace ThinkEngine
             while (property.Count > 0)
             {
                 currentProperty = property[0];
-
+                //Debug.Log("Property: " + currentProperty);
                 currentObjectValue = RetrieveProperty(currentObjectValue, currentProperty, currentType, out currentType);
+                //Debug.Log("Type: " + currentType);
                 if (mapper == null)
                 {
                     IDataMapper tempMapper = MapperManager.GetMapper(currentType);
@@ -635,7 +657,8 @@ namespace ThinkEngine
                         mapper = tempMapper;
                     }
                 }
-
+                //Debug.Log("Mapper: " + mapper);
+                //Debug.Log("Current Object Value= " + (currentObjectValue == null? "NULL":currentObjectValue.GetType()) );
                 propertyHierarchyNames.Add(currentProperty);
                 propertyHierarchyTypeNames.Add(TypeNameOrAlias(currentType));
                 propertyHierarchyTypeNamespaces.Add(currentType.Namespace);
@@ -675,13 +698,14 @@ namespace ThinkEngine
                 return null;
             }
             MemberInfo[] members = currentObjectValue.GetType().GetMember(currentProperty, Utility.BindingAttr);
-
+            //Debug.Log(string.Format("Members of {0} are : {1}", currentObjectValue.GetType(), string.Join(", ", (object[])members)));
             //If exists a currentObject's member with name currentProperty
             if (members.Length > 0)
             {
                 FieldOrProperty fieldOrProperty = new FieldOrProperty(members[0]);
-                currentObjectValue = fieldOrProperty.GetValue(currentObjectValue);
+                //Debug.Log("First Member " + ((FieldInfo)members[0]).GetValue(currentObjectValue) + " New current Object value " + currentObjectValue);
                 currentType = fieldOrProperty.Type();
+                currentObjectValue = fieldOrProperty.GetValue(currentObjectValue);
                 return currentObjectValue;
             }
             //If not let's search in the currentObject's components
@@ -713,8 +737,11 @@ namespace ThinkEngine
             while (property.Count > 0)
             {
                 currentProperty = property[0];
+
+                //Debug.Log("Current Type= " + currentType);
                 currentType = RetrievePropertyByType(currentProperty, currentType);
-                Debug.Log(currentType);
+                //Debug.Log("Current Type= " + currentType);
+
                 if (currentType == null)
                 {
                     //Object 's value is null. Is this a problem?
@@ -730,7 +757,6 @@ namespace ThinkEngine
                         if (tempMapper != null)
                         {
                             mapper = tempMapper;
-                            Debug.Log(mapper.GetType());
                         }
                     }
 
