@@ -98,8 +98,9 @@ namespace ThinkEngine
             }*/
 
         }
-        internal static IDataMapper RetrieveMapper(ref MyListString residualPropertyHierarchy, ref object currentObject, out Type currentType)
+        internal static IDataMapper RetrieveMapper(ref MyListString residualPropertyHierarchy, ref object currentObject, out Type currentType, ref string fullPropertyPath)
         {
+            fullPropertyPath = fullPropertyPath ?? string.Empty;
             currentType = null;
             if (currentObject != null)
             {
@@ -108,7 +109,8 @@ namespace ThinkEngine
                 {
                     //Debug.Log("esiste il mapper per l'oggetto "+currentObject);
                     currentType = currentObject.GetType();
-                    return metMappers[currentObject.GetType()];
+                    fullPropertyPath += fullPropertyPath == "" ? "" : "." + metMappers[currentType].RetrievePropertyPath(residualPropertyHierarchy[0]);
+                    return metMappers[currentType];
                 }
                 /*else
                 {
@@ -124,6 +126,7 @@ namespace ThinkEngine
                 //Debug.Log(currentObject+ " C");
                 if (currentType != null && ExistsMapper(currentType))
                 {
+                    fullPropertyPath += fullPropertyPath == "" ? "" : "." + metMappers[currentType].RetrievePropertyPath(currentProperty);
                     return metMappers[currentType];
                 }
                 else
@@ -132,6 +135,7 @@ namespace ThinkEngine
                     {
                         return null;
                     }
+                    fullPropertyPath += fullPropertyPath==""?"":"."+ currentProperty;
                 }
                 residualPropertyHierarchy.RemoveAt(0);
             }

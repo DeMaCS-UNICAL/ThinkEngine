@@ -713,6 +713,7 @@ namespace ThinkEngine
             while (property.Count > 0)
             {
                 currentProperty = property[0];
+                Debug.Log(currentProperty + " HAS " + currentType);
                 currentType = RetrievePropertyByType(currentProperty, currentType);
                 Debug.Log(currentType);
                 if (currentType == null)
