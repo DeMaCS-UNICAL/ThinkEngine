@@ -20,6 +20,5 @@ namespace ThinkEngine.Mappers.BaseMappers
         IActuators ManageActuators(InstantiationInformation information, IActuators actuators);
         void SetPropertyValue(MonoBehaviourActuator actuator, MyListString propertyHierarchy, object currentObject, object valueToSet, int level);// Set the value of the property or field (propertyHierarchy) for the object actualObject
         string GetASPTemplate(ref InstantiationInformation information, List<string> variables);
-        string RetrievePropertyPath(string v);
     }
 }
