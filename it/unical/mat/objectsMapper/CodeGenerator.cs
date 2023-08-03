@@ -502,7 +502,7 @@ namespace ThinkEngine
 
         private static string GetOperationToTargetProperty(int baseOfTabs, int positionInHierarchy)
         {
-            //Debug.Log(positionInHierarchy + " " + finalType.Name);
+            Debug.Log(positionInHierarchy + " " + finalType.Name+" "+propertyHierarchyNames.Count+" "+iDataMapperTypes.Count);
             string text = string.Empty;
             if (positionInHierarchy == iDataMapperTypes.Count)
             {
@@ -863,18 +863,6 @@ namespace ThinkEngine
 
                 bool returnFalse = currentObjectValue == null && !ReachPropertyByReflectionByType(property, currentType, out finalType, out mapper);
                 Type tempType = currentType;
-                if (tempMapper != null && mapper is CollectionMapper collectionMapper)
-                {
-                    //Debug.Log("Found a CollectionMapper");
-                    iDataMapperTypes.Add(mapper.GetType());
-                    numberOfCollectionMappers++;
-                    currentType = collectionMapper.ElementType(currentType);
-                    //Debug.Log("The new currentType is " + currentType.Name);
-                }
-                else
-                {
-                    iDataMapperTypes.Add(null);
-                }
                 if (currentObjectValue == null)
                 {
                     if (returnFalse)
@@ -888,6 +876,19 @@ namespace ThinkEngine
                 }
                 else
                 {
+
+                    if (tempMapper != null && mapper is CollectionMapper collectionMapper)
+                    {
+                        //Debug.Log("Found a CollectionMapper");
+                        iDataMapperTypes.Add(mapper.GetType());
+                        numberOfCollectionMappers++;
+                        currentType = collectionMapper.ElementType(currentType);
+                        //Debug.Log("The new currentType is " + currentType.Name);
+                    }
+                    else
+                    {
+                        iDataMapperTypes.Add(null);
+                    }
                     propertyHierarchyNames.Add(currentProperty);
                     propertyHierarchyTypeNames.Add(TypeNameOrAlias(tempType));
                     propertyHierarchyTypeNamespaces.Add(tempType.Namespace);
@@ -1004,7 +1005,7 @@ namespace ThinkEngine
                         finalType = currentType;
                         if (mapper is CollectionMapper collectionMapper2)
                         {
-                            mapper = MapperManager.GetMapper(collectionMapper2.ElementType(finalType));
+                            mapper = MapperManager.GetMapper(collectionMapper2.ElementType(tempType));
                         }
                     }
                 }
