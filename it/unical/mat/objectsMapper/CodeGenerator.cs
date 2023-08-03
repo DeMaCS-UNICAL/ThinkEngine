@@ -115,10 +115,11 @@ namespace ThinkEngine
 
                 File.WriteAllText(path, content);
 
-                // Refresh the unity asset database
-                AssetDatabase.ImportAsset(generatedCodeRelativePath, ImportAssetOptions.ForceSynchronousImport);
-                AssetDatabase.Refresh();
+                
             }
+            // Refresh the unity asset database
+            AssetDatabase.ImportAsset(generatedCodeRelativePath, ImportAssetOptions.ForceSynchronousImport);
+            AssetDatabase.Refresh();
         }
 
         #region TEXT_GENERATION
@@ -507,13 +508,13 @@ namespace ThinkEngine
             if(positionInHierarchy == 0 || (iDataMapperTypes[positionInHierarchy - 1] != typeof(ASPListMapper) && iDataMapperTypes[positionInHierarchy - 1] != typeof(ASPArrayMapper)))
             {
                 text = string.Concat(text, "" +
-                    string.Format("{3}{0} {1}{2} = {4}{5}", propertyHierarchyTypeNames[positionInHierarchy], propertyHierarchyNames[positionInHierarchy], positionInHierarchy, GetTabs(baseOfTabs), positionInHierarchy == 0 ? "gameObject" : propertyHierarchyNames[positionInHierarchy - 1], positionInHierarchy == 0 ? "" : positionInHierarchy - 1));
+                    string.Format("{3}{0} {1}{2} = {4}{5}", propertyHierarchyTypeNames[positionInHierarchy], propertyHierarchyNames[positionInHierarchy], positionInHierarchy, GetTabs(baseOfTabs), positionInHierarchy == 0 ? "gameObject" : propertyHierarchyNames[positionInHierarchy - 1], positionInHierarchy == 0 ? "" : ""+(positionInHierarchy - 1)));
 
             }
             else
             {
                 text = string.Concat(text, "" +
-                    string.Format("{3}{0} {1}{2} = {4}{5}[i_{6}]", propertyHierarchyTypeNames[positionInHierarchy], propertyHierarchyNames[positionInHierarchy], positionInHierarchy, GetTabs(baseOfTabs), positionInHierarchy == 0 ? "gameObject" : propertyHierarchyNames[positionInHierarchy - 1], positionInHierarchy == 0 ? "" : positionInHierarchy - 1, positionInHierarchy - 1));
+                    string.Format("{3}{0} {1}{2} = {4}{5}[i_{6}]", propertyHierarchyTypeNames[positionInHierarchy], propertyHierarchyNames[positionInHierarchy], positionInHierarchy, GetTabs(baseOfTabs), positionInHierarchy == 0 ? "gameObject" : propertyHierarchyNames[positionInHierarchy - 1], positionInHierarchy == 0 ? "" : "" + (positionInHierarchy - 1), positionInHierarchy - 1));
             }
 
             if ((positionInHierarchy == 0 || propertyHierarchyTypeNames[positionInHierarchy - 1].Equals("GameObject")) && arePropertiesComponent[positionInHierarchy])
@@ -775,7 +776,7 @@ namespace ThinkEngine
 
                 bool returnFalse = currentObjectValue == null && !ReachPropertyByReflectionByType(property, currentType, out finalType, out mapper);
                 Type tempType = currentType;
-                if (mapper != null && mapper is CollectionMapper collectionMapper)
+                if (tempMapper != null && mapper is CollectionMapper collectionMapper)
                 {
                     //Debug.Log("Found a CollectionMapper");
                     iDataMapperTypes.Add(mapper.GetType());
@@ -865,7 +866,7 @@ namespace ThinkEngine
             string currentProperty = string.Empty;
             while (property.Count > 0)
             {
-                //Debug.Log(property);
+                Debug.Log(property);
                 currentProperty = property[0];
                 currentType = RetrievePropertyByType(currentProperty, currentType);
                 //Debug.Log("Current Type= " + currentType);
@@ -885,13 +886,13 @@ namespace ThinkEngine
                     {
                         mapper = tempMapper;
                     }
-                    if (mapper != null && mapper is CollectionMapper collectionMapper)
+                    if (tempMapper != null && mapper is CollectionMapper collectionMapper)
                     {
-                        //Debug.Log("Found a CollectionMapper");
+                        Debug.Log("Found a CollectionMapper");
                         iDataMapperTypes.Add(mapper.GetType());
                         numberOfCollectionMappers++;
                         currentType = collectionMapper.ElementType(currentType);
-                        //Debug.Log("The new currentType is " + currentType.Name);
+                        Debug.Log("The new currentType is " + currentType.Name);
                     }
                     else
                     {
