@@ -86,14 +86,11 @@ namespace ThinkEngine
 
         internal static void SubscribeSensors(List<Sensor> listOfGeneratedSensors, string configurationName)
         {
-            if(_sensorsInstances.ContainsKey(configurationName))
+            if(!_sensorsInstances.ContainsKey(configurationName))
             {
-                _sensorsInstances[configurationName].AddRange(listOfGeneratedSensors);
+                _sensorsInstances[configurationName] = new List<Sensor>();
             }
-            else
-            {
-                _sensorsInstances[configurationName] = listOfGeneratedSensors;
-            }
+            _sensorsInstances[configurationName].AddRange(listOfGeneratedSensors);
         }
 
         internal static void UnsubscribeSensors(List<Sensor> listOfGeneratedSensors, string configurationName)
