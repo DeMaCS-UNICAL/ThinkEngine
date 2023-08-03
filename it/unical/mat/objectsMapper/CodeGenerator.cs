@@ -547,7 +547,7 @@ namespace ThinkEngine
                     "{0}{{{7}" +
                         "{1}for(int i = {5}; i < values{4}.Count; i++){7}" +
                         "{1}{{{7}" +
-                            "{8}values{4}.RemoveAt(values{4}.Count);{7}" +
+                            "{8}values{4}.RemoveAt(values{4}.Count - 1);{7}" +
                         "{1}}}{7}" +
                     "{0}}}{7}", GetTabs(baseOfTabs), GetTabs(baseOfTabs + 1), propertyHierarchyNames[positionInHierarchy], positionInHierarchy, GetCollectionElement(positionInHierarchy), GetCollectionSize(iDataMapperTypes[positionInHierarchy], string.Format("{0}{1}", propertyHierarchyNames[positionInHierarchy], positionInHierarchy)), GetRecursiveString("List<{0}>", numberOfCollectionMappers - GetNumberOfCollectionMapperBeforePosition(positionInHierarchy)), Environment.NewLine, GetTabs(baseOfTabs + 2))); ;
 
