@@ -44,6 +44,24 @@ namespace ThinkEngine
         private CodeGenerator() { }
 
         //Generate the MonobehaviourSensorManager
+#if UNITY_EDITOR
+        internal static void AttachSensorsScripts(SensorConfiguration sensorConfiguration)
+        {
+            /*foreach (string monoScript in AssetDatabase.FindAssets("t:MonoScript", new string[] { "Assets/Scripts/GeneratedCode" }))
+            {
+                Debug.Log("Found this asset: "+monoScript);
+                Debug.Log(AssetDatabase.GUIDToAssetPath(monoScript));
+            }*/
+            sensorConfiguration._serializableSensorsTypes.Clear();
+            foreach (PropertyFeatures pF in sensorConfiguration.PropertyFeaturesList) {
+                MonoScript retrieved = AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "Scripts", "GeneratedCode", pF.PropertyAlias + ".cs"),typeof(MonoScript)) as MonoScript;
+                if (retrieved != null)
+                {
+                    sensorConfiguration._serializableSensorsTypes.Add(new SerializableSensorType(retrieved));
+                }
+            }
+        }
+#endif
         internal static void GenerateCode(List<MyListString> toMapProperties, object objectValue, SensorConfiguration sensorConfiguration)
         {
             if (sensorConfiguration.ConfigurationName.Equals(string.Empty))
@@ -883,6 +901,8 @@ namespace ThinkEngine
                         iDataMapperTypes.Add(mapper.GetType());
                         numberOfCollectionMappers++;
                         currentType = collectionMapper.ElementType(currentType);
+                        propertyHierarchyTypeNamespaces.Add(currentType.Namespace);
+
                         //Debug.Log("The new currentType is " + currentType.Name);
                     }
                     else
@@ -984,6 +1004,7 @@ namespace ThinkEngine
                         iDataMapperTypes.Add(mapper.GetType());
                         numberOfCollectionMappers++;
                         currentType = collectionMapper.ElementType(currentType);
+                        propertyHierarchyTypeNamespaces.Add(currentType.Namespace);
                         //Debug.Log("The new currentType is " + currentType.Name);
                     }
                     else
@@ -1080,7 +1101,22 @@ namespace ThinkEngine
             }
 
             // Default to CLR type name
+            if(type.IsNested)
+            {
+                return NameForNestedType(type);
+            }
             return type.Name;
+        }
+
+        private static string NameForNestedType(Type type)
+        {
+            string toReturn = type.DeclaringType + ".";
+            propertyHierarchyTypeNamespaces.Add(type.DeclaringType.Namespace);
+            if(type.DeclaringType.IsNested)
+            {
+                return toReturn +"."+NameForNestedType(type.DeclaringType)+"."+type.Name;
+            }
+            return toReturn+type.Name;
         }
 
         private static string RecursiveGenericTypeName(Type type)
