@@ -21,6 +21,8 @@ namespace ThinkEngine
         internal List<SerializableSensorType> _serializableSensorsTypes = new List<SerializableSensorType>();
         [SerializeField,HideInInspector]
         internal bool generatedCode;
+        [SerializeField, HideInInspector]
+        internal List<string> generatedScripts= new List<string>();
         private List<Sensor> _sensorsInstances = new List<Sensor>();
 
         void Awake()

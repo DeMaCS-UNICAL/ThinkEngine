@@ -69,7 +69,14 @@ namespace ThinkEngine
                 Debug.LogError("SensorConfiguration name can't be empty!");
                 return;
             }
-
+            foreach (string path in sensorConfiguration.generatedScripts)
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+            }
+            sensorConfiguration.generatedScripts.Clear();
             currentSensorConfiguration = sensorConfiguration;
 
             foreach (MyListString propertyHierarchy in toMapProperties)
@@ -132,7 +139,7 @@ namespace ThinkEngine
                     Directory.CreateDirectory(generatedCodePath);
 
                 File.WriteAllText(path, content);
-
+                sensorConfiguration.generatedScripts.Add(path);
                 
             }
             // Refresh the unity asset database
@@ -520,7 +527,6 @@ namespace ThinkEngine
 
         private static string GetOperationToTargetProperty(int baseOfTabs, int positionInHierarchy)
         {
-            Debug.Log(positionInHierarchy + " " + finalType.Name+" "+propertyHierarchyNames.Count+" "+iDataMapperTypes.Count);
             string text = string.Empty;
             if (positionInHierarchy == iDataMapperTypes.Count)
             {
