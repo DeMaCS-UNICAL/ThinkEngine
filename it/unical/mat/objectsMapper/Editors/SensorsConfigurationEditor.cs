@@ -33,7 +33,10 @@ namespace ThinkEngine.Editors
                 ConfigureProperty();
             }
         }
-
+        protected override void PropertyAliasChanged(string oldAlias, string newAlias)
+        {
+            sensorConfiguration.PropertyAliasChanged(oldAlias,newAlias);
+        }
         protected override void VirtualFields(PropertyFeatures features)
         {
             

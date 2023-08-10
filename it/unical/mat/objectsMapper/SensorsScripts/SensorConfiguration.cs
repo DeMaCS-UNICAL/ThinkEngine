@@ -29,8 +29,10 @@ namespace ThinkEngine
         void Awake()
         {
             if(Application.isPlaying)
-            { 
+            {
+#if UNITY_EDITOR
                 CodeGenerator.AttachSensorsScripts(this);
+#endif
                 foreach (SerializableSensorType serializableSensorType in _serializableSensorsTypes)
                 {
  //                   _sensorsInstances.Add((Sensor)serializableSensorType.ScriptType.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null));
@@ -43,6 +45,15 @@ namespace ThinkEngine
                 }
             }
         }
+
+        internal void PropertyAliasChanged(string oldAlias, string newAlias)
+        {
+#if UNITY_EDITOR
+            CodeGenerator.Rename(oldAlias,newAlias,this);
+            generatedCode = true;
+#endif
+        }
+
         [UnityEditor.Callbacks.DidReloadScripts]
         static void Reload()
         {
@@ -62,10 +73,12 @@ namespace ThinkEngine
 
         void GenerateScripts()
         {
+#if UNITY_EDITOR
             CodeGenerator.GenerateCode(this);
             generatedCode = true;
-            CompilationPipeline.RequestScriptCompilation();
-
+            //CompilationPipeline.RequestScriptCompilation();
+            AssetDatabase.Refresh();
+#endif
         }
         void Start()
         {
@@ -170,12 +183,21 @@ namespace ThinkEngine
         
         protected override void PropertySelected(MyListString property)
         {
+#if UNITY_EDITOR
             CodeGenerator.GenerateCode(this);
+#endif
             generatedCode = true;
         }
         protected override void PropertyDeleted(MyListString property) 
         {
+#if UNITY_EDITOR
             CodeGenerator.RemoveUseless(property, this);
+#endif
+        }
+
+        protected override void PropertiesAliasChanged()
+        {
+            GenerateScripts();
         }
         void Update()
         {
@@ -186,7 +208,8 @@ namespace ThinkEngine
                 {
                     Debug.LogWarning("Compiling " + ConfigurationName + " generated scripts.");
                     generatedCode = true;
-                    CompilationPipeline.RequestScriptCompilation();
+                    //CompilationPipeline.RequestScriptCompilation();
+                    AssetDatabase.Refresh();
                 }
             }
 #endif

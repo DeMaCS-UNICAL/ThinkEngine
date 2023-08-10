@@ -39,6 +39,23 @@ namespace ThinkEngine
         private static Type mapperType;
         private static SensorConfiguration currentSensorConfiguration;
         private static MyListString currentPropertyHierarchy;
+
+        internal static void Rename(string oldAlias, string newAlias, SensorConfiguration sensorConfiguration)
+        {
+            foreach(string path in sensorConfiguration.generatedScripts)
+            {
+                if (path.EndsWith(oldAlias+".cs"))
+                {
+                    string newPath = path.Replace(oldAlias, newAlias);
+                    File.Move(path, newPath);
+                    if (File.Exists(path + ".meta"))
+                    {
+                        File.Delete(path + ".meta");
+                    }
+                }
+            }
+        }
+
         private static PropertyFeatures currentPropertyFeatures;
 
         private CodeGenerator() { }

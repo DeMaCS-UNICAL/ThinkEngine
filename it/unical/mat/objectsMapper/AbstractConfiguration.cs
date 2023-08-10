@@ -157,7 +157,10 @@ namespace ThinkEngine
                     Debug.Log("changed " + p.PropertyAlias);
                 }
             }
+            PropertiesAliasChanged();
         }
+
+        protected virtual void PropertiesAliasChanged() { }
 
         protected virtual void PropertyDeleted(MyListString property) { }
         protected virtual void PropertySelected(MyListString property) { }

@@ -56,7 +56,9 @@ namespace ThinkEngine.Editors
             {
                 try
                 {
+                    string old = features.PropertyAlias;
                     features.PropertyAlias = tempPropertyName;
+                    PropertyAliasChanged(old,features.PropertyAlias);
                 }
                 catch (Exception ex)
                 {
@@ -78,6 +80,7 @@ namespace ThinkEngine.Editors
             }
         }
 
+        protected virtual void PropertyAliasChanged(string oldAlias, string newAlias) { }
         protected abstract void VirtualFields(PropertyFeatures features);
 
         static AbstractConfigurationEditor()
