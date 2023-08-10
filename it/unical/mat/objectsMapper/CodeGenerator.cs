@@ -57,12 +57,20 @@ namespace ThinkEngine
                 MonoScript retrieved = AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "Scripts", "GeneratedCode", pF.PropertyAlias + ".cs"),typeof(MonoScript)) as MonoScript;
                 if (retrieved != null)
                 {
-                    sensorConfiguration._serializableSensorsTypes.Add(new SerializableSensorType(retrieved));
+                    try
+                    {
+                        SerializableSensorType item = new SerializableSensorType(retrieved);
+                        sensorConfiguration._serializableSensorsTypes.Add(item);
+                    }
+                    catch
+                    {
+                        Debug.LogWarning("Something went wrong with property " + pF.PropertyAlias + ". Sensor is not active.");
+                    }
                 }
             }
         }
 #endif
-        internal static void GenerateCode(List<MyListString> toMapProperties, object objectValue, SensorConfiguration sensorConfiguration)
+        internal static void GenerateCode(SensorConfiguration sensorConfiguration)
         {
             if (sensorConfiguration.ConfigurationName.Equals(string.Empty))
             {
@@ -71,15 +79,12 @@ namespace ThinkEngine
             }
             foreach (string path in sensorConfiguration.generatedScripts)
             {
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                }
+                DeleteGeneratedScript(path);
             }
             sensorConfiguration.generatedScripts.Clear();
             currentSensorConfiguration = sensorConfiguration;
-
-            foreach (MyListString propertyHierarchy in toMapProperties)
+            List<MyListString> toRemove = new List<MyListString>();
+            foreach (MyListString propertyHierarchy in sensorConfiguration.ToMapProperties)
             {
                 currentPropertyHierarchy = propertyHierarchy;
                 currentPropertyFeatures = currentSensorConfiguration.PropertyFeaturesList.Find(x => x.property.Equals(currentPropertyHierarchy));
@@ -92,17 +97,18 @@ namespace ThinkEngine
                 iDataMapperTypes = new List<Type>();
                 numberOfCollectionMappers = 0;
 
-                object currentObjectValue = objectValue;
+                object currentObjectValue = sensorConfiguration.gameObject;
 
                 //Reflection
                 if (!ReachPropertyByReflection(propertyHierarchy.GetClone(), currentObjectValue, out finalType, out mapper))
                 {
+                    toRemove.Add(propertyHierarchy);
                     continue;
                 }
                 if (mapper == null)
                 {
                     //Object 's value is null. Is this a problem?
-                    Debug.LogError(string.Format("Couldn't find a proper mapper for the target property of type {0}", finalType.Name));
+                    toRemove.Add(propertyHierarchy);
                     continue;
                 }
 
@@ -128,11 +134,6 @@ namespace ThinkEngine
                 string content = CreateText(templateTextFile.text);
                 string path = Path.Combine(generatedCodePath, sensorName + ".cs");
 
-                // confirm overwrite
-                if (File.Exists(path) && !EditorUtility.DisplayDialog(string.Format("Generated code file already exists in {0}", generatedCodeRelativePath), "Do you want to overwite it?", "Yes", "No"))
-                {
-                    return;
-                }
                 //Debug.Log("overwriting file "+path);
                 // create folder if not exists
                 if (!Directory.Exists(generatedCodePath))
@@ -143,8 +144,34 @@ namespace ThinkEngine
                 
             }
             // Refresh the unity asset database
-            AssetDatabase.ImportAsset(generatedCodeRelativePath, ImportAssetOptions.ForceSynchronousImport);
-            AssetDatabase.Refresh();
+            foreach(MyListString p in toRemove)
+            {
+                sensorConfiguration.ToggleProperty(p, false);
+            }
+        }
+
+        internal static void RemoveUseless(MyListString property, SensorConfiguration configuration)
+        {
+            string alias = configuration.PropertyFeaturesList.Find(x=>x.property.Equals(property)).PropertyAlias;
+            if (alias != null)
+            {
+                string toDelete = configuration.generatedScripts.Find(x => x.Contains(alias));
+                DeleteGeneratedScript(toDelete);
+                configuration.generatedScripts.Remove(toDelete);
+            }
+        }
+
+        private static void DeleteGeneratedScript(string toDelete)
+        {
+            if (File.Exists(toDelete))
+            {
+                File.Delete(toDelete);
+            }
+            if (File.Exists(toDelete + ".meta"))
+            {
+                File.Delete(toDelete + ".meta");
+
+            }
         }
 
         #region TEXT_GENERATION
