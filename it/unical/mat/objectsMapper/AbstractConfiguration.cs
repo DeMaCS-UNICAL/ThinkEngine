@@ -127,8 +127,8 @@ namespace ThinkEngine
                 {
                     ToMapProperties.Add(property);
                     PropertyFeaturesList.Add(new PropertyFeatures(ConfigurationName, property));
+                    PropertySelected(property);
                 }
-                PropertySelected(property);
             }
             else
             {
