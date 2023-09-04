@@ -86,9 +86,9 @@ namespace ThinkEngine.ScriptGeneration
                     {
                         data.IDataMapperTypes.Add(mapper.GetType());
                         data.NumberOfCollectionMappers++;
-                        data.Namespaces.Add(currentType.Namespace);
 
                         currentType = collectionMapper.ElementType(currentType);
+                        data.Namespaces.Add(currentType.Namespace);
                     }
                     else
                     {
@@ -189,9 +189,10 @@ namespace ThinkEngine.ScriptGeneration
                     {
                         data.IDataMapperTypes.Add(mapper.GetType());
                         data.NumberOfCollectionMappers++;
-                        data.Namespaces.Add(currentType.Namespace);
 
                         currentType = collectionMapper.ElementType(currentType);
+                        data.Namespaces.Add(currentType.Namespace);
+
                     }
                     else
                     {
