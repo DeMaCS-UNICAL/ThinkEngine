@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -277,7 +277,6 @@
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Planner\PlannerBrainsCoordinator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Specialitations\ASP\ASPPlannerExecutor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Planner\Scheduler.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\CodeGenerator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Editors\ActuatorConfigurationEditor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\MonoBehaviourActuatorsManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\BrainsScripts\Actuator\ReactiveBrain.cs" />
@@ -314,6 +313,9 @@
     <Compile Include="it\unical\mat\objectsMapper\Printer.cs" />
     <Compile Include="it\unical\mat\objectsMapper\PropertyDetails.cs" />
     <Compile Include="it\unical\mat\objectsMapper\PropertyFeatures.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Reflection\CodeGenerator.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Reflection\ReflectionUtility.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Reflection\TextGenerationUtility.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\Sensor.cs" />
     <Compile Include="it\unical\mat\objectsMapper\SensorsScripts\SensorConfiguration.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ObjectTracker.cs" />

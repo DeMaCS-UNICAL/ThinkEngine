@@ -4,6 +4,7 @@ using System.Reflection;
 using ThinkEngine.Mappers;
 using UnityEditor;
 using UnityEditor.Compilation;
+using ThinkEngine.ScriptGeneration;
 using UnityEngine;
 
 namespace ThinkEngine
