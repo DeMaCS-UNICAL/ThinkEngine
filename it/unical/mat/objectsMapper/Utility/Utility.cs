@@ -164,8 +164,14 @@ namespace ThinkEngine
             List<string> toReturn = new List<string>();
             foreach (MethodInfo mI in TriggerMethods)
             {
-                if (mI.ReturnType == typeof(bool) && mI.GetParameters().Length == 0)
+                ParameterInfo[] parameterInfos = mI.GetParameters();
+                if (mI.ReturnType == typeof(bool) && parameterInfos.Length <2)
                 {
+                    
+                    if (parameterInfos.Length==1 && !typeof(Brain).IsAssignableFrom(parameterInfos[0].ParameterType))
+                    {
+                        continue;
+                    }
                     toReturn.Add(mI.Name);
                 }
             }
