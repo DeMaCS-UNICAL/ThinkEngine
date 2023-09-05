@@ -5,7 +5,6 @@ using System;
 using System.Reflection;
 using ThinkEngine.Mappers.BaseMappers;
 using it.unical.mat.embasp.languages;
-using UnityEngine.Timeline;
 using ThinkEngine.Mappers;
 
 namespace ThinkEngine.ScriptGeneration
