@@ -16,11 +16,10 @@ using UnityEditor.SceneManagement;
 #endif
 namespace ThinkEngine
 {
-
-
     [ExecuteInEditMode]
     public class SensorsManager : MonoBehaviour
     {
+        private StopwatchManager _stopwatchManager;
         internal static Stopwatch watch = new Stopwatch();
         public int MIN_AVG_FPS;
         public int MIN_CURRENT_FPS;
@@ -83,8 +82,10 @@ namespace ThinkEngine
 
         //GMDG
         private static Dictionary<string, List<Sensor>> _sensorsInstances = new Dictionary<string, List<Sensor>>();    
-        //private static List<Sensor> _sensorsInstances = new List<Sensor>();
-
+        private static int _sensorCount = 0;
+        private static float _maxDeltaSeconds = 0;
+        private static int _maxNumberOfSensorPerUpdate = 0;
+        private static float _deltaSensorsCycle = 0;
         internal static void SubscribeSensors(List<Sensor> listOfGeneratedSensors, string configurationName)
         {
             if(!_sensorsInstances.ContainsKey(configurationName))
@@ -92,6 +93,7 @@ namespace ThinkEngine
                 _sensorsInstances[configurationName] = new List<Sensor>();
             }
             _sensorsInstances[configurationName].AddRange(listOfGeneratedSensors);
+            _sensorCount += listOfGeneratedSensors.Count;
         }
 
         internal static void UnsubscribeSensors(List<Sensor> listOfGeneratedSensors, string configurationName)
@@ -100,7 +102,7 @@ namespace ThinkEngine
                 return;
             
             _sensorsInstances[configurationName].RemoveAll(sensor => listOfGeneratedSensors.Contains(sensor));
-            
+            _sensorCount -= listOfGeneratedSensors.Count;   
 
             if (_sensorsInstances[configurationName].Count <= 0) 
             {
@@ -108,22 +110,109 @@ namespace ThinkEngine
             } 
         }
 
-        private void Update()
+        private void Start()
         {
-            if (Executor.CanRead(false))
+            if(Application.isPlaying)
             {
-                if (Application.isPlaying)
+                _stopwatchManager = GetComponent<StopwatchManager>();
+                _maxDeltaSeconds = 1f / MIN_CURRENT_FPS;
+                StartCoroutine(CheckTime());
+                StartCoroutine(UpdateSensors());
+            }
+        }
+
+        //private void LateUpdate()
+        //{
+        //    if (Executor.CanRead(false))
+        //    {
+        //        if (Application.isPlaying)
+        //        {
+        //            Debug.Log("Currently active sensors: " + _sensorCount);
+        //            Debug.Log("MaxDeltaSeconds: " + _maxDeltaSeconds);
+
+        //            //UpdateSensors();
+
+        //            _iteration++;
+        //        }
+        //        Executor.CanRead(true);
+        //    }
+        //}
+
+        private IEnumerator CheckTime()
+        {
+            _maxNumberOfSensorPerUpdate = _sensorCount;
+
+            while (true) 
+            { 
+                yield return null;
+                //Debug.Log(string.Format("Active Sensors: {0} - Max Sensors: {1} - DeltaTime: {2} - SensorCycle: {3} - CostPerSensor: {4}", _sensorCount, _maxNumberOfSensorPerUpdate, Time.deltaTime, _deltaSensorsCycle, _deltaSensorsCycle / _maxNumberOfSensorPerUpdate));
+
+
+                if (Time.deltaTime >= _maxDeltaSeconds)
                 {
-                    foreach (List<Sensor> sensors in _sensorsInstances.Values)
+                    if (_maxNumberOfSensorPerUpdate >= _sensorCount)
                     {
-                        for (int i = 0; i < sensors.Count; i++)
-                        {
-                            sensors[i].Update();
-                        }
+                        _maxNumberOfSensorPerUpdate = _sensorCount - 1;
                     }
-                    _iteration++;
+                    else
+                    {
+                        _maxNumberOfSensorPerUpdate -= (int)Mathf.Floor((Time.deltaTime - _maxDeltaSeconds) / (_deltaSensorsCycle / _maxNumberOfSensorPerUpdate));
+                        _maxNumberOfSensorPerUpdate = Mathf.Clamp(_maxNumberOfSensorPerUpdate, 1, int.MaxValue);
+                    }
                 }
-                Executor.CanRead(true);
+                else
+                {
+                    if (_maxNumberOfSensorPerUpdate >= _sensorCount)
+                    {
+                        _maxNumberOfSensorPerUpdate = _sensorCount;
+                    }
+                    else
+                    {
+                        _maxNumberOfSensorPerUpdate += (int)Mathf.Floor((_maxDeltaSeconds - Time.deltaTime) / (_deltaSensorsCycle / _maxNumberOfSensorPerUpdate));
+                    }
+                }
+            }
+        }
+
+        private IEnumerator UpdateSensors()
+        {
+            int sensorUpdatedCount = 0;
+
+            yield return new WaitForEndOfFrame();
+
+            double startTime = _stopwatchManager.TakeCurrentTime();
+
+            while (true) 
+            {
+                if (Executor.CanRead(false))
+                {
+                    if (Application.isPlaying)
+                    {
+                        sensorUpdatedCount = sensorUpdatedCount > 0 ? sensorUpdatedCount : 0;
+
+                        foreach (List<Sensor> sensors in _sensorsInstances.Values)
+                        {
+                            for (int i = 0; i < sensors.Count; i++)
+                            {
+                                sensors[i].Update();
+                                sensorUpdatedCount++;
+
+                                if (sensorUpdatedCount >= _maxNumberOfSensorPerUpdate)
+                                {
+                                    _deltaSensorsCycle = (float)_stopwatchManager.TakeDeltaTime(startTime);
+
+                                    yield return new WaitForEndOfFrame();
+
+                                    sensorUpdatedCount = 0;
+                                    startTime = _stopwatchManager.TakeCurrentTime();
+                                }
+                            }
+                        }
+
+                        _iteration++;
+                    }
+                    Executor.CanRead(true);
+                }
             }
         }
 
@@ -152,6 +241,7 @@ namespace ThinkEngine
                 return _sensorsInstances.Count;
             }
         }
+
         #region Unity Messages
         void OnDestroy()
         {
@@ -308,7 +398,9 @@ namespace ThinkEngine
             }
             return availableConfigurationNames;
         }
+
         #endregion
+
         #region Design-time methods
         private static void NotifyBrains()
         {

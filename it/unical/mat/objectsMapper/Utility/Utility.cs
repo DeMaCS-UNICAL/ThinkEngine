@@ -126,6 +126,7 @@ namespace ThinkEngine
                     if (_sensorsManager == null)
                     {
                         _sensorsManager = HiddenGameObject.AddComponent<SensorsManager>();
+                        HiddenGameObject.AddComponent<StopwatchManager>();
                     }
                 }
                 return _sensorsManager;
