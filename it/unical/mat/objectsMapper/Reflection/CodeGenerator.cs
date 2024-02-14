@@ -20,6 +20,7 @@ namespace ThinkEngine.ScriptGeneration
 
         internal static void GenerateCode(SensorConfiguration sensorConfiguration)
         {
+            Debug.Log("generating scripts for "+sensorConfiguration.ConfigurationName);
             if (sensorConfiguration.ConfigurationName.Equals(string.Empty))
             {
                 Debug.LogError("SensorConfiguration name can't be empty!");
@@ -36,7 +37,7 @@ namespace ThinkEngine.ScriptGeneration
             foreach (MyListString currentPropertyHierarchy in sensorConfiguration.ToMapProperties)
             {
                 PropertyReflectionData reflectionData = new PropertyReflectionData(currentPropertyHierarchy, sensorConfiguration.gameObject, sensorConfiguration);
-
+                Debug.Log("Found " + currentPropertyHierarchy);
                 if (!ReflectionUtility.PopulateReflectionData(reflectionData))
                 {
                     toRemove.Add(currentPropertyHierarchy);

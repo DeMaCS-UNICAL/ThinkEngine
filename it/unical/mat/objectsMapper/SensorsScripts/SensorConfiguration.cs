@@ -101,7 +101,10 @@ namespace ThinkEngine
         }
         static void Recompile()
         {
-            Instance.teRecompile = true;
+            if (Instance != null)
+            {
+                Instance.teRecompile = true;
+            }
             Utility.LoadPrefabs();
             foreach (SensorConfiguration sensorConfiguration in Resources.FindObjectsOfTypeAll<SensorConfiguration>())
             {
@@ -245,21 +248,32 @@ namespace ThinkEngine
                     Debug.LogWarning("Compiling " + ConfigurationName + " generated scripts.");
                     recompile = false;
                     //CompilationPipeline.RequestScriptCompilation();
-                    Instance.teRecompile = true;
+                    if (Instance != null)
+                    {
+                        Instance.forceRecompile = true;
+                    }
+                    else
+                    {
+                        forceRecompile = true;
+                    }
                     AssetDatabase.Refresh();
                 }
                 else
                 {
-                    if (forceRecompile)
-                    {
-                        forceRecompile = false;
-                        Recompile();
-                    }
+                    
                 }
             }
 
         }
 
+        void LateUpdate()
+        {
+            if (forceRecompile)
+            {
+                forceRecompile = false;
+                Recompile();
+            }
+        }
         private bool InEditMode()
         {
             return !(EditorApplication.isPlaying || EditorApplication.isCompiling
