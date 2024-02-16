@@ -310,7 +310,6 @@
     <Compile Include="it\unical\mat\objectsMapper\Mappers\MapperManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\ActuatorsScripts\MonoBehaviourActuator.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Mappers\OperationContainer.cs" />
-    <Compile Include="it\unical\mat\objectsMapper\Printer.cs" />
     <Compile Include="it\unical\mat\objectsMapper\PropertyDetails.cs" />
     <Compile Include="it\unical\mat\objectsMapper\PropertyFeatures.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Reflection\CodeGenerator.cs" />
@@ -323,6 +322,7 @@
     <Compile Include="it\unical\mat\objectsMapper\SerializableSensorType.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\MyListString.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\SolversChecker.cs" />
+    <Compile Include="it\unical\mat\objectsMapper\Utility\StopwatchManager.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Utility\Utility.cs" />
     <Compile Include="it\unical\mat\objectsMapper\Performance.cs" />
     <Compile Include="it\unical\mat\objectsMapper\FieldOrProperty.cs" />

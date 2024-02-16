@@ -10,7 +10,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
+#if UNITY_EDITOR 
 using UnityEditor;
+#endif
 using UnityEngine;
 using static ThinkEngine.Brain;
 

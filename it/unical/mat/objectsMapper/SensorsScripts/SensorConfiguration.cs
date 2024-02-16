@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Reflection;
 using ThinkEngine.Mappers;
-using UnityEditor;
-using UnityEditor.Compilation;
+#if UNITY_EDITOR
+    using UnityEditor;
+#endif
 using ThinkEngine.ScriptGeneration;
 using UnityEngine;
 using System.IO;
@@ -76,8 +77,9 @@ namespace ThinkEngine
             recompile = true;
 #endif
         }
-
+#if UNITY_EDITOR
         [UnityEditor.Callbacks.DidReloadScripts]
+#endif
         static void Reload()
         {
             Debug.Log("Did Reload");
@@ -101,6 +103,7 @@ namespace ThinkEngine
         }
         static void Recompile()
         {
+#if UNITY_EDITOR
             if (Instance != null)
             {
                 Instance.teRecompile = true;
@@ -111,6 +114,7 @@ namespace ThinkEngine
                 sensorConfiguration.GenerateScripts(false);
             }
             AssetDatabase.Refresh();
+#endif
         }
 
         internal void GenerateScripts(bool _recompile=true)
