@@ -76,7 +76,6 @@ namespace ThinkEngine.ScriptGeneration
             }
         }
 
-#if UNITY_EDITOR
         internal static void AttachSensorsScripts(SensorConfiguration sensorConfiguration)
         {
             /*foreach (string monoScript in AssetDatabase.FindAssets("t:MonoScript", new string[] { "Assets/Scripts/GeneratedCode" }))
@@ -84,6 +83,8 @@ namespace ThinkEngine.ScriptGeneration
                 Debug.Log("Found this asset: "+monoScript);
                 Debug.Log(AssetDatabase.GUIDToAssetPath(monoScript));
             }*/
+
+#if UNITY_EDITOR
             sensorConfiguration._serializableSensorsTypes.Clear();
             foreach (PropertyFeatures pF in sensorConfiguration.PropertyFeaturesList)
             {
@@ -93,8 +94,8 @@ namespace ThinkEngine.ScriptGeneration
                     sensorConfiguration._serializableSensorsTypes.Add(new SerializableSensorType(retrieved));
                 }
             }
-        }
 #endif
+        }
 
         internal static void Rename(string oldAlias, string newAlias, SensorConfiguration sensorConfiguration)
         {

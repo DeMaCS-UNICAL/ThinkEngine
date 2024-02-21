@@ -9,19 +9,21 @@ namespace ThinkEngine
     [Serializable]
     public class SerializableSensorType 
     {
-#if UNITY_EDITOR
-        [SerializeField]
-        private MonoScript scriptAsset;
-#endif
 
         [SerializeField]
         [HideInInspector]
         private string typeName;
+        [SerializeField]
+        [HideInInspector]
+        private Type _ScriptType;
+        public Type ScriptType {
+            get { return _ScriptType; }
+            private set { _ScriptType = value; } 
+        }
 #if UNITY_EDITOR
         public SerializableSensorType(MonoScript retrieved)
         {
-            this.scriptAsset = retrieved;
-            string type = scriptAsset.GetClass()?.AssemblyQualifiedName;
+            string type = retrieved.GetClass()?.AssemblyQualifiedName;
             if (TypeIsValid(type))
             {
                 ScriptType = Type.GetType(type);
@@ -36,7 +38,6 @@ namespace ThinkEngine
         {
             return Type.GetType(assemblyQualifiedName).IsSubclassOf(typeof(Sensor));
         }
-        public Type ScriptType { get; private set; }
         /*
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {

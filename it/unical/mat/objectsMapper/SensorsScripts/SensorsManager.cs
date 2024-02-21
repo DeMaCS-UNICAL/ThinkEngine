@@ -16,7 +16,7 @@ using UnityEditor.SceneManagement;
 #endif
 namespace ThinkEngine
 {
-    [ExecuteInEditMode]
+    [ExecuteInEditMode,RequireComponent(typeof(StopwatchManager))]
     public class SensorsManager : MonoBehaviour
     {
         private StopwatchManager _stopwatchManager;
@@ -184,16 +184,21 @@ namespace ThinkEngine
 
             while (true) 
             {
+                yield return null;
                 if (Executor.CanRead(false))
                 {
                     if (Application.isPlaying)
                     {
                         sensorUpdatedCount = sensorUpdatedCount > 0 ? sensorUpdatedCount : 0;
-
                         foreach (List<Sensor> sensors in _sensorsInstances.Values)
                         {
+
                             for (int i = 0; i < sensors.Count; i++)
                             {
+                                if (sensors[i] == null)
+                                {
+                                    continue;
+                                }
                                 sensors[i].Update();
                                 sensorUpdatedCount++;
 

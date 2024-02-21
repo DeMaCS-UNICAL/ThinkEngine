@@ -61,6 +61,7 @@ namespace ThinkEngine
                 {
  //                   _sensorsInstances.Add((Sensor)serializableSensorType.ScriptType.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null));
                     _sensorsInstances.Add((Sensor)Activator.CreateInstance(serializableSensorType.ScriptType));
+                    Debug.Log(_sensorsInstances[_sensorsInstances.Count - 1]);
 
                 }
                 foreach (Sensor instance in _sensorsInstances)
