@@ -11,7 +11,7 @@ using System.IO;
 
 namespace ThinkEngine
 {
-    [ExecuteInEditMode, Serializable]
+    [ExecuteAlways, Serializable]
     public class SensorConfiguration : AbstractConfiguration//, ISerializationCallbackReceiver
     {
         public bool isInvariant;
@@ -52,15 +52,18 @@ namespace ThinkEngine
 
         void Awake()
         {
-            if(Application.isPlaying)
+            if (Application.isPlaying)
             {
-#if UNITY_EDITOR
-                CodeGenerator.AttachSensorsScripts(this);
-#endif
+   
                 foreach (SerializableSensorType serializableSensorType in _serializableSensorsTypes)
                 {
- //                   _sensorsInstances.Add((Sensor)serializableSensorType.ScriptType.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null));
-                    _sensorsInstances.Add((Sensor)Activator.CreateInstance(serializableSensorType.ScriptType));
+                    //                   _sensorsInstances.Add((Sensor)serializableSensorType.ScriptType.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null));
+                    
+                        _sensorsInstances.Add((Sensor)Activator.CreateInstance(serializableSensorType.ScriptType));
+                    /*using (StreamWriter fs = new StreamWriter(Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", "Log.log"), true))
+                    {
+                        fs.Write(_sensorsInstances[_sensorsInstances.Count - 1] + Environment.NewLine);
+                    }*/
                     Debug.Log(_sensorsInstances[_sensorsInstances.Count - 1]);
 
                 }
@@ -87,19 +90,26 @@ namespace ThinkEngine
             if (Instance == null)
             {
                 Debug.Log("Instance is null.");
-                return;
             }
-            if (Instance.teRecompile)
+            else if (Instance.teRecompile)
             {
                 Debug.Log("TE recompiled.");
                 Instance.teRecompile = false;
-                return;
             }
             else
             {
                 Debug.Log("Forcing TE recompile.");
                 Instance.teRecompile=true;
                 Instance.forceRecompile=true;
+                return;
+            }
+
+            foreach (SensorConfiguration sensorConfiguration in Resources.FindObjectsOfTypeAll<SensorConfiguration>())
+            {
+                if (sensorConfiguration != null)
+                {
+                    CodeGenerator.AttachSensorsScripts(sensorConfiguration);
+                }
             }
         }
         static void Recompile()
@@ -128,6 +138,12 @@ namespace ThinkEngine
         }
         void Start()
         {
+            /*
+            using (StreamWriter fs = new StreamWriter(Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", "Log.log"), true))
+            {
+                fs.Write(ConfigurationName+" configuration started" + Environment.NewLine);
+            }
+            */
             Utility.LoadPrefabs();
 
         }
@@ -245,7 +261,6 @@ namespace ThinkEngine
 #if UNITY_EDITOR
         void Update()
         {
-
             if (InEditMode()) 
             {
                 if (EditorWindow.focusedWindow != null && EditorWindow.focusedWindow.titleContent.text != "Inspector" && recompile)

@@ -91,7 +91,9 @@ namespace ThinkEngine.ScriptGeneration
                 MonoScript retrieved = AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "Scripts", "GeneratedCode", pF.PropertyAlias + ".cs"), typeof(MonoScript)) as MonoScript;
                 if (retrieved != null)
                 {
+                    Debug.Log("adding "+retrieved.name);
                     sensorConfiguration._serializableSensorsTypes.Add(new SerializableSensorType(retrieved));
+                    Debug.Log(sensorConfiguration._serializableSensorsTypes[sensorConfiguration._serializableSensorsTypes.Count-1].ScriptType);
                 }
             }
 #endif

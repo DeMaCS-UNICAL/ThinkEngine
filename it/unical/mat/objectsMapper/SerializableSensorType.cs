@@ -17,16 +17,26 @@ namespace ThinkEngine
         [HideInInspector]
         private Type _ScriptType;
         public Type ScriptType {
-            get { return _ScriptType; }
+            get { 
+                if (_ScriptType == null)
+                {
+                    _ScriptType = Type.GetType(typeName);
+                }
+                return _ScriptType; 
+            }
             private set { _ScriptType = value; } 
         }
 #if UNITY_EDITOR
         public SerializableSensorType(MonoScript retrieved)
         {
             string type = retrieved.GetClass()?.AssemblyQualifiedName;
+            Debug.Log("trying serialize "+type);
             if (TypeIsValid(type))
             {
-                ScriptType = Type.GetType(type);
+                Debug.Log("is valid");
+                //ScriptType = Type.GetType(type);
+                typeName = type;
+                Debug.Log("scripttype is "+ScriptType);
             }
             else
             {

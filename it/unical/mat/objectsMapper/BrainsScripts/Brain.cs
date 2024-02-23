@@ -125,6 +125,10 @@ namespace ThinkEngine
 
         protected virtual void Start()
         {
+            if (maintainInputFile)
+            {
+                Debug.developerConsoleVisible = true;   
+            }
             Utility.LoadPrefabs();
             if (Application.isPlaying && enableBrain)
             {

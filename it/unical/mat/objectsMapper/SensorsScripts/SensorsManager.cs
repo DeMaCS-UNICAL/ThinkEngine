@@ -10,6 +10,7 @@ using System.Linq;
 using ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using System.IO;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -88,7 +89,18 @@ namespace ThinkEngine
         private static float _deltaSensorsCycle = 0;
         internal static void SubscribeSensors(List<Sensor> listOfGeneratedSensors, string configurationName)
         {
-            if(!_sensorsInstances.ContainsKey(configurationName))
+            /*
+            using (StreamWriter fs = new StreamWriter(Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", "Log.log"), true))
+            {
+                fs.Write("Subscribing "+configurationName + Environment.NewLine);
+                fs.Write("number of registerd sensors:  "+listOfGeneratedSensors.Count + Environment.NewLine);
+                foreach(Sensor s in listOfGeneratedSensors)
+                {
+                    fs.Write("sensor is  " + s + Environment.NewLine);
+
+                }
+            }*/
+            if (!_sensorsInstances.ContainsKey(configurationName))
             {
                 _sensorsInstances[configurationName] = new List<Sensor>();
             }
@@ -112,7 +124,12 @@ namespace ThinkEngine
 
         private void Start()
         {
-            if(Application.isPlaying)
+            /*
+            using (StreamWriter fs = new StreamWriter(Path.Combine(Path.GetTempPath(), "ThinkEngineFacts","Log.log"), true))
+            {
+                fs.Write("Sensors manager ready");
+            }*/
+            if (Application.isPlaying)
             {
                 _stopwatchManager = GetComponent<StopwatchManager>();
                 _maxDeltaSeconds = 1f / MIN_CURRENT_FPS;
@@ -183,25 +200,47 @@ namespace ThinkEngine
             double startTime = _stopwatchManager.TakeCurrentTime();
 
             while (true) 
-            {
+            {/*
+                using (StreamWriter fs = new StreamWriter(Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", "Log.log"), true))
+                {
+                    fs.Write("New iteration" + Environment.NewLine);
+                }*/
                 yield return null;
                 if (Executor.CanRead(false))
                 {
                     if (Application.isPlaying)
                     {
                         sensorUpdatedCount = sensorUpdatedCount > 0 ? sensorUpdatedCount : 0;
+                        /*
+                        using (StreamWriter fs = new StreamWriter(Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", "Log.log"), true))
+                        {
+                            fs.Write("Sensors: "+ _sensorsInstances.Values.Count + Environment.NewLine);
+                        }*/
                         foreach (List<Sensor> sensors in _sensorsInstances.Values)
                         {
-
+                            /*
+                            using (StreamWriter fs = new StreamWriter(Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", "Log.log"), true))
+                            {
+                                fs.Write("sensors list count "+sensors.Count + Environment.NewLine);
+                            }*/
                             for (int i = 0; i < sensors.Count; i++)
                             {
                                 if (sensors[i] == null)
-                                {
+                                {/*
+                                    using (StreamWriter fs = new StreamWriter(Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", "Log.log"), true))
+                                    {
+                                        fs.Write("Sensor is null"+Environment.NewLine);
+
+                                    }*/
                                     continue;
                                 }
                                 sensors[i].Update();
                                 sensorUpdatedCount++;
-
+                                /*
+                                using (StreamWriter fs = new StreamWriter(Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", "Log.log"), true))
+                                {
+                                    fs.Write("Sensor: " + sensors[i]);
+                                }*/
                                 if (sensorUpdatedCount >= _maxNumberOfSensorPerUpdate)
                                 {
                                     _deltaSensorsCycle = (float)_stopwatchManager.TakeDeltaTime(startTime);
