@@ -95,6 +95,7 @@ namespace ThinkEngine.Planning
         {
             if (Planner != null)
             {
+                brainName += "_Pr_"+Priority;
                 yield return StartCoroutine(base.Init());
                 executor = Planner.GetPlannerExecutor(this);
                 executorName = "Solver executor " + gameObject.name + Priority;
