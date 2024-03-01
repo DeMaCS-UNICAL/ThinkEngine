@@ -152,6 +152,10 @@ namespace ThinkEngine
             if (Application.isPlaying)
             {
                 SensorsManager.SubscribeSensors(_sensorsInstances, ConfigurationName);
+                foreach (Sensor s in _sensorsInstances)
+                {
+                    s.Enable();
+                }
             }
         }
 
@@ -159,6 +163,10 @@ namespace ThinkEngine
         {
             if (Application.isPlaying)
             {
+                foreach(Sensor s in _sensorsInstances)
+                {
+                    s.Disable();
+                }
                 SensorsManager.UnsubscribeSensors(_sensorsInstances, ConfigurationName);
             }
         }

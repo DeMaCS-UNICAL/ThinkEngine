@@ -116,6 +116,14 @@ namespace ThinkEngine
         public abstract void Initialize(SensorConfiguration sensorConfiguration);
 
         public abstract void Destroy();
+        public void Disable()
+        {
+            ready = false;
+        }
+        public void Enable()
+        {
+            ready = true;
+        }
 
         public abstract void Update();
 
