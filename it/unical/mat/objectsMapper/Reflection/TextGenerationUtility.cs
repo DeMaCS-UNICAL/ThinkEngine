@@ -188,8 +188,25 @@ namespace ThinkEngine.ScriptGeneration
             // Take next property
 
             string takeProperty = data.IDataMapperTypes[pos - 1] == null ? data.VariableNames[pos - 1] : data.VariableNames[pos - 1] + string.Format("[i_{0}]", pos - 1);
-            takeProperty += (data.TypeNames[pos - 1].Equals("GameObject")) && data.AreComponent[pos] ? string.Format(".GetComponent<{0}>()", data.TypeNames[pos]) : data.Names[pos] != null ? string.Format(".{0}", data.Names[pos]) : "";
-
+            if ((data.TypeNames[pos - 1].Equals("GameObject")) && data.AreComponent[pos])
+            {
+                takeProperty += string.Format(".GetComponent<{0}>()", data.TypeNames[pos]);
+            }
+            else
+            {
+                if (!data.AreValueType[pos - 1] && data.IDataMapperTypes[pos] ==null)
+                {
+                    text = string.Concat(text, string.Format("" +
+                        "if({0} == null)" +
+                        "{{" +
+                            "values{1}.Clear();" +
+                            "{2};" +
+                        "}}" +
+                    "", takeProperty, GetCollectionElement(pos, data), GetNumberOfCollectionMapperBeforePosition(pos, data) == 0 ? "return" : "continue"));
+                }
+                takeProperty += data.Names[pos] != null ? string.Format(".{0}", data.Names[pos]) : "";
+            }
+            
             text = string.Concat(text, string.Format("" +
                 "{0} {1} = {2};" +
             "", data.TypeNames[pos], data.VariableNames[pos], takeProperty));
