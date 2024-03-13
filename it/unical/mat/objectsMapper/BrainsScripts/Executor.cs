@@ -109,7 +109,7 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         }
         internal virtual void Run()
         {
-            int facts_id=0; 
+            int facts_id=0;
             if (!Directory.Exists(Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", brain.brainName)))
             {
                 if (!Directory.Exists(Path.Combine(Path.GetTempPath(), "ThinkEngineFacts")))
