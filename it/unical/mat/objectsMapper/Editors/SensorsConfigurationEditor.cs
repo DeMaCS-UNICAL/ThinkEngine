@@ -25,12 +25,12 @@ namespace ThinkEngine.Editors
             if (!configurePropertyMode)
             {
                 DrawPropertiesExcluding(serializedObject, new string[] { });
-                serializedObject.ApplyModifiedProperties();
                 base.OnInspectorGUI();
             }
             else
             {
                 ConfigureProperty();
+                serializedObject.ApplyModifiedProperties();
             }
         }
         protected override void PropertyAliasChanged(string oldAlias, string newAlias)

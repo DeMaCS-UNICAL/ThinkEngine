@@ -8,6 +8,7 @@ using ThinkEngine.Mappers;
 using ThinkEngine.ScriptGeneration;
 using UnityEngine;
 using System.IO;
+using UnityEditor.SceneManagement;
 
 namespace ThinkEngine
 {
@@ -77,6 +78,25 @@ namespace ThinkEngine
         internal override void PropertyAliasChanged(string oldAlias, string newAlias)
         {
 #if UNITY_EDITOR
+            if (PrefabStageUtility.GetPrefabStage(gameObject) != null)
+            {
+                foreach (SensorConfiguration s in Resources.FindObjectsOfTypeAll<SensorConfiguration>())
+                {
+                    if(s!=null && s!=this && s.ConfigurationName == this.ConfigurationName)
+                    {
+                        foreach(PropertyFeatures pF in s.PropertyFeaturesList)
+                        {
+                            if (pF.PropertyAlias == oldAlias)
+                            {
+                                Debug.Log("Changing name to " + s.gameObject);
+                                pF.AssignPropertyAliasWithoutValidation( newAlias);
+                                CodeGenerator.Rename(oldAlias, newAlias, s);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
             CodeGenerator.Rename(oldAlias,newAlias,this);
             recompile = true;
 #endif
@@ -180,6 +200,12 @@ namespace ThinkEngine
                     instance.Destroy();
                 }
             }
+#if UNITY_EDITOR
+            if (recompile)
+            {
+                Recompiling();
+        }
+#endif
         }
         //GMDG
 
@@ -273,18 +299,7 @@ namespace ThinkEngine
             {
                 if (EditorWindow.focusedWindow != null && EditorWindow.focusedWindow.titleContent.text != "Inspector" && recompile)
                 {
-                    Debug.LogWarning("Compiling " + ConfigurationName + " generated scripts.");
-                    recompile = false;
-                    //CompilationPipeline.RequestScriptCompilation();
-                    if (Instance != null)
-                    {
-                        Instance.forceRecompile = true;
-                    }
-                    else
-                    {
-                        forceRecompile = true;
-                    }
-                    AssetDatabase.Refresh();
+                    Recompiling();
                 }
                 else
                 {
@@ -292,6 +307,22 @@ namespace ThinkEngine
                 }
             }
 
+        }
+
+        private void Recompiling()
+        {
+            Debug.LogWarning("Compiling " + ConfigurationName + " generated scripts.");
+            recompile = false;
+            //CompilationPipeline.RequestScriptCompilation();
+            if (Instance != null)
+            {
+                Instance.forceRecompile = true;
+            }
+            else
+            {
+                forceRecompile = true;
+            }
+            AssetDatabase.Refresh();
         }
 
         void LateUpdate()

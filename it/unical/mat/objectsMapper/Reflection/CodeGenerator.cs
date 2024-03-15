@@ -39,7 +39,7 @@ namespace ThinkEngine.ScriptGeneration
             foreach (MyListString currentPropertyHierarchy in sensorConfiguration.ToMapProperties)
             {
                 PropertyReflectionData reflectionData = new PropertyReflectionData(currentPropertyHierarchy, sensorConfiguration.gameObject, sensorConfiguration);
-                Debug.Log("Found " + currentPropertyHierarchy);
+                //Debug.Log("Found " + currentPropertyHierarchy);
                 if (!ReflectionUtility.PopulateReflectionData(reflectionData))
                 {
                     toRemove.Add(currentPropertyHierarchy);
@@ -101,24 +101,26 @@ namespace ThinkEngine.ScriptGeneration
 
         internal static void Rename(string oldAlias, string newAlias, SensorConfiguration sensorConfiguration)
         {
-            foreach (string path in sensorConfiguration.generatedScripts)
+            foreach (string fileName in sensorConfiguration.generatedScripts)
             {
-                string oldPath = Path.Combine(generatedCodePath, path);
+                string oldPath = Path.Combine(generatedCodePath, fileName);
                 if (File.Exists(oldPath))
                 {
-                    if (path.EndsWith(oldAlias + ".cs"))
+                    if (fileName.EndsWith(oldAlias + ".cs"))
                     {
-                        string newPath = oldPath.Replace(oldAlias, newAlias);
-                        File.Move(path, newPath);
-                        if (File.Exists(path + ".meta"))
+                        string newPath = oldPath.Remove(oldPath.Length - oldAlias.Length)+newAlias;
+
+                        File.Move(oldPath, newPath);
+                        if (File.Exists(fileName + ".meta"))
                         {
-                            File.Delete(path + ".meta");
+                            File.Delete(fileName + ".meta");
                         }
                     }
                 }
                 else
                 {
                     sensorConfiguration.GenerateScripts();
+                    break;
                 }
             }
         }

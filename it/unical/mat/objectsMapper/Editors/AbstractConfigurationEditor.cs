@@ -19,6 +19,7 @@ namespace ThinkEngine.Editors
         static GUIStyle toUse;
 
         protected bool configurePropertyMode;
+        protected int getFocus;
         protected MyListString actualProperty;
         protected string tempPropertyName;
         protected void Reset()
@@ -51,6 +52,7 @@ namespace ThinkEngine.Editors
             EditorGUILayout.HelpBox("Configure advanced feature of the property", MessageType.Info);
             PropertyFeatures features = configuration.PropertyFeaturesList.Find(x => x.property.Equals(actualProperty));
             EditorGUILayout.BeginHorizontal();
+            GUI.SetNextControlName("Alias");
             tempPropertyName = EditorGUILayout.TextField("Property Alias:", tempPropertyName);
             if (GUILayout.Button("Save"))
             {
@@ -62,6 +64,7 @@ namespace ThinkEngine.Editors
                 }
                 catch (Exception ex)
                 {
+                    Debug.Log(ex);
                     if (ex.Message == "InvalidName")
                     {
                         Debug.LogError("The name " + tempPropertyName + " can not be used.");

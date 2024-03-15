@@ -38,7 +38,10 @@ namespace ThinkEngine
                 ValidateNameAndAssign(value);
             }
         }
-
+        internal void AssignPropertyAliasWithoutValidation(string value)
+        {
+            _propertyAlias = value;
+        }
         internal PropertyFeatures(string configurationName, MyListString p)
         {
             property = p.GetClone();
