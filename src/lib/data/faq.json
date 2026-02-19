@@ -1,0 +1,42 @@
+[
+  {
+    "category": "🧠 Base",
+    "q": "What is ThinkEngine?",
+    "a": "ThinkEngine is a Unity asset that connects the game world to a reasoning engine (ASP), enabling declarative logic and intelligent behaviors."
+  },
+  {
+    "category": "🧠 Base",
+    "q": "What is the difference between Reactive and Planner Brain?",
+    "a": "Reactive Brain makes immediate decisions every frame. Planner Brain generates and executes action plans."
+  },
+  {
+    "category": "⚙️ Installation",
+    "q": "Where should I place my .asp files?",
+    "a": "Inside `Assets/StreamingAssets/ThinkEngineer/ThinkEngine/`. It's the only folder the solver reads at runtime."
+  },
+  {
+    "category": "⚙️ Installation",
+    "q": "Where should I put the solver binary?",
+    "a": "Place it in `Assets/StreamingAssets/ThinkEngineer/ThinkEngine/lib/` and ensure it has execution permissions."
+  },
+  {
+    "category": "🛰 Sensors & Actuators",
+    "q": "What are sensors used for?",
+    "a": "Sensors read GameObject properties and translate them into ASP facts."
+  },
+  {
+    "category": "🧭 Brains",
+    "q": "Can I have multiple brains?",
+    "a": "Yes, but you need to manage priorities and avoid conflicts between planner and reactive logic."
+  },
+  {
+    "category": "🧪 Debugging",
+    "q": "Why are my actuators not applying values?",
+    "a": "Check property names, triggers, and ensure the solver outputs `setOnActuator(...)` atoms."
+  },
+  {
+    "category": "🧱 Best Practices",
+    "q": "How should I organize my ASP files?",
+    "a": "Keep them modular and well named, matching sensor and actuator predicate names."
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "artifacts": [
+    {
+      "file": "ThinkEngineMicro.zip",
+      "displayName": "ThinkEngine Hello World",
+      "version": "1.0.0",
+      "released": "2025-10-20",
+      "size": 13600000,
+      "sha256": "A0B5AB4B6ED104A280683B741FB0DC7FDCD8A3936E183E8B06278CFA660A36C0"
+    }
+  ]
+}
