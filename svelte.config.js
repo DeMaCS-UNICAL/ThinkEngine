@@ -2,7 +2,7 @@ import adapter from '@sveltejs/adapter-static';
 import { mdsvex } from 'mdsvex';
 import gfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
-import rehypeSlug from 'rehype-slug'; // 👈 NEW
+import rehypeSlug from 'rehype-slug';
 
 const config = {
   extensions: ['.svelte', '.svx', '.md'],
@@ -13,15 +13,26 @@ const config = {
       remarkPlugins: [gfm],
       rehypePlugins: [
         [rehypeHighlight, { ignoreMissing: true, detect: true }],
-        rehypeSlug // 👈 aggiunge id agli <h1..h6>
+        rehypeSlug
       ]
     })
   ],
   kit: {
-    adapter: adapter({ pages: 'build', assets: 'build', fallback: '404.html' }),
-    alias: { $content: 'src/content', $lib: 'src/lib' },
-    paths: { base: process.env.PUBLIC_BASE_PATH || '' },
-    prerender: { entries: ['*'] }
+    adapter: adapter({
+      pages: 'build',
+      assets: 'build',
+      fallback: '404.html'
+    }),
+    alias: {
+      $content: 'src/content',
+      $lib: 'src/lib'
+    },
+    paths: {
+      base: '/ThinkEngine'
+    },
+    prerender: {
+      entries: ['*']
+    }
   }
 };
 

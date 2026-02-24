@@ -19,8 +19,8 @@
     </div>
     <div class="col-12 col-lg-6">
       <VideoHero
-        srcMp4="/videos/video-tutorial.mp4"
-        poster="/images/poster.png"
+        srcMp4="videos/video-tutorial.mp4"
+        poster="images/poster.png"
         title="ThinkEngine – Video Tutorial"
       />
     </div>

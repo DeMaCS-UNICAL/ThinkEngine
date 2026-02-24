@@ -18,12 +18,12 @@
     <NavLink href={`${base}/faq`}>FAQ</NavLink>
   </NavItem>
       <NavItem>
-        <NavLink href="https://github.com/tuo-repo" target="_blank" rel="noopener noreferrer">
+        <NavLink href="https://github.com/DeMaCS-UNICAL/ThinkEngine" target="_blank" rel="noopener noreferrer">
           GitHub
         </NavLink>
       </NavItem>
       <NavItem>
-        <NavLink href="https://thinkengine.ai">Website</NavLink>
+        <NavLink href="https://github.com/DeMaCS-UNICAL/ThinkEngine">Website</NavLink>
       </NavItem>
     </Nav>
 
