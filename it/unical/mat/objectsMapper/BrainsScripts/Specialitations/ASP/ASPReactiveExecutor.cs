@@ -39,6 +39,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         {
             List<OptionDescriptor> options = new List<OptionDescriptor>();
             options.Add(new OptionDescriptor("--filter=setOnActuator/1 "));
+            if (Utility.SensorsManager.DEBUG_TE)
+            {
+                Debug.Log("--filter=setOnActuator/1 Added");
+            }
             return options;
         }
        

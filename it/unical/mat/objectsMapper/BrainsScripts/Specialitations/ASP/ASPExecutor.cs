@@ -38,6 +38,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
         }
         protected override void OutputParsing(Output o)
         {
+            if (Utility.SensorsManager.DEBUG_TE)
+            {
+                Debug.Log("Output Parsing");
+            }
             AnswerSets answers = (AnswerSets)o;
             if (answers.Answersets.Count > 0)
             {

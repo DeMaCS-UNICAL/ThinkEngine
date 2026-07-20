@@ -16,6 +16,7 @@ namespace ThinkEngine
     [ExecuteInEditMode]
     internal class ActuatorsManager : MonoBehaviour
     {
+        public bool DEBUG_ACTUATORS;
         private static Dictionary<ReactiveBrain, List<string>> _instantiatedActuators;
         private static ConcurrentQueue<KeyValuePair<ReactiveBrain, AnswerSet>> _actuatorsToApply;
         private static ConcurrentQueue<KeyValuePair<ReactiveBrain, object>> _requestedObjectIndexes;
@@ -329,6 +330,10 @@ namespace ThinkEngine
         }
         private static string GetObjectIndexes(ReactiveBrain brain)//retrieves the asp representation of the indexes (IndexTracker) of the gameobject to which it is associated an actuator assigned to the relative brain 
         {
+            if (brain == null)
+            {
+                return "";
+            }
             string toReturn = "";
             MonoBehaviourActuatorsManager[] monoBehaviourActuatorsManager;
             if (brain.prefabBrain)
@@ -407,6 +412,10 @@ namespace ThinkEngine
         }
         private void ApplyActuatorForPrefabBrain(ReactiveBrain brain, AnswerSet answerSet)
         {
+            if(brain == null)
+            {
+                return;
+            }
             MonoBehaviourActuatorsManager monoBehaviourActuatorsManager = brain.GetComponent<MonoBehaviourActuatorsManager>();
             if (monoBehaviourActuatorsManager == null)
             {

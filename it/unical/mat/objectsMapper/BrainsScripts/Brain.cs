@@ -120,6 +120,11 @@ namespace ThinkEngine
         }
         void Awake()
         {
+            if (AIFilesPrefix == null)
+            {
+                AIFilesPrefix = new List<string>();
+                AIFilesPrefix.Add(gameObject.name + "_");
+            }
             AIFilesPath = Utility.StreamingAssetsContent;
         }
 
@@ -141,10 +146,6 @@ namespace ThinkEngine
 
         private void FindCurrentParadigm()
         {
-            if (AIFilesPrefix == null)
-            {
-                return;
-            }
             _fileExtension = "";
             // Iterate over all the files in the StreamingAssetsContent folder (and subfolders)
             foreach (string filePath in Directory.GetFiles(Utility.StreamingAssetsContent, "*.*", SearchOption.AllDirectories))
@@ -172,6 +173,7 @@ namespace ThinkEngine
 
             if (FileExtension.Equals(""))
             {
+                Debug.LogError("AI files not found. Check for AI Files Prefix matching your AI files name.");
                 _fileExtension = null;
             }
         }

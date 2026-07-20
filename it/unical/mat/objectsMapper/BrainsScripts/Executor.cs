@@ -27,8 +27,16 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
             }
             public void Callback(Output o)
             {
+                if (Utility.SensorsManager.DEBUG_TE)
+                {
+                    Debug.Log("Solver Done");
+                }
                 if (!executor.reason)
                 {
+                    if (Utility.SensorsManager.DEBUG_TE)
+                    {
+                        Debug.Log("Reasoner stopped");
+                    }
                     return;
                 }
                 if (!o.ErrorsString.Equals(""))
@@ -222,12 +230,17 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                     {
                         handler = GetHandler(out string s);
                         handler.AddProgram(encoding);
-                    }
+                        if (Utility.SensorsManager.DEBUG_TE)
+                        {
+                            Debug.Log("Got handler");
+                        }
+                     }
                     handler.AddProgram(facts);
 
                     for (int i = 0; i < brain.solver_options.Count; i++)
                     {
                         handler.AddOption(new OptionDescriptor(brain.solver_options[i]));
+                       
 
                     }
                     if (!brain.debug)
@@ -235,6 +248,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                         foreach(OptionDescriptor option in SpecificOptions())
                         {
                             handler.AddOption(option);
+                        }
+                        if (Utility.SensorsManager.DEBUG_TE)
+                        {
+                            Debug.Log("Options Added");
                         }
                     }
 
@@ -245,6 +262,10 @@ namespace ThinkEngine.it.unical.mat.objectsMapper.BrainsScripts
                         return;
                     }
                     stopwatch.Restart();
+                    if (Utility.SensorsManager.DEBUG_TE)
+                    {
+                        Debug.Log("Starting Async");
+                    }
                     handler.StartAsync(new MyCallBack(this));
                     while (!solverDone)
                     {

@@ -148,15 +148,24 @@ namespace ThinkEngine
         {
             foreach(PropertyFeatures p in PropertyFeaturesList)
             {
-                Debug.Log(p.PropertyAlias);
+                if (Utility.SensorsManager.DEBUG_TE)
+                {
+                    Debug.Log(p.PropertyAlias);
+                }
                 if(p.configurationName != "")
                 {
-                    Debug.Log("changing " + p.PropertyAlias);
+                    if (Utility.SensorsManager.DEBUG_TE)
+                    {
+                        Debug.Log("changing " + p.PropertyAlias);
+                    }
                     string old = p.PropertyAlias;
                     p.PropertyAlias = ConfigurationName+ p.PropertyAlias.Substring(p.configurationName.Length);
                     p.configurationName = ConfigurationName;
                     PropertyAliasChanged(old, p.PropertyAlias);
-                    Debug.Log("changed " + p.PropertyAlias);
+                    if (Utility.SensorsManager.DEBUG_TE)
+                    {
+                        Debug.Log("changed " + p.PropertyAlias);
+                    }
                 }
             }
         }

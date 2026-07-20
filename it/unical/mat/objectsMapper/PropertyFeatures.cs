@@ -52,19 +52,28 @@ namespace ThinkEngine
         {
             if(_propertyAlias == value)
             {
-                Debug.Log("SAME VALUE! "+_propertyAlias+" "+value);
+                if (Utility.SensorsManager.DEBUG_TE)
+                {
+                    Debug.Log("SAME VALUE! " + _propertyAlias + " " + value);
+                }
                 return;
             }
             if (usedPropertyAlias.Contains(value.GetHashCode()))
             {
-                Debug.Log("THROWING!");
+                if (Utility.SensorsManager.DEBUG_TE)
+                {
+                    Debug.Log("THROWING!");
+                }
                 throw new Exception("InvalidName");
             }
             if(_propertyAlias!=null && usedPropertyAlias.Contains(propertyAliasHash))
             {
                 usedPropertyAlias.Remove(propertyAliasHash);
             }
-            Debug.Log("setting _property_name to " + value);
+            if (Utility.SensorsManager.DEBUG_TE)
+            {
+                Debug.Log("setting _property_name to " + value);
+            }
             if (!value.StartsWith(configurationName))
             {
                 configurationName = "";
@@ -80,7 +89,10 @@ namespace ThinkEngine
             configurationName = confName;
             string suffix ="";
             int count = 0;
-            Debug.Log(property);
+            if (Utility.SensorsManager.DEBUG_TE)
+            {
+                Debug.Log(property);
+            }
             if (property.Count > 0)
             {
                 count = property.Count - 1;

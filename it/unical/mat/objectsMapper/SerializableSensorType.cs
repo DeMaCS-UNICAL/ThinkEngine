@@ -30,13 +30,22 @@ namespace ThinkEngine
         public SerializableSensorType(MonoScript retrieved)
         {
             string type = retrieved.GetClass()?.AssemblyQualifiedName;
-            Debug.Log("trying serialize "+type);
+            if (Utility.SensorsManager.DEBUG_TE)
+            {
+                Debug.Log("trying serialize " + type);
+            }
             if (TypeIsValid(type))
             {
-                Debug.Log("is valid");
+                if (Utility.SensorsManager.DEBUG_TE)
+                {
+                    Debug.Log("is valid");
+                }
                 //ScriptType = Type.GetType(type);
                 typeName = type;
-                Debug.Log("scripttype is "+ScriptType);
+                if (Utility.SensorsManager.DEBUG_TE)
+                {
+                    Debug.Log("scripttype is " + ScriptType);
+                }
             }
             else
             {

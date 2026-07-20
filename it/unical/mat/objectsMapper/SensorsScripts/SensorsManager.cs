@@ -26,6 +26,7 @@ namespace ThinkEngine
         public int MIN_CURRENT_FPS;
         public int MAX_AVG_FPS;
         public int MAX_CURRENT_FPS;
+        public bool DEBUG_TE;
         internal static int MAX_MS = 5;
         internal List<float> MOVING_AVG_FRAMES;
         private float currentFps;
@@ -38,6 +39,7 @@ namespace ThinkEngine
         internal static int frameCount = 0;
         internal static bool destroyed;
         internal static int _iteration=0;
+        
         public static int iteration { get { return _iteration; } }
         private static Dictionary<Brain, List<string>> InstantiatedSensors
         {
@@ -87,6 +89,7 @@ namespace ThinkEngine
         private static float _maxDeltaSeconds = 0;
         private static int _maxNumberOfSensorPerUpdate = 0;
         private static float _deltaSensorsCycle = 0;
+        private static bool _dirtySensors = false;
         internal static void SubscribeSensors(List<Sensor> listOfGeneratedSensors, string configurationName)
         {
             /*
@@ -106,6 +109,7 @@ namespace ThinkEngine
             }
             _sensorsInstances[configurationName].AddRange(listOfGeneratedSensors);
             _sensorCount += listOfGeneratedSensors.Count;
+            _dirtySensors = true;
         }
 
         internal static void UnsubscribeSensors(List<Sensor> listOfGeneratedSensors, string configurationName)
@@ -120,6 +124,7 @@ namespace ThinkEngine
             {
                 _sensorsInstances.Remove(configurationName);
             } 
+            _dirtySensors=true;
         }
 
         private void Start()
@@ -216,39 +221,54 @@ namespace ThinkEngine
                         {
                             fs.Write("Sensors: "+ _sensorsInstances.Values.Count + Environment.NewLine);
                         }*/
-                        foreach (List<Sensor> sensors in _sensorsInstances.Values)
+
+                        bool again = true;
+                        while (again)
                         {
-                            /*
-                            using (StreamWriter fs = new StreamWriter(Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", "Log.log"), true))
+                            again = false;
+                            foreach (List<Sensor> sensors in _sensorsInstances.Values)
                             {
-                                fs.Write("sensors list count "+sensors.Count + Environment.NewLine);
-                            }*/
-                            for (int i = 0; i < sensors.Count; i++)
-                            {
-                                if (sensors[i] == null)
-                                {/*
+                                /*
+                                using (StreamWriter fs = new StreamWriter(Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", "Log.log"), true))
+                                {
+                                    fs.Write("sensors list count "+sensors.Count + Environment.NewLine);
+                                }*/
+                                for (int i = 0; i < sensors.Count; i++)
+                                {
+                                    if (sensors[i] == null)
+                                    {/*
                                     using (StreamWriter fs = new StreamWriter(Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", "Log.log"), true))
                                     {
                                         fs.Write("Sensor is null"+Environment.NewLine);
 
                                     }*/
-                                    continue;
+                                        continue;
+                                    }
+                                    sensors[i].Update();
+                                    sensorUpdatedCount++;
+                                    /*
+                                    using (StreamWriter fs = new StreamWriter(Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", "Log.log"), true))
+                                    {
+                                        fs.Write("Sensor: " + sensors[i]);
+                                    }*/
+                                    if (sensorUpdatedCount >= _maxNumberOfSensorPerUpdate)
+                                    {
+                                        _deltaSensorsCycle = (float)_stopwatchManager.TakeDeltaTime(startTime);
+
+                                        yield return new WaitForEndOfFrame();
+                                        sensorUpdatedCount = 0;
+                                        startTime = _stopwatchManager.TakeCurrentTime();
+                                        if (_dirtySensors)
+                                        {
+                                            _dirtySensors = false;
+                                            again = true;
+                                            break;
+                                        }
+                                    }
                                 }
-                                sensors[i].Update();
-                                sensorUpdatedCount++;
-                                /*
-                                using (StreamWriter fs = new StreamWriter(Path.Combine(Path.GetTempPath(), "ThinkEngineFacts", "Log.log"), true))
+                                if (again)
                                 {
-                                    fs.Write("Sensor: " + sensors[i]);
-                                }*/
-                                if (sensorUpdatedCount >= _maxNumberOfSensorPerUpdate)
-                                {
-                                    _deltaSensorsCycle = (float)_stopwatchManager.TakeDeltaTime(startTime);
-
-                                    yield return new WaitForEndOfFrame();
-
-                                    sensorUpdatedCount = 0;
-                                    startTime = _stopwatchManager.TakeCurrentTime();
+                                    break;
                                 }
                             }
                         }

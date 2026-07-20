@@ -111,18 +111,30 @@ namespace ThinkEngine
             Regex regex = new Regex(@pattern);
             foreach (string literal in answerSet.GetAnswerSet())
             {
-                Debug.Log(literal+ "     VS      "+mappingToCompare);
+                if (Utility.ActuatorsManager.DEBUG_ACTUATORS)
+                {
+                    Debug.Log(literal + "     VS      " + mappingToCompare);
+                }
                 string literalPrefix = literal.Substring(0, Math.Min(mappingToCompare.Length, literal.Length));
                 Match matcher = regex.Match(literalPrefix);
                 if (matcher.Success && int.Parse(matcher.Groups[1].Value) == gameObject.GetInstanceID())//if the index of the object associated to the actuator is different from the one of the literal
                 {
-                    Debug.Log("Regex matched");
+                    if (Utility.ActuatorsManager.DEBUG_ACTUATORS)
+                    {
+                        Debug.Log("Regex matched");
+                    }
                     if (literalPrefix.Contains(mappingToCompare))
                     {
-                    Debug.Log("Full match");
+                        if (Utility.ActuatorsManager.DEBUG_ACTUATORS)
+                        {
+                            Debug.Log("Full match");
+                        }
                         string partialRes = literal.Substring(mappingToCompare.Length);
                         partialRes = partialRes.Remove(partialRes.IndexOf(suffix));
-                        Debug.Log(partialRes);
+                        if (Utility.ActuatorsManager.DEBUG_ACTUATORS)
+                        {
+                            Debug.Log(partialRes);
+                        }
 
                         return partialRes.Trim('\"', ' ');//trim " to avoid conversion problems
                     }

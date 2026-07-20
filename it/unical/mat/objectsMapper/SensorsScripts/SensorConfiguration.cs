@@ -53,11 +53,28 @@ namespace ThinkEngine
 
         void Awake()
         {
+#if UNITY_EDITOR
+            _serializableSensorsTypes.Clear();
+            foreach (PropertyFeatures pF in PropertyFeaturesList)
+            {
+
+                MonoScript retrieved = AssetDatabase.LoadAssetAtPath(Path.Combine("Assets", "Scripts", "GeneratedCode", pF.PropertyAlias + ".cs"), typeof(MonoScript)) as MonoScript;
+                if (retrieved != null)
+                {
+                    _serializableSensorsTypes.Add(new SerializableSensorType(retrieved));
+                    if (Utility.SensorsManager.DEBUG_TE)
+                    {
+                        Debug.Log(_serializableSensorsTypes[_serializableSensorsTypes.Count - 1].ScriptType);
+                    }
+                }
+            }
+#endif
             if (Application.isPlaying)
             {
    
                 foreach (SerializableSensorType serializableSensorType in _serializableSensorsTypes)
                 {
+                    
                     //                   _sensorsInstances.Add((Sensor)serializableSensorType.ScriptType.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null));
                     
                         _sensorsInstances.Add((Sensor)Activator.CreateInstance(serializableSensorType.ScriptType));
@@ -65,7 +82,10 @@ namespace ThinkEngine
                     {
                         fs.Write(_sensorsInstances[_sensorsInstances.Count - 1] + Environment.NewLine);
                     }*/
-                    Debug.Log(_sensorsInstances[_sensorsInstances.Count - 1]);
+                    if (Utility.SensorsManager.DEBUG_TE)
+                    {
+                        Debug.Log(_sensorsInstances[_sensorsInstances.Count - 1]);
+                    }
 
                 }
                 foreach (Sensor instance in _sensorsInstances)
@@ -88,7 +108,10 @@ namespace ThinkEngine
                         {
                             if (pF.PropertyAlias == oldAlias)
                             {
-                                Debug.Log("Changing name to " + s.gameObject);
+                                if (Utility.SensorsManager.DEBUG_TE)
+                                {
+                                    Debug.Log("Changing name to " + s.gameObject);
+                                }
                                 pF.AssignPropertyAliasWithoutValidation( newAlias);
                                 CodeGenerator.Rename(oldAlias, newAlias, s);
                                 break;
@@ -106,30 +129,25 @@ namespace ThinkEngine
 #endif
         static void Reload()
         {
-            Debug.Log("Did Reload");
-            if (Instance == null)
+            if (Utility.SensorsManager.DEBUG_TE)
+            {
+                Debug.Log("Did Reload");
+            }
+            if (Instance == null && Utility.SensorsManager.DEBUG_TE)
             {
                 Debug.Log("Instance is null.");
             }
-            else if (Instance.teRecompile)
+            else if (Instance.teRecompile && Utility.SensorsManager.DEBUG_TE)
             {
                 Debug.Log("TE recompiled.");
                 Instance.teRecompile = false;
             }
-            else
+            else if(Utility.SensorsManager.DEBUG_TE)
             {
                 Debug.Log("Forcing TE recompile.");
                 Instance.teRecompile=true;
                 Instance.forceRecompile=true;
                 return;
-            }
-
-            foreach (SensorConfiguration sensorConfiguration in Resources.FindObjectsOfTypeAll<SensorConfiguration>())
-            {
-                if (sensorConfiguration != null)
-                {
-                    CodeGenerator.AttachSensorsScripts(sensorConfiguration);
-                }
             }
         }
         static void Recompile()
@@ -311,7 +329,6 @@ namespace ThinkEngine
 
         private void Recompiling()
         {
-            Debug.LogWarning("Compiling " + ConfigurationName + " generated scripts.");
             recompile = false;
             //CompilationPipeline.RequestScriptCompilation();
             if (Instance != null)
